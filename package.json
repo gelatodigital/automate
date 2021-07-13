@@ -1,0 +1,35 @@
+{
+  "name": "task-store",
+  "version": "1.0.0",
+  "description": "",
+  "main": "hardhat.config.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "devDependencies": {
+    "@nomiclabs/hardhat-ethers": "^2.0.2",
+    "@nomiclabs/hardhat-waffle": "^2.0.1",
+    "@openzeppelin/contracts": "^4.2.0",
+    "@uniswap/v3-core": "1.0.0",
+    "@uniswap/v3-periphery": "1.1.0",
+    "chai": "^4.3.4",
+    "dotenv": "^8.2.0",
+    "eslint": "7.14.0",
+    "eslint-config-prettier": "6.15.0",
+    "ethereum-waffle": "^3.4.0",
+    "ethers": "^5.4.1",
+    "hardhat": "^2.4.3",
+    "hardhat-deploy": "^0.8.6",
+    "hardhat-deploy-ethers": "^0.3.0-beta.10",
+    "hardhat-gas-reporter": "^1.0.4",
+    "lint-staged": "10.5.2",
+    "prettier": "^2.1.2",
+    "prettier-plugin-solidity": "^1.0.0-alpha.60",
+    "solhint": "^3.3.2",
+    "solhint-plugin-prettier": "^0.0.5",
+    "solidity-coverage": "0.7.14"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {}
+}

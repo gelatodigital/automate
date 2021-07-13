@@ -1,0 +1,20 @@
+# Dependency directory
+node_modules
+
+# local env variables
+.env
+
+#hardhat
+artifacts/
+cache/
+
+# ESLint
+.eslintcache
+
+# macOS
+.DS_Store
+*.icloud
+
+# yarn
+yarn-error.log
+package-lock.json
