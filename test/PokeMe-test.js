@@ -34,34 +34,22 @@ describe("PokeMe Test", async function () {
     });
     executor = await ethers.provider.getSigner(executorAddress);
 
-    taskData = await resolver.interface.encodeFunctionData(
-      "genPayloadAndCanExec",
-      [3]
-    );
-    await expect(
-      taskStore
-        .connect(user)
-        .createTask(resolver.address, taskData, counter.address)
-    )
+    taskData = await counter.interface.encodeFunctionData("increaseCount", [3]);
+
+    await expect(taskStore.connect(user).createTask(taskData, counter.address))
       .to.emit(taskStore, "TaskCreated")
-      .withArgs(resolver.address, taskData, counter.address);
+      .withArgs(taskData, counter.address);
   });
 
   it("check create and cancel task", async () => {
     await expect(
-      taskStore
-        .connect(user)
-        .createTask(resolver.address, taskData, counter.address)
+      taskStore.connect(user).createTask(taskData, counter.address)
     ).to.be.revertedWith("PokeMe: createTask: Sender already started task");
 
-    await taskStore
-      .connect(user)
-      .cancelTask(resolver.address, taskData, counter.address);
+    await taskStore.connect(user).cancelTask(taskData, counter.address);
 
     await expect(
-      taskStore
-        .connect(user)
-        .cancelTask(resolver.address, taskData, counter.address)
+      taskStore.connect(user).cancelTask(taskData, counter.address)
     ).to.be.revertedWith("PokeMe: cancelTask: Sender did not start task yet");
   });
 
@@ -81,25 +69,25 @@ describe("PokeMe Test", async function () {
     );
   });
 
-  it("get payload from task", async () => {
-    const iface = new ethers.utils.Interface([generalGenPayload]);
+  // it("get payload from task", async () => {
+  //   const iface = new ethers.utils.Interface([generalGenPayload]);
 
-    const payload = await ethers.provider.call({
-      to: resolver.address,
-      data: taskData,
-    });
+  //   const payload = await ethers.provider.call({
+  //     to: resolver.address,
+  //     data: taskData,
+  //   });
 
-    // genPayloadAndCanExec must return
-    //   address _execAddress,
-    //   bytes memory _execData,
-    //   bool _canExec
+  //   // genPayloadAndCanExec must return
+  //   //   address _execAddress,
+  //   //   bytes memory _execData,
+  //   //   bool _canExec
 
-    res = iface.decodeFunctionResult("generalGenPayload", payload);
+  //   res = iface.decodeFunctionResult("generalGenPayload", payload);
 
-    const execData = res._execData;
+  //   const execData = res._execData;
 
-    console.log(execData);
-  });
+  //   console.log(execData);
+  // });
 
   it("canExec should be true, caller does not have balance", async () => {
     const THREE_MIN = 3 * 60;
@@ -112,27 +100,10 @@ describe("PokeMe Test", async function () {
 
     expect(time_after - time_before).to.be.eql(THREE_MIN);
 
-    const iface = new ethers.utils.Interface([generalGenPayload]);
-
-    const payload = await ethers.provider.call({
-      to: resolver.address,
-      data: taskData,
-    });
-
-    res = iface.decodeFunctionResult("generalGenPayload", payload);
-
-    const execData = res._execData;
-
     await expect(
       taskStore
         .connect(executor)
-        .exec(
-          resolver.address,
-          taskData,
-          counter.address,
-          execData,
-          ethers.utils.parseEther("1")
-        )
+        .exec(taskData, counter.address, ethers.utils.parseEther("1"))
     ).to.be.reverted;
   });
 
@@ -147,17 +118,6 @@ describe("PokeMe Test", async function () {
 
     expect(time_after - time_before).to.be.eql(THREE_MIN);
 
-    const iface = new ethers.utils.Interface([generalGenPayload]);
-
-    const payload = await ethers.provider.call({
-      to: resolver.address,
-      data: taskData,
-    });
-
-    res = iface.decodeFunctionResult("generalGenPayload", payload);
-
-    const execData = res._execData;
-
     expect(await counter.count()).to.be.eql(ethers.BigNumber.from("0"));
 
     await taskStore
@@ -170,13 +130,7 @@ describe("PokeMe Test", async function () {
 
     await taskStore
       .connect(executor)
-      .exec(
-        resolver.address,
-        taskData,
-        counter.address,
-        execData,
-        ethers.utils.parseEther("1")
-      );
+      .exec(taskData, counter.address, ethers.utils.parseEther("1"));
 
     expect(await counter.count()).to.be.eql(ethers.BigNumber.from("3"));
     expect(
@@ -187,13 +141,7 @@ describe("PokeMe Test", async function () {
     await expect(
       taskStore
         .connect(executor)
-        .exec(
-          resolver.address,
-          taskData,
-          counter.address,
-          execData,
-          ethers.utils.parseEther("1")
-        )
+        .exec(taskData, counter.address, ethers.utils.parseEther("1"))
     ).to.be.revertedWith("PokeMe: exec: Execution failed");
   });
 });

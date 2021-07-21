@@ -13,20 +13,10 @@ contract PokeMe is ReentrancyGuard, Gelatofied {
 
   constructor(address payable _gelato) Gelatofied(_gelato) {}
 
-  event TaskCreated(
-    address resolverAddress,
-    bytes taskData,
-    address taskAddress
-  );
+  event TaskCreated(bytes taskData, address taskAddress);
 
-  function createTask(
-    address _resolverAddress,
-    bytes calldata _taskData,
-    address _execAddress
-  ) external {
-    bytes32 _task = keccak256(
-      abi.encode(_resolverAddress, _taskData, _execAddress)
-    );
+  function createTask(bytes calldata _taskData, address _taskAddress) external {
+    bytes32 _task = keccak256(abi.encode(_taskData, _taskAddress));
 
     require(
       calleeOfTask[_task] == address(0),
@@ -35,17 +25,11 @@ contract PokeMe is ReentrancyGuard, Gelatofied {
 
     calleeOfTask[_task] = msg.sender;
 
-    emit TaskCreated(_resolverAddress, _taskData, _execAddress);
+    emit TaskCreated(_taskData, _taskAddress);
   }
 
-  function cancelTask(
-    address _resolverAddress,
-    bytes calldata _taskData,
-    address _execAddress
-  ) external {
-    bytes32 _task = keccak256(
-      abi.encode(_resolverAddress, _taskData, _execAddress)
-    );
+  function cancelTask(bytes calldata _taskData, address _taskAddress) external {
+    bytes32 _task = keccak256(abi.encode(_taskData, _taskAddress));
 
     require(
       calleeOfTask[_task] != address(0),
@@ -56,20 +40,16 @@ contract PokeMe is ReentrancyGuard, Gelatofied {
   }
 
   function exec(
-    address _resolverAddress,
     bytes calldata _taskData,
-    address _execAddress,
-    bytes calldata _execData,
+    address _taskAddress,
     uint256 _txFee
   ) external gelatofy(_txFee, ETH) {
-    bytes32 _task = keccak256(
-      abi.encode(_resolverAddress, _taskData, _execAddress)
-    );
+    bytes32 _task = keccak256(abi.encode(_taskData, _taskAddress));
 
     address _callee = calleeOfTask[_task];
     require(_callee != address(0), "PokeMe: exec: No task found");
 
-    (bool success, ) = _execAddress.call(_execData);
+    (bool success, ) = _taskAddress.call(_taskData);
     require(success, "PokeMe: exec: Execution failed");
 
     uint256 _balanceOfCallee = balanceOfCallee[_callee];
