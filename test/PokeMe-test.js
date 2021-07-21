@@ -68,7 +68,7 @@ describe("PokeMe Test", async function () {
   it("deposit and withdraw funds", async () => {
     await taskStore
       .connect(user)
-      .depositFunds({ value: ethers.utils.parseEther("1") });
+      .depositFunds(userAddress, { value: ethers.utils.parseEther("1") });
 
     expect(await taskStore.balanceOfCallee(userAddress)).to.be.eql(
       ethers.utils.parseEther("1")
@@ -162,7 +162,7 @@ describe("PokeMe Test", async function () {
 
     await taskStore
       .connect(user)
-      .depositFunds({ value: ethers.utils.parseEther("1") });
+      .depositFunds(userAddress, { value: ethers.utils.parseEther("1") });
 
     expect(
       await taskStore.connect(user).balanceOfCallee(userAddress)

@@ -77,10 +77,10 @@ contract PokeMe is ReentrancyGuard, Gelatofied {
     balanceOfCallee[_callee] = _balanceOfCallee.sub(_txFee);
   }
 
-  function depositFunds() external payable {
+  function depositFunds(address _receiver) external payable {
     require(msg.value != 0, "PokeMe: depositFunds: No ether sent");
 
-    balanceOfCallee[msg.sender] = balanceOfCallee[msg.sender].add(msg.value);
+    balanceOfCallee[_receiver] = balanceOfCallee[_receiver].add(msg.value);
   }
 
   function withdrawFunds(uint256 _amount) external nonReentrant {
@@ -91,9 +91,9 @@ contract PokeMe is ReentrancyGuard, Gelatofied {
       "PokeMe: withdrawFunds: Sender has insufficient balance"
     );
 
+    balanceOfCallee[msg.sender] = balance.sub(_amount);
+
     (bool success, ) = msg.sender.call{ value: _amount }("");
     require(success, "PokeMe: withdrawFunds: Withdraw funds failed");
-
-    balanceOfCallee[msg.sender] = balance.sub(_amount);
   }
 }
