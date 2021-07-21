@@ -19,7 +19,7 @@ contract PokeMe is ReentrancyGuard {
     gelato = IGelato(_gelato);
   }
 
-  event TaskCreated(address taskContract, bytes taskData);
+  event TaskCreated(address resolverAddress, bytes taskData);
 
   function createTask(address _resolverAddress, bytes calldata _taskData)
     external
