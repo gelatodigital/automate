@@ -7,11 +7,9 @@ async function main() {
   const _counter = await ethers.getContractFactory("Counter");
 
   const PokeMe = await _PokeMe.deploy(gelatoAddress);
-  await PokeMe.deployed();
   console.log("PokeMe address: ", PokeMe.address);
 
   const counter = await _counter.deploy();
-  await counter.deployed();
   console.log("Counter address: ", counter.address);
 }
 

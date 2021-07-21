@@ -1,8 +1,7 @@
 const { ethers } = require("hardhat");
-const { task } = require("hardhat/config");
 
-const POKEME_ADDRESS = "0xcc9a86297f61203A17F3CffE8686E7eD27c37b3a";
-const COUNTER_ADDRESS = "0xf2bd58B64b9b44a4c32E2d20B1A83Bdd559A727e";
+const POKEME_ADDRESS = "0x70921EFA654b7a30CC02279866a9644510726550";
+const COUNTER_ADDRESS = "0x3e3a46586e19a0dc721e42455cBd9E395706b4e4";
 
 async function main() {
   [user] = await hre.ethers.getSigners();
@@ -14,15 +13,31 @@ async function main() {
 
   let txn = await pokeme.depositFunds(userAddress, {
     value: ethers.utils.parseEther("0.1"),
+    gasLimit: 1000000,
+    gasPrice: ethers.utils.parseUnits("2", "gwei"),
   });
-  await txn.wait();
+  let res = await txn.wait();
+  console.log(res);
 
   const taskData = await counter.interface.encodeFunctionData("increaseCount", [
     1,
   ]);
 
-  txn = await pokeme.createTask(counter.address, taskData);
+  txn = await pokeme.createTask(counter.address, taskData, {
+    gasLimit: 1000000,
+    gasPrice: ethers.utils.parseUnits("2", "gwei"),
+  });
   await txn.wait();
+
+  res = await txn.wait();
+  console.log(res);
+
+  // txn = await pokeme.cancelTask(counter.address, taskData, {
+  //   gasLimit: 1000000,
+  //   gasPrice: ethers.utils.parseUnits("2", "gwei"),
+  // });
+  // res = await txn.wait();
+  // console.log(res);
 }
 
 main()
