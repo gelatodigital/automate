@@ -5,7 +5,7 @@ import { ReentrancyGuard } from "@openzeppelin/contracts/security/ReentrancyGuar
 import { SafeMath } from "@openzeppelin/contracts/utils/math/SafeMath.sol";
 import { IGelato } from "./interfaces/IGelato.sol";
 
-contract TaskStore is ReentrancyGuard {
+contract PokeMe is ReentrancyGuard {
   using SafeMath for uint256;
 
   uint256 public txFee;
@@ -21,55 +21,60 @@ contract TaskStore is ReentrancyGuard {
 
   event TaskCreated(address taskContract, bytes taskData);
 
-  function createTask(address _taskContract, bytes calldata _taskData)
+  function createTask(address _resolverAddress, bytes calldata _taskData)
     external
   {
-    bytes32 _task = keccak256(abi.encode(_taskContract, _taskData));
+    bytes32 _task = keccak256(abi.encode(_resolverAddress, _taskData));
 
     require(
       calleeOfTask[_task] == address(0),
-      "TaskStore: createTask: Sender already started task"
+      "PokeMe: createTask: Sender already started task"
     );
 
     calleeOfTask[_task] = msg.sender;
 
-    emit TaskCreated(_taskContract, _taskData);
+    emit TaskCreated(_resolverAddress, _taskData);
   }
 
-  function cancelTask(address _taskContract, bytes calldata _taskData)
+  function cancelTask(address _resolverAddress, bytes calldata _taskData)
     external
   {
-    bytes32 _task = keccak256(abi.encode(_taskContract, _taskData));
+    bytes32 _task = keccak256(abi.encode(_resolverAddress, _taskData));
 
     require(
       calleeOfTask[_task] != address(0),
-      "TaskStore: cancelTask: Sender did not start task yet"
+      "PokeMe: cancelTask: Sender did not start task yet"
     );
 
     delete calleeOfTask[_task];
   }
 
-  function exec(address _taskContract, bytes calldata _taskData) external {
-    require(gelato.isExecutor(msg.sender), "TaskStore: exec: Only executors");
+  function exec(
+    address _resolverAddress,
+    bytes calldata _taskData,
+    address _execAddress,
+    bytes calldata _execData
+  ) external {
+    require(gelato.isExecutor(msg.sender), "PokeMe: exec: Only executors");
 
-    bytes32 _task = keccak256(abi.encode(_taskContract, _taskData));
+    bytes32 _task = keccak256(abi.encode(_resolverAddress, _taskData));
 
     address _callee = calleeOfTask[_task];
-    require(_callee != address(0), "TaskStore: cancelTask: No task found");
+    require(_callee != address(0), "PokeMe: cancelTask: No task found");
 
     address _sponsor = sponsorOfCallee[_callee];
-    require(_sponsor != address(0), "TaskStore: exec: No sponsor");
+    require(_sponsor != address(0), "PokeMe: exec: No sponsor");
 
     uint256 _balanceOfSponsor = balanceOfSponsor[_sponsor];
     require(
       _balanceOfSponsor >= txFee,
-      "TaskStore: exec: Sponsor insufficient balance"
+      "PokeMe: exec: Sponsor insufficient balance"
     );
 
-    _taskContract.call(_taskData);
+    _execAddress.call(_execData);
 
     (bool success, ) = msg.sender.call{ value: txFee }("");
-    require(success, "TaskStore: exec: Transfer to executor failed");
+    require(success, "PokeMe: exec: Transfer to executor failed");
 
     balanceOfSponsor[_sponsor] = _balanceOfSponsor.sub(txFee);
   }
@@ -77,11 +82,11 @@ contract TaskStore is ReentrancyGuard {
   function whitelistCallee(address _callee) external {
     require(
       balanceOfSponsor[msg.sender] > 0,
-      "TaskStore: whitelistCallee: Sponsor does not have balance"
+      "PokeMe: whitelistCallee: Sponsor does not have balance"
     );
     require(
       sponsorOfCallee[_callee] == address(0),
-      "TaskStore: whitelistCallee: Callee already have sponsor"
+      "PokeMe: whitelistCallee: Callee already have sponsor"
     );
 
     sponsorOfCallee[_callee] = msg.sender;
@@ -90,14 +95,14 @@ contract TaskStore is ReentrancyGuard {
   function removeWhitelist(address _callee) external {
     require(
       sponsorOfCallee[_callee] == msg.sender,
-      "TaskStore: removeWhitelist: Not sponsor of callee"
+      "PokeMe: removeWhitelist: Not sponsor of callee"
     );
 
     delete sponsorOfCallee[_callee];
   }
 
   function depositFunds() external payable {
-    require(msg.value != 0, "TaskStore: depositFunds: No ether sent");
+    require(msg.value != 0, "PokeMe: depositFunds: No ether sent");
 
     balanceOfSponsor[msg.sender] = balanceOfSponsor[msg.sender].add(msg.value);
   }
@@ -107,11 +112,11 @@ contract TaskStore is ReentrancyGuard {
 
     require(
       balance >= _amount,
-      "TaskStore: withdrawFunds: Sender has insufficient balance"
+      "PokeMe: withdrawFunds: Sender has insufficient balance"
     );
 
     (bool success, ) = msg.sender.call{ value: _amount }("");
-    require(success, "TaskStore: withdrawFunds: Withdraw funds failed");
+    require(success, "PokeMe: withdrawFunds: Withdraw funds failed");
 
     balanceOfSponsor[msg.sender] = balance.sub(_amount);
   }
