@@ -8,14 +8,10 @@ import { SafeMath } from "@openzeppelin/contracts/utils/math/SafeMath.sol";
 contract PokeMe is ReentrancyGuard, Gelatofied {
   using SafeMath for uint256;
 
-  uint256 public txFee;
   mapping(bytes32 => address) public calleeOfTask;
-  mapping(address => uint256) public balanceOfSponsor;
-  mapping(address => address) public sponsorOfCallee;
+  mapping(address => uint256) public balanceOfCallee;
 
-  constructor(uint256 _txFee, address payable _gelato) Gelatofied(_gelato) {
-    txFee = _txFee;
-  }
+  constructor(address payable _gelato) Gelatofied(_gelato) {}
 
   event TaskCreated(
     address resolverAddress,
@@ -63,8 +59,9 @@ contract PokeMe is ReentrancyGuard, Gelatofied {
     address _resolverAddress,
     bytes calldata _taskData,
     address _execAddress,
-    bytes calldata _execData
-  ) external gelatofy(txFee, ETH) {
+    bytes calldata _execData,
+    uint256 _txFee
+  ) external gelatofy(_txFee, ETH) {
     bytes32 _task = keccak256(
       abi.encode(_resolverAddress, _taskData, _execAddress)
     );
@@ -72,46 +69,22 @@ contract PokeMe is ReentrancyGuard, Gelatofied {
     address _callee = calleeOfTask[_task];
     require(_callee != address(0), "PokeMe: exec: No task found");
 
-    address _sponsor = sponsorOfCallee[_callee];
-
     (bool success, ) = _execAddress.call(_execData);
     require(success, "PokeMe: exec: Execution failed");
 
-    uint256 _balanceOfSponsor = balanceOfSponsor[_sponsor];
+    uint256 _balanceOfCallee = balanceOfCallee[_callee];
 
-    balanceOfSponsor[_sponsor] = _balanceOfSponsor.sub(txFee);
-  }
-
-  function whitelistCallee(address _callee) external {
-    require(
-      balanceOfSponsor[msg.sender] > 0,
-      "PokeMe: whitelistCallee: Sponsor does not have balance"
-    );
-    require(
-      sponsorOfCallee[_callee] == address(0),
-      "PokeMe: whitelistCallee: Callee already have sponsor"
-    );
-
-    sponsorOfCallee[_callee] = msg.sender;
-  }
-
-  function removeWhitelist(address _callee) external {
-    require(
-      sponsorOfCallee[_callee] == msg.sender,
-      "PokeMe: removeWhitelist: Not sponsor of callee"
-    );
-
-    delete sponsorOfCallee[_callee];
+    balanceOfCallee[_callee] = _balanceOfCallee.sub(_txFee);
   }
 
   function depositFunds() external payable {
     require(msg.value != 0, "PokeMe: depositFunds: No ether sent");
 
-    balanceOfSponsor[msg.sender] = balanceOfSponsor[msg.sender].add(msg.value);
+    balanceOfCallee[msg.sender] = balanceOfCallee[msg.sender].add(msg.value);
   }
 
   function withdrawFunds(uint256 _amount) external nonReentrant {
-    uint256 balance = balanceOfSponsor[msg.sender];
+    uint256 balance = balanceOfCallee[msg.sender];
 
     require(
       balance >= _amount,
@@ -121,6 +94,6 @@ contract PokeMe is ReentrancyGuard, Gelatofied {
     (bool success, ) = msg.sender.call{ value: _amount }("");
     require(success, "PokeMe: withdrawFunds: Withdraw funds failed");
 
-    balanceOfSponsor[msg.sender] = balance.sub(_amount);
+    balanceOfCallee[msg.sender] = balance.sub(_amount);
   }
 }

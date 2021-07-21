@@ -22,10 +22,7 @@ describe("PokeMe Test", async function () {
     _counter = await ethers.getContractFactory("Counter");
     _resolver = await ethers.getContractFactory("Resolver");
 
-    taskStore = await _taskStore.deploy(
-      ethers.utils.parseEther("1"),
-      gelatoDiamondAddress
-    );
+    taskStore = await _taskStore.deploy(gelatoDiamondAddress);
     counter = await _counter.deploy();
     resolver = await _resolver.deploy();
 
@@ -70,18 +67,16 @@ describe("PokeMe Test", async function () {
 
   it("deposit and withdraw funds", async () => {
     await taskStore
-      .connect(sponsor)
+      .connect(user)
       .depositFunds({ value: ethers.utils.parseEther("1") });
 
-    expect(await taskStore.balanceOfSponsor(sponsorAddress)).to.be.eql(
+    expect(await taskStore.balanceOfCallee(userAddress)).to.be.eql(
       ethers.utils.parseEther("1")
     );
 
-    await taskStore
-      .connect(sponsor)
-      .withdrawFunds(ethers.utils.parseEther("1"));
+    await taskStore.connect(user).withdrawFunds(ethers.utils.parseEther("1"));
 
-    expect(await taskStore.balanceOfSponsor(sponsorAddress)).to.be.eql(
+    expect(await taskStore.balanceOfCallee(userAddress)).to.be.eql(
       ethers.BigNumber.from("0")
     );
   });
@@ -106,7 +101,7 @@ describe("PokeMe Test", async function () {
     console.log(execData);
   });
 
-  it("canExec should be true, unhappy paths", async () => {
+  it("canExec should be true, caller does not have balance", async () => {
     const THREE_MIN = 3 * 60;
     const time_before = (await ethers.provider.getBlock()).timestamp;
 
@@ -129,25 +124,15 @@ describe("PokeMe Test", async function () {
     const execData = res._execData;
 
     await expect(
-      taskStore.connect(sponsor).whitelistCallee(userAddress)
-    ).to.be.revertedWith(
-      "PokeMe: whitelistCallee: Sponsor does not have balance"
-    );
-
-    await taskStore
-      .connect(sponsor)
-      .depositFunds({ value: ethers.utils.parseEther("1") });
-
-    await taskStore.connect(sponsor).whitelistCallee(userAddress);
-
-    await taskStore
-      .connect(sponsor)
-      .withdrawFunds(ethers.utils.parseEther("1"));
-
-    await expect(
       taskStore
         .connect(executor)
-        .exec(resolver.address, taskData, counter.address, execData)
+        .exec(
+          resolver.address,
+          taskData,
+          counter.address,
+          execData,
+          ethers.utils.parseEther("1")
+        )
     ).to.be.reverted;
   });
 
@@ -176,28 +161,39 @@ describe("PokeMe Test", async function () {
     expect(await counter.count()).to.be.eql(ethers.BigNumber.from("0"));
 
     await taskStore
-      .connect(sponsor)
+      .connect(user)
       .depositFunds({ value: ethers.utils.parseEther("1") });
 
     expect(
-      await taskStore.connect(sponsor).balanceOfSponsor(sponsorAddress)
+      await taskStore.connect(user).balanceOfCallee(userAddress)
     ).to.be.eql(ethers.utils.parseEther("1"));
-
-    await taskStore.connect(sponsor).whitelistCallee(userAddress);
 
     await taskStore
       .connect(executor)
-      .exec(resolver.address, taskData, counter.address, execData);
+      .exec(
+        resolver.address,
+        taskData,
+        counter.address,
+        execData,
+        ethers.utils.parseEther("1")
+      );
 
     expect(await counter.count()).to.be.eql(ethers.BigNumber.from("3"));
     expect(
-      await taskStore.connect(sponsor).balanceOfSponsor(sponsorAddress)
+      await taskStore.connect(user).balanceOfCallee(userAddress)
     ).to.be.eql(ethers.BigNumber.from("0"));
 
+    // time not elapsed
     await expect(
       taskStore
         .connect(executor)
-        .exec(resolver.address, taskData, counter.address, execData)
+        .exec(
+          resolver.address,
+          taskData,
+          counter.address,
+          execData,
+          ethers.utils.parseEther("1")
+        )
     ).to.be.revertedWith("PokeMe: exec: Execution failed");
   });
 });
