@@ -13,9 +13,10 @@ contract PokeMe is ReentrancyGuard, Gelatofied {
 
   constructor(address payable _gelato) Gelatofied(_gelato) {}
 
-  event TaskCreated(bytes taskData, address taskAddress);
+  event TaskCreated(address taskAddress, bytes taskData);
+  event TaskCancelled(address taskAddress, bytes taskData);
 
-  function createTask(bytes calldata _taskData, address _taskAddress) external {
+  function createTask(address _taskAddress, bytes calldata _taskData) external {
     bytes32 _task = keccak256(abi.encode(_taskData, _taskAddress));
 
     require(
@@ -25,10 +26,10 @@ contract PokeMe is ReentrancyGuard, Gelatofied {
 
     calleeOfTask[_task] = msg.sender;
 
-    emit TaskCreated(_taskData, _taskAddress);
+    emit TaskCreated(_taskAddress, _taskData);
   }
 
-  function cancelTask(bytes calldata _taskData, address _taskAddress) external {
+  function cancelTask(address _taskAddress, bytes calldata _taskData) external {
     bytes32 _task = keccak256(abi.encode(_taskData, _taskAddress));
 
     require(
@@ -37,12 +38,14 @@ contract PokeMe is ReentrancyGuard, Gelatofied {
     );
 
     delete calleeOfTask[_task];
+
+    emit TaskCancelled(_taskAddress, _taskData);
   }
 
   function exec(
-    bytes calldata _taskData,
+    uint256 _txFee,
     address _taskAddress,
-    uint256 _txFee
+    bytes calldata _taskData
   ) external gelatofy(_txFee, ETH) {
     bytes32 _task = keccak256(abi.encode(_taskData, _taskAddress));
 

@@ -1,8 +1,8 @@
 const { ethers } = require("hardhat");
+const { task } = require("hardhat/config");
 
-// const POKEME_ADDRESS = "0x642F5ACFE6897B5b82565CF22e8ee17972C57a9f";
-// const COUNTER_ADDRESS = "0x92cDca8c76FD91dcA40772509a8470B9Ce0b55B6";
-// const RESOLVER_ADDRESS = "0xc6c755302E71448c11b5041Cf5592AE993dfA288";
+const POKEME_ADDRESS = "0xcc9a86297f61203A17F3CffE8686E7eD27c37b3a";
+const COUNTER_ADDRESS = "0xf2bd58B64b9b44a4c32E2d20B1A83Bdd559A727e";
 
 async function main() {
   [user] = await hre.ethers.getSigners();
@@ -10,37 +10,21 @@ async function main() {
   console.log("User address: ", userAddress);
 
   const pokeme = await ethers.getContractAt("PokeMe", POKEME_ADDRESS, user);
-  const resolver = await ethers.getContractAt(
-    "Resolver",
-    RESOLVER_ADDRESS,
-    user
-  );
+  const counter = await ethers.getContractAt("Counter", COUNTER_ADDRESS, user);
 
-  let txn = await pokeme.depositFunds({
+  let txn = await pokeme.depositFunds(userAddress, {
     value: ethers.utils.parseEther("0.1"),
   });
   await txn.wait();
 
-  console.log(
-    "Sponsor balance: ",
-    (await pokeme.balanceOfSponsor(userAddress)).toString()
-  );
+  const taskData = await counter.interface.encodeFunctionData("increaseCount", [
+    1,
+  ]);
 
-  txn = await pokeme.whitelistCallee(userAddress);
-  await txn.wait();
-
-  console.log("Sponsor of user: ", await pokeme.sponsorOfCallee(userAddress));
-
-  const taskData = await resolver.interface.encodeFunctionData(
-    "genPayloadAndCanExec",
-    [1]
-  );
-  txn = await pokeme.createTask(RESOLVER_ADDRESS, taskData);
+  txn = await pokeme.createTask(counter.address, taskData);
   await txn.wait();
 }
 
-// We recommend this pattern to be able to use async/await everywhere
-// and properly handle errors.
 main()
   .then(() => process.exit(0))
   .catch((error) => {

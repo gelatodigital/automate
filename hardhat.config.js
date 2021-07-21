@@ -23,11 +23,7 @@ const ETHERSCAN_API = process.env.ETHERSCAN_API;
  */
 module.exports = {
   defaultNetwork: "hardhat",
-  gasReporter: {
-    enabled: process.env.REPORT_GAS ? true : false,
-    maxMethodDiff: 25,
-    coinmarketcap: process.env.COINMARKETCAP_API_KEY,
-  },
+
   networks: {
     hardhat: {
       // Standard config
@@ -37,7 +33,6 @@ module.exports = {
         blockNumber: 12645718,
       },
     },
-
     mainnet: {
       accounts: DEPLOYER_PK_MAINNET ? [DEPLOYER_PK_MAINNET] : [],
       chainId: 1,
