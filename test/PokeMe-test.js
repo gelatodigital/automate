@@ -3,7 +3,7 @@ const { expect } = require("chai");
 
 const gelatoDiamondAddress = "0x3caca7b48d0573d793d3b0279b5f0029180e83b6";
 const generalGenPayload =
-  " function generalGenPayload() external view returns (address _execAddress, bytes memory _execData, bool _canExec)";
+  " function generalGenPayload() external view returns (bytes memory _execData)";
 
 describe("PokeMe Test", async function () {
   let taskStore;
@@ -27,10 +27,9 @@ describe("PokeMe Test", async function () {
       gelatoDiamondAddress
     );
     counter = await _counter.deploy();
-    resolver = await _resolver.deploy(counter.address);
-    gelatoDiamond = await ethers.getContractAt("IGelato", gelatoDiamondAddress);
+    resolver = await _resolver.deploy();
 
-    executorAddress = (await gelatoDiamond.executors())[0];
+    executorAddress = gelatoDiamondAddress;
 
     await hre.network.provider.request({
       method: "hardhat_impersonateAccount",
@@ -42,20 +41,30 @@ describe("PokeMe Test", async function () {
       "genPayloadAndCanExec",
       [3]
     );
-    await expect(taskStore.connect(user).createTask(resolver.address, taskData))
+    await expect(
+      taskStore
+        .connect(user)
+        .createTask(resolver.address, taskData, counter.address)
+    )
       .to.emit(taskStore, "TaskCreated")
-      .withArgs(resolver.address, taskData);
+      .withArgs(resolver.address, taskData, counter.address);
   });
 
   it("check create and cancel task", async () => {
     await expect(
-      taskStore.connect(user).createTask(resolver.address, taskData)
+      taskStore
+        .connect(user)
+        .createTask(resolver.address, taskData, counter.address)
     ).to.be.revertedWith("PokeMe: createTask: Sender already started task");
 
-    await taskStore.connect(user).cancelTask(resolver.address, taskData);
+    await taskStore
+      .connect(user)
+      .cancelTask(resolver.address, taskData, counter.address);
 
     await expect(
-      taskStore.connect(user).cancelTask(resolver.address, taskData)
+      taskStore
+        .connect(user)
+        .cancelTask(resolver.address, taskData, counter.address)
     ).to.be.revertedWith("PokeMe: cancelTask: Sender did not start task yet");
   });
 
@@ -92,24 +101,21 @@ describe("PokeMe Test", async function () {
 
     res = iface.decodeFunctionResult("generalGenPayload", payload);
 
-    const execAddress = res._execAddress;
     const execData = res._execData;
-    const canExec = res._canExec;
 
-    expect(execAddress).to.be.eql(counter.address);
-    expect(canExec).to.be.eql(false);
+    console.log(execData);
   });
 
   it("canExec should be true, unhappy paths", async () => {
-    const FIVE_MIN = 5 * 60;
+    const THREE_MIN = 3 * 60;
     const time_before = (await ethers.provider.getBlock()).timestamp;
 
-    await network.provider.send("evm_increaseTime", [FIVE_MIN]);
+    await network.provider.send("evm_increaseTime", [THREE_MIN]);
     await network.provider.send("evm_mine", []);
 
     const time_after = (await ethers.provider.getBlock()).timestamp;
 
-    expect(time_after - time_before).to.be.eql(FIVE_MIN);
+    expect(time_after - time_before).to.be.eql(THREE_MIN);
 
     const iface = new ethers.utils.Interface([generalGenPayload]);
 
@@ -120,18 +126,7 @@ describe("PokeMe Test", async function () {
 
     res = iface.decodeFunctionResult("generalGenPayload", payload);
 
-    execAddress = res._execAddress;
-    execData = res._execData;
-    canExec = res._canExec;
-
-    expect(execAddress).to.be.eql(counter.address);
-    expect(canExec).to.be.eql(true);
-
-    await expect(
-      taskStore
-        .connect(executor)
-        .exec(resolver.address, taskData, execAddress, execData)
-    ).to.be.revertedWith("PokeMe: exec: No sponsor");
+    const execData = res._execData;
 
     await expect(
       taskStore.connect(sponsor).whitelistCallee(userAddress)
@@ -152,20 +147,20 @@ describe("PokeMe Test", async function () {
     await expect(
       taskStore
         .connect(executor)
-        .exec(resolver.address, taskData, execAddress, execData)
-    ).to.be.revertedWith("PokeMe: exec: Sponsor insufficient");
+        .exec(resolver.address, taskData, counter.address, execData)
+    ).to.be.reverted;
   });
 
   it("canExec should be true, executor should exec", async () => {
-    const FIVE_MIN = 5 * 60;
+    const THREE_MIN = 3 * 60;
     const time_before = (await ethers.provider.getBlock()).timestamp;
 
-    await network.provider.send("evm_increaseTime", [FIVE_MIN]);
+    await network.provider.send("evm_increaseTime", [THREE_MIN]);
     await network.provider.send("evm_mine", []);
 
     const time_after = (await ethers.provider.getBlock()).timestamp;
 
-    expect(time_after - time_before).to.be.eql(FIVE_MIN);
+    expect(time_after - time_before).to.be.eql(THREE_MIN);
 
     const iface = new ethers.utils.Interface([generalGenPayload]);
 
@@ -176,12 +171,7 @@ describe("PokeMe Test", async function () {
 
     res = iface.decodeFunctionResult("generalGenPayload", payload);
 
-    execAddress = res._execAddress;
-    execData = res._execData;
-    canExec = res._canExec;
-
-    expect(execAddress).to.be.eql(counter.address);
-    expect(canExec).to.be.eql(true);
+    const execData = res._execData;
 
     expect(await counter.count()).to.be.eql(ethers.BigNumber.from("0"));
 
@@ -197,11 +187,17 @@ describe("PokeMe Test", async function () {
 
     await taskStore
       .connect(executor)
-      .exec(resolver.address, taskData, execAddress, execData);
+      .exec(resolver.address, taskData, counter.address, execData);
 
     expect(await counter.count()).to.be.eql(ethers.BigNumber.from("3"));
     expect(
       await taskStore.connect(sponsor).balanceOfSponsor(sponsorAddress)
     ).to.be.eql(ethers.BigNumber.from("0"));
+
+    await expect(
+      taskStore
+        .connect(executor)
+        .exec(resolver.address, taskData, counter.address, execData)
+    ).to.be.revertedWith("PokeMe: exec: Execution failed");
   });
 });

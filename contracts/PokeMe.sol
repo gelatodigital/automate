@@ -1,30 +1,36 @@
 // SPDX-License-Identifier: UNLICENSED
 pragma solidity 0.8.0;
 
+import { Gelatofied } from "./Gelatofied.sol";
 import { ReentrancyGuard } from "@openzeppelin/contracts/security/ReentrancyGuard.sol";
 import { SafeMath } from "@openzeppelin/contracts/utils/math/SafeMath.sol";
-import { IGelato } from "./interfaces/IGelato.sol";
 
-contract PokeMe is ReentrancyGuard {
+contract PokeMe is ReentrancyGuard, Gelatofied {
   using SafeMath for uint256;
 
   uint256 public txFee;
-  IGelato public immutable gelato;
   mapping(bytes32 => address) public calleeOfTask;
   mapping(address => uint256) public balanceOfSponsor;
   mapping(address => address) public sponsorOfCallee;
 
-  constructor(uint256 _txFee, address _gelato) {
+  constructor(uint256 _txFee, address payable _gelato) Gelatofied(_gelato) {
     txFee = _txFee;
-    gelato = IGelato(_gelato);
   }
 
-  event TaskCreated(address resolverAddress, bytes taskData);
+  event TaskCreated(
+    address resolverAddress,
+    bytes taskData,
+    address taskAddress
+  );
 
-  function createTask(address _resolverAddress, bytes calldata _taskData)
-    external
-  {
-    bytes32 _task = keccak256(abi.encode(_resolverAddress, _taskData));
+  function createTask(
+    address _resolverAddress,
+    bytes calldata _taskData,
+    address _execAddress
+  ) external {
+    bytes32 _task = keccak256(
+      abi.encode(_resolverAddress, _taskData, _execAddress)
+    );
 
     require(
       calleeOfTask[_task] == address(0),
@@ -33,13 +39,17 @@ contract PokeMe is ReentrancyGuard {
 
     calleeOfTask[_task] = msg.sender;
 
-    emit TaskCreated(_resolverAddress, _taskData);
+    emit TaskCreated(_resolverAddress, _taskData, _execAddress);
   }
 
-  function cancelTask(address _resolverAddress, bytes calldata _taskData)
-    external
-  {
-    bytes32 _task = keccak256(abi.encode(_resolverAddress, _taskData));
+  function cancelTask(
+    address _resolverAddress,
+    bytes calldata _taskData,
+    address _execAddress
+  ) external {
+    bytes32 _task = keccak256(
+      abi.encode(_resolverAddress, _taskData, _execAddress)
+    );
 
     require(
       calleeOfTask[_task] != address(0),
@@ -54,27 +64,20 @@ contract PokeMe is ReentrancyGuard {
     bytes calldata _taskData,
     address _execAddress,
     bytes calldata _execData
-  ) external {
-    require(gelato.isExecutor(msg.sender), "PokeMe: exec: Only executors");
-
-    bytes32 _task = keccak256(abi.encode(_resolverAddress, _taskData));
-
-    address _callee = calleeOfTask[_task];
-    require(_callee != address(0), "PokeMe: cancelTask: No task found");
-
-    address _sponsor = sponsorOfCallee[_callee];
-    require(_sponsor != address(0), "PokeMe: exec: No sponsor");
-
-    uint256 _balanceOfSponsor = balanceOfSponsor[_sponsor];
-    require(
-      _balanceOfSponsor >= txFee,
-      "PokeMe: exec: Sponsor insufficient balance"
+  ) external gelatofy(txFee, ETH) {
+    bytes32 _task = keccak256(
+      abi.encode(_resolverAddress, _taskData, _execAddress)
     );
 
-    _execAddress.call(_execData);
+    address _callee = calleeOfTask[_task];
+    require(_callee != address(0), "PokeMe: exec: No task found");
 
-    (bool success, ) = msg.sender.call{ value: txFee }("");
-    require(success, "PokeMe: exec: Transfer to executor failed");
+    address _sponsor = sponsorOfCallee[_callee];
+
+    (bool success, ) = _execAddress.call(_execData);
+    require(success, "PokeMe: exec: Execution failed");
+
+    uint256 _balanceOfSponsor = balanceOfSponsor[_sponsor];
 
     balanceOfSponsor[_sponsor] = _balanceOfSponsor.sub(txFee);
   }
