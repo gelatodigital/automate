@@ -1,26 +1,43 @@
-# Gelato PokeMe
+# Gelato PokeMe 🍦
 
 ## Description
 
 Automate smart contract executions with Gelato by submitting tasks to `PokeMe`
 
-- [PokeMe](https://ropsten.etherscan.io/address/0x70921EFA654b7a30CC02279866a9644510726550)
-
-## Submitting a task
-
-1. Deposit some funds `depositFunds` with the callee address which will be submitting the task as parameter.
-2. Callee can now call `createTask` with address and payload of the task.
-
-Payload in 2. should be an encoded data of the function call and it's arguments.
+- [PokeMe](https://ropsten.etherscan.io/address/0xeC8700A092789F58608212E314e3576bF2E98556)
 
 ## Demo
 
 ### Ropsten:
 
-- [Counter](https://ropsten.etherscan.io/address/0x3e3a46586e19a0dc721e42455cBd9E395706b4e4)
+In this demo, you will deploy your own instance of `Counter` contract and submit a task to `PokeMe`, which Gelato will then monitor and increase the count of your `Counter` every 3 minutes.
+
+1. Git clone this repo.
+
+2. Install dependencies and fill out `ALCHEMY_ID`, `DEPLOYER_PK_ROPSTEN`, `ETHERSCAN_API` in .env.
+
+3. Deploy your `Counter` contract. The `Counter` address will be needed later on.
 
 ```
-npx hardhat run ./scripts/create-task-counter.js --network ropsten
+npm run deploy-counter
 ```
 
-A task will be submitted to increase the count in `Counter` every 3 minutes
+4. Verify your `Counter` contract so that you will be able to check the count easily.
+
+```
+npx hardhat verify --network ropsten "YOUR COUNTER ADDRESS"
+```
+
+5. Deposit some ETH to `PokeMe` which will be used to pay Gelato executors after each successful execution. Make sure to have more than 0.1 ETH on ropsten.
+
+```
+npm run deposit
+```
+
+6. Submit a task to `PokeMe` to tell Gelato to monitor your `Counter` contract.
+
+```
+npm run submit-task --counter=YOUR COUNTER ADDRESS
+```
+
+7. Done! Gelato will pick up on the task you submitted. You can check the count of your `Counter` on Ropsten Etherscan.

@@ -4,7 +4,11 @@
   "description": "",
   "main": "hardhat.config.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "deploy-counter": "npx hardhat run ./scripts/deploy-counter-ropsten.js",
+    "deposit": "npx hardhat run ./scripts/deposit-funds.js",
+    "submit-task": "npx hardhat run ./scripts/submit-task.js",
+    "withdraw": "npx hardhat run ./scripts/withdraw-funds.js"
   },
   "devDependencies": {
     "@nomiclabs/hardhat-ethers": "^2.0.2",

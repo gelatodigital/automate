@@ -18,11 +18,13 @@ const DEPLOYER_PK_MAINNET = process.env.DEPLOYER_PK_MAINNET;
 const DEPLOYER_PK_ROPSTEN = process.env.DEPLOYER_PK_ROPSTEN;
 const ETHERSCAN_API = process.env.ETHERSCAN_API;
 
+const POKEME_ADDRESS = "0xeC8700A092789F58608212E314e3576bF2E98556";
+
 /**
  * @type import('hardhat/config').HardhatUserConfig
  */
 module.exports = {
-  defaultNetwork: "hardhat",
+  defaultNetwork: "ropsten",
 
   networks: {
     hardhat: {
@@ -45,6 +47,7 @@ module.exports = {
       chainId: 3,
       url: `https://eth-ropsten.alchemyapi.io/v2/${ALCHEMY_ID}`,
       gasPrice: parseInt(utils.parseUnits("2", "gwei")),
+      POKEME_ADDRESS,
     },
   },
   solidity: {

@@ -11,33 +11,33 @@ async function main() {
   const pokeme = await ethers.getContractAt("PokeMe", POKEME_ADDRESS, user);
   const counter = await ethers.getContractAt("Counter", COUNTER_ADDRESS, user);
 
-  let txn = await pokeme.depositFunds(userAddress, {
-    value: ethers.utils.parseEther("0.1"),
-    gasLimit: 1000000,
-    gasPrice: ethers.utils.parseUnits("2", "gwei"),
-  });
-  let res = await txn.wait();
-  console.log(res);
+  // let txn = await pokeme.depositFunds(userAddress, {
+  //   value: ethers.utils.parseEther("0.2"),
+  //   gasLimit: 1000000,
+  //   gasPrice: ethers.utils.parseUnits("2", "gwei"),
+  // });
+  // let res = await txn.wait();
+  // console.log(res);
 
   const taskData = await counter.interface.encodeFunctionData("increaseCount", [
     1,
   ]);
 
-  txn = await pokeme.createTask(counter.address, taskData, {
-    gasLimit: 1000000,
-    gasPrice: ethers.utils.parseUnits("2", "gwei"),
-  });
-  await txn.wait();
-
-  res = await txn.wait();
-  console.log(res);
-
-  // txn = await pokeme.cancelTask(counter.address, taskData, {
+  // txn = await pokeme.createTask(counter.address, taskData, {
   //   gasLimit: 1000000,
   //   gasPrice: ethers.utils.parseUnits("2", "gwei"),
   // });
+  // await txn.wait();
+
   // res = await txn.wait();
   // console.log(res);
+
+  txn = await pokeme.cancelTask(counter.address, taskData, {
+    gasLimit: 1000000,
+    gasPrice: ethers.utils.parseUnits("2", "gwei"),
+  });
+  res = await txn.wait();
+  console.log(res);
 }
 
 main()
