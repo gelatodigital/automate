@@ -41,3 +41,15 @@ npm run submit-task --counter=YOUR COUNTER ADDRESS
 ```
 
 7. Done! Gelato will pick up on the task you submitted. You can check the count of your `Counter` on Ropsten Etherscan.
+
+8. To stop Gelato from monitoring, cancel the task.
+
+```
+npm run cancel-task --counter=YOUR COUNTER ADDRESS
+```
+
+9. Withdraw your remaining ETH
+
+```
+npm run withdraw
+```

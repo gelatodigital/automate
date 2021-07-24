@@ -6,7 +6,7 @@ const COUNTER_ADDRESS = process.env.npm_config_counter;
 async function main() {
   [user] = await hre.ethers.getSigners();
   userAddress = await user.getAddress();
-  console.log("Submitting Task: ");
+  console.log("Submitting Task");
 
   console.log(COUNTER_ADDRESS);
   const pokeme = await ethers.getContractAt("PokeMe", POKEME_ADDRESS, user);
