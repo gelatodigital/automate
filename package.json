@@ -4,12 +4,15 @@
   "description": "",
   "main": "hardhat.config.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
+    "compile": "npx hardhat compile",
+    "verify": "npx hardhat etherscan-verify",
+    "test": "npx hardhat test",
     "deploy-counter": "npx hardhat run ./scripts/deploy-counter-ropsten.js",
     "deposit": "npx hardhat run ./scripts/deposit-funds.js",
     "submit-task": "npx hardhat run ./scripts/submit-task.js",
     "cancel-task": "npx hardhat run ./scripts/cancel-task.js",
-    "withdraw": "npx hardhat run ./scripts/withdraw-funds.js"
+    "withdraw": "npx hardhat run ./scripts/withdraw-funds.js",
+    "format": "prettier --write '*/**/*.{js,sol,json,md,ts}'"
   },
   "devDependencies": {
     "@nomiclabs/hardhat-ethers": "^2.0.2",
@@ -23,7 +26,7 @@
     "eslint": "7.14.0",
     "eslint-config-prettier": "6.15.0",
     "ethereum-waffle": "^3.4.0",
-    "ethers": "^5.4.1",
+    "ethers": "^5.4.2",
     "hardhat": "^2.4.3",
     "hardhat-deploy": "^0.8.6",
     "hardhat-deploy-ethers": "^0.3.0-beta.10",
