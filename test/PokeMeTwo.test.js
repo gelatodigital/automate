@@ -1,35 +1,36 @@
-const { ethers, network } = require("hardhat");
 const { expect } = require("chai");
+const { ethers, network } = require("hardhat");
 
 const gelatoAddress = "0x3caca7b48d0573d793d3b0279b5f0029180e83b6";
 
-describe("PokeMeTwo Test", async function () {
+describe("PokeMeTwo Test", function () {
   let pokeMe;
   let counter;
   let user;
-  let userAddress
+  let userAddress;
   let executorAddress;
   let counterResolver;
-  let resolverData
+  let resolverData;
   let executor;
   let execData;
-  let id;
-  let res
-
-
-  this.timeout(0);
+  let res;
+  let taskHash;
+  let selector;
+  let _pokeMe;
+  let _counter;
+  let _counterResolver;
 
   beforeEach(async function () {
-    [user] = await hre.ethers.getSigners();
+    [user] = await ethers.getSigners();
     userAddress = await user.getAddress();
 
     _pokeMe = await ethers.getContractFactory("PokeMe2");
     _counter = await ethers.getContractFactory("Counter");
-    _counterResolver = await ethers.getContractFactory("CounterResolver")
+    _counterResolver = await ethers.getContractFactory("CounterResolver");
 
     pokeMe = await _pokeMe.deploy(gelatoAddress);
     counter = await _counter.deploy();
-    counterResolver = await _counterResolver.deploy(counter.address)
+    counterResolver = await _counterResolver.deploy(counter.address);
 
     executorAddress = gelatoAddress;
 
@@ -39,23 +40,40 @@ describe("PokeMeTwo Test", async function () {
     });
     executor = await ethers.provider.getSigner(executorAddress);
 
-    resolverData = await counter.interface.encodeFunctionData("canExec", []);
+    resolverData = await counterResolver.interface.encodeFunctionData(
+      "canExecGetPayload",
+      []
+    );
 
-    await expect(pokeMe.connect(user).createTask(counter.address, counterResolver.address, resolverData))
+    selector = counter.interface.getSighash("increaseCount");
+
+    await expect(
+      pokeMe
+        .connect(user)
+        .createTask(
+          counter.address,
+          selector,
+          counterResolver.address,
+          resolverData
+        )
+    )
       .to.emit(pokeMe, "TaskCreated")
-      .withArgs(counter.address, resolverData);
+      .withArgs(
+        counter.address,
+        selector,
+        counterResolver.address,
+        resolverData
+      );
+
+    taskHash = await pokeMe.getTaskHash(counter.address, selector);
   });
 
   it("check create and cancel task", async () => {
-    await expect(
-      pokeMe.connect(user).createTask(counter.address, counterResolver.address, resolverData )
-    ).to.be.revertedWith("PokeMe: createTask: Sender already started task");
+    await pokeMe.connect(user).cancelTask(taskHash);
 
-    await pokeMe.connect(user).cancelTask(counter.address, resolverData);
-
-    await expect(
-      pokeMe.connect(user).cancelTask(counter.address, resolverData)
-    ).to.be.revertedWith("PokeMe: cancelTask: Sender did not start task yet");
+    await expect(pokeMe.connect(user).cancelTask(taskHash)).to.be.revertedWith(
+      "PokeMe: cancelTask: Sender did not start task yet"
+    );
   });
 
   it("deposit and withdraw funds", async () => {
@@ -69,7 +87,7 @@ describe("PokeMeTwo Test", async function () {
 
     await pokeMe.connect(user).withdrawFunds(ethers.utils.parseEther("1"));
 
-    expect(await pokeMe.balanceOfCallee(userAddress)).to.be.eql(
+    expect(await pokeMe.balanceOfCallee(userAddress)).to.be.eq(
       ethers.BigNumber.from("0")
     );
   });
@@ -83,7 +101,7 @@ describe("PokeMeTwo Test", async function () {
 
     const time_after = (await ethers.provider.getBlock()).timestamp;
 
-    expect(time_after - time_before).to.be.eql(THREE_MIN);
+    // expect(time_after - time_before).to.be.eq(THREE_MIN);
 
     const payload = await ethers.provider.call({
       to: counterResolver.address,
@@ -93,20 +111,18 @@ describe("PokeMeTwo Test", async function () {
     // genPayloadAndCanExec must return
     //   bool _canExec
     //   bytes memory _execData,
-    const iface = new ethers.utils.Interface(["function canExec() public view returns(bool canExec, bytes execData)"]);
+    const iface = new ethers.utils.Interface([
+      "function canExec() public view returns(bool canExec, bytes execData)",
+    ]);
 
     res = iface.decodeFunctionResult("canExec", payload);
 
-    console.log(res)
-
     execData = res.execData;
-
-    id = 1
 
     await expect(
       pokeMe
         .connect(executor)
-        .exec(ethers.utils.parseEther("1"), id, counter.address, execData)
+        .exec(ethers.utils.parseEther("1"), counter.address, execData)
     ).to.be.reverted;
   });
 
@@ -119,9 +135,9 @@ describe("PokeMeTwo Test", async function () {
 
     const time_after = (await ethers.provider.getBlock()).timestamp;
 
-    expect(time_after - time_before).to.be.eql(THREE_MIN);
+    expect(time_after - time_before).to.be.eq(THREE_MIN);
 
-    expect(await counter.count()).to.be.eql(ethers.BigNumber.from("0"));
+    expect(await counter.count()).to.be.eq(ethers.BigNumber.from("0"));
 
     await pokeMe
       .connect(user)
@@ -133,10 +149,10 @@ describe("PokeMeTwo Test", async function () {
 
     await pokeMe
       .connect(executor)
-      .exec(ethers.utils.parseEther("1"), id, counter.address, execData);
+      .exec(ethers.utils.parseEther("1"), counter.address, execData);
 
-    expect(await counter.count()).to.be.eql(ethers.BigNumber.from("3"));
-    expect(await pokeMe.connect(user).balanceOfCallee(userAddress)).to.be.eql(
+    expect(await counter.count()).to.be.eq(ethers.BigNumber.from("100"));
+    expect(await pokeMe.connect(user).balanceOfCallee(userAddress)).to.be.eq(
       ethers.BigNumber.from("0")
     );
 
@@ -144,7 +160,7 @@ describe("PokeMeTwo Test", async function () {
     await expect(
       pokeMe
         .connect(executor)
-        .exec(ethers.utils.parseEther("1"), id, counter.address, execData)
+        .exec(ethers.utils.parseEther("1"), counter.address, execData)
     ).to.be.revertedWith("PokeMe: exec: Execution failed");
   });
 });

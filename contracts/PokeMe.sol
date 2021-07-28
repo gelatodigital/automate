@@ -1,82 +1,86 @@
 // SPDX-License-Identifier: UNLICENSED
 pragma solidity 0.8.0;
 
-import { Gelatofied } from "./Gelatofied.sol";
-import { ReentrancyGuard } from "@openzeppelin/contracts/security/ReentrancyGuard.sol";
-import { SafeMath } from "@openzeppelin/contracts/utils/math/SafeMath.sol";
+import {Gelatofied} from "./Gelatofied.sol";
+import {ReentrancyGuard} from "@openzeppelin/contracts/security/ReentrancyGuard.sol";
+import {SafeMath} from "@openzeppelin/contracts/utils/math/SafeMath.sol";
 
 contract PokeMe is ReentrancyGuard, Gelatofied {
-  using SafeMath for uint256;
+    using SafeMath for uint256;
 
-  mapping(bytes32 => address) public calleeOfTask;
-  mapping(address => uint256) public balanceOfCallee;
+    mapping(bytes32 => address) public calleeOfTask;
+    mapping(address => uint256) public balanceOfCallee;
 
-  constructor(address payable _gelato) Gelatofied(_gelato) {}
+    constructor(address payable _gelato) Gelatofied(_gelato) {}
 
-  event TaskCreated(address taskAddress, bytes taskData);
-  event TaskCancelled(address taskAddress, bytes taskData);
+    event TaskCreated(address taskAddress, bytes taskData);
+    event TaskCancelled(address taskAddress, bytes taskData);
 
-  function createTask(address _taskAddress, bytes calldata _taskData) external {
-    bytes32 _task = keccak256(abi.encode(_taskData, _taskAddress));
+    function createTask(address _taskAddress, bytes calldata _taskData)
+        external
+    {
+        bytes32 _task = keccak256(abi.encode(_taskData, _taskAddress));
 
-    require(
-      calleeOfTask[_task] == address(0),
-      "PokeMe: createTask: Sender already started task"
-    );
+        require(
+            calleeOfTask[_task] == address(0),
+            "PokeMe: createTask: Sender already started task"
+        );
 
-    calleeOfTask[_task] = msg.sender;
+        calleeOfTask[_task] = msg.sender;
 
-    emit TaskCreated(_taskAddress, _taskData);
-  }
+        emit TaskCreated(_taskAddress, _taskData);
+    }
 
-  function cancelTask(address _taskAddress, bytes calldata _taskData) external {
-    bytes32 _task = keccak256(abi.encode(_taskData, _taskAddress));
+    function cancelTask(address _taskAddress, bytes calldata _taskData)
+        external
+    {
+        bytes32 _task = keccak256(abi.encode(_taskData, _taskAddress));
 
-    require(
-      calleeOfTask[_task] != address(0),
-      "PokeMe: cancelTask: Sender did not start task yet"
-    );
+        require(
+            calleeOfTask[_task] != address(0),
+            "PokeMe: cancelTask: Sender did not start task yet"
+        );
 
-    delete calleeOfTask[_task];
+        delete calleeOfTask[_task];
 
-    emit TaskCancelled(_taskAddress, _taskData);
-  }
+        emit TaskCancelled(_taskAddress, _taskData);
+    }
 
-  function exec(
-    uint256 _txFee,
-    address _taskAddress,
-    bytes calldata _taskData
-  ) external gelatofy(_txFee, ETH) {
-    bytes32 _task = keccak256(abi.encode(_taskData, _taskAddress));
+    function exec(
+        uint256 _txFee,
+        address _taskAddress,
+        bytes calldata _taskData
+    ) external gelatofy(_txFee, ETH) {
+        bytes32 _task = keccak256(abi.encode(_taskData, _taskAddress));
 
-    address _callee = calleeOfTask[_task];
-    require(_callee != address(0), "PokeMe: exec: No task found");
+        address _callee = calleeOfTask[_task];
+        require(_callee != address(0), "PokeMe: exec: No task found");
 
-    (bool success, ) = _taskAddress.call(_taskData);
-    require(success, "PokeMe: exec: Execution failed");
+        (bool success, ) = _taskAddress.call(_taskData);
+        require(success, "PokeMe: exec: Execution failed");
 
-    uint256 _balanceOfCallee = balanceOfCallee[_callee];
+        uint256 _balanceOfCallee = balanceOfCallee[_callee];
 
-    balanceOfCallee[_callee] = _balanceOfCallee.sub(_txFee);
-  }
+        balanceOfCallee[_callee] = _balanceOfCallee.sub(_txFee);
+    }
 
-  function depositFunds(address _receiver) external payable {
-    require(msg.value != 0, "PokeMe: depositFunds: No ether sent");
+    function depositFunds(address _receiver) external payable {
+        require(msg.value != 0, "PokeMe: depositFunds: No ether sent");
 
-    balanceOfCallee[_receiver] = balanceOfCallee[_receiver].add(msg.value);
-  }
+        balanceOfCallee[_receiver] = balanceOfCallee[_receiver].add(msg.value);
+    }
 
-  function withdrawFunds(uint256 _amount) external nonReentrant {
-    uint256 balance = balanceOfCallee[msg.sender];
+    function withdrawFunds(uint256 _amount) external nonReentrant {
+        uint256 balance = balanceOfCallee[msg.sender];
 
-    require(
-      balance >= _amount,
-      "PokeMe: withdrawFunds: Sender has insufficient balance"
-    );
+        require(
+            balance >= _amount,
+            "PokeMe: withdrawFunds: Sender has insufficient balance"
+        );
 
-    balanceOfCallee[msg.sender] = balance.sub(_amount);
+        balanceOfCallee[msg.sender] = balance.sub(_amount);
 
-    (bool success, ) = msg.sender.call{ value: _amount }("");
-    require(success, "PokeMe: withdrawFunds: Withdraw funds failed");
-  }
+        (bool success, ) = msg.sender.call{value: _amount}("");
+        require(success, "PokeMe: withdrawFunds: Withdraw funds failed");
+    }
 }

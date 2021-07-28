@@ -24,7 +24,7 @@ const POKEME_ADDRESS = "0xeC8700A092789F58608212E314e3576bF2E98556";
  * @type import('hardhat/config').HardhatUserConfig
  */
 module.exports = {
-  defaultNetwork: "ropsten",
+  defaultNetwork: "hardhat",
 
   networks: {
     hardhat: {
@@ -32,7 +32,7 @@ module.exports = {
       // timeout: 150000,
       forking: {
         url: `https://eth-mainnet.alchemyapi.io/v2/${ALCHEMY_ID}`,
-        blockNumber: 12645718,
+        blockNumber: 12901600,
       },
     },
     mainnet: {
