@@ -1,77 +1,70 @@
 // SPDX-License-Identifier: UNLICENSED
 pragma solidity 0.8.0;
 
-import { Gelatofied } from "./Gelatofied.sol";
-import { GelatoBytes } from "./GelatoBytes.sol";
-import { ReentrancyGuard } from "@openzeppelin/contracts/security/ReentrancyGuard.sol";
-import { EnumerableSet } from "@openzeppelin/contracts/utils/structs/EnumerableSet.sol";
-import { Math } from "@openzeppelin/contracts/utils/math/Math.sol";
-import { SafeERC20, IERC20 } from "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
+import {Gelatofied} from "./Gelatofied.sol";
+import {GelatoBytes} from "./GelatoBytes.sol";
+import {EnumerableSet} from "@openzeppelin/contracts/utils/structs/EnumerableSet.sol";
+import {SafeERC20, IERC20} from "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
+import {_transfer, ETH} from "./FGelato.sol";
+import {TaskTreasury} from "./TaskTreasury.sol";
 
-contract PokeMe2 is ReentrancyGuard, Gelatofied {
-  using SafeERC20 for IERC20;
-  using GelatoBytes for bytes;
-  using EnumerableSet for EnumerableSet.Bytes32Set;
-  using EnumerableSet for EnumerableSet.AddressSet;
+contract PokeMe2 is Gelatofied {
+    using SafeERC20 for IERC20;
+    using GelatoBytes for bytes;
+    using EnumerableSet for EnumerableSet.Bytes32Set;
 
-  mapping(bytes32 => address) public calleeOfTask;
-  mapping(bytes32 => address) public execAddresses;
-  mapping(address => mapping(address => uint256)) public balanceOfCallee;
-  mapping(address => EnumerableSet.Bytes32Set) internal _createdTasks;
-  mapping(address => EnumerableSet.AddressSet) internal _tokenCredits;
+    string constant public version = "2";
+    mapping(bytes32 => address) public calleeOfTask;
+    mapping(bytes32 => address) public execAddresses;
+    mapping(address => mapping(address => uint256)) public balanceOfCallee;
+    mapping(address => EnumerableSet.Bytes32Set) internal _createdTasks;
+    address public immutable taskTreasury;
 
-  constructor(address payable _gelato) Gelatofied(_gelato) {}
+    constructor(address payable _gelato, address _taskTreasury) Gelatofied(_gelato) {
+        taskTreasury = _taskTreasury;
+    }
 
-  event TaskCreated(
-    address execAddress,
-    bytes4 selector,
-    address resolverAddress,
-    bytes32 taskId,
-    bytes resolverData
-  );
-  event TaskCancelled(bytes32 task);
-  event FundsDeposited(
-    address indexed sender,
-    address indexed token,
-    uint256 indexed amount
-  );
-  event FundsWithdrawn(
-    address indexed receiver,
-    address indexed token,
-    uint256 amount
-  );
-  event ExecSuccess(
-    uint256 indexed txFee,
-    address indexed feeToken,
-    address indexed execAddress,
-    bytes execData
-  );
-
-  function createTask(
-    address _execAddress,
-    bytes4 _execSelector,
-    address _resolverAddress,
-    bytes calldata _resolverData
-  ) external {
-    bytes32 _task = getTaskId(_execAddress, _execSelector);
-
-    require(
-      calleeOfTask[_task] == address(0),
-      "PokeMe: createTask: Sender already started task"
+    event TaskCreated(
+        address callee,
+        address execAddress,
+        bytes4 selector,
+        address resolverAddress,
+        bytes32 taskId,
+        bytes resolverData
     );
+    event TaskCancelled(bytes32 taskId);
+    event ExecSuccess(
+        uint256 indexed txFee,
+        address indexed feeToken,
+        address indexed execAddress,
+        bytes execData
+    );
+
+    function createTask(
+        address _execAddress,
+        bytes4 _execSelector,
+        address _resolverAddress,
+        bytes calldata _resolverData
+    ) external {
+        bytes32 _task = getTaskId(msg.sender, _execAddress, _execSelector);
+
+        require(
+            calleeOfTask[_task] == address(0),
+            "PokeMe: createTask: Sender already started task"
+        );
 
     _createdTasks[msg.sender].add(_task);
     calleeOfTask[_task] = msg.sender;
     execAddresses[_task] = _execAddress;
 
-    emit TaskCreated(
-      _execAddress,
-      _execSelector,
-      _resolverAddress,
-      _task,
-      _resolverData
-    );
-  }
+        emit TaskCreated(msg.sender, _execAddress, _execSelector, _resolverAddress, _task, _resolverData);
+    }
+
+    function cancelTask(bytes32 _task) external {
+        require(
+            calleeOfTask[_task] != address(0),
+            "PokeMe: cancelTask: Sender did not start task yet"
+        );
 
   function cancelTask(bytes32 _task) external {
     require(
@@ -123,78 +116,52 @@ contract PokeMe2 is ReentrancyGuard, Gelatofied {
       depositAmount = postBalance - preBalance;
     }
 
-    balanceOfCallee[_receiver][_token] =
-      balanceOfCallee[_receiver][_token] +
-      depositAmount;
+    function exec(
+        uint256 _txFee,
+        address _feeToken,
+        address _callee,
+        address _execAddress,
+        bytes calldata _execData
+    ) external onlyGelato() {
+        bytes32 task = getTaskId(
+            _callee,
+            _execAddress,
+            _execData.calldataSliceSelector()
+        );
+
+        address callee = calleeOfTask[task];
+        require(callee == _callee, "PokeMe: exec: No task found");
 
     if (!_tokenCredits[msg.sender].contains(_token))
       _tokenCredits[msg.sender].add(_token);
 
-    emit FundsDeposited(_receiver, _token, depositAmount);
-  }
+        TaskTreasury(taskTreasury).useFunds(_feeToken, _txFee, callee);
 
-  function withdrawFunds(address _token, uint256 _amount)
-    external
-    nonReentrant
-  {
-    uint256 balance = balanceOfCallee[msg.sender][_token];
-
-    uint256 withdrawAmount = Math.min(balance, _amount);
-
-    balanceOfCallee[msg.sender][_token] = balance - withdrawAmount;
-
-    if (withdrawAmount == balance) _tokenCredits[msg.sender].remove(_token);
-
-    _transfer(payable(msg.sender), _token, withdrawAmount);
-
-    emit FundsWithdrawn(msg.sender, _token, withdrawAmount);
-  }
-
-  function getTaskId(address _execAddress, bytes4 _selector)
-    public
-    pure
-    returns (bytes32)
-  {
-    return keccak256(abi.encode(_execAddress, _selector));
-  }
-
-  /*
-    "transfer(address,uint256)"
-    0xa9059cbb
-    "transferFrom(address,address,uint256)"
-    0x23b872dd
-    */
-  function getSelector(string calldata _func) external pure returns (bytes4) {
-    return bytes4(keccak256(bytes(_func)));
-  }
-
-  function getTaskIdsByUser(address _callee)
-    external
-    view
-    returns (bytes32[] memory)
-  {
-    uint256 _length = _createdTasks[_callee].length();
-    bytes32[] memory taskIds = new bytes32[](_length);
-
-    for (uint256 i; i < _length; i++) {
-      taskIds[i] = _createdTasks[_callee].at(i);
+        emit ExecSuccess(_txFee, _feeToken, _execAddress, _execData);
     }
 
-    return taskIds;
-  }
-
-  function getCreditTokensByUser(address _callee)
-    external
-    view
-    returns (address[] memory)
-  {
-    uint256 _length = _createdTasks[_callee].length();
-    address[] memory creditTokens = new address[](_length);
-
-    for (uint256 i; i < _length; i++) {
-      creditTokens[i] = _tokenCredits[_callee].at(i);
+    function getTaskId(
+        address _callee,
+        address _execAddress,
+        bytes4 _selector
+    ) public pure returns (bytes32) {
+        return keccak256(abi.encode(_callee, _execAddress, _selector));
     }
 
-    return creditTokens;
-  }
+    /// @dev Example: "transferFrom(address,address,uint256)" => 0x23b872dd
+    function getSelector(string calldata _func) external pure returns (bytes4) {
+        return bytes4(keccak256(bytes(_func)));
+    }
+
+    function getTaskIdsByUser(address _callee) external view returns(bytes32[] memory) {
+        uint256 length = _createdTasks[_callee].length();
+        bytes32[] memory taskIds = new bytes32[](length);
+
+        for (uint256 i; i < length; i++) {
+            taskIds[i] = _createdTasks[_callee].at(i);
+        }
+
+        return taskIds;
+    }
+
 }

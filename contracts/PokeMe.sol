@@ -4,10 +4,12 @@ pragma solidity 0.8.0;
 import {Gelatofied} from "./Gelatofied.sol";
 import {ReentrancyGuard} from "@openzeppelin/contracts/security/ReentrancyGuard.sol";
 import {SafeMath} from "@openzeppelin/contracts/utils/math/SafeMath.sol";
+import {ETH} from "./FGelato.sol";
 
 contract PokeMe is ReentrancyGuard, Gelatofied {
     using SafeMath for uint256;
 
+    string constant public version = "1";
     mapping(bytes32 => address) public calleeOfTask;
     mapping(address => uint256) public balanceOfCallee;
 
