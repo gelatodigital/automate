@@ -40,8 +40,8 @@ module.exports = {
       forking: {
         url: `https://eth-mainnet.alchemyapi.io/v2/${ALCHEMY_ID}`,
         blockNumber: 12901600,
-        GELATO
       },
+      GELATO: "0x3caca7b48d0573d793d3b0279b5f0029180e83b6"
     },
     mainnet: {
       accounts: DEPLOYER_PK_MAINNET ? [DEPLOYER_PK_MAINNET] : [],
