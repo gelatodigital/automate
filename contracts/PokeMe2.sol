@@ -28,6 +28,7 @@ contract PokeMe2 is ReentrancyGuard, Gelatofied {
         address execAddress,
         bytes4 selector,
         address resolver,
+        bytes32 taskId,
         bytes resolverData
     );
     event TaskCancelled(bytes32 task);
@@ -65,7 +66,7 @@ contract PokeMe2 is ReentrancyGuard, Gelatofied {
         calleeOfTask[_task] = msg.sender;
         execAddresses[_task] = _execAddress;
 
-        emit TaskCreated(_execAddress, _execSelector, _resolver, _resolverData);
+        emit TaskCreated(_execAddress, _execSelector, _resolver, _task, _resolverData);
     }
 
     function cancelTask(bytes32 _task) external {

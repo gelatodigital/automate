@@ -54,7 +54,7 @@ describe("PokeMeTwo Test", function () {
       []
     );
 
-    selector = counter.interface.getSighash("increaseCount");
+    selector = await pokeMe.getSelector("increaseCount(uint256)");
 
     await expect(
       pokeMe
