@@ -1,7 +1,10 @@
 const { expect } = require("chai");
 const { ethers, network } = require("hardhat");
+const {getTokenFromFaucet} = require("./helpers.js")
 
-const gelatoAddress = "0x3caca7b48d0573d793d3b0279b5f0029180e83b6";
+const gelatoAddress = network.config.GELATO
+const ETH = "0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE"
+const DAI = "0x6b175474e89094c44da98b954eedeac495271d0f"
 
 describe("PokeMeTwo Test", function () {
   let pokeMe;
@@ -19,6 +22,7 @@ describe("PokeMeTwo Test", function () {
   let _pokeMe;
   let _counter;
   let _counterResolver;
+  let dai;
 
   beforeEach(async function () {
     [user] = await ethers.getSigners();
@@ -27,6 +31,7 @@ describe("PokeMeTwo Test", function () {
     _pokeMe = await ethers.getContractFactory("PokeMe2");
     _counter = await ethers.getContractFactory("Counter");
     _counterResolver = await ethers.getContractFactory("CounterResolver");
+    dai = await ethers.getContractAt("IERC20", DAI)
 
     pokeMe = await _pokeMe.deploy(gelatoAddress);
     counter = await _counter.deploy();
@@ -77,17 +82,19 @@ describe("PokeMeTwo Test", function () {
   });
 
   it("deposit and withdraw funds", async () => {
+    const depositAmount = ethers.utils.parseEther("1");
+    
     await pokeMe
       .connect(user)
-      .depositFunds(userAddress, { value: ethers.utils.parseEther("1") });
+      .depositFunds(userAddress, ETH,  depositAmount, { value: depositAmount });
 
-    expect(await pokeMe.balanceOfCallee(userAddress)).to.be.eql(
+    expect(await pokeMe.balanceOfCallee(userAddress, ETH)).to.be.eq(
       ethers.utils.parseEther("1")
     );
 
-    await pokeMe.connect(user).withdrawFunds(ethers.utils.parseEther("1"));
+    await pokeMe.connect(user).withdrawFunds(ETH, ethers.utils.parseEther("1"));
 
-    expect(await pokeMe.balanceOfCallee(userAddress)).to.be.eq(
+    expect(await pokeMe.balanceOfCallee(userAddress, ETH)).to.be.eq(
       ethers.BigNumber.from("0")
     );
   });
@@ -122,7 +129,7 @@ describe("PokeMeTwo Test", function () {
     await expect(
       pokeMe
         .connect(executor)
-        .exec(ethers.utils.parseEther("1"), counter.address, execData)
+        .exec(ethers.utils.parseEther("1"), ETH, counter.address, execData)
     ).to.be.reverted;
   });
 
@@ -139,20 +146,21 @@ describe("PokeMeTwo Test", function () {
 
     expect(await counter.count()).to.be.eq(ethers.BigNumber.from("0"));
 
+    const depositAmount = ethers.utils.parseEther("1") 
     await pokeMe
       .connect(user)
-      .depositFunds(userAddress, { value: ethers.utils.parseEther("1") });
+      .depositFunds(userAddress, ETH,  depositAmount, { value: depositAmount });
 
-    expect(await pokeMe.connect(user).balanceOfCallee(userAddress)).to.be.eql(
+    expect(await pokeMe.connect(user).balanceOfCallee(userAddress, ETH)).to.be.eq(
       ethers.utils.parseEther("1")
     );
 
     await pokeMe
       .connect(executor)
-      .exec(ethers.utils.parseEther("1"), counter.address, execData);
+      .exec(ethers.utils.parseEther("1"), ETH, counter.address, execData);
 
     expect(await counter.count()).to.be.eq(ethers.BigNumber.from("100"));
-    expect(await pokeMe.connect(user).balanceOfCallee(userAddress)).to.be.eq(
+    expect(await pokeMe.connect(user).balanceOfCallee(userAddress, ETH)).to.be.eq(
       ethers.BigNumber.from("0")
     );
 
@@ -160,7 +168,67 @@ describe("PokeMeTwo Test", function () {
     await expect(
       pokeMe
         .connect(executor)
-        .exec(ethers.utils.parseEther("1"), counter.address, execData)
+        .exec(ethers.utils.parseEther("1"), ETH, counter.address, execData)
     ).to.be.revertedWith("PokeMe: exec: Execution failed");
   });
+
+  it("should exec and pay with ERC20 token", async () => {
+    
+    await 
+      pokeMe
+        .connect(executor)
+        .exec(ethers.utils.parseEther("0"), ETH, counter.address, execData)
+    
+    
+    let [canExec, execData2] = await counterResolver.canExecGetPayload();
+
+    expect(canExec).to.be.eq(false)
+
+    const THREE_MIN = 3 * 70; // add 10 sec buffer
+    const time_before = (await ethers.provider.getBlock()).timestamp;
+
+    await network.provider.send("evm_increaseTime", [THREE_MIN]);
+    await network.provider.send("evm_mine", []);
+
+    [canExec, execData2] = await counterResolver.canExecGetPayload()
+
+    expect(canExec).to.be.eq(true)    
+
+    const time_after = (await ethers.provider.getBlock()).timestamp;
+
+    expect(await counter.count()).to.be.eq(ethers.BigNumber.from("100"));
+
+    const daiAmount = ethers.utils.parseEther("100")
+    
+    await getTokenFromFaucet(DAI, userAddress, daiAmount)
+
+    await dai.approve(pokeMe.address, daiAmount)
+    
+    await pokeMe
+      .connect(user)
+      .depositFunds(userAddress, DAI,  daiAmount);
+
+    expect(await pokeMe.connect(user).balanceOfCallee(userAddress, DAI)).to.be.eq(
+      daiAmount
+    );
+
+    await pokeMe
+      .connect(executor)
+      .exec(ethers.utils.parseEther("90"), DAI, counter.address, execData2);
+
+    expect(await counter.count()).to.be.eq(ethers.BigNumber.from("200"));
+    expect(await pokeMe.connect(user).balanceOfCallee(userAddress, DAI)).to.be.eq(
+      ethers.utils.parseEther("10")
+    );
+
+    // time not elapsed
+    await expect(
+      pokeMe
+        .connect(executor)
+        .exec(ethers.utils.parseEther("1"), DAI, counter.address, execData2)
+    ).to.be.revertedWith("PokeMe: exec: Execution failed");
+  });
+
+
+  
 });

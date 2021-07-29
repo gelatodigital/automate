@@ -8,8 +8,6 @@ interface ICounter {
 }
 
 contract CounterResolver {
-    uint256 public count;
-    uint256 public lastExecuted;
     address public immutable COUNTER;
 
     constructor(address _counter) {
@@ -18,6 +16,7 @@ contract CounterResolver {
 
     function canExecGetPayload()
         external
+        view
         returns (bool canExec, bytes memory execPayload)
     {
         uint256 lastExecuted = ICounter(COUNTER).lastExecuted();
@@ -28,9 +27,5 @@ contract CounterResolver {
             ICounter.increaseCount.selector,
             uint256(100)
         );
-    }
-
-    function selector() external pure returns (bytes4) {
-        return this.canExecGetPayload.selector;
     }
 }
