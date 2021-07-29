@@ -49,7 +49,8 @@ describe("PokeMeTwo Test", function () {
       []
     );
 
-    selector = counter.interface.getSighash("increaseCount");
+    selector = await pokeMe.getSelector("increaseCount(uint256)");
+    // selector = counter.interface.getSighash("increaseCount");
 
     await expect(
       pokeMe
@@ -227,6 +228,10 @@ describe("PokeMeTwo Test", function () {
         .exec(ethers.utils.parseEther("1"), DAI, counter.address, execData2)
     ).to.be.revertedWith("PokeMe: exec: Execution failed");
   });
+
+  
+
+
 
 
   
