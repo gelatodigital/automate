@@ -74,7 +74,7 @@ describe("PokeMeTwo Test", function () {
         resolverData
       );
 
-    taskHash = await pokeMe.getTaskHash(counter.address, selector);
+    taskHash = await pokeMe.getTaskId(counter.address, selector);
   });
 
   it("sender already started task", async () => {

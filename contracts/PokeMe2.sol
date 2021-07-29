@@ -54,7 +54,7 @@ contract PokeMe2 is ReentrancyGuard, Gelatofied {
         address _resolver,
         bytes calldata _resolverData
     ) external {
-        bytes32 _task = getTaskHash(_execAddress, _execSelector);
+        bytes32 _task = getTaskId(_execAddress, _execSelector);
 
         require(
             calleeOfTask[_task] == address(0),
@@ -87,13 +87,9 @@ contract PokeMe2 is ReentrancyGuard, Gelatofied {
         address _execAddress,
         bytes calldata _execData
     ) external gelatofy(_txFee, _feeToken) {
-        bytes32 task = getTaskHash(
+        bytes32 task = getTaskId(
             _execAddress,
             _execData.calldataSliceSelector()
-        );
-        require(
-            calleeOfTask[task] != address(0),
-            "PokeMe: exec: Sender did not start task yet"
         );
 
         address _callee = calleeOfTask[task];
@@ -151,10 +147,32 @@ contract PokeMe2 is ReentrancyGuard, Gelatofied {
         emit FundsWithdrawn(msg.sender, _token, withdrawAmount);
     }
 
-    function getTaskHash(
+    function getTaskId(
         address _execAddress,
         bytes4 _selector
     ) public pure returns (bytes32) {
         return keccak256(abi.encode(_execAddress, _selector));
+    }
+
+    /*
+    "transfer(address,uint256)"
+    0xa9059cbb
+    "transferFrom(address,address,uint256)"
+    0x23b872dd
+    */
+    function getSelector(string calldata _func) external pure returns (bytes4) {
+        return bytes4(keccak256(bytes(_func)));
+    }
+
+    function getTaskIdsByUser(address _callee) external view returns(bytes32[] memory taskIds) {
+        for (uint256 i; i < _createdTasks[_callee].length(); i++) {
+            taskIds[i] = _createdTasks[_callee].at(i);
+        }
+    }
+
+    function getCreditTokensByUser(address _callee) external view returns(address[] memory creditTokens) {
+        for (uint256 i; i < _createdTasks[_callee].length(); i++) {
+            creditTokens[i] = _tokenCredits[_callee].at(i);
+        }
     }
 }
