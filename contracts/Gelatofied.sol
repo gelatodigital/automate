@@ -21,5 +21,4 @@ abstract contract Gelatofied {
         require(msg.sender == gelato, "Gelatofied: Only gelato");
         _;
     }
-
 }

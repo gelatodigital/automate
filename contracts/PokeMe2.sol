@@ -13,14 +13,16 @@ contract PokeMe2 is Gelatofied {
     using GelatoBytes for bytes;
     using EnumerableSet for EnumerableSet.Bytes32Set;
 
-    string constant public version = "2";
+    string public constant version = "2";
     mapping(bytes32 => address) public calleeOfTask;
     mapping(bytes32 => address) public execAddresses;
     mapping(address => mapping(address => uint256)) public balanceOfCallee;
     mapping(address => EnumerableSet.Bytes32Set) internal _createdTasks;
     address public immutable taskTreasury;
 
-    constructor(address payable _gelato, address _taskTreasury) Gelatofied(_gelato) {
+    constructor(address payable _gelato, address _taskTreasury)
+        Gelatofied(_gelato)
+    {
         taskTreasury = _taskTreasury;
     }
 
@@ -53,11 +55,18 @@ contract PokeMe2 is Gelatofied {
             "PokeMe: createTask: Sender already started task"
         );
 
-    _createdTasks[msg.sender].add(_task);
-    calleeOfTask[_task] = msg.sender;
-    execAddresses[_task] = _execAddress;
+        _createdTasks[msg.sender].add(_task);
+        calleeOfTask[_task] = msg.sender;
+        execAddresses[_task] = _execAddress;
 
-        emit TaskCreated(msg.sender, _execAddress, _execSelector, _resolverAddress, _task, _resolverData);
+        emit TaskCreated(
+            msg.sender,
+            _execAddress,
+            _execSelector,
+            _resolverAddress,
+            _task,
+            _resolverData
+        );
     }
 
     function cancelTask(bytes32 _task) external {
@@ -66,54 +75,11 @@ contract PokeMe2 is Gelatofied {
             "PokeMe: cancelTask: Sender did not start task yet"
         );
 
-  function cancelTask(bytes32 _task) external {
-    require(
-      calleeOfTask[_task] != address(0),
-      "PokeMe: cancelTask: Sender did not start task yet"
-    );
+        _createdTasks[msg.sender].remove(_task);
+        delete calleeOfTask[_task];
+        delete execAddresses[_task];
 
-    _createdTasks[msg.sender].remove(_task);
-    delete calleeOfTask[_task];
-    delete execAddresses[_task];
-
-    emit TaskCancelled(_task);
-  }
-
-  function exec(
-    uint256 _txFee,
-    address _feeToken,
-    address _execAddress,
-    bytes calldata _execData
-  ) external gelatofy(_txFee, _feeToken) {
-    bytes32 task = getTaskId(_execAddress, _execData.calldataSliceSelector());
-
-    address _callee = calleeOfTask[task];
-    require(_callee != address(0), "PokeMe: exec: No task found");
-
-    (bool success, ) = _execAddress.call(_execData);
-    require(success, "PokeMe: exec: Execution failed");
-
-    uint256 _balanceOfCallee = balanceOfCallee[_callee][_feeToken];
-
-    balanceOfCallee[_callee][_feeToken] = _balanceOfCallee - _txFee;
-
-    emit ExecSuccess(_txFee, _feeToken, _execAddress, _execData);
-  }
-
-  function depositFunds(
-    address _receiver,
-    address _token,
-    uint256 _amount
-  ) external payable {
-    uint256 depositAmount;
-    if (_token == ETH) {
-      depositAmount = msg.value;
-    } else {
-      IERC20 token = IERC20(_token);
-      uint256 preBalance = token.balanceOf(address(this));
-      token.safeTransferFrom(msg.sender, address(this), _amount);
-      uint256 postBalance = token.balanceOf(address(this));
-      depositAmount = postBalance - preBalance;
+        emit TaskCancelled(_task);
     }
 
     function exec(
@@ -122,7 +88,8 @@ contract PokeMe2 is Gelatofied {
         address _callee,
         address _execAddress,
         bytes calldata _execData
-    ) external onlyGelato() {
+    ) external onlyGelato {
+
         bytes32 task = getTaskId(
             _callee,
             _execAddress,
@@ -132,8 +99,8 @@ contract PokeMe2 is Gelatofied {
         address callee = calleeOfTask[task];
         require(callee == _callee, "PokeMe: exec: No task found");
 
-    if (!_tokenCredits[msg.sender].contains(_token))
-      _tokenCredits[msg.sender].add(_token);
+        (bool success, ) = _execAddress.call(_execData);
+        require(success, "PokeMe: exec: Execution failed");
 
         TaskTreasury(taskTreasury).useFunds(_feeToken, _txFee, callee);
 
@@ -153,7 +120,11 @@ contract PokeMe2 is Gelatofied {
         return bytes4(keccak256(bytes(_func)));
     }
 
-    function getTaskIdsByUser(address _callee) external view returns(bytes32[] memory) {
+    function getTaskIdsByUser(address _callee)
+        external
+        view
+        returns (bytes32[] memory)
+    {
         uint256 length = _createdTasks[_callee].length();
         bytes32[] memory taskIds = new bytes32[](length);
 
@@ -163,5 +134,4 @@ contract PokeMe2 is Gelatofied {
 
         return taskIds;
     }
-
 }

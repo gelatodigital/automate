@@ -18,9 +18,7 @@ module.exports = async (hre) => {
 
   await deploy("TaskTreasury", {
     from: deployer,
-    args: [
-      hre.network.config.GELATO,
-    ],
+    args: [hre.network.config.GELATO],
   });
 };
 

@@ -28,10 +28,15 @@ contract TaskTreasury is Ownable, ReentrancyGuard {
         uint256 amount
     );
 
-    constructor(address payable _gelato) {gelato = _gelato;}
+    constructor(address payable _gelato) {
+        gelato = _gelato;
+    }
 
     modifier onlyWhitelistedServices() {
-        require(whitelistedServices[msg.sender], "TaskTreasury: onlyWhitelistedServices");
+        require(
+            whitelistedServices[msg.sender],
+            "TaskTreasury: onlyWhitelistedServices"
+        );
         _;
     }
 
@@ -51,7 +56,9 @@ contract TaskTreasury is Ownable, ReentrancyGuard {
             depositAmount = postBalance - preBalance;
         }
 
-        userTokenBalance[_receiver][_token] = userTokenBalance[_receiver][_token] + depositAmount;
+        userTokenBalance[_receiver][_token] =
+            userTokenBalance[_receiver][_token] +
+            depositAmount;
 
         if (!_tokenCredits[msg.sender].contains(_token))
             _tokenCredits[msg.sender].add(_token);
@@ -76,10 +83,11 @@ contract TaskTreasury is Ownable, ReentrancyGuard {
         emit FundsWithdrawn(msg.sender, _token, withdrawAmount);
     }
 
-    function useFunds(address _token, uint256 _amount, address _user) 
-        external
-        onlyWhitelistedServices
-    {
+    function useFunds(
+        address _token,
+        uint256 _amount,
+        address _user
+    ) external onlyWhitelistedServices {
         uint256 _balanceOfCallee = userTokenBalance[_user][_token];
 
         userTokenBalance[_user][_token] = _balanceOfCallee - _amount;
@@ -89,25 +97,35 @@ contract TaskTreasury is Ownable, ReentrancyGuard {
 
     // Governance functions
     function addWhitelistedService(address _service) external onlyOwner {
-        require(whitelistedServices[_service] == false, "TaskTreasury: addWhitelistedService: whitelisted");
+        require(
+            whitelistedServices[_service] == false,
+            "TaskTreasury: addWhitelistedService: whitelisted"
+        );
         whitelistedServices[_service] = true;
     }
 
     // Governance functions
     function removeWhitelistedService(address _service) external onlyOwner {
-        require(whitelistedServices[_service] == true, "TaskTreasury: addWhitelistedService: !whitelisted");
+        require(
+            whitelistedServices[_service] == true,
+            "TaskTreasury: addWhitelistedService: !whitelisted"
+        );
         whitelistedServices[_service] = false;
     }
 
     // View Funcs
-    function getCreditTokensByUser(address _callee) external view returns(address[] memory) {
+    function getCreditTokensByUser(address _callee)
+        external
+        view
+        returns (address[] memory)
+    {
         uint256 length = _tokenCredits[_callee].length();
         address[] memory creditTokens = new address[](length);
-        
+
         for (uint256 i; i < length; i++) {
             creditTokens[i] = _tokenCredits[_callee].at(i);
         }
-        
+
         return creditTokens;
     }
 }

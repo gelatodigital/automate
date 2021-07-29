@@ -18,9 +18,7 @@ module.exports = async (hre) => {
 
   await deploy("CounterResolver", {
     from: deployer,
-    args: [
-      (await hre.ethers.getContract("Counter")).address,
-    ],
+    args: [(await hre.ethers.getContract("Counter")).address],
   });
 };
 
