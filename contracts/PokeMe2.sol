@@ -5,12 +5,10 @@ import { Gelatofied } from "./Gelatofied.sol";
 import { GelatoBytes } from "./GelatoBytes.sol";
 import { ReentrancyGuard } from "@openzeppelin/contracts/security/ReentrancyGuard.sol";
 import { EnumerableSet } from "@openzeppelin/contracts/utils/structs/EnumerableSet.sol";
-import { SafeMath } from "@openzeppelin/contracts/utils/math/SafeMath.sol";
 import { Math } from "@openzeppelin/contracts/utils/math/Math.sol";
 import { SafeERC20, IERC20 } from "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
 
 contract PokeMe2 is ReentrancyGuard, Gelatofied {
-  using SafeMath for uint256;
   using SafeERC20 for IERC20;
   using GelatoBytes for bytes;
   using EnumerableSet for EnumerableSet.Bytes32Set;
@@ -27,7 +25,7 @@ contract PokeMe2 is ReentrancyGuard, Gelatofied {
   event TaskCreated(
     address execAddress,
     bytes4 selector,
-    address resolver,
+    address resolverAddress,
     bytes32 taskId,
     bytes resolverData
   );
@@ -52,7 +50,7 @@ contract PokeMe2 is ReentrancyGuard, Gelatofied {
   function createTask(
     address _execAddress,
     bytes4 _execSelector,
-    address _resolver,
+    address _resolverAddress,
     bytes calldata _resolverData
   ) external {
     bytes32 _task = getTaskId(_execAddress, _execSelector);
@@ -69,7 +67,7 @@ contract PokeMe2 is ReentrancyGuard, Gelatofied {
     emit TaskCreated(
       _execAddress,
       _execSelector,
-      _resolver,
+      _resolverAddress,
       _task,
       _resolverData
     );
@@ -104,7 +102,7 @@ contract PokeMe2 is ReentrancyGuard, Gelatofied {
 
     uint256 _balanceOfCallee = balanceOfCallee[_callee][_feeToken];
 
-    balanceOfCallee[_callee][_feeToken] = _balanceOfCallee.sub(_txFee);
+    balanceOfCallee[_callee][_feeToken] = _balanceOfCallee - _txFee;
 
     emit ExecSuccess(_txFee, _feeToken, _execAddress, _execData);
   }
@@ -125,9 +123,9 @@ contract PokeMe2 is ReentrancyGuard, Gelatofied {
       depositAmount = postBalance - preBalance;
     }
 
-    balanceOfCallee[_receiver][_token] = balanceOfCallee[_receiver][_token].add(
-      depositAmount
-    );
+    balanceOfCallee[_receiver][_token] =
+      balanceOfCallee[_receiver][_token] +
+      depositAmount;
 
     if (!_tokenCredits[msg.sender].contains(_token))
       _tokenCredits[msg.sender].add(_token);
@@ -143,11 +141,11 @@ contract PokeMe2 is ReentrancyGuard, Gelatofied {
 
     uint256 withdrawAmount = Math.min(balance, _amount);
 
-    balanceOfCallee[msg.sender][_token] = balance.sub(withdrawAmount);
-
-    _transfer(payable(msg.sender), _token, withdrawAmount);
+    balanceOfCallee[msg.sender][_token] = balance - withdrawAmount;
 
     if (withdrawAmount == balance) _tokenCredits[msg.sender].remove(_token);
+
+    _transfer(payable(msg.sender), _token, withdrawAmount);
 
     emit FundsWithdrawn(msg.sender, _token, withdrawAmount);
   }
