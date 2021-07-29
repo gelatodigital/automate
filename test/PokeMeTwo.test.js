@@ -183,45 +183,85 @@ describe("PokeMeTwo Test", function () {
     expect(Number(await pokeMe.balanceOfCallee(userAddress, DAI))).to.be.eql(0);
   });
 
-  it("canExec should be true, caller does not have balance", async () => {
+  it("no task found when exec", async () => {
     const THREE_MIN = 3 * 60;
 
     await network.provider.send("evm_increaseTime", [THREE_MIN]);
     await network.provider.send("evm_mine", []);
 
-    const payload = await ethers.provider.call({
-      to: counterResolver.address,
-      data: resolverData,
-    });
+    await pokeMe.connect(user).cancelTask(taskHash);
+    [canExec, execData] = await counterResolver.canExecGetPayload();
 
-    // genPayloadAndCanExec must return
-    //   bool _canExec
-    //   bytes memory _execData,
-    const iface = new ethers.utils.Interface([
-      "function canExec() public view returns(bool canExec, bytes execData)",
-    ]);
+    await expect(
+      pokeMe
+        .connect(executor)
+        .exec(ethers.utils.parseEther("1"), DAI, counter.address, execData)
+    ).to.be.revertedWith("PokeMe: exec: No task found");
+  });
 
-    res = iface.decodeFunctionResult("canExec", payload);
+  it("canExec should be true, caller does not have enough ETH", async () => {
+    const THREE_MIN = 3 * 60;
 
-    execData = res.execData;
+    await network.provider.send("evm_increaseTime", [THREE_MIN]);
+    await network.provider.send("evm_mine", []);
+
+    const depositAmount = ethers.utils.parseEther("0.5");
+    await pokeMe
+      .connect(user)
+      .depositFunds(userAddress, ETH, depositAmount, { value: depositAmount });
+
+    [canExec, execData] = await counterResolver.canExecGetPayload();
+    expect(canExec).to.be.eq(true);
 
     await expect(
       pokeMe
         .connect(executor)
         .exec(ethers.utils.parseEther("1"), ETH, counter.address, execData)
-    ).to.be.reverted;
+    ).to.be.revertedWith(
+      "reverted with panic code 0x11 (Arithmetic operation underflowed or overflowed outside of an unchecked block)"
+    );
+
+    expect(await pokeMe.balanceOfCallee(userAddress, ETH)).to.be.eql(
+      depositAmount
+    );
   });
 
-  it("canExec should be true, executor should exec", async () => {
+  it("canExec should be true, caller does not have enough DAI", async () => {
     const THREE_MIN = 3 * 60;
-    const time_before = (await ethers.provider.getBlock()).timestamp;
 
     await network.provider.send("evm_increaseTime", [THREE_MIN]);
     await network.provider.send("evm_mine", []);
 
-    const time_after = (await ethers.provider.getBlock()).timestamp;
+    [canExec, execData] = await counterResolver.canExecGetPayload();
+    expect(canExec).to.be.eq(true);
 
-    expect(time_after - time_before).to.be.eq(THREE_MIN);
+    const depositAmount = ethers.utils.parseEther("0.5");
+    await getTokenFromFaucet(DAI, userAddress, depositAmount);
+
+    await dai.connect(user).approve(pokeMe.address, depositAmount);
+    await pokeMe.connect(user).depositFunds(userAddress, DAI, depositAmount);
+
+    await expect(
+      pokeMe
+        .connect(executor)
+        .exec(ethers.utils.parseEther("1"), DAI, counter.address, execData)
+    ).to.be.revertedWith(
+      "reverted with panic code 0x11 (Arithmetic operation underflowed or overflowed outside of an unchecked block)"
+    );
+
+    expect(await pokeMe.balanceOfCallee(userAddress, DAI)).to.be.eql(
+      depositAmount
+    );
+  });
+
+  it("canExec should be true, executor should exec", async () => {
+    [canExec, execData] = await counterResolver.canExecGetPayload();
+    expect(canExec).to.be.eq(true);
+
+    const THREE_MIN = 3 * 60;
+
+    await network.provider.send("evm_increaseTime", [THREE_MIN]);
+    await network.provider.send("evm_mine", []);
 
     expect(await counter.count()).to.be.eq(ethers.BigNumber.from("0"));
 
