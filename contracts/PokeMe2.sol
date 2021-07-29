@@ -6,18 +6,21 @@ import {GelatoBytes} from "./GelatoBytes.sol";
 import {ReentrancyGuard} from "@openzeppelin/contracts/security/ReentrancyGuard.sol";
 import {EnumerableSet} from "@openzeppelin/contracts/utils/structs/EnumerableSet.sol";
 import {SafeMath} from "@openzeppelin/contracts/utils/math/SafeMath.sol";
+import {Math} from "@openzeppelin/contracts/utils/math/Math.sol";
+import {SafeERC20, IERC20} from "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
 
 contract PokeMe2 is ReentrancyGuard, Gelatofied {
     using SafeMath for uint256;
+    using SafeERC20 for IERC20;
     using GelatoBytes for bytes;
     using EnumerableSet for EnumerableSet.Bytes32Set;
     using EnumerableSet for EnumerableSet.AddressSet;
 
-    uint256 public id;
     mapping(bytes32 => address) public calleeOfTask;
     mapping(bytes32 => address) public execAddresses;
-    mapping(address => uint256) public balanceOfCallee;
+    mapping(address => mapping(address => uint256)) public balanceOfCallee;
     mapping(address => EnumerableSet.Bytes32Set) internal _createdTasks;
+    mapping(address => EnumerableSet.AddressSet) internal _tokenCredits;
 
     constructor(address payable _gelato) Gelatofied(_gelato) {}
 
@@ -28,6 +31,22 @@ contract PokeMe2 is ReentrancyGuard, Gelatofied {
         bytes resolverData
     );
     event TaskCancelled(bytes32 task);
+    event FundsDeposited(
+        address indexed sender,
+        address indexed token,
+        uint256 indexed amount
+    );
+    event FundsWithdrawn(
+        address indexed receiver,
+        address indexed token,
+        uint256 amount
+    );
+    event ExecSuccess(
+        uint256 indexed txFee,
+        address indexed feeToken,
+        address indexed execAddress,
+        bytes execData
+    );
 
     function createTask(
         address _execAddress,
@@ -64,9 +83,10 @@ contract PokeMe2 is ReentrancyGuard, Gelatofied {
 
     function exec(
         uint256 _txFee,
+        address _feeToken,
         address _execAddress,
         bytes calldata _execData
-    ) external gelatofy(_txFee, ETH) {
+    ) external gelatofy(_txFee, _feeToken) {
         bytes32 task = getTaskHash(
             _execAddress,
             _execData.calldataSliceSelector()
@@ -82,36 +102,59 @@ contract PokeMe2 is ReentrancyGuard, Gelatofied {
         (bool success, ) = _execAddress.call(_execData);
         require(success, "PokeMe: exec: Execution failed");
 
-        uint256 _balanceOfCallee = balanceOfCallee[_callee];
+        uint256 _balanceOfCallee = balanceOfCallee[_callee][_feeToken];
 
-        balanceOfCallee[_callee] = _balanceOfCallee.sub(_txFee);
+        balanceOfCallee[_callee][_feeToken] = _balanceOfCallee.sub(_txFee);
+
+        emit ExecSuccess(_txFee, _feeToken, _execAddress, _execData);
     }
 
-    function depositFunds(address _receiver) external payable {
-        require(msg.value != 0, "PokeMe: depositFunds: No ether sent");
+    function depositFunds(
+        address _receiver,
+        address _token,
+        uint256 _amount
+    ) external payable {
+        uint256 depositAmount;
+        if (_token == ETH) {
+            depositAmount = msg.value;
+        } else {
+            IERC20 token = IERC20(_token);
+            uint256 preBalance = token.balanceOf(address(this));
+            token.safeTransferFrom(msg.sender, address(this), _amount);
+            uint256 postBalance = token.balanceOf(address(this));
+            depositAmount = postBalance - preBalance;
+        }
 
-        balanceOfCallee[_receiver] = balanceOfCallee[_receiver].add(msg.value);
+        balanceOfCallee[_receiver][_token] = balanceOfCallee[_receiver][_token]
+            .add(depositAmount);
+
+        if (!_tokenCredits[msg.sender].contains(_token))
+            _tokenCredits[msg.sender].add(_token);
+
+        emit FundsDeposited(_receiver, _token, depositAmount);
     }
 
-    function withdrawFunds(uint256 _amount) external nonReentrant {
-        uint256 balance = balanceOfCallee[msg.sender];
-
-        require(
-            balance >= _amount,
-            "PokeMe: withdrawFunds: Sender has insufficient balance"
-        );
-
-        balanceOfCallee[msg.sender] = balance.sub(_amount);
-
-        (bool success, ) = msg.sender.call{value: _amount}("");
-        require(success, "PokeMe: withdrawFunds: Withdraw funds failed");
-    }
-
-    function getTaskHash(address _execAddress, bytes4 _selector)
-        public
-        pure
-        returns (bytes32)
+    function withdrawFunds(address _token, uint256 _amount)
+        external
+        nonReentrant
     {
+        uint256 balance = balanceOfCallee[msg.sender][_token];
+
+        uint256 withdrawAmount = Math.min(balance, _amount);
+
+        balanceOfCallee[msg.sender][_token] = balance.sub(withdrawAmount);
+
+        _transfer(payable(msg.sender), _token, withdrawAmount);
+
+        if (withdrawAmount == balance) _tokenCredits[msg.sender].remove(_token);
+
+        emit FundsWithdrawn(msg.sender, _token, withdrawAmount);
+    }
+
+    function getTaskHash(
+        address _execAddress,
+        bytes4 _selector
+    ) public pure returns (bytes32) {
         return keccak256(abi.encode(_execAddress, _selector));
     }
 }

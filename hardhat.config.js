@@ -2,6 +2,8 @@
 require("@nomiclabs/hardhat-ethers");
 require("@nomiclabs/hardhat-waffle");
 require("@nomiclabs/hardhat-etherscan");
+require("hardhat-deploy");
+require("hardhat-deploy-ethers");
 
 // Libraries
 const assert = require("assert");
@@ -18,14 +20,19 @@ const DEPLOYER_PK_MAINNET = process.env.DEPLOYER_PK_MAINNET;
 const DEPLOYER_PK_ROPSTEN = process.env.DEPLOYER_PK_ROPSTEN;
 const ETHERSCAN_API = process.env.ETHERSCAN_API;
 
-const POKEME_ADDRESS = "0xeC8700A092789F58608212E314e3576bF2E98556";
+const GELATO = "0x3caca7b48d0573d793d3b0279b5f0029180e83b6"
 
 /**
  * @type import('hardhat/config').HardhatUserConfig
  */
 module.exports = {
   defaultNetwork: "hardhat",
-
+  // hardhat-deploy
+  namedAccounts: {
+    deployer: {
+      default: 0,
+    },
+  },
   networks: {
     hardhat: {
       // Standard config
@@ -33,6 +40,7 @@ module.exports = {
       forking: {
         url: `https://eth-mainnet.alchemyapi.io/v2/${ALCHEMY_ID}`,
         blockNumber: 12901600,
+        GELATO
       },
     },
     mainnet: {
@@ -40,6 +48,7 @@ module.exports = {
       chainId: 1,
       url: `https://eth-mainnet.alchemyapi.io/v2/${ALCHEMY_ID}`,
       gasPrice: parseInt(utils.parseUnits("1", "gwei")),
+      GELATO: "0x3caca7b48d0573d793d3b0279b5f0029180e83b6"
     },
 
     ropsten: {
@@ -47,7 +56,7 @@ module.exports = {
       chainId: 3,
       url: `https://eth-ropsten.alchemyapi.io/v2/${ALCHEMY_ID}`,
       gasPrice: parseInt(utils.parseUnits("2", "gwei")),
-      POKEME_ADDRESS,
+      GELATO: "0xCc4CcD69D31F9FfDBD3BFfDe49c6aA886DaB98d9"
     },
   },
   solidity: {

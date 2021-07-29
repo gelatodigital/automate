@@ -14,11 +14,19 @@ abstract contract Gelatofied {
     modifier gelatofy(uint256 _amount, address _paymentToken) {
         require(msg.sender == gelato, "Gelatofied: Only gelato");
         _;
+        _transfer(gelato, _paymentToken, _amount);
+    }
+
+    function _transfer(
+        address payable _to,
+        address _paymentToken,
+        uint256 _amount
+    ) internal {
         if (_paymentToken == ETH) {
-            (bool success, ) = gelato.call{value: _amount}("");
+            (bool success, ) = _to.call{value: _amount}("");
             require(success, "Gelatofied: Gelato fee failed");
         } else {
-            SafeERC20.safeTransfer(IERC20(_paymentToken), gelato, _amount);
+            SafeERC20.safeTransfer(IERC20(_paymentToken), _to, _amount);
         }
     }
 }
