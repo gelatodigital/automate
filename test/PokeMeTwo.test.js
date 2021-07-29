@@ -18,7 +18,7 @@ describe("PokeMeTwo Test", function () {
   let resolverData;
   let executor;
   let execData;
-  let res;
+  let task;
   let taskHash;
   let selector;
   let _pokeMe;
@@ -55,6 +55,7 @@ describe("PokeMeTwo Test", function () {
     );
 
     selector = await pokeMe.getSelector("increaseCount(uint256)");
+    task = await pokeMe.getTaskId(counter.address, selector);
 
     await expect(
       pokeMe
@@ -71,6 +72,7 @@ describe("PokeMeTwo Test", function () {
         counter.address,
         selector,
         counterResolver.address,
+        task,
         resolverData
       );
 
@@ -101,15 +103,23 @@ describe("PokeMeTwo Test", function () {
   it("deposit and withdraw ETH", async () => {
     const depositAmount = ethers.utils.parseEther("1");
 
-    await pokeMe
-      .connect(user)
-      .depositFunds(userAddress, ETH, depositAmount, { value: depositAmount });
+    await expect(
+      pokeMe
+        .connect(user)
+        .depositFunds(userAddress, ETH, depositAmount, { value: depositAmount })
+    )
+      .to.emit(pokeMe, "FundsDeposited")
+      .withArgs(userAddress, ETH, depositAmount);
 
     expect(await pokeMe.balanceOfCallee(userAddress, ETH)).to.be.eq(
       ethers.utils.parseEther("1")
     );
 
-    await pokeMe.connect(user).withdrawFunds(ETH, ethers.utils.parseEther("1"));
+    await expect(
+      pokeMe.connect(user).withdrawFunds(ETH, ethers.utils.parseEther("1"))
+    )
+      .to.emit(pokeMe, "FundsWithdrawn")
+      .withArgs(userAddress, ETH, depositAmount);
 
     expect(await pokeMe.balanceOfCallee(userAddress, ETH)).to.be.eq(
       ethers.BigNumber.from("0")
@@ -338,5 +348,38 @@ describe("PokeMeTwo Test", function () {
         .connect(executor)
         .exec(ethers.utils.parseEther("1"), DAI, counter.address, execData2)
     ).to.be.revertedWith("PokeMe: exec: Execution failed");
+  });
+
+  it("getTaskIdsByUser test", async () => {
+    // fake task
+    await pokeMe
+      .connect(user)
+      .createTask(userAddress, selector, counterResolver.address, resolverData);
+    const ids = await pokeMe.getTaskIdsByUser(userAddress);
+
+    expect(ids.length).to.be.eql(2);
+  });
+
+  it("getCreditTokensByUser test", async () => {
+    const depositAmount = ethers.utils.parseEther("1");
+
+    await getTokenFromFaucet(DAI, userAddress, depositAmount);
+
+    await dai.approve(pokeMe.address, depositAmount);
+
+    await pokeMe.connect(user).depositFunds(userAddress, DAI, depositAmount);
+
+    await pokeMe
+      .connect(user)
+      .depositFunds(userAddress, ETH, depositAmount, { value: depositAmount });
+
+    expect(await pokeMe.balanceOfCallee(userAddress, ETH)).to.be.eql(
+      depositAmount
+    );
+    expect(await pokeMe.balanceOfCallee(userAddress, DAI)).to.be.eql(
+      depositAmount
+    );
+    const creditTokens = await pokeMe.getCreditTokensByUser(userAddress);
+    console.log(creditTokens);
   });
 });
