@@ -31,9 +31,14 @@ describe("PokeMeTwo Test", function () {
     _pokeMe = await ethers.getContractFactory("PokeMe2");
     _counter = await ethers.getContractFactory("Counter");
     _counterResolver = await ethers.getContractFactory("CounterResolver");
+    console.log("1")
     dai = await ethers.getContractAt("IERC20", DAI)
+    console.log("2")
 
+    console.log("3")
+    console.log(gelatoAddress)
     pokeMe = await _pokeMe.deploy(gelatoAddress);
+    console.log("4")
     counter = await _counter.deploy();
     counterResolver = await _counterResolver.deploy(counter.address);
 
@@ -70,7 +75,7 @@ describe("PokeMeTwo Test", function () {
         resolverData
       );
 
-    taskHash = await pokeMe.getTaskHash(counter.address, selector);
+    taskHash = await pokeMe.getTaskId(counter.address, selector);
   });
 
   it("check create and cancel task", async () => {
