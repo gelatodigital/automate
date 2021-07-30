@@ -24,6 +24,7 @@ contract TaskTreasury is Ownable, ReentrancyGuard {
     );
     event FundsWithdrawn(
         address indexed receiver,
+        address indexed initiator,
         address indexed token,
         uint256 amount
     );
@@ -40,6 +41,10 @@ contract TaskTreasury is Ownable, ReentrancyGuard {
         _;
     }
 
+    /// @notice Function to deposit Funds which will be used to execute transactions on various services
+    /// @param _receiver Address receiving the credits
+    /// @param _token Token to be credited, use "0xeeee...." for ETH
+    /// @param _amount Amount to be credited
     function depositFunds(
         address _receiver,
         address _token,
@@ -60,42 +65,57 @@ contract TaskTreasury is Ownable, ReentrancyGuard {
             userTokenBalance[_receiver][_token] +
             depositAmount;
 
-        if (!_tokenCredits[msg.sender].contains(_token))
-            _tokenCredits[msg.sender].add(_token);
+        if (!_tokenCredits[_receiver].contains(_token))
+            _tokenCredits[_receiver].add(_token);
 
         emit FundsDeposited(_receiver, _token, depositAmount);
     }
 
-    function withdrawFunds(address _token, uint256 _amount)
-        external
-        nonReentrant
-    {
+    /// @notice Function to withdraw Funds back to the _receiver
+    /// @param _receiver Address receiving the credits
+    /// @param _token Token to be credited, use "0xeeee...." for ETH
+    /// @param _amount Amount to be credited
+    function withdrawFunds(
+        address payable _receiver,
+        address _token,
+        uint256 _amount
+    ) external nonReentrant {
         uint256 balance = userTokenBalance[msg.sender][_token];
 
         uint256 withdrawAmount = Math.min(balance, _amount);
 
         userTokenBalance[msg.sender][_token] = balance - withdrawAmount;
 
-        _transfer(payable(msg.sender), _token, withdrawAmount);
+        _transfer(_receiver, _token, withdrawAmount);
 
         if (withdrawAmount == balance) _tokenCredits[msg.sender].remove(_token);
 
-        emit FundsWithdrawn(msg.sender, _token, withdrawAmount);
+        emit FundsWithdrawn(_receiver, msg.sender, _token, withdrawAmount);
     }
 
+    /// @notice Function called by whitelisted services to handle payments, e.g. PokeMe"
+    /// @param _token Token to be used for payment by users
+    /// @param _amount Amount to be deducted
+    /// @param _user Address of user whose balance will be deducted
     function useFunds(
         address _token,
         uint256 _amount,
         address _user
     ) external onlyWhitelistedServices {
-        uint256 _balanceOfCallee = userTokenBalance[_user][_token];
+        userTokenBalance[_user][_token] =
+            userTokenBalance[_user][_token] -
+            _amount;
 
-        userTokenBalance[_user][_token] = _balanceOfCallee - _amount;
+        if (userTokenBalance[_user][_token] == 0)
+            _tokenCredits[_user].remove(_token);
 
         _transfer(gelato, _token, _amount);
     }
 
     // Governance functions
+
+    /// @notice Add new service that can call useFunds. Gelato Governance
+    /// @param _service New service to add
     function addWhitelistedService(address _service) external onlyOwner {
         require(
             whitelistedServices[_service] == false,
@@ -104,7 +124,8 @@ contract TaskTreasury is Ownable, ReentrancyGuard {
         whitelistedServices[_service] = true;
     }
 
-    // Governance functions
+    /// @notice Remove old service that can call useFunds. Gelato Governance
+    /// @param _service Old service to remove
     function removeWhitelistedService(address _service) external onlyOwner {
         require(
             whitelistedServices[_service] == true,
@@ -114,16 +135,19 @@ contract TaskTreasury is Ownable, ReentrancyGuard {
     }
 
     // View Funcs
-    function getCreditTokensByUser(address _callee)
+
+    /// @notice Helper func to get all deposited tokens by a user
+    /// @param _user User to get the balances from
+    function getCreditTokensByUser(address _user)
         external
         view
         returns (address[] memory)
     {
-        uint256 length = _tokenCredits[_callee].length();
+        uint256 length = _tokenCredits[_user].length();
         address[] memory creditTokens = new address[](length);
 
         for (uint256 i; i < length; i++) {
-            creditTokens[i] = _tokenCredits[_callee].at(i);
+            creditTokens[i] = _tokenCredits[_user].at(i);
         }
 
         return creditTokens;
