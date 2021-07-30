@@ -34,7 +34,7 @@ describe("PokeMeTwo Test", function () {
     user2Address = await user2.getAddress();
 
     _taskTreasury = await ethers.getContractFactory("TaskTreasury");
-    _pokeMe = await ethers.getContractFactory("PokeMe2");
+    _pokeMe = await ethers.getContractFactory("PokeMe");
     _counter = await ethers.getContractFactory("Counter");
     _counterResolver = await ethers.getContractFactory("CounterResolver");
 
