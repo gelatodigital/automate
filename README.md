@@ -146,7 +146,33 @@ To get `taskId`, use `getTaskId`:
 
 ## Demo 🌟
 
-### Ropsten:
+### Using Etherscan - Mainnet:
+
+This demo will automate incrementing a counter on the [Counter.sol](https://github.com/gelatodigital/pokeme/blob/23803cf2dc6e95614c1ec52a5dcce20dd70b70f6/contracts/Counter.sol) contract every 3 minutes.
+
+1. Go to PokeMe's [Etherscan Page](https://etherscan.io/address/0x89a26d08c26E00cE935a775Ba74A984Ad346679b)
+   
+2. Call createTask with the following parameters:
+
+- _execAddress: "0x15a4d35e067213278c5a996f6050f37e7de6df2f" - Counter.sol
+- _execSelector: "0x46d4adf2" - encoded "increaseCount(uint256)" function 
+- _resolverAddress: "0x17eaf9c43736b4e44c3b270a88aa162477e094e3" - CounterResolver.sol
+- _resolverData: "0xcf5303cf" - encoded "checker()" data
+
+![CreateTask](/createTask.png)
+
+You can get the _execSelector using PokeMe's `getSelector()` func
+
+![getSelector](/getSelector.png)
+ 
+3. Deposit ETH on the [TaskTreasury](https://etherscan.io/address/0x66e2F69df68C8F56837142bE2E8C290EfE76DA9f) using the `depositFunds()` func
+
+![Deposit Funds](/deposit.png)
+
+And you should be good to go ✅ Check the Counter on Counter.sol incrementing
+
+
+### Using CLI - Ropsten:
 
 In this demo, you will deploy your own instance of `Counter`, `CounterResolver` contract and submit a task to `PokeMe`, which Gelato will then monitor and increase the count of your `Counter` every 3 minutes.
 
