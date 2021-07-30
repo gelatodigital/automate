@@ -20,8 +20,6 @@ const DEPLOYER_PK_MAINNET = process.env.DEPLOYER_PK_MAINNET;
 const DEPLOYER_PK_ROPSTEN = process.env.DEPLOYER_PK_ROPSTEN;
 const ETHERSCAN_API = process.env.ETHERSCAN_API;
 
-const GELATO = "0x3caca7b48d0573d793d3b0279b5f0029180e83b6"
-
 /**
  * @type import('hardhat/config').HardhatUserConfig
  */
@@ -41,14 +39,14 @@ module.exports = {
         url: `https://eth-mainnet.alchemyapi.io/v2/${ALCHEMY_ID}`,
         blockNumber: 12901600,
       },
-      GELATO: "0x3caca7b48d0573d793d3b0279b5f0029180e83b6"
+      GELATO: "0x3caca7b48d0573d793d3b0279b5f0029180e83b6",
     },
     mainnet: {
       accounts: DEPLOYER_PK_MAINNET ? [DEPLOYER_PK_MAINNET] : [],
       chainId: 1,
       url: `https://eth-mainnet.alchemyapi.io/v2/${ALCHEMY_ID}`,
       gasPrice: parseInt(utils.parseUnits("1", "gwei")),
-      GELATO: "0x3caca7b48d0573d793d3b0279b5f0029180e83b6"
+      GELATO: "0x3caca7b48d0573d793d3b0279b5f0029180e83b6",
     },
 
     ropsten: {
@@ -56,7 +54,10 @@ module.exports = {
       chainId: 3,
       url: `https://eth-ropsten.alchemyapi.io/v2/${ALCHEMY_ID}`,
       gasPrice: parseInt(utils.parseUnits("2", "gwei")),
-      GELATO: "0xCc4CcD69D31F9FfDBD3BFfDe49c6aA886DaB98d9"
+      GELATO: "0xCc4CcD69D31F9FfDBD3BFfDe49c6aA886DaB98d9",
+      POKEME: "0x53638DFef84aAA6AAbA70F948d39d00001771d99",
+      TASK_TREASURY: "0x2705aCca70CdB3E326C1013eEA2c03A4f2935b66",
+      ETH: "0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE",
     },
   },
   solidity: {
