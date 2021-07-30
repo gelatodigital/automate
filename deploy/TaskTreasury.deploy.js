@@ -7,7 +7,7 @@ module.exports = async (hre) => {
     hre.network.name === "ropsten"
   ) {
     console.log(
-      `Deploying CounterResolver to ${hre.network.name}. Hit ctrl + c to abort`
+      `Deploying TaskTreasury to ${hre.network.name}. Hit ctrl + c to abort`
     );
     await sleep(10000);
   }
@@ -16,9 +16,9 @@ module.exports = async (hre) => {
   const { deploy } = deployments;
   const { deployer } = await hre.getNamedAccounts();
 
-  await deploy("CounterResolver", {
+  await deploy("TaskTreasury", {
     from: deployer,
-    args: [(await hre.ethers.getContract("Counter")).address],
+    args: [hre.network.config.GELATO],
   });
 };
 
@@ -30,5 +30,4 @@ module.exports.skip = async (hre) => {
   return skip ? true : false;
 };
 
-module.exports.tags = ["CounterResolver"];
-module.exports.dependencies = ["Counter"];
+module.exports.tags = ["TaskTreasury"];

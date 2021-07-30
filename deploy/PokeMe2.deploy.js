@@ -20,6 +20,7 @@ module.exports = async (hre) => {
     from: deployer,
     args: [
       hre.network.config.GELATO,
+      (await hre.ethers.getContract("TaskTreasury")).address,
     ],
   });
 };
@@ -33,3 +34,4 @@ module.exports.skip = async (hre) => {
 };
 
 module.exports.tags = ["PokeMe2"];
+module.exports.dependencies = ["TaskTreasury"];
