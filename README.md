@@ -169,7 +169,7 @@ You can get the _execSelector using PokeMe's `getSelector()` func
 
 ![Deposit Funds](/deposit.png)
 
-And you should be good to go ✅ Check the Counter on Counter.sol incrementing
+And you should be good to go ✅ Check the `count` on Counter.sol incrementing
 
 
 ### Using CLI - Ropsten:
