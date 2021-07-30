@@ -34,7 +34,7 @@ describe("PokeMeTwo Test", function () {
     user2Address = await user2.getAddress();
 
     _taskTreasury = await ethers.getContractFactory("TaskTreasury");
-    _pokeMe = await ethers.getContractFactory("PokeMe2");
+    _pokeMe = await ethers.getContractFactory("PokeMe");
     _counter = await ethers.getContractFactory("Counter");
     _counterResolver = await ethers.getContractFactory("CounterResolver");
 
@@ -55,7 +55,7 @@ describe("PokeMeTwo Test", function () {
     executor = await ethers.provider.getSigner(executorAddress);
 
     resolverData = await counterResolver.interface.encodeFunctionData(
-      "canExecGetPayload",
+      "checker",
       []
     );
 
@@ -120,10 +120,10 @@ describe("PokeMeTwo Test", function () {
     await expect(
       taskTreasury
         .connect(user)
-        .withdrawFunds(ETH, ethers.utils.parseEther("1"))
+        .withdrawFunds(userAddress, ETH, ethers.utils.parseEther("1"))
     )
       .to.emit(taskTreasury, "FundsWithdrawn")
-      .withArgs(userAddress, ETH, depositAmount);
+      .withArgs(userAddress, userAddress, ETH, depositAmount);
 
     expect(await taskTreasury.userTokenBalance(userAddress, ETH)).to.be.eq(
       ethers.BigNumber.from("0")
@@ -147,9 +147,11 @@ describe("PokeMeTwo Test", function () {
       ethers.utils.parseEther("1")
     );
 
-    await expect(taskTreasury.connect(user).withdrawFunds(DAI, depositAmount))
+    await expect(
+      taskTreasury.connect(user).withdrawFunds(userAddress, DAI, depositAmount)
+    )
       .to.emit(taskTreasury, "FundsWithdrawn")
-      .withArgs(userAddress, DAI_checksum, depositAmount);
+      .withArgs(userAddress, userAddress, DAI_checksum, depositAmount);
 
     expect(await taskTreasury.userTokenBalance(userAddress, DAI)).to.be.eq(
       ethers.BigNumber.from("0")
@@ -165,7 +167,9 @@ describe("PokeMeTwo Test", function () {
 
     const balanceBefore = await ethers.provider.getBalance(pokeMe.address);
 
-    await taskTreasury.connect(user).withdrawFunds(ETH, ethers.utils.parseEther("1"));
+    await taskTreasury
+      .connect(user)
+      .withdrawFunds(userAddress, ETH, ethers.utils.parseEther("1"));
 
     const balanceAfter = await ethers.provider.getBalance(pokeMe.address);
 
@@ -173,7 +177,9 @@ describe("PokeMeTwo Test", function () {
     expect(await taskTreasury.userTokenBalance(user2Address, ETH)).to.be.eql(
       depositAmount
     );
-    expect(Number(await taskTreasury.userTokenBalance(userAddress, ETH))).to.be.eql(0);
+    expect(
+      Number(await taskTreasury.userTokenBalance(userAddress, ETH))
+    ).to.be.eql(0);
   });
 
   it("user withdraw more DAI than balance", async () => {
@@ -182,11 +188,15 @@ describe("PokeMeTwo Test", function () {
     await getTokenFromFaucet(DAI, user2Address, depositAmount);
 
     await dai.connect(user2).approve(taskTreasury.address, depositAmount);
-    await taskTreasury.connect(user2).depositFunds(user2Address, DAI, depositAmount);
+    await taskTreasury
+      .connect(user2)
+      .depositFunds(user2Address, DAI, depositAmount);
 
     const balanceBefore = await dai.balanceOf(taskTreasury.address);
 
-    await taskTreasury.connect(user).withdrawFunds(DAI, ethers.utils.parseEther("1"));
+    await taskTreasury
+      .connect(user)
+      .withdrawFunds(userAddress, DAI, ethers.utils.parseEther("1"));
 
     const balanceAfter = await dai.balanceOf(taskTreasury.address);
 
@@ -194,7 +204,9 @@ describe("PokeMeTwo Test", function () {
     expect(await taskTreasury.userTokenBalance(user2Address, DAI)).to.be.eql(
       depositAmount
     );
-    expect(Number(await taskTreasury.userTokenBalance(userAddress, DAI))).to.be.eql(0);
+    expect(
+      Number(await taskTreasury.userTokenBalance(userAddress, DAI))
+    ).to.be.eql(0);
   });
 
   it("no task found when exec", async () => {
@@ -204,12 +216,18 @@ describe("PokeMeTwo Test", function () {
     await network.provider.send("evm_mine", []);
 
     await pokeMe.connect(user).cancelTask(taskHash);
-    let [, execData] = await counterResolver.canExecGetPayload();
+    let [, execData] = await counterResolver.checker();
 
     await expect(
       pokeMe
         .connect(executor)
-        .exec(ethers.utils.parseEther("1"), DAI, userAddress, counter.address, execData)
+        .exec(
+          ethers.utils.parseEther("1"),
+          DAI,
+          userAddress,
+          counter.address,
+          execData
+        )
     ).to.be.revertedWith("PokeMe: exec: No task found");
   });
 
@@ -224,7 +242,7 @@ describe("PokeMeTwo Test", function () {
       .connect(user)
       .depositFunds(userAddress, ETH, depositAmount, { value: depositAmount });
 
-    let [canExec, execData] = await counterResolver.canExecGetPayload();
+    let [canExec, execData] = await counterResolver.checker();
     expect(canExec).to.be.eq(true);
 
     await expect(
@@ -246,19 +264,27 @@ describe("PokeMeTwo Test", function () {
     await network.provider.send("evm_increaseTime", [THREE_MIN]);
     await network.provider.send("evm_mine", []);
 
-    let [canExec, execData] = await counterResolver.canExecGetPayload();
+    let [canExec, execData] = await counterResolver.checker();
     expect(canExec).to.be.eq(true);
 
     const depositAmount = ethers.utils.parseEther("0.5");
     await getTokenFromFaucet(DAI, userAddress, depositAmount);
 
     await dai.connect(user).approve(taskTreasury.address, depositAmount);
-    await taskTreasury.connect(user).depositFunds(userAddress, DAI, depositAmount);
+    await taskTreasury
+      .connect(user)
+      .depositFunds(userAddress, DAI, depositAmount);
 
     await expect(
       pokeMe
         .connect(executor)
-        .exec(ethers.utils.parseEther("1"), DAI, userAddress, counter.address, execData)
+        .exec(
+          ethers.utils.parseEther("1"),
+          DAI,
+          userAddress,
+          counter.address,
+          execData
+        )
     ).to.be.revertedWith(
       "reverted with panic code 0x11 (Arithmetic operation underflowed or overflowed outside of an unchecked block)"
     );
@@ -269,7 +295,7 @@ describe("PokeMeTwo Test", function () {
   });
 
   it("canExec should be true, executor should exec", async () => {
-    let [canExec, execData] = await counterResolver.canExecGetPayload();
+    let [canExec, execData] = await counterResolver.checker();
     expect(canExec).to.be.eq(true);
 
     const THREE_MIN = 3 * 60;
@@ -327,33 +353,20 @@ describe("PokeMeTwo Test", function () {
     //     counter.address,
     //     execData
     //   )).to.be.revertedWith("PokeMe: exec: Execution failed");
-    
-
-    // let [canExec, execData2] = await counterResolver.canExecGetPayload();
-
+    // let [canExec, execData2] = await counterResolver.checker();
     // expect(canExec).to.be.eq(false);
-
     // const THREE_MIN = 3 * 70; // add 10 sec buffer
-
     // await network.provider.send("evm_increaseTime", [THREE_MIN]);
     // await network.provider.send("evm_mine", []);
-
-    // [canExec, execData2] = await counterResolver.canExecGetPayload();
-
+    // [canExec, execData2] = await counterResolver.checker();
     // expect(canExec).to.be.eq(true);
-
     // expect(await counter.count()).to.be.eq(ethers.BigNumber.from("100"));
-
     // const daiAmount = ethers.utils.parseEther("100");
-
     // await dai.approve(taskTreasury.address, daiAmount);
-
     // await taskTreasury.connect(user).depositFunds(userAddress, DAI, daiAmount);
-
     // expect(
     //   await taskTreasury.connect(user).userTokenBalance(userAddress, DAI)
     // ).to.be.eq(daiAmount);
-
     // await pokeMe
     //   .connect(executor)
     //   .exec(
@@ -363,12 +376,10 @@ describe("PokeMeTwo Test", function () {
     //     counter.address,
     //     execData2
     //   );
-
     // expect(await counter.count()).to.be.eq(ethers.BigNumber.from("200"));
     // expect(
     //   await taskTreasury.connect(user).userTokenBalance(userAddress, DAI)
     // ).to.be.eq(ethers.utils.parseEther("10"));
-
     // // time not elapsed
     // await expect(
     //   pokeMe
@@ -400,7 +411,9 @@ describe("PokeMeTwo Test", function () {
 
     await dai.approve(taskTreasury.address, depositAmount);
 
-    await taskTreasury.connect(user).depositFunds(userAddress, DAI, depositAmount);
+    await taskTreasury
+      .connect(user)
+      .depositFunds(userAddress, DAI, depositAmount);
 
     await taskTreasury
       .connect(user)

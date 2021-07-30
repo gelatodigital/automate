@@ -7,7 +7,7 @@ module.exports = async (hre) => {
     hre.network.name === "ropsten"
   ) {
     console.log(
-      `Deploying PokeMe2 to ${hre.network.name}. Hit ctrl + c to abort`
+      `Deploying PokeMe to ${hre.network.name}. Hit ctrl + c to abort`
     );
     await sleep(10000);
   }
@@ -16,7 +16,7 @@ module.exports = async (hre) => {
   const { deploy } = deployments;
   const { deployer } = await hre.getNamedAccounts();
 
-  await deploy("PokeMe2", {
+  await deploy("PokeMe", {
     from: deployer,
     args: [
       hre.network.config.GELATO,
@@ -33,5 +33,5 @@ module.exports.skip = async (hre) => {
   return skip ? true : false;
 };
 
-module.exports.tags = ["PokeMe2"];
+module.exports.tags = ["PokeMe"];
 module.exports.dependencies = ["TaskTreasury"];
