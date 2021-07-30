@@ -18,21 +18,39 @@ To start, you would need to have a resolver contract which returns
 - Whether your task should be executed.
 - Payload of the execution. This Payload should consist of the function selector + encoded data
 
-Example of a checker function:
+Example of a Resolver which exposes a checker function:
 
 ```js
- function checker()
-    external
-    view
-    override
-    returns (bool canExec, bytes memory execPayload)
-  {
-    canExec = true;
+  contract CounterResolver {
 
-    execPayload = abi.encodeWithSelector(
-        ICounter.increaseCount.selector,
-        uint256(100)
-    );
+    uint256 public count;
+
+    constructor(address _counter) {
+        COUNTER = _counter;
+    }
+
+    function checker()
+        external
+        view
+        override
+        returns (bool canExec, bytes memory execPayload)
+    {
+        canExec = true; // will always execute
+
+        execPayload = abi.encodeWithSelector(
+            CounterResolver.increaseCount.selector,
+            uint256(100)
+        );
+    }
+
+    function increaseCount(uint256 amount) external {
+        require(
+            ((block.timestamp - lastExecuted) > 180),
+            "Counter: increaseCount: Time not elapsed"
+        );
+
+        count += amount;
+    }
   }
 ```
 
@@ -56,7 +74,7 @@ const pokeMeAbi = ["function getSelector(string _func) external pure returns (by
 
 const pokeMe = await ethers.getContractAt(pokeMeAbi, "0x89a26d08c26E00cE935a775Ba74A984Ad346679b");
 
-const execSelector = await pokeMe.getSelector("exec(address,address,uint256)");
+const execSelector = await pokeMe.getSelector("increaseCount(uint256)");
 
 const resolverAbi = ["function checker(address _token, address _receiver, uint256 amount) external view returns(bool canExec, bytes calldata execData)"]
 
