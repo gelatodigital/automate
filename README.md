@@ -155,7 +155,7 @@ This demo will automate incrementing a counter on the [Counter.sol](https://gith
 2. Call createTask with the following parameters:
 
 - _execAddress: "0x15a4d35e067213278c5a996f6050f37e7de6df2f" - Counter.sol
-- _execSelector: "0x46d4adf2" - encoded "increaseCount(uint256)" function 
+- _execSelector: "0x46d4adf2" - "increaseCount(uint256)" function selector
 - _resolverAddress: "0x17eaf9c43736b4e44c3b270a88aa162477e094e3" - CounterResolver.sol
 - _resolverData: "0xcf5303cf" - encoded "checker()" data
 
@@ -165,7 +165,7 @@ You can get the _execSelector using PokeMe's `getSelector()` func
 
 ![getSelector](/getSelector.png)
  
-3. Deposit ETH on the [TaskTreasury](https://etherscan.io/address/0x66e2F69df68C8F56837142bE2E8C290EfE76DA9f) using the `depositFunds()` func
+1. Deposit ETH on the [TaskTreasury](https://etherscan.io/address/0x66e2F69df68C8F56837142bE2E8C290EfE76DA9f) using the `depositFunds()` func
 
 ![Deposit Funds](/deposit.png)
 
