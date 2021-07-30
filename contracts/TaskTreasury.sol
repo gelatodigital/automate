@@ -14,7 +14,7 @@ contract TaskTreasury is Ownable, ReentrancyGuard {
 
     mapping(address => mapping(address => uint256)) public userTokenBalance;
     mapping(address => EnumerableSet.AddressSet) internal _tokenCredits;
-    mapping(address => bool) public whitelistedServices;
+    EnumerableSet.AddressSet internal _whitelistedServices;
     address payable public immutable gelato;
 
     event FundsDeposited(
@@ -35,7 +35,7 @@ contract TaskTreasury is Ownable, ReentrancyGuard {
 
     modifier onlyWhitelistedServices() {
         require(
-            whitelistedServices[msg.sender],
+            _whitelistedServices.contains(msg.sender),
             "TaskTreasury: onlyWhitelistedServices"
         );
         _;
@@ -118,20 +118,20 @@ contract TaskTreasury is Ownable, ReentrancyGuard {
     /// @param _service New service to add
     function addWhitelistedService(address _service) external onlyOwner {
         require(
-            whitelistedServices[_service] == false,
+            !_whitelistedServices.contains(_service),
             "TaskTreasury: addWhitelistedService: whitelisted"
         );
-        whitelistedServices[_service] = true;
+        _whitelistedServices.add(_service);
     }
 
     /// @notice Remove old service that can call useFunds. Gelato Governance
     /// @param _service Old service to remove
     function removeWhitelistedService(address _service) external onlyOwner {
         require(
-            whitelistedServices[_service] == true,
+            _whitelistedServices.contains(_service),
             "TaskTreasury: addWhitelistedService: !whitelisted"
         );
-        whitelistedServices[_service] = false;
+        _whitelistedServices.remove(_service);
     }
 
     // View Funcs
@@ -149,7 +149,16 @@ contract TaskTreasury is Ownable, ReentrancyGuard {
         for (uint256 i; i < length; i++) {
             creditTokens[i] = _tokenCredits[_user].at(i);
         }
-
         return creditTokens;
+    }
+
+    function getWhitelistedServices() external view returns (address[] memory) {
+        uint256 length = _whitelistedServices.length();
+        address[] memory whitelistedServices = new address[](length);
+
+        for (uint256 i; i < length; i++) {
+            whitelistedServices[i] = _whitelistedServices.at(i);
+        }
+        return whitelistedServices;
     }
 }
