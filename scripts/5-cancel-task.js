@@ -1,21 +1,25 @@
 const { ethers } = require("hardhat");
 
-const POKEME_ADDRESS = hre.network.config.POKEME_ADDRESS;
-const COUNTER_ADDRESS = process.env.npm_config_counter;
+const POKEME = hre.network.config.POKEME;
+const COUNTER = process.env.npm_config_counter;
 
 async function main() {
   [user] = await hre.ethers.getSigners();
   userAddress = await user.getAddress();
   console.log("Canceling Task");
 
-  const pokeme = await ethers.getContractAt("PokeMe", POKEME_ADDRESS, user);
-  const counter = await ethers.getContractAt("Counter", COUNTER_ADDRESS, user);
+  const pokeMe = await ethers.getContractAt("PokeMe", POKEME, user);
+  const counter = await ethers.getContractAt("Counter", COUNTER, user);
 
-  const taskData = await counter.interface.encodeFunctionData("increaseCount", [
-    1,
-  ]);
+  selector = await pokeMe.getSelector("increaseCount(uint256)");
 
-  txn = await pokeme.cancelTask(counter.address, taskData, {
+  const taskHash = await pokeMe.getTaskId(
+    userAddress,
+    counter.address,
+    selector
+  );
+
+  txn = await pokeMe.cancelTask(taskHash, {
     gasLimit: 1000000,
     gasPrice: ethers.utils.parseUnits("2", "gwei"),
   });
