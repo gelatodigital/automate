@@ -20,8 +20,6 @@ const DEPLOYER_PK_MAINNET = process.env.DEPLOYER_PK_MAINNET;
 const DEPLOYER_PK_ROPSTEN = process.env.DEPLOYER_PK_ROPSTEN;
 const ETHERSCAN_API = process.env.ETHERSCAN_API;
 
-const GELATO = "0x3caca7b48d0573d793d3b0279b5f0029180e83b6"
-
 /**
  * @type import('hardhat/config').HardhatUserConfig
  */
