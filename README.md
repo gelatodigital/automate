@@ -15,39 +15,91 @@ Automate smart contract executions with Gelato by submitting tasks to `PokeMe`
 
 To start, you would need to have a resolver contract which returns
 
-- Wether your task should be executed.
-- Payload of the execution.
+- Whether your task should be executed.
+- Payload of the execution. This Payload should consist of the function selector + encoded data
 
 Example of a checker function:
 
-```
+```js
  function checker()
-        external
-        view
-        override
-        returns (bool canExec, bytes memory execPayload)
+    external
+    view
+    override
+    returns (bool canExec, bytes memory execPayload)
+  {
+    canExec = true;
+
+    execPayload = abi.encodeWithSelector(
+        ICounter.increaseCount.selector,
+        uint256(100)
+    );
+  }
 ```
 
-This function can be named whatever you want. And it will be passed to `PokeMe` later on.
+This `checker` function can be named whatever you want and can take arbitrary parameters. The only important thing is that it returns a boolean indicating whether the transaction should execute and bytes that determine which function should be called with which inputs.
+
+Check out the [CounterResolver.sol](https://github.com/gelatodigital/pokeme/blob/a2c1bbe123d40844621f467943902e93e5a6a5c7/contracts/CounterResolver.sol) contract for an example of how a Resolver can look like.
 
 ### Creating task
 
-To create a task, call `createTask()` which has parameters:
+To create a task, call `createTask()` on the PokeMe.sol contract. The function takes the following inputs:
 
-- address `execAddress` : The contract which Gelato should execute the transactions.\
+- address `execAddress` : The contract which Gelato should execute the transactions on.\
 - bytes4 `execSelector` : The function which Gelato should call in `execAddress` contract.\
 - address `resolverAddress` : The address of resolver contract.\
 - bytes `resolverData` : The data used to check on the Resolver when to execute the tx.\
 
 Example of getting `execSelector` and `resolverData`,
 
-```
-const execSelector = await pokeMe.getSelector("transferFrom(address,address,uint256)");
+```ts
+const pokeMeAbi = ["function getSelector(string _func) external pure returns (bytes4)"]
 
- const resolverData = await resolver.interface.encodeFunctionData(
-      "checker",
-      [addressX, addressY, 1]
-    );
+const pokeMe = await ethers.getContractAt(pokeMeAbi, "0x89a26d08c26E00cE935a775Ba74A984Ad346679b");
+
+const execSelector = await pokeMe.getSelector("exec(address,address,uint256)");
+
+const resolverAbi = ["function checker(address _token, address _receiver, uint256 amount) external view returns(bool canExec, bytes calldata execData)"]
+
+const resolverInterface = new ethers.utils.Interface(resolverAbi)
+
+const resolverData = await resolver.interface.encodeFunctionData(
+    "checker",
+    [addressX, addressY, 1]
+  );
+```
+
+To create the Task and have Gelato bots start executing it, call `createTask()` like so:
+
+```ts
+  await pokeMe.createTask(execAddress, execSelector, resolverAddress, resolverData)
+```
+
+### Depositing Tokens in order to pay for the execution of your transactions
+
+Transctions on Ethereum are not for free! That's why you need to deposit some tokens on the `TaskTreasury.sol` contract in order to pay for the executions. You can deposit any token you want. This balance will be deducted based on the actual execution cost per transaction. 
+
+If for example the ethereum gas fees of a particular transaction cost $10 then your costs will be between $10-$12 dollars, where the margin on top of the miner fee will be given to Gelato bots.
+
+```ts
+  const taskTreasuryAbi = ["function depositFunds(address _receiver, address _token, uint256 _amount) external payable"]
+  const taskTreasury = await ethers.getContractAt(taskTreasuryAbi, "0x66e2F69df68C8F56837142bE2E8C290EfE76DA9f");
+  const ETH = "0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE" // Use this address for ETH deposits
+  const depositAmount = ethers.utils.parseEther("1");
+  const userAddress = "YOUR_ADDRESS"; // Use your address in here
+  await taskTreasury.depositFunds(userAddress, ETH, depositAmount, { value: depositAmount });
+```
+
+If you deposit ERC20 tokens, make sure that you approve the TaskTreasury contract beforehand in order to not revert.
+
+You can also always withdraw your deposited funds like so:
+
+```ts
+  const taskTreasuryAbi = ["function withdrawFunds(address payable _receiver, address _token, uint256 _amount ) external"]
+  const taskTreasury = await ethers.getContractAt(taskTreasuryAbi, "0x66e2F69df68C8F56837142bE2E8C290EfE76DA9f");
+  const ETH = "0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE" // Use this address for ETH deposits
+  const depositAmount = ethers.utils.parseEther("1");
+  const userAddress = "RECEIVER:ADDRESS"; // Address which should be receiving the funds
+  await taskTreasury.withdrawFunds(userAddress, ETH, depositAmount);
 ```
 
 ### Canceling task
@@ -58,12 +110,20 @@ To cancel a task, call `cancelTask()` which has parameters:
 
 To get `taskId`, use `getTaskId`:
 
-```
- const taskHash = await pokeMe.getTaskId(
+```ts
+  const pokeMeAbi = [
+    "function getTaskId(address _taskCreator, address _execAddress, bytes4 _selector) public pure returns (bytes32)",
+    "function cancelTask(bytes32 _taskId) external"
+  ]
+  const pokeMe = await ethers.getContractAt(pokeMeAbi, "0x89a26d08c26E00cE935a775Ba74A984Ad346679b");
+
+  const execSelector = await pokeMe.getSelector("transferFrom(address,address,uint256)");
+  const taskId = await pokeMe.getTaskId(
     taskCreatorAddress,
     execAddress,
     selector
   );
+  const taskHash = await pokeMe.cancelTask(taskId);
 ```
 
 ## Demo 🌟
