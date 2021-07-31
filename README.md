@@ -165,9 +165,11 @@ You can get the _execSelector using PokeMe's `getSelector()` func
 
 ![getSelector](/getSelector.png)
  
-1. Deposit ETH on the [TaskTreasury](https://etherscan.io/address/0x66e2F69df68C8F56837142bE2E8C290EfE76DA9f) using the `depositFunds()` func
+3. Deposit ETH or any Token you want to the [TaskTreasury](https://etherscan.io/address/0x66e2F69df68C8F56837142bE2E8C290EfE76DA9f) using the `depositFunds()` func in order to pay for transactions. The address you pass as `_receiver` should be the same address which calls `createTask()`, e.g. your EOA.
 
-![Deposit Funds](/deposit.png)
+![Deposit Funds](/deposit2.png)
+
+Use `0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE` as the `_token` address if you want to deposit ETH.
 
 And you should be good to go ✅ Check the Counter on Counter.sol incrementing
 
