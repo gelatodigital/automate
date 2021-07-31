@@ -41,6 +41,11 @@ module.exports = {
       },
       GELATO: "0x3caca7b48d0573d793d3b0279b5f0029180e83b6",
     },
+    matic: {
+      url: `https://polygon-mainnet.g.alchemy.com/v2/${ALCHEMY_ID}`,
+      accounts: DEPLOYER_PK_MAINNET ? [DEPLOYER_PK_MAINNET] : [],
+      GELATO: "0x7598e84B2E114AB62CAB288CE5f7d5f6bad35BbA",
+    },
     mainnet: {
       accounts: DEPLOYER_PK_MAINNET ? [DEPLOYER_PK_MAINNET] : [],
       chainId: 1,
