@@ -294,7 +294,7 @@ describe("PokeMeTwo Test", function () {
     );
   });
 
-  it("canExec should be true, executor should exec", async () => {
+  it("should exec and pay with ETH", async () => {
     let [canExec, execData] = await counterResolver.checker();
     expect(canExec).to.be.eq(true);
 
@@ -343,55 +343,51 @@ describe("PokeMeTwo Test", function () {
     ).to.be.revertedWith("PokeMe: exec: Execution failed");
   });
 
-  it("should exec and pay with ERC20 token", async () => {
-    // await expect (pokeMe
-    //   .connect(executor)
-    //   .exec(
-    //     ethers.utils.parseEther("1"),
-    //     ETH,
-    //     userAddress,
-    //     counter.address,
-    //     execData
-    //   )).to.be.revertedWith("PokeMe: exec: Execution failed");
-    // let [canExec, execData2] = await counterResolver.checker();
-    // expect(canExec).to.be.eq(false);
-    // const THREE_MIN = 3 * 70; // add 10 sec buffer
-    // await network.provider.send("evm_increaseTime", [THREE_MIN]);
-    // await network.provider.send("evm_mine", []);
-    // [canExec, execData2] = await counterResolver.checker();
-    // expect(canExec).to.be.eq(true);
-    // expect(await counter.count()).to.be.eq(ethers.BigNumber.from("100"));
-    // const daiAmount = ethers.utils.parseEther("100");
-    // await dai.approve(taskTreasury.address, daiAmount);
-    // await taskTreasury.connect(user).depositFunds(userAddress, DAI, daiAmount);
-    // expect(
-    //   await taskTreasury.connect(user).userTokenBalance(userAddress, DAI)
-    // ).to.be.eq(daiAmount);
-    // await pokeMe
-    //   .connect(executor)
-    //   .exec(
-    //     ethers.utils.parseEther("90"),
-    //     DAI,
-    //     userAddress,
-    //     counter.address,
-    //     execData2
-    //   );
-    // expect(await counter.count()).to.be.eq(ethers.BigNumber.from("200"));
-    // expect(
-    //   await taskTreasury.connect(user).userTokenBalance(userAddress, DAI)
-    // ).to.be.eq(ethers.utils.parseEther("10"));
-    // // time not elapsed
-    // await expect(
-    //   pokeMe
-    //     .connect(executor)
-    //     .exec(
-    //       ethers.utils.parseEther("1"),
-    //       DAI,
-    //       userAddress,
-    //       counter.address,
-    //       execData2
-    //     )
-    // ).to.be.revertedWith("PokeMe: exec: Execution failed");
+  it("should exec and pay with DAI", async () => {
+    let [canExec, execData] = await counterResolver.checker();
+    expect(canExec).to.be.eq(true);
+
+    const THREE_MIN = 3 * 60;
+
+    await network.provider.send("evm_increaseTime", [THREE_MIN]);
+    await network.provider.send("evm_mine", []);
+
+    const depositAmount = ethers.utils.parseEther("2");
+    await getTokenFromFaucet(DAI, userAddress, depositAmount);
+
+    await dai.connect(user).approve(taskTreasury.address, depositAmount);
+    await taskTreasury
+      .connect(user)
+      .depositFunds(userAddress, DAI, depositAmount);
+
+    expect(
+      await taskTreasury.connect(user).userTokenBalance(userAddress, DAI)
+    ).to.be.eq(ethers.utils.parseEther("2"));
+
+    await pokeMe
+      .connect(executor)
+      .exec(
+        ethers.utils.parseEther("1"),
+        DAI,
+        userAddress,
+        counter.address,
+        execData
+      );
+
+    expect(await counter.count()).to.be.eq(ethers.BigNumber.from("100"));
+
+    // time not elapsed
+    await expect(
+      pokeMe
+        .connect(executor)
+        .exec(
+          ethers.utils.parseEther("1"),
+          DAI,
+          userAddress,
+          counter.address,
+          execData
+        )
+    ).to.be.revertedWith("PokeMe: exec: Execution failed");
   });
 
   it("getTaskIdsByUser test", async () => {
