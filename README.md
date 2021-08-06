@@ -58,7 +58,7 @@ Example of a Resolver which exposes a checker function:
 
 This `checker` function can be named whatever you want and can take arbitrary parameters. The only important thing is that it returns a boolean indicating whether the transaction should execute and bytes that determine which function should be called with which inputs.
 
-Check out the [CounterResolver.sol](https://github.com/gelatodigital/pokeme/blob/a2c1bbe123d40844621f467943902e93e5a6a5c7/contracts/CounterResolver.sol) contract for an example of how a Resolver can look like.
+Check out the [CounterResolver.sol](https://github.com/gelatodigital/poke-me/blob/4f47679db1833daa212c04a3828ef083fecb6c62/contracts/CounterResolver.sol) contract for an example of how a Resolver can look like.
 
 ### Creating task
 
@@ -150,7 +150,7 @@ To get `taskId`, use `getTaskId`:
 
 ### Using Etherscan - Mainnet:
 
-This demo will automate incrementing a counter on the [Counter.sol](https://github.com/gelatodigital/pokeme/blob/23803cf2dc6e95614c1ec52a5dcce20dd70b70f6/contracts/Counter.sol) contract every 3 minutes.
+This demo will automate incrementing a counter on the [Counter.sol](https://github.com/gelatodigital/poke-me/blob/4f47679db1833daa212c04a3828ef083fecb6c62/contracts/Counter.sol) contract every 3 minutes.
 
 1. Go to PokeMe's [Etherscan Page](https://etherscan.io/address/0x89a26d08c26E00cE935a775Ba74A984Ad346679b)
    

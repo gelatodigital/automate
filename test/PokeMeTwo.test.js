@@ -231,7 +231,7 @@ describe("PokeMeTwo Test", function () {
     ).to.be.revertedWith("PokeMe: exec: No task found");
   });
 
-  it("canExec should be true, caller does not have enough ETH", async () => {
+  it("message should be OK, caller does not have enough ETH", async () => {
     const THREE_MIN = 3 * 60;
 
     await network.provider.send("evm_increaseTime", [THREE_MIN]);
@@ -242,8 +242,8 @@ describe("PokeMeTwo Test", function () {
       .connect(user)
       .depositFunds(userAddress, ETH, depositAmount, { value: depositAmount });
 
-    let [canExec, execData] = await counterResolver.checker();
-    expect(canExec).to.be.eq(true);
+    let [message, execData] = await counterResolver.checker();
+    expect(message).to.be.eql("OK");
 
     await expect(
       pokeMe
@@ -258,14 +258,14 @@ describe("PokeMeTwo Test", function () {
     ).to.be.reverted;
   });
 
-  it("canExec should be true, caller does not have enough DAI", async () => {
+  it("message should be OK, caller does not have enough DAI", async () => {
     const THREE_MIN = 3 * 60;
 
     await network.provider.send("evm_increaseTime", [THREE_MIN]);
     await network.provider.send("evm_mine", []);
 
-    let [canExec, execData] = await counterResolver.checker();
-    expect(canExec).to.be.eq(true);
+    let [message, execData] = await counterResolver.checker();
+    expect(message).to.be.eql("OK");
 
     const depositAmount = ethers.utils.parseEther("0.5");
     await getTokenFromFaucet(DAI, userAddress, depositAmount);
@@ -295,8 +295,8 @@ describe("PokeMeTwo Test", function () {
   });
 
   it("should exec and pay with ETH", async () => {
-    let [canExec, execData] = await counterResolver.checker();
-    expect(canExec).to.be.eq(true);
+    let [message, execData] = await counterResolver.checker();
+    expect(message).to.be.eql("OK");
 
     const THREE_MIN = 3 * 60;
 
@@ -341,11 +341,14 @@ describe("PokeMeTwo Test", function () {
           execData
         )
     ).to.be.revertedWith("PokeMe: exec: Execution failed");
+
+    let [message2] = await counterResolver.checker();
+    expect(message2).to.be.eql("Time has not elapsed!");
   });
 
   it("should exec and pay with DAI", async () => {
-    let [canExec, execData] = await counterResolver.checker();
-    expect(canExec).to.be.eq(true);
+    let [message, execData] = await counterResolver.checker();
+    expect(message).to.be.eql("OK");
 
     const THREE_MIN = 3 * 60;
 
