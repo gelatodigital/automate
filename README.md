@@ -13,9 +13,12 @@ Automate smart contract executions with Gelato by submitting tasks to `PokeMe`
 
 ## Guide 🧑‍🦯
 
+### PokeMeReady
+
+For the contract you are trying to automate, inherit [PokeMeReady.sol](https://github.com/gelatodigital/poke-me/blob/4f47679db1833daa212c04a3828ef083fecb6c62/contracts/PokeMeReady.sol) and use the `onlyPokeMe` modifier in the function which Gelato will call. Take a look at [Counter.sol](https://github.com/gelatodigital/poke-me/blob/4f47679db1833daa212c04a3828ef083fecb6c62/contracts/Counter.sol).
 ### Resolvers
 
-To start, you would need to have a resolver contract which returns
+You would need to have a resolver contract which returns
 
 - Whether your task should be executed.
 - Payload of the execution. This Payload should consist of the function selector + encoded data
