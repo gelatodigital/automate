@@ -41,7 +41,7 @@ describe("PokeMeTwo Test", function () {
     dai = await ethers.getContractAt("IERC20", DAI);
     taskTreasury = await _taskTreasury.deploy(gelatoAddress);
     pokeMe = await _pokeMe.deploy(gelatoAddress, taskTreasury.address);
-    counter = await _counter.deploy();
+    counter = await _counter.deploy(pokeMe.address);
     counterResolver = await _counterResolver.deploy(counter.address);
 
     executorAddress = gelatoAddress;

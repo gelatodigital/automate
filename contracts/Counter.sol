@@ -1,17 +1,21 @@
 // SPDX-License-Identifier: UNLICENSED
 pragma solidity 0.8.0;
 
-contract Counter {
-    uint256 public count;
-    uint256 public lastExecuted;
+import { PokeMeReady } from "./PokeMeReady.sol";
 
-    function increaseCount(uint256 amount) external {
-        require(
-            ((block.timestamp - lastExecuted) > 180),
-            "Counter: increaseCount: Time not elapsed"
-        );
+contract Counter is PokeMeReady {
+  uint256 public count;
+  uint256 public lastExecuted;
 
-        count += amount;
-        lastExecuted = block.timestamp;
-    }
+  constructor(address payable _pokeMe) PokeMeReady(_pokeMe) {}
+
+  function increaseCount(uint256 amount) external onlyPokeMe {
+    require(
+      ((block.timestamp - lastExecuted) > 180),
+      "Counter: increaseCount: Time not elapsed"
+    );
+
+    count += amount;
+    lastExecuted = block.timestamp;
+  }
 }
