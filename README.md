@@ -15,7 +15,7 @@ Automate smart contract executions with Gelato by submitting tasks to `PokeMe`
 
 ### PokeMeReady
 
-For the contract you are trying to automate, inherit [PokeMeReady.sol](https://github.com/gelatodigital/poke-me/blob/b88168ad8d8008fb1550998fe3ff529d1fb6a279/contracts/PokeMeReady.sol) and use the `onlyPokeMe` modifier in the function which Gelato will call. Take a look at [Counter.sol](https://github.com/gelatodigital/poke-me/blob/4f47679db1833daa212c04a3828ef083fecb6c62/contracts/Counter.sol).
+For the contract you are trying to automate, inherit [PokeMeReady.sol](https://github.com/gelatodigital/poke-me/blob/master/contracts/PokeMeReady.sol) and use the `onlyPokeMe` modifier in the function which Gelato will call. Take a look at [Counter.sol](https://github.com/gelatodigital/poke-me/blob/master/contracts/Counter.sol).
 
 For simplicity, you could just use this modifier if your contract is on mainnet:
 ```js
@@ -69,7 +69,7 @@ Example of a Resolver which exposes a checker function:
 
 This `checker` function can be named whatever you want and can take arbitrary parameters. The only important thing is that it returns a boolean indicating whether the transaction should execute and bytes that determine which function should be called with which inputs.
 
-Check out the [CounterResolver.sol](https://github.com/gelatodigital/poke-me/blob/4f47679db1833daa212c04a3828ef083fecb6c62/contracts/CounterResolver.sol) contract for an example of how a Resolver can look like.
+Check out the [CounterResolver.sol](https://github.com/gelatodigital/poke-me/blob/master/contracts/CounterResolver.sol) contract for an example of how a Resolver can look like.
 
 ### Creating task
 
@@ -134,7 +134,7 @@ const resolverData = await resolver.interface.encodeFunctionData(
 
 ### Using Etherscan - Mainnet:
 
-This demo will automate incrementing a counter on the [Counter.sol](https://github.com/gelatodigital/poke-me/blob/4f47679db1833daa212c04a3828ef083fecb6c62/contracts/Counter.sol) contract every 3 minutes.
+This demo will automate incrementing a counter on the [Counter.sol](https://github.com/gelatodigital/poke-me/blob/master/contracts/Counter.sol) contract every 3 minutes.
 
 1. Go to [PokeMe's UI](https://app.gelato.network/dashboard)
    
