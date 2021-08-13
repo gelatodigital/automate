@@ -1,48 +1,63 @@
-const { expect } = require("chai");
-const { ethers, network } = require("hardhat");
-const { getTokenFromFaucet } = require("./helpers.js");
+import { SignerWithAddress } from "@nomiclabs/hardhat-ethers/dist/src/signer-with-address";
+import { expect } from "chai";
+import { ethers, network } from "hardhat";
+import { getTokenFromFaucet } from "./helpers";
 
 const gelatoAddress = "0x3caca7b48d0573d793d3b0279b5f0029180e83b6";
 const ETH = "0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE";
 const DAI = "0x6b175474e89094c44da98b954eedeac495271d0f";
 
+import {
+  PokeMe,
+  Counter,
+  CounterResolver,
+  TaskTreasury,
+  IERC20,
+} from "../typechain";
+
 describe("PokeMeTwo Test", function () {
-  let pokeMe;
-  let counter;
-  let user;
-  let userAddress;
-  let user2;
-  let user2Address;
-  let executorAddress;
-  let counterResolver;
-  let resolverData;
-  let executor;
-  let execData;
-  let taskId;
-  let taskHash;
-  let selector;
+  let pokeMe: PokeMe;
+  let counter: Counter;
+  let counterResolver: CounterResolver;
+  let taskTreasury: TaskTreasury;
+  let dai: IERC20;
+
+  let user: SignerWithAddress;
+  let userAddress: string;
+
+  let user2: SignerWithAddress;
+  let user2Address: string;
+
+  let executor: any;
+  let executorAddress: string;
+
+  let resolverData: any;
+  let taskId: any;
+  let taskHash: any;
+  let selector: any;
+
   let _pokeMe;
   let _counter;
   let _counterResolver;
   let _taskTreasury;
-  let taskTreasury;
-  let dai;
 
   beforeEach(async function () {
     [user, user2] = await ethers.getSigners();
     userAddress = await user.getAddress();
     user2Address = await user2.getAddress();
 
-    _taskTreasury = await ethers.getContractFactory("TaskTreasury");
-    _pokeMe = await ethers.getContractFactory("PokeMe");
-    _counter = await ethers.getContractFactory("Counter");
-    _counterResolver = await ethers.getContractFactory("CounterResolver");
+    const _taskTreasury = await ethers.getContractFactory("TaskTreasury");
+    const _pokeMe = await ethers.getContractFactory("PokeMe");
+    const _counter = await ethers.getContractFactory("Counter");
+    const _counterResolver = await ethers.getContractFactory("CounterResolver");
 
-    dai = await ethers.getContractAt("IERC20", DAI);
-    taskTreasury = await _taskTreasury.deploy(gelatoAddress);
-    pokeMe = await _pokeMe.deploy(gelatoAddress, taskTreasury.address);
-    counter = await _counter.deploy(pokeMe.address);
-    counterResolver = await _counterResolver.deploy(counter.address);
+    dai = <IERC20>await ethers.getContractAt("IERC20", DAI);
+    taskTreasury = <TaskTreasury>await _taskTreasury.deploy(gelatoAddress);
+    pokeMe = <PokeMe>await _pokeMe.deploy(gelatoAddress, taskTreasury.address);
+    counter = <Counter>await _counter.deploy(pokeMe.address);
+    counterResolver = <CounterResolver>(
+      await _counterResolver.deploy(counter.address)
+    );
 
     executorAddress = gelatoAddress;
 
@@ -52,11 +67,11 @@ describe("PokeMeTwo Test", function () {
       method: "hardhat_impersonateAccount",
       params: [executorAddress],
     });
+
     executor = await ethers.provider.getSigner(executorAddress);
 
     resolverData = await counterResolver.interface.encodeFunctionData(
-      "checker",
-      []
+      "checker"
     );
 
     selector = await pokeMe.getSelector("increaseCount(uint256)");

@@ -1,0 +1,16 @@
+{
+  "overrides": [
+    {
+      "files": "*.sol",
+      "options": {
+        "compiler": "0.8.0"
+      }
+    },
+    {
+      "files": "contracts/dependencies/GelatoCoreImport.sol",
+      "options": {
+        "compiler": "0.6.10"
+      }
+    }
+  ]
+}

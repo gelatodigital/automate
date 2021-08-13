@@ -1,15 +1,20 @@
-// Hardhat
-require("@nomiclabs/hardhat-ethers");
-require("@nomiclabs/hardhat-waffle");
-require("@nomiclabs/hardhat-etherscan");
-require("hardhat-deploy");
-require("hardhat-deploy-ethers");
+import { HardhatUserConfig } from "hardhat/config";
+
+// PLUGINS
+import "@nomiclabs/hardhat-ethers";
+import "@nomiclabs/hardhat-waffle";
+import "@nomiclabs/hardhat-etherscan";
+import "@typechain/hardhat";
+import "hardhat-deploy";
+import "hardhat-deploy-ethers";
+
+// Process Env Variables
+import * as dotenv from "dotenv";
+dotenv.config({ path: __dirname + "/.env" });
 
 // Libraries
-const assert = require("assert");
-const { utils } = require("ethers");
-
-require("dotenv").config();
+import assert from "assert";
+import { utils } from "ethers";
 
 // @dev Put this in .env
 const ALCHEMY_ID = process.env.ALCHEMY_ID;
@@ -20,10 +25,8 @@ const DEPLOYER_PK_MAINNET = process.env.DEPLOYER_PK_MAINNET;
 const DEPLOYER_PK_ROPSTEN = process.env.DEPLOYER_PK_ROPSTEN;
 const ETHERSCAN_API = process.env.ETHERSCAN_API;
 
-/**
- * @type import('hardhat/config').HardhatUserConfig
- */
-module.exports = {
+// ================================= CONFIG =========================================
+const config: HardhatUserConfig = {
   defaultNetwork: "hardhat",
   // hardhat-deploy
   namedAccounts: {
@@ -39,30 +42,23 @@ module.exports = {
         url: `https://eth-mainnet.alchemyapi.io/v2/${ALCHEMY_ID}`,
         blockNumber: 12901600,
       },
-      GELATO: "0x3caca7b48d0573d793d3b0279b5f0029180e83b6",
     },
     matic: {
       url: `https://polygon-mainnet.g.alchemy.com/v2/${ALCHEMY_ID}`,
       accounts: DEPLOYER_PK_MAINNET ? [DEPLOYER_PK_MAINNET] : [],
-      GELATO: "0x7598e84B2E114AB62CAB288CE5f7d5f6bad35BbA",
     },
     mainnet: {
       accounts: DEPLOYER_PK_MAINNET ? [DEPLOYER_PK_MAINNET] : [],
       chainId: 1,
       url: `https://eth-mainnet.alchemyapi.io/v2/${ALCHEMY_ID}`,
-      gasPrice: parseInt(utils.parseUnits("1", "gwei")),
-      GELATO: "0x3caca7b48d0573d793d3b0279b5f0029180e83b6",
+      gasPrice: parseInt(utils.parseUnits("40", "gwei").toString()),
     },
 
     ropsten: {
       accounts: DEPLOYER_PK_ROPSTEN ? [DEPLOYER_PK_ROPSTEN] : [],
       chainId: 3,
       url: `https://eth-ropsten.alchemyapi.io/v2/${ALCHEMY_ID}`,
-      gasPrice: parseInt(utils.parseUnits("2", "gwei")),
-      GELATO: "0xCc4CcD69D31F9FfDBD3BFfDe49c6aA886DaB98d9",
-      POKEME: "0x53638DFef84aAA6AAbA70F948d39d00001771d99",
-      TASK_TREASURY: "0x2705aCca70CdB3E326C1013eEA2c03A4f2935b66",
-      ETH: "0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE",
+      gasPrice: parseInt(utils.parseUnits("90", "gwei").toString()),
     },
   },
   solidity: {
@@ -72,7 +68,13 @@ module.exports = {
       },
     ],
   },
+  typechain: {
+    outDir: "typechain",
+    target: "ethers-v5",
+  },
   etherscan: {
     apiKey: ETHERSCAN_API,
   },
 };
+
+export default config;

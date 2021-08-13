@@ -18,12 +18,14 @@ Automate smart contract executions with Gelato by submitting tasks to `PokeMe`
 For the contract you are trying to automate, inherit [PokeMeReady.sol](https://github.com/gelatodigital/poke-me/blob/master/contracts/PokeMeReady.sol) and use the `onlyPokeMe` modifier in the function which Gelato will call. Take a look at [Counter.sol](https://github.com/gelatodigital/poke-me/blob/master/contracts/Counter.sol).
 
 For simplicity, you could just use this modifier if your contract is on mainnet:
+
 ```js
     modifier onlyPokeMe() {
         require(msg.sender == address(0x89a26d08c26E00cE935a775Ba74A984Ad346679b), "PokeMeReady: onlyPokeMe");
         _;
     }
 ```
+
 ### Resolvers
 
 You would need to have a resolver contract which returns
@@ -74,10 +76,9 @@ Check out the [CounterResolver.sol](https://github.com/gelatodigital/poke-me/blo
 ### Creating task
 
 1. Go to [PokeMe's UI](https://app.gelato.network/dashboard)
-   
 2. Navigate to Submit Task.
 
-![SubmitTask](/submitTask1.png)
+![SubmitTask](/img/submitTask1.png)
 
 3. Fill in the `Execution address` and choose the function which you want to automate.
 
@@ -88,29 +89,36 @@ Check out the [CounterResolver.sol](https://github.com/gelatodigital/poke-me/blo
 If the contracts are not verified, you can get `execSelector` and `resolverData` like so:
 
 ```ts
-const pokeMeAbi = ["function getSelector(string _func) external pure returns (bytes4)"]
+const pokeMeAbi = [
+  "function getSelector(string _func) external pure returns (bytes4)",
+];
 
-const pokeMe = await ethers.getContractAt(pokeMeAbi, "0x89a26d08c26E00cE935a775Ba74A984Ad346679b");
+const pokeMe = await ethers.getContractAt(
+  pokeMeAbi,
+  "0x89a26d08c26E00cE935a775Ba74A984Ad346679b"
+);
 
 const execSelector = await pokeMe.getSelector("increaseCount(uint256)");
 
-const resolverAbi = ["function checker(address _token, address _receiver, uint256 amount) external view returns(bool canExec, bytes calldata execData)"]
+const resolverAbi = [
+  "function checker(address _token, address _receiver, uint256 amount) external view returns(bool canExec, bytes calldata execData)",
+];
 
-const resolverInterface = new ethers.utils.Interface(resolverAbi)
+const resolverInterface = new ethers.utils.Interface(resolverAbi);
 
-const resolverData = await resolver.interface.encodeFunctionData(
-    "checker",
-    [addressX, addressY, 1]
-  );
+const resolverData = await resolver.interface.encodeFunctionData("checker", [
+  addressX,
+  addressY,
+  1,
+]);
 ```
 
 ### Depositing Tokens in order to pay for the execution of your transactions
 
 1. Go to [PokeMe's UI](https://app.gelato.network/dashboard)
-   
 2. Navigate to Manage Funds.
 
-![Deposit Funds](/depositFunds.png)
+![Deposit Funds](/img/depositFunds.png)
 
 3. Select the token and the amount you want to deposit.
 
@@ -119,14 +127,13 @@ const resolverData = await resolver.interface.encodeFunctionData(
 ### Canceling task
 
 1. Go to [PokeMe's UI](https://app.gelato.network/dashboard)
-   
 2. Navigate to My Tasks.
 
-![My Tasks](/myTasks.png)
+![My Tasks](/img/myTasks.png)
 
 3. Click on the task you want to cancel.
 
-![Task Status](/taskStatus.png)
+![Task Status](/img/taskStatus.png)
 
 4. Under Task Status, click on Cancel Task.
 
@@ -137,19 +144,17 @@ const resolverData = await resolver.interface.encodeFunctionData(
 This demo will automate incrementing a counter on the [Counter.sol](https://github.com/gelatodigital/poke-me/blob/master/contracts/Counter.sol) contract every 3 minutes.
 
 1. Go to [PokeMe's UI](https://app.gelato.network/dashboard)
-   
 2. Navigate to Submit Task
 
-![SubmitTask](/submitTask2.png)
+![SubmitTask](/img/submitTask2.png)
 
-Fill in the execution address with `0x15a4d35e067213278c5a996f6050f37e7de6df2f` and select `Count()`
+Fill in the execution address with `0x63c51b1d80b209cf336bec5a3e17d3523b088cdb` and select `Count()`
 
-Fill in the resolver address with `0x17eaf9c43736b4e44c3b270a88aa162477e094e3` and select `Checker()`
- 
-3. Deposit some ETH 
+Fill in the resolver address with `0x95f4538C3950CE0EF5821f2049aE2aC5cCade68D` and select `Checker()`
 
-![Deposit Funds](/depositFunds.png)
+3. Deposit some ETH
 
+![Deposit Funds](/img/depositFunds.png)
 
 ### Using CLI - Ropsten:
 

@@ -1,0 +1,8 @@
+node_modules/
+contracts/dependencies
+contracts/diamond/facets/standard
+contracts/diamond/interfaces/standard
+contracts/diamond/libraries/standard
+contracts/functions
+contracts/vendor
+contracts/diamond/__mocks__/MockUniV3Oracle/libraries

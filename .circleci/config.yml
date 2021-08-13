@@ -1,0 +1,61 @@
+version: 2.1 # use CircleCI 2.1
+#orbs:
+#coveralls: coveralls/coveralls@1.0.6
+jobs: # a collection of steps
+  build: # runs not using Workflows must have a `build` job as entry point
+    working_directory: ~/gelato-instadapp-ci # directory where steps will run
+    docker: # run the steps with Docker
+      - image: circleci/node:14.15.3 # ...with this image as the primary container; this is where all `steps` will run
+    steps: # a collection of executable commands
+      - checkout # special step to check out source code to working directory
+      - restore_cache: # restore the dependency cache
+          # Read about caching dependencies: https://circleci.com/docs/2.0/caching/
+          name: Restore Yarn Package Cache
+          key: yarn-packages-{{ checksum "yarn.lock" }}
+      - run:
+          name: yarn install
+          command: yarn install --frozen-lockfile
+      - save_cache: # special step to save the dependency cache
+          name: Save Yarn Package Cache
+          key: yarn-packages-{{ checksum "yarn.lock" }}
+          paths:
+            - ./node_modules
+      - restore_cache: # restore hardhat compile cache
+          name: Restore Hardhat Compilation Cache
+          key: solidity-files-cache-
+      - run: # Compile
+          name: Compile
+          command: yarn compile
+      - save_cache: # special step to save the hardhat compile cache
+          name: Save Hardhat Compilation Cache
+          key: solidity-files-cache-{{ checksum "./cache/solidity-files-cache.json" }}
+          paths:
+            - ./cache/solidity-files-cache.json
+      - run: # Formatting
+          name: Prettier Check
+          command: yarn prettier --check .
+      - run: # Linting
+          name: ESLint
+          command: yarn lint
+      - restore_cache: # restore the Hardhat Network Fork Cache
+          name: Restore Hardhat Network Fork Cache
+          key: v4-hardhat-network-fork-cache
+      - run: # Tests with Gas reporter
+          name: Tests using hardhat mainnet fork and gas reporter
+          command: yarn test:gas
+      - save_cache: # special step to save the Hardhat Network Fork cache
+          name: Save Hardhat Network Fork Cache
+          key: v4-hardhat-network-fork-cache
+          paths:
+            - ./cache/hardhat-network-fork
+      - run: # Codechecks
+          name: Codechecks gas reporting
+          command: npx codechecks
+      #- run: # Coverage
+      #name: solidity-coverage
+      #command: yarn hardhat coverage
+      #- coveralls/upload # upload lcov.info to coveralls.io
+    #   - store_artifacts: # for display in Artifacts: https://circleci.com/docs/2.0/artifacts/
+    #       path: coverage
+    #       prefix: coverage
+    # See https://circleci.com/docs/2.0/deployment-integrations/ for deploy examples

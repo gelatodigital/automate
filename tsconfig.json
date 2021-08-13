@@ -1,0 +1,16 @@
+{
+  "extends": "@tsconfig/recommended/tsconfig.json",
+  "compilerOptions": {
+    "noImplicitAny": true,
+    "allowSyntheticDefaultImports": true,
+    "downlevelIteration": true,
+    "skipLibCheck": true,
+    "moduleResolution": "node",
+    "resolveJsonModule": true,
+    "typeRoots": ["./node_modules/@types"],
+    "outDir": "dist"
+  },
+  "files": ["hardhat.config.ts"],
+  "include": ["hardhat", "deploy", "src", "test", "typechain"],
+  "exclude": ["node_modules"]
+}

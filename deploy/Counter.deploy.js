@@ -18,15 +18,14 @@ module.exports = async (hre) => {
 
   await deploy("Counter", {
     from: deployer,
-    args: [],
+    args: [(await hre.ethers.getContract("PokeMe")).address],
   });
 };
 
 module.exports.skip = async (hre) => {
   const skip =
     // hre.network.name === "mainnet" ||
-    hre.network.name === "rinkeby" ||
-    hre.network.name === "hardhat"; // skip local deployment here for tests to run
+    hre.network.name === "rinkeby" || hre.network.name === "hardhat"; // skip local deployment here for tests to run
   return skip ? true : false;
 };
 
