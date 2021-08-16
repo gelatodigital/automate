@@ -4,6 +4,9 @@ node_modules
 # local env variables
 .env
 
+# Typechain generation
+typechain
+
 #hardhat
 artifacts/
 cache/

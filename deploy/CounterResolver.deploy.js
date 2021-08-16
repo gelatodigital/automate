@@ -4,7 +4,9 @@ module.exports = async (hre) => {
   if (
     hre.network.name === "mainnet" ||
     hre.network.name === "rinkeby" ||
-    hre.network.name === "ropsten"
+    hre.network.name === "ropsten" ||
+    hre.network.name === "fantom" ||
+    hre.network.name === "matic"
   ) {
     console.log(
       `Deploying CounterResolver to ${hre.network.name}. Hit ctrl + c to abort`
@@ -25,8 +27,7 @@ module.exports = async (hre) => {
 module.exports.skip = async (hre) => {
   const skip =
     // hre.network.name === "mainnet" ||
-    hre.network.name === "rinkeby" ||
-    hre.network.name === "hardhat"; // skip local deployment here for tests to run
+    hre.network.name === "rinkeby" || hre.network.name === "hardhat"; // skip local deployment here for tests to run
   return skip ? true : false;
 };
 

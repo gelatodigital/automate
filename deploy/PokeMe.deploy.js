@@ -1,10 +1,13 @@
 const { sleep } = require("@gelatonetwork/core");
+const { getGelatoAddress } = require("../hardhat/config/addresses");
 
 module.exports = async (hre) => {
   if (
     hre.network.name === "mainnet" ||
     hre.network.name === "rinkeby" ||
-    hre.network.name === "ropsten"
+    hre.network.name === "ropsten" ||
+    hre.network.name === "fantom" ||
+    hre.network.name === "matic"
   ) {
     console.log(
       `Deploying PokeMe to ${hre.network.name}. Hit ctrl + c to abort`
@@ -15,12 +18,13 @@ module.exports = async (hre) => {
   const { deployments } = hre;
   const { deploy } = deployments;
   const { deployer } = await hre.getNamedAccounts();
+  const GELATO = getGelatoAddress(hre.network.name);
 
   await deploy("PokeMe", {
     from: deployer,
     args: [
-      hre.network.config.GELATO,
-      (await hre.ethers.getContract("TaskTreasury")).address,
+      GELATO,
+      (await hre.ethers.getContract("TaskTreasuryFantom")).address,
     ],
   });
 };
@@ -34,4 +38,4 @@ module.exports.skip = async (hre) => {
 };
 
 module.exports.tags = ["PokeMe"];
-module.exports.dependencies = ["TaskTreasury"];
+module.exports.dependencies = ["TaskTreasuryFantom"];

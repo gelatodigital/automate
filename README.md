@@ -8,6 +8,8 @@ Automate smart contract executions with Gelato by submitting tasks to `PokeMe`
 - [TaskTreasury Mainnet](https://etherscan.io/address/0x66e2F69df68C8F56837142bE2E8C290EfE76DA9f)
 - [PokeMe Polygon / Matic](https://polygonscan.com/address/0x00e8f432b33D1C550E02Ff55c8413Fd50a931c39)
 - [TaskTreasury Polygon / Matic](https://polygonscan.com/address/0xA8a7BBe83960B29789d5CB06Dcd2e6C1DF20581C)
+- [PokeMe Fantom](https://ftmscan.com/address/0x04bdbb7ef8c17117d8ef884029c268b7becb2a19)
+- [TaskTreasury Fantom](https://ftmscan.com/address/0x6c3224f9b3fee000a444681d5d45e4532d5ba531)
 - [PokeMe Ropsten](https://ropsten.etherscan.io/address/0x53638DFef84aAA6AAbA70F948d39d00001771d99)
 - [TaskTreasury Ropsten](https://ropsten.etherscan.io/address/0x2705aCca70CdB3E326C1013eEA2c03A4f2935b66)
 

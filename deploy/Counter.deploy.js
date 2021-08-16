@@ -4,7 +4,9 @@ module.exports = async (hre) => {
   if (
     hre.network.name === "mainnet" ||
     hre.network.name === "rinkeby" ||
-    hre.network.name === "ropsten"
+    hre.network.name === "ropsten" ||
+    hre.network.name === "fantom" ||
+    hre.network.name === "matic"
   ) {
     console.log(
       `Deploying Counter to ${hre.network.name}. Hit ctrl + c to abort`

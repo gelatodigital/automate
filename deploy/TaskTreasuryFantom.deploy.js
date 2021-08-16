@@ -10,7 +10,7 @@ module.exports = async (hre) => {
     hre.network.name === "matic"
   ) {
     console.log(
-      `Deploying TaskTreasuryMatic to ${hre.network.name}. Hit ctrl + c to abort`
+      `Deploying TaskTreasuryFantom to ${hre.network.name}. Hit ctrl + c to abort`
     );
     await sleep(10000);
   }
@@ -20,7 +20,7 @@ module.exports = async (hre) => {
   const { deployer } = await hre.getNamedAccounts();
   const GELATO = getGelatoAddress(hre.network.name);
 
-  await deploy("TaskTreasuryMatic", {
+  await deploy("TaskTreasuryFantom", {
     from: deployer,
     args: [GELATO],
   });
@@ -34,4 +34,4 @@ module.exports.skip = async (hre) => {
   return skip ? true : false;
 };
 
-module.exports.tags = ["TaskTreasuryMatic"];
+module.exports.tags = ["TaskTreasuryFantom"];

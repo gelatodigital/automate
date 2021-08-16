@@ -11,6 +11,7 @@ export type { IResolver } from "./IResolver";
 export type { PokeMe } from "./PokeMe";
 export type { PokeMeReady } from "./PokeMeReady";
 export type { TaskTreasury } from "./TaskTreasury";
+export type { TaskTreasuryFantom } from "./TaskTreasuryFantom";
 export type { TaskTreasuryMatic } from "./TaskTreasuryMatic";
 
 export { Ownable__factory } from "./factories/Ownable__factory";
@@ -23,4 +24,5 @@ export { IResolver__factory } from "./factories/IResolver__factory";
 export { PokeMe__factory } from "./factories/PokeMe__factory";
 export { PokeMeReady__factory } from "./factories/PokeMeReady__factory";
 export { TaskTreasury__factory } from "./factories/TaskTreasury__factory";
+export { TaskTreasuryFantom__factory } from "./factories/TaskTreasuryFantom__factory";
 export { TaskTreasuryMatic__factory } from "./factories/TaskTreasuryMatic__factory";

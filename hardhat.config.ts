@@ -23,7 +23,8 @@ assert.ok(ALCHEMY_ID, "no Alchemy ID in process.env");
 // @dev fill this out
 const DEPLOYER_PK_MAINNET = process.env.DEPLOYER_PK_MAINNET;
 const DEPLOYER_PK_ROPSTEN = process.env.DEPLOYER_PK_ROPSTEN;
-const ETHERSCAN_API = process.env.ETHERSCAN_API;
+// const ETHERSCAN_API = process.env.ETHERSCAN_API;
+const FANTOMSCAN_API = process.env.FANTOMSCAN_API;
 
 // ================================= CONFIG =========================================
 const config: HardhatUserConfig = {
@@ -53,12 +54,17 @@ const config: HardhatUserConfig = {
       url: `https://eth-mainnet.alchemyapi.io/v2/${ALCHEMY_ID}`,
       gasPrice: parseInt(utils.parseUnits("40", "gwei").toString()),
     },
-
     ropsten: {
       accounts: DEPLOYER_PK_ROPSTEN ? [DEPLOYER_PK_ROPSTEN] : [],
       chainId: 3,
       url: `https://eth-ropsten.alchemyapi.io/v2/${ALCHEMY_ID}`,
       gasPrice: parseInt(utils.parseUnits("90", "gwei").toString()),
+    },
+    fantom: {
+      accounts: DEPLOYER_PK_MAINNET ? [DEPLOYER_PK_MAINNET] : [],
+      chainId: 250,
+      url: `https://rpcapi.fantom.network/`,
+      gasPrice: parseInt(utils.parseUnits("70", "gwei").toString()),
     },
   },
   solidity: {
@@ -73,7 +79,7 @@ const config: HardhatUserConfig = {
     target: "ethers-v5",
   },
   etherscan: {
-    apiKey: ETHERSCAN_API,
+    apiKey: FANTOMSCAN_API,
   },
 };
 
