@@ -1,12 +1,13 @@
 const { ethers } = require("hardhat");
 
-const TASK_TREASURY = hre.network.config.TASK_TREASURY;
-const ETH = hre.network.config.ETH;
+const ETH = "0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE";
 
 async function main() {
   [user] = await hre.ethers.getSigners();
   userAddress = await user.getAddress();
   console.log("Depositing 0.1 ETH");
+
+  const TASK_TREASURY = (await hre.ethers.getContract("TaskTreasury")).address;
 
   const taskTreasury = await ethers.getContractAt(
     "TaskTreasury",

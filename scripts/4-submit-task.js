@@ -1,6 +1,5 @@
 const { ethers } = require("hardhat");
 
-const POKEME = hre.network.config.POKEME;
 const COUNTER = process.env.npm_config_counter;
 const RESOLVER = process.env.npm_config_resolver;
 
@@ -11,6 +10,8 @@ async function main() {
 
   console.log("Counter address: ", COUNTER);
   console.log("Counter resolver address: ", RESOLVER);
+
+  const POKEME = (await hre.ethers.getContract("PokeMe")).address;
 
   const pokeMe = await ethers.getContractAt("PokeMe", POKEME, user);
   const counter = await ethers.getContractAt("Counter", COUNTER, user);

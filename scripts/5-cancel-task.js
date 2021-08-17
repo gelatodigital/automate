@@ -1,12 +1,13 @@
 const { ethers } = require("hardhat");
 
-const POKEME = hre.network.config.POKEME;
 const COUNTER = process.env.npm_config_counter;
 
 async function main() {
   [user] = await hre.ethers.getSigners();
   userAddress = await user.getAddress();
   console.log("Canceling Task");
+
+  const POKEME = (await hre.ethers.getContract("PokeMe")).address;
 
   const pokeMe = await ethers.getContractAt("PokeMe", POKEME, user);
   const counter = await ethers.getContractAt("Counter", COUNTER, user);
