@@ -68,9 +68,7 @@ contract PokeMe is Gelatofied {
         bytes calldata _resolverData,
         bool _useTaskTreasuryFunds
     ) external {
-        bytes32 resolverHash = keccak256(
-            abi.encode(_resolverAddress, _resolverData)
-        );
+        bytes32 resolverHash = getResolverHash(_resolverAddress, _resolverData);
         bytes32 task = getTaskId(
             msg.sender,
             _execAddress,
@@ -186,6 +184,16 @@ contract PokeMe is Gelatofied {
     /// @dev Example: "transferFrom(address,address,uint256)" => 0x23b872dd
     function getSelector(string calldata _func) external pure returns (bytes4) {
         return bytes4(keccak256(bytes(_func)));
+    }
+
+    /// @notice Helper func to query the resolverHash
+    /// @param _resolverAddress Address of resolver
+    /// @param _resolverData Data passed to resolver
+    function getResolverHash(
+        address _resolverAddress,
+        bytes memory _resolverData
+    ) public pure returns (bytes32) {
+        return keccak256(abi.encode(_resolverAddress, _resolverData));
     }
 
     /// @notice Helper func to query all open tasks by a task creator
