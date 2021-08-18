@@ -28,9 +28,9 @@ describe("PokeMeTwo Test", function () {
     let executor;
     let executorAddress;
     let resolverData;
-    let taskId;
     let taskHash;
     let selector;
+    let resolverHash;
     beforeEach(function () {
         return __awaiter(this, void 0, void 0, function* () {
             [user, user2] = yield hardhat_1.ethers.getSigners();
@@ -54,13 +54,13 @@ describe("PokeMeTwo Test", function () {
             executor = yield hardhat_1.ethers.provider.getSigner(executorAddress);
             resolverData = yield counterResolver.interface.encodeFunctionData("checker");
             selector = yield pokeMe.getSelector("increaseCount(uint256)");
-            taskId = yield pokeMe.getTaskId(userAddress, counter.address, selector, true);
+            resolverHash = hardhat_1.ethers.utils.keccak256(new hardhat_1.ethers.utils.AbiCoder().encode(["address", "bytes"], [counterResolver.address, resolverData]));
+            taskHash = yield pokeMe.getTaskId(userAddress, counter.address, selector, true, resolverHash);
             yield chai_1.expect(pokeMe
                 .connect(user)
                 .createTask(counter.address, selector, counterResolver.address, resolverData, true))
                 .to.emit(pokeMe, "TaskCreated")
-                .withArgs(userAddress, counter.address, selector, counterResolver.address, taskId, resolverData, true);
-            taskHash = yield pokeMe.getTaskId(userAddress, counter.address, selector, true);
+                .withArgs(userAddress, counter.address, selector, counterResolver.address, taskHash, resolverData, true, resolverHash);
         });
     });
     it("sender already started task", () => __awaiter(this, void 0, void 0, function* () {
@@ -137,7 +137,7 @@ describe("PokeMeTwo Test", function () {
         const [, execData] = yield counterResolver.checker();
         yield chai_1.expect(pokeMe
             .connect(executor)
-            .exec(hardhat_1.ethers.utils.parseEther("1"), DAI, userAddress, true, counter.address, execData)).to.be.revertedWith("PokeMe: exec: No task found");
+            .exec(hardhat_1.ethers.utils.parseEther("1"), DAI, userAddress, true, resolverHash, counter.address, execData)).to.be.revertedWith("PokeMe: exec: No task found");
     }));
     it("canExec should be true, caller does not have enough ETH", () => __awaiter(this, void 0, void 0, function* () {
         const THREE_MIN = 3 * 60;
@@ -151,7 +151,7 @@ describe("PokeMeTwo Test", function () {
         chai_1.expect(canExec).to.be.eq(true);
         yield chai_1.expect(pokeMe
             .connect(executor)
-            .exec(hardhat_1.ethers.utils.parseEther("1"), ETH, userAddress, true, counter.address, execData)).to.be.reverted;
+            .exec(hardhat_1.ethers.utils.parseEther("1"), ETH, userAddress, true, resolverHash, counter.address, execData)).to.be.reverted;
     }));
     it("canExec should be true, caller does not have enough DAI", () => __awaiter(this, void 0, void 0, function* () {
         const THREE_MIN = 3 * 60;
@@ -167,7 +167,7 @@ describe("PokeMeTwo Test", function () {
             .depositFunds(userAddress, DAI, depositAmount);
         yield chai_1.expect(pokeMe
             .connect(executor)
-            .exec(hardhat_1.ethers.utils.parseEther("1"), DAI, userAddress, true, counter.address, execData)).to.be.revertedWith("reverted with panic code 0x11 (Arithmetic operation underflowed or overflowed outside of an unchecked block)");
+            .exec(hardhat_1.ethers.utils.parseEther("1"), DAI, userAddress, true, resolverHash, counter.address, execData)).to.be.revertedWith("reverted with panic code 0x11 (Arithmetic operation underflowed or overflowed outside of an unchecked block)");
         chai_1.expect(yield taskTreasury.userTokenBalance(userAddress, DAI)).to.be.eql(depositAmount);
     }));
     it("should exec and pay with ETH", () => __awaiter(this, void 0, void 0, function* () {
@@ -184,13 +184,13 @@ describe("PokeMeTwo Test", function () {
         chai_1.expect(yield taskTreasury.connect(user).userTokenBalance(userAddress, ETH)).to.be.eq(hardhat_1.ethers.utils.parseEther("1"));
         yield pokeMe
             .connect(executor)
-            .exec(hardhat_1.ethers.utils.parseEther("1"), ETH, userAddress, true, counter.address, execData);
+            .exec(hardhat_1.ethers.utils.parseEther("1"), ETH, userAddress, true, resolverHash, counter.address, execData);
         chai_1.expect(yield counter.count()).to.be.eq(hardhat_1.ethers.BigNumber.from("100"));
         chai_1.expect(yield taskTreasury.connect(user).userTokenBalance(userAddress, ETH)).to.be.eq(hardhat_1.ethers.BigNumber.from("0"));
         // time not elapsed
         yield chai_1.expect(pokeMe
             .connect(executor)
-            .exec(hardhat_1.ethers.utils.parseEther("1"), ETH, userAddress, true, counter.address, execData)).to.be.revertedWith("PokeMe: exec: Execution failed");
+            .exec(hardhat_1.ethers.utils.parseEther("1"), ETH, userAddress, true, resolverHash, counter.address, execData)).to.be.revertedWith("PokeMe: exec: Execution failed");
     }));
     it("should exec and pay with DAI", () => __awaiter(this, void 0, void 0, function* () {
         const [canExec, execData] = yield counterResolver.checker();
@@ -207,12 +207,12 @@ describe("PokeMeTwo Test", function () {
         chai_1.expect(yield taskTreasury.connect(user).userTokenBalance(userAddress, DAI)).to.be.eq(hardhat_1.ethers.utils.parseEther("2"));
         yield pokeMe
             .connect(executor)
-            .exec(hardhat_1.ethers.utils.parseEther("1"), DAI, userAddress, true, counter.address, execData);
+            .exec(hardhat_1.ethers.utils.parseEther("1"), DAI, userAddress, true, resolverHash, counter.address, execData);
         chai_1.expect(yield counter.count()).to.be.eq(hardhat_1.ethers.BigNumber.from("100"));
         // time not elapsed
         yield chai_1.expect(pokeMe
             .connect(executor)
-            .exec(hardhat_1.ethers.utils.parseEther("1"), DAI, userAddress, true, counter.address, execData)).to.be.revertedWith("PokeMe: exec: Execution failed");
+            .exec(hardhat_1.ethers.utils.parseEther("1"), DAI, userAddress, true, resolverHash, counter.address, execData)).to.be.revertedWith("PokeMe: exec: Execution failed");
     }));
     it("getTaskIdsByUser test", () => __awaiter(this, void 0, void 0, function* () {
         // fake task

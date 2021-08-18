@@ -32,9 +32,9 @@ describe("PokeMeTwo Test", function () {
   let executorAddress: string;
 
   let resolverData: any;
-  let taskId: any;
   let taskHash: any;
   let selector: any;
+  let resolverHash: any;
 
   beforeEach(async function () {
     [user, user2] = await ethers.getSigners();
@@ -76,11 +76,20 @@ describe("PokeMeTwo Test", function () {
     );
 
     selector = await pokeMe.getSelector("increaseCount(uint256)");
-    taskId = await pokeMe.getTaskId(
+
+    resolverHash = ethers.utils.keccak256(
+      new ethers.utils.AbiCoder().encode(
+        ["address", "bytes"],
+        [counterResolver.address, resolverData]
+      )
+    );
+
+    taskHash = await pokeMe.getTaskId(
       userAddress,
       counter.address,
       selector,
-      true
+      true,
+      resolverHash
     );
 
     await expect(
@@ -100,17 +109,11 @@ describe("PokeMeTwo Test", function () {
         counter.address,
         selector,
         counterResolver.address,
-        taskId,
+        taskHash,
         resolverData,
-        true
+        true,
+        resolverHash
       );
-
-    taskHash = await pokeMe.getTaskId(
-      userAddress,
-      counter.address,
-      selector,
-      true
-    );
   });
 
   it("sender already started task", async () => {
@@ -255,6 +258,7 @@ describe("PokeMeTwo Test", function () {
           DAI,
           userAddress,
           true,
+          resolverHash,
           counter.address,
           execData
         )
@@ -283,6 +287,7 @@ describe("PokeMeTwo Test", function () {
           ETH,
           userAddress,
           true,
+          resolverHash,
           counter.address,
           execData
         )
@@ -314,6 +319,7 @@ describe("PokeMeTwo Test", function () {
           DAI,
           userAddress,
           true,
+          resolverHash,
           counter.address,
           execData
         )
@@ -353,6 +359,7 @@ describe("PokeMeTwo Test", function () {
         ETH,
         userAddress,
         true,
+        resolverHash,
         counter.address,
         execData
       );
@@ -371,6 +378,7 @@ describe("PokeMeTwo Test", function () {
           ETH,
           userAddress,
           true,
+          resolverHash,
           counter.address,
           execData
         )
@@ -405,6 +413,7 @@ describe("PokeMeTwo Test", function () {
         DAI,
         userAddress,
         true,
+        resolverHash,
         counter.address,
         execData
       );
@@ -420,6 +429,7 @@ describe("PokeMeTwo Test", function () {
           DAI,
           userAddress,
           true,
+          resolverHash,
           counter.address,
           execData
         )

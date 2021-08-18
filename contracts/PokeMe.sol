@@ -43,7 +43,8 @@ contract PokeMe is Gelatofied {
         address resolverAddress,
         bytes32 taskId,
         bytes resolverData,
-        bool useTaskTreasuryFunds
+        bool useTaskTreasuryFunds,
+        bytes32 resolverHash
     );
     event TaskCancelled(bytes32 taskId, address taskCreator);
     event ExecSuccess(
@@ -67,30 +68,35 @@ contract PokeMe is Gelatofied {
         bytes calldata _resolverData,
         bool _useTaskTreasuryFunds
     ) external {
-        bytes32 _task = getTaskId(
+        bytes32 resolverHash = keccak256(
+            abi.encode(_resolverAddress, _resolverData)
+        );
+        bytes32 task = getTaskId(
             msg.sender,
             _execAddress,
             _execSelector,
-            _useTaskTreasuryFunds
+            _useTaskTreasuryFunds,
+            resolverHash
         );
 
         require(
-            taskCreator[_task] == address(0),
+            taskCreator[task] == address(0),
             "PokeMe: createTask: Sender already started task"
         );
 
-        _createdTasks[msg.sender].add(_task);
-        taskCreator[_task] = msg.sender;
-        execAddresses[_task] = _execAddress;
+        _createdTasks[msg.sender].add(task);
+        taskCreator[task] = msg.sender;
+        execAddresses[task] = _execAddress;
 
         emit TaskCreated(
             msg.sender,
             _execAddress,
             _execSelector,
             _resolverAddress,
-            _task,
+            task,
             _resolverData,
-            _useTaskTreasuryFunds
+            _useTaskTreasuryFunds,
+            resolverHash
         );
     }
 
@@ -121,6 +127,7 @@ contract PokeMe is Gelatofied {
         address _feeToken,
         address _taskCreator,
         bool _useTaskTreasuryFunds,
+        bytes32 _resolverHash,
         address _execAddress,
         bytes calldata _execData
     ) external onlyGelato {
@@ -128,7 +135,8 @@ contract PokeMe is Gelatofied {
             _taskCreator,
             _execAddress,
             _execData.calldataSliceSelector(),
-            _useTaskTreasuryFunds
+            _useTaskTreasuryFunds,
+            _resolverHash
         );
 
         require(
@@ -158,7 +166,8 @@ contract PokeMe is Gelatofied {
         address _taskCreator,
         address _execAddress,
         bytes4 _selector,
-        bool _useTaskTreasuryFunds
+        bool _useTaskTreasuryFunds,
+        bytes32 _resolverHash
     ) public pure returns (bytes32) {
         return
             keccak256(
@@ -166,7 +175,8 @@ contract PokeMe is Gelatofied {
                     _taskCreator,
                     _execAddress,
                     _selector,
-                    _useTaskTreasuryFunds
+                    _useTaskTreasuryFunds,
+                    _resolverHash
                 )
             );
     }
