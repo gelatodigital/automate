@@ -26,6 +26,7 @@ interface PokeMeInterface extends ethers.utils.Interface {
     "exec(uint256,address,address,bool,bytes32,address,bytes)": FunctionFragment;
     "execAddresses(bytes32)": FunctionFragment;
     "gelato()": FunctionFragment;
+    "getResolverHash(address,bytes)": FunctionFragment;
     "getSelector(string)": FunctionFragment;
     "getTaskId(address,address,bytes4,bool,bytes32)": FunctionFragment;
     "getTaskIdsByUser(address)": FunctionFragment;
@@ -59,6 +60,10 @@ interface PokeMeInterface extends ethers.utils.Interface {
     values: [BytesLike]
   ): string;
   encodeFunctionData(functionFragment: "gelato", values?: undefined): string;
+  encodeFunctionData(
+    functionFragment: "getResolverHash",
+    values: [string, BytesLike]
+  ): string;
   encodeFunctionData(functionFragment: "getSelector", values: [string]): string;
   encodeFunctionData(
     functionFragment: "getTaskId",
@@ -86,6 +91,10 @@ interface PokeMeInterface extends ethers.utils.Interface {
     data: BytesLike
   ): Result;
   decodeFunctionResult(functionFragment: "gelato", data: BytesLike): Result;
+  decodeFunctionResult(
+    functionFragment: "getResolverHash",
+    data: BytesLike
+  ): Result;
   decodeFunctionResult(
     functionFragment: "getSelector",
     data: BytesLike
@@ -192,6 +201,12 @@ export class PokeMe extends BaseContract {
 
     gelato(overrides?: CallOverrides): Promise<[string]>;
 
+    getResolverHash(
+      _resolverAddress: string,
+      _resolverData: BytesLike,
+      overrides?: CallOverrides
+    ): Promise<[string]>;
+
     getSelector(_func: string, overrides?: CallOverrides): Promise<[string]>;
 
     getTaskId(
@@ -244,6 +259,12 @@ export class PokeMe extends BaseContract {
 
   gelato(overrides?: CallOverrides): Promise<string>;
 
+  getResolverHash(
+    _resolverAddress: string,
+    _resolverData: BytesLike,
+    overrides?: CallOverrides
+  ): Promise<string>;
+
   getSelector(_func: string, overrides?: CallOverrides): Promise<string>;
 
   getTaskId(
@@ -292,6 +313,12 @@ export class PokeMe extends BaseContract {
     execAddresses(arg0: BytesLike, overrides?: CallOverrides): Promise<string>;
 
     gelato(overrides?: CallOverrides): Promise<string>;
+
+    getResolverHash(
+      _resolverAddress: string,
+      _resolverData: BytesLike,
+      overrides?: CallOverrides
+    ): Promise<string>;
 
     getSelector(_func: string, overrides?: CallOverrides): Promise<string>;
 
@@ -399,6 +426,12 @@ export class PokeMe extends BaseContract {
 
     gelato(overrides?: CallOverrides): Promise<BigNumber>;
 
+    getResolverHash(
+      _resolverAddress: string,
+      _resolverData: BytesLike,
+      overrides?: CallOverrides
+    ): Promise<BigNumber>;
+
     getSelector(_func: string, overrides?: CallOverrides): Promise<BigNumber>;
 
     getTaskId(
@@ -454,6 +487,12 @@ export class PokeMe extends BaseContract {
     ): Promise<PopulatedTransaction>;
 
     gelato(overrides?: CallOverrides): Promise<PopulatedTransaction>;
+
+    getResolverHash(
+      _resolverAddress: string,
+      _resolverData: BytesLike,
+      overrides?: CallOverrides
+    ): Promise<PopulatedTransaction>;
 
     getSelector(
       _func: string,
