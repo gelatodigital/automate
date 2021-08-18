@@ -75,7 +75,12 @@ describe("PokeMeTwo Test", function () {
     );
 
     selector = await pokeMe.getSelector("increaseCount(uint256)");
-    taskId = await pokeMe.getTaskId(userAddress, counter.address, selector);
+    taskId = await pokeMe.getTaskId(
+      userAddress,
+      counter.address,
+      selector,
+      true
+    );
 
     await expect(
       pokeMe
@@ -84,7 +89,8 @@ describe("PokeMeTwo Test", function () {
           counter.address,
           selector,
           counterResolver.address,
-          resolverData
+          resolverData,
+          true
         )
     )
       .to.emit(pokeMe, "TaskCreated")
@@ -94,10 +100,16 @@ describe("PokeMeTwo Test", function () {
         selector,
         counterResolver.address,
         taskId,
-        resolverData
+        resolverData,
+        true
       );
 
-    taskHash = await pokeMe.getTaskId(userAddress, counter.address, selector);
+    taskHash = await pokeMe.getTaskId(
+      userAddress,
+      counter.address,
+      selector,
+      true
+    );
   });
 
   it("sender already started task", async () => {
@@ -108,7 +120,8 @@ describe("PokeMeTwo Test", function () {
           counter.address,
           selector,
           counterResolver.address,
-          resolverData
+          resolverData,
+          true
         )
     ).to.be.revertedWith("PokeMe: createTask: Sender already started task");
   });
@@ -240,6 +253,7 @@ describe("PokeMeTwo Test", function () {
           ethers.utils.parseEther("1"),
           DAI,
           userAddress,
+          true,
           counter.address,
           execData
         )
@@ -267,6 +281,7 @@ describe("PokeMeTwo Test", function () {
           ethers.utils.parseEther("1"),
           ETH,
           userAddress,
+          true,
           counter.address,
           execData
         )
@@ -297,6 +312,7 @@ describe("PokeMeTwo Test", function () {
           ethers.utils.parseEther("1"),
           DAI,
           userAddress,
+          true,
           counter.address,
           execData
         )
@@ -335,6 +351,7 @@ describe("PokeMeTwo Test", function () {
         ethers.utils.parseEther("1"),
         ETH,
         userAddress,
+        true,
         counter.address,
         execData
       );
@@ -352,6 +369,7 @@ describe("PokeMeTwo Test", function () {
           ethers.utils.parseEther("1"),
           ETH,
           userAddress,
+          true,
           counter.address,
           execData
         )
@@ -385,6 +403,7 @@ describe("PokeMeTwo Test", function () {
         ethers.utils.parseEther("1"),
         DAI,
         userAddress,
+        true,
         counter.address,
         execData
       );
@@ -399,6 +418,7 @@ describe("PokeMeTwo Test", function () {
           ethers.utils.parseEther("1"),
           DAI,
           userAddress,
+          true,
           counter.address,
           execData
         )
@@ -409,7 +429,13 @@ describe("PokeMeTwo Test", function () {
     // fake task
     await pokeMe
       .connect(user)
-      .createTask(userAddress, selector, counterResolver.address, resolverData);
+      .createTask(
+        userAddress,
+        selector,
+        counterResolver.address,
+        resolverData,
+        true
+      );
     const ids = await pokeMe.getTaskIdsByUser(userAddress);
 
     expect(ids.length).to.be.eql(2);
