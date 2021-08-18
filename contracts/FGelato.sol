@@ -8,6 +8,8 @@ import {
 
 address constant ETH = 0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE;
 
+// solhint-disable private-vars-leading-underscore
+// solhint-disable func-visibility
 function _transfer(
     address payable _to,
     address _paymentToken,

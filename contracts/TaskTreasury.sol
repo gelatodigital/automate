@@ -48,6 +48,7 @@ contract TaskTreasury is Ownable, ReentrancyGuard {
         _;
     }
 
+    // solhint-disable max-line-length
     /// @notice Function to deposit Funds which will be used to execute transactions on various services
     /// @param _receiver Address receiving the credits
     /// @param _token Token to be credited, use "0xeeee...." for ETH

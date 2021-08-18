@@ -13,6 +13,7 @@ import {
 import {_transfer, ETH} from "./FGelato.sol";
 import {TaskTreasury} from "./TaskTreasury.sol";
 
+// solhint-disable max-line-length
 /// @notice PokeMe enables everyone to communicate to Gelato Bots to monitor and execute certain transactions
 /// @notice ResolverAddresses determine when Gelato should execute and provides bots with
 /// the payload they should use to execute
@@ -22,6 +23,7 @@ contract PokeMe is Gelatofied {
     using GelatoBytes for bytes;
     using EnumerableSet for EnumerableSet.Bytes32Set;
 
+    // solhint-disable const-name-snakecase
     string public constant version = "3";
     mapping(bytes32 => address) public taskCreator;
     mapping(bytes32 => address) public execAddresses;

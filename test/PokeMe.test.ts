@@ -36,27 +36,28 @@ describe("PokeMeTwo Test", function () {
   let taskHash: any;
   let selector: any;
 
-  let _pokeMe;
-  let _counter;
-  let _counterResolver;
-  let _taskTreasury;
-
   beforeEach(async function () {
     [user, user2] = await ethers.getSigners();
     userAddress = await user.getAddress();
     user2Address = await user2.getAddress();
 
-    const _taskTreasury = await ethers.getContractFactory("TaskTreasury");
-    const _pokeMe = await ethers.getContractFactory("PokeMe");
-    const _counter = await ethers.getContractFactory("Counter");
-    const _counterResolver = await ethers.getContractFactory("CounterResolver");
+    const taskTreasuryFactory = await ethers.getContractFactory("TaskTreasury");
+    const pokeMeFactory = await ethers.getContractFactory("PokeMe");
+    const counterFactory = await ethers.getContractFactory("Counter");
+    const counterResolverFactory = await ethers.getContractFactory(
+      "CounterResolver"
+    );
 
     dai = <IERC20>await ethers.getContractAt("IERC20", DAI);
-    taskTreasury = <TaskTreasury>await _taskTreasury.deploy(gelatoAddress);
-    pokeMe = <PokeMe>await _pokeMe.deploy(gelatoAddress, taskTreasury.address);
-    counter = <Counter>await _counter.deploy(pokeMe.address);
+    taskTreasury = <TaskTreasury>(
+      await taskTreasuryFactory.deploy(gelatoAddress)
+    );
+    pokeMe = <PokeMe>(
+      await pokeMeFactory.deploy(gelatoAddress, taskTreasury.address)
+    );
+    counter = <Counter>await counterFactory.deploy(pokeMe.address);
     counterResolver = <CounterResolver>(
-      await _counterResolver.deploy(counter.address)
+      await counterResolverFactory.deploy(counter.address)
     );
 
     executorAddress = gelatoAddress;
@@ -160,7 +161,7 @@ describe("PokeMeTwo Test", function () {
 
   it("deposit and withdraw DAI", async () => {
     const depositAmount = ethers.utils.parseEther("1");
-    const DAI_checksum = ethers.utils.getAddress(DAI);
+    const DAI_CHECKSUM = ethers.utils.getAddress(DAI);
 
     await getTokenFromFaucet(DAI, userAddress, depositAmount);
 
@@ -169,7 +170,7 @@ describe("PokeMeTwo Test", function () {
       taskTreasury.connect(user).depositFunds(userAddress, DAI, depositAmount)
     )
       .to.emit(taskTreasury, "FundsDeposited")
-      .withArgs(userAddress, DAI_checksum, depositAmount);
+      .withArgs(userAddress, DAI_CHECKSUM, depositAmount);
 
     expect(await taskTreasury.userTokenBalance(userAddress, DAI)).to.be.eq(
       ethers.utils.parseEther("1")
@@ -179,7 +180,7 @@ describe("PokeMeTwo Test", function () {
       taskTreasury.connect(user).withdrawFunds(userAddress, DAI, depositAmount)
     )
       .to.emit(taskTreasury, "FundsWithdrawn")
-      .withArgs(userAddress, userAddress, DAI_checksum, depositAmount);
+      .withArgs(userAddress, userAddress, DAI_CHECKSUM, depositAmount);
 
     expect(await taskTreasury.userTokenBalance(userAddress, DAI)).to.be.eq(
       ethers.BigNumber.from("0")
@@ -244,7 +245,7 @@ describe("PokeMeTwo Test", function () {
     await network.provider.send("evm_mine", []);
 
     await pokeMe.connect(user).cancelTask(taskHash);
-    let [, execData] = await counterResolver.checker();
+    const [, execData] = await counterResolver.checker();
 
     await expect(
       pokeMe
@@ -271,7 +272,7 @@ describe("PokeMeTwo Test", function () {
       .connect(user)
       .depositFunds(userAddress, ETH, depositAmount, { value: depositAmount });
 
-    let [canExec, execData] = await counterResolver.checker();
+    const [canExec, execData] = await counterResolver.checker();
     expect(canExec).to.be.eq(true);
 
     await expect(
@@ -294,7 +295,7 @@ describe("PokeMeTwo Test", function () {
     await network.provider.send("evm_increaseTime", [THREE_MIN]);
     await network.provider.send("evm_mine", []);
 
-    let [canExec, execData] = await counterResolver.checker();
+    const [canExec, execData] = await counterResolver.checker();
     expect(canExec).to.be.eq(true);
 
     const depositAmount = ethers.utils.parseEther("0.5");
@@ -326,7 +327,7 @@ describe("PokeMeTwo Test", function () {
   });
 
   it("should exec and pay with ETH", async () => {
-    let [canExec, execData] = await counterResolver.checker();
+    const [canExec, execData] = await counterResolver.checker();
     expect(canExec).to.be.eq(true);
 
     const THREE_MIN = 3 * 60;
@@ -377,7 +378,7 @@ describe("PokeMeTwo Test", function () {
   });
 
   it("should exec and pay with DAI", async () => {
-    let [canExec, execData] = await counterResolver.checker();
+    const [canExec, execData] = await counterResolver.checker();
     expect(canExec).to.be.eq(true);
 
     const THREE_MIN = 3 * 60;

@@ -10,6 +10,7 @@ interface ICounter {
 }
 
 contract CounterResolver is IResolver {
+    // solhint-disable var-name-mixedcase
     address public immutable COUNTER;
 
     constructor(address _counter) {
@@ -24,6 +25,7 @@ contract CounterResolver is IResolver {
     {
         uint256 lastExecuted = ICounter(COUNTER).lastExecuted();
 
+        // solhint-disable not-rely-on-time
         canExec = (block.timestamp - lastExecuted) > 180;
 
         execPayload = abi.encodeWithSelector(
