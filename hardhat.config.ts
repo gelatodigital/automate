@@ -23,8 +23,9 @@ assert.ok(ALCHEMY_ID, "no Alchemy ID in process.env");
 // @dev fill this out
 const DEPLOYER_PK_MAINNET = process.env.DEPLOYER_PK_MAINNET;
 const DEPLOYER_PK_ROPSTEN = process.env.DEPLOYER_PK_ROPSTEN;
-// const ETHERSCAN_API = process.env.ETHERSCAN_API;
-const FANTOMSCAN_API = process.env.FANTOMSCAN_API;
+const ETHERSCAN_API = process.env.ETHERSCAN_API;
+// const ETHERSCAN_MATIC_API = process.env.ETHERSCAN_MATIC_API;
+// const ETHERSCAN_FANTOM_API = process.env.ETHERSCAN_FANTOM_API;
 
 // ================================= CONFIG =========================================
 const config: HardhatUserConfig = {
@@ -79,7 +80,7 @@ const config: HardhatUserConfig = {
     target: "ethers-v5",
   },
   etherscan: {
-    apiKey: FANTOMSCAN_API,
+    apiKey: ETHERSCAN_API,
   },
 };
 
