@@ -4,6 +4,7 @@
   "description": "",
   "main": "hardhat.config.js",
   "scripts": {
+    "build": "yarn compile --force && npx tsc",
     "compile": "npx hardhat compile",
     "verify": "npx hardhat etherscan-verify",
     "test": "npx hardhat test",
@@ -13,7 +14,12 @@
     "submit-task": "npx hardhat run ./scripts/4-submit-task.js --network ropsten",
     "cancel-task": "npx hardhat run ./scripts/5-cancel-task.js --network ropsten",
     "withdraw": "npx hardhat run ./scripts/6-withdraw-funds.js --network ropsten",
-    "format": "prettier --write '*/**/*.{js,sol,json,md,ts}'"
+    "format": "prettier --write '*/**/*.{js,sol,json,md,ts}'",
+    "format:check": "prettier --check '*/**/*.{js,sol,json,md,ts}'",
+    "lint": "eslint --cache . && yarn lint:sol",
+    "lint:ts": "eslint -c .eslintrc.json --ext \"**/*.ts\" \"**/*.test.ts\"",
+    "lint:sol": "solhint 'contracts/**/*.sol'",
+    "postinstall": "yarn husky install"
   },
   "devDependencies": {
     "@gelatonetwork/core": "1.6.0",
@@ -55,5 +61,9 @@
   },
   "author": "",
   "license": "ISC",
-  "dependencies": {}
+  "dependencies": {},
+  "lint-staged": {
+    "*.{js,sol,json,md,ts,yml,yaml}": "prettier --write",
+    "*.{ts,js}": "eslint -c .eslintrc.json"
+  }
 }

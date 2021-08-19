@@ -1,10 +1,17 @@
 // SPDX-License-Identifier: UNLICENSED
 pragma solidity 0.8.0;
 
-import {EnumerableSet} from "@openzeppelin/contracts/utils/structs/EnumerableSet.sol";
-import {SafeERC20, IERC20} from "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
+import {
+    EnumerableSet
+} from "@openzeppelin/contracts/utils/structs/EnumerableSet.sol";
+import {
+    SafeERC20,
+    IERC20
+} from "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
 import {Ownable} from "@openzeppelin/contracts/access/Ownable.sol";
-import {ReentrancyGuard} from "@openzeppelin/contracts/security/ReentrancyGuard.sol";
+import {
+    ReentrancyGuard
+} from "@openzeppelin/contracts/security/ReentrancyGuard.sol";
 import {Math} from "@openzeppelin/contracts/utils/math/Math.sol";
 import {_transfer, ETH} from "./FGelato.sol";
 
@@ -41,6 +48,7 @@ contract TaskTreasury is Ownable, ReentrancyGuard {
         _;
     }
 
+    // solhint-disable max-line-length
     /// @notice Function to deposit Funds which will be used to execute transactions on various services
     /// @param _receiver Address receiving the credits
     /// @param _token Token to be credited, use "0xeeee...." for ETH

@@ -3,11 +3,17 @@ pragma solidity 0.8.0;
 
 import {Gelatofied} from "./Gelatofied.sol";
 import {GelatoBytes} from "./GelatoBytes.sol";
-import {EnumerableSet} from "@openzeppelin/contracts/utils/structs/EnumerableSet.sol";
-import {SafeERC20, IERC20} from "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
+import {
+    EnumerableSet
+} from "@openzeppelin/contracts/utils/structs/EnumerableSet.sol";
+import {
+    SafeERC20,
+    IERC20
+} from "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
 import {_transfer, ETH} from "./FGelato.sol";
 import {TaskTreasury} from "./TaskTreasury.sol";
 
+// solhint-disable max-line-length
 /// @notice PokeMe enables everyone to communicate to Gelato Bots to monitor and execute certain transactions
 /// @notice ResolverAddresses determine when Gelato should execute and provides bots with
 /// the payload they should use to execute
@@ -17,7 +23,8 @@ contract PokeMe is Gelatofied {
     using GelatoBytes for bytes;
     using EnumerableSet for EnumerableSet.Bytes32Set;
 
-    string public constant version = "2";
+    // solhint-disable const-name-snakecase
+    string public constant version = "3";
     mapping(bytes32 => address) public taskCreator;
     mapping(bytes32 => address) public execAddresses;
     mapping(address => EnumerableSet.Bytes32Set) internal _createdTasks;
@@ -35,7 +42,9 @@ contract PokeMe is Gelatofied {
         bytes4 selector,
         address resolverAddress,
         bytes32 taskId,
-        bytes resolverData
+        bytes resolverData,
+        bool useTaskTreasuryFunds,
+        bytes32 resolverHash
     );
     event TaskCancelled(bytes32 taskId, address taskCreator);
     event ExecSuccess(
@@ -51,30 +60,41 @@ contract PokeMe is Gelatofied {
     /// @param _execSelector Which function Gelato should eecute on the _execAddress
     /// @param _resolverAddress On which contract should Gelato check when to execute the tx
     /// @param _resolverData Which data should be used to check on the Resolver when to execute the tx
+    /// @param _useTaskTreasuryFunds If msg.sender's balance on TaskTreasury should pay for the tx
     function createTask(
         address _execAddress,
         bytes4 _execSelector,
         address _resolverAddress,
-        bytes calldata _resolverData
+        bytes calldata _resolverData,
+        bool _useTaskTreasuryFunds
     ) external {
-        bytes32 _task = getTaskId(msg.sender, _execAddress, _execSelector);
+        bytes32 resolverHash = getResolverHash(_resolverAddress, _resolverData);
+        bytes32 task = getTaskId(
+            msg.sender,
+            _execAddress,
+            _execSelector,
+            _useTaskTreasuryFunds,
+            resolverHash
+        );
 
         require(
-            taskCreator[_task] == address(0),
+            taskCreator[task] == address(0),
             "PokeMe: createTask: Sender already started task"
         );
 
-        _createdTasks[msg.sender].add(_task);
-        taskCreator[_task] = msg.sender;
-        execAddresses[_task] = _execAddress;
+        _createdTasks[msg.sender].add(task);
+        taskCreator[task] = msg.sender;
+        execAddresses[task] = _execAddress;
 
         emit TaskCreated(
             msg.sender,
             _execAddress,
             _execSelector,
             _resolverAddress,
-            _task,
-            _resolverData
+            task,
+            _resolverData,
+            _useTaskTreasuryFunds,
+            resolverHash
         );
     }
 
@@ -97,19 +117,24 @@ contract PokeMe is Gelatofied {
     /// @param _txFee Fee paid to Gelato for execution, deducted on the TaskTreasury
     /// @param _feeToken Token used to pay for the execution. ETH = 0xeeeeee...
     /// @param _taskCreator On which contract should Gelato check when to execute the tx
+    /// @param _useTaskTreasuryFunds If msg.sender's balance on TaskTreasury should pay for the tx
     /// @param _execAddress On which contract should Gelato execute the tx
     /// @param _execData Data used to execute the tx, queried from the Resolver by Gelato
     function exec(
         uint256 _txFee,
         address _feeToken,
         address _taskCreator,
+        bool _useTaskTreasuryFunds,
+        bytes32 _resolverHash,
         address _execAddress,
         bytes calldata _execData
     ) external onlyGelato {
         bytes32 task = getTaskId(
             _taskCreator,
             _execAddress,
-            _execData.calldataSliceSelector()
+            _execData.calldataSliceSelector(),
+            _useTaskTreasuryFunds,
+            _resolverHash
         );
 
         require(
@@ -120,7 +145,12 @@ contract PokeMe is Gelatofied {
         (bool success, ) = _execAddress.call(_execData);
         require(success, "PokeMe: exec: Execution failed");
 
-        TaskTreasury(taskTreasury).useFunds(_feeToken, _txFee, _taskCreator);
+        if (_useTaskTreasuryFunds)
+            TaskTreasury(taskTreasury).useFunds(
+                _feeToken,
+                _txFee,
+                _taskCreator
+            );
 
         emit ExecSuccess(_txFee, _feeToken, _execAddress, _execData, task);
     }
@@ -129,12 +159,24 @@ contract PokeMe is Gelatofied {
     /// @param _taskCreator Address of the task creator
     /// @param _execAddress Address of the contract to be executed by Gelato
     /// @param _selector Function on the _execAddress which should be executed
+    /// @param _useTaskTreasuryFunds If msg.sender's balance on TaskTreasury should pay for the tx
     function getTaskId(
         address _taskCreator,
         address _execAddress,
-        bytes4 _selector
+        bytes4 _selector,
+        bool _useTaskTreasuryFunds,
+        bytes32 _resolverHash
     ) public pure returns (bytes32) {
-        return keccak256(abi.encode(_taskCreator, _execAddress, _selector));
+        return
+            keccak256(
+                abi.encode(
+                    _taskCreator,
+                    _execAddress,
+                    _selector,
+                    _useTaskTreasuryFunds,
+                    _resolverHash
+                )
+            );
     }
 
     /// @notice Helper func to query the _selector of a function you want to automate
@@ -142,6 +184,16 @@ contract PokeMe is Gelatofied {
     /// @dev Example: "transferFrom(address,address,uint256)" => 0x23b872dd
     function getSelector(string calldata _func) external pure returns (bytes4) {
         return bytes4(keccak256(bytes(_func)));
+    }
+
+    /// @notice Helper func to query the resolverHash
+    /// @param _resolverAddress Address of resolver
+    /// @param _resolverData Data passed to resolver
+    function getResolverHash(
+        address _resolverAddress,
+        bytes memory _resolverData
+    ) public pure returns (bytes32) {
+        return keccak256(abi.encode(_resolverAddress, _resolverData));
     }
 
     /// @notice Helper func to query all open tasks by a task creator

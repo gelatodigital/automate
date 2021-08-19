@@ -1,13 +1,22 @@
 // SPDX-License-Identifier: UNLICENSED
 pragma solidity 0.8.0;
 
-import {EnumerableSet} from "@openzeppelin/contracts/utils/structs/EnumerableSet.sol";
-import {SafeERC20, IERC20} from "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
+import {
+    EnumerableSet
+} from "@openzeppelin/contracts/utils/structs/EnumerableSet.sol";
+import {
+    SafeERC20,
+    IERC20
+} from "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
 import {Ownable} from "@openzeppelin/contracts/access/Ownable.sol";
-import {ReentrancyGuard} from "@openzeppelin/contracts/security/ReentrancyGuard.sol";
+import {
+    ReentrancyGuard
+} from "@openzeppelin/contracts/security/ReentrancyGuard.sol";
 import {Math} from "@openzeppelin/contracts/utils/math/Math.sol";
 import {_transfer, ETH} from "./FGelato.sol";
 
+// solhint-disable max-states-count
+// solhint-disable max-line-length
 contract TaskTreasuryMatic is Ownable, ReentrancyGuard {
     using EnumerableSet for EnumerableSet.AddressSet;
     using SafeERC20 for IERC20;
@@ -104,7 +113,8 @@ contract TaskTreasuryMatic is Ownable, ReentrancyGuard {
         uint256 _amount,
         address _user
     ) external onlyWhitelistedServices {
-        if (maxFee != 0) require(maxFee >= _amount, "TaskTreasury: useFunds: Overchared" );
+        if (maxFee != 0)
+            require(maxFee >= _amount, "TaskTreasury: useFunds: Overchared");
         userTokenBalance[_user][_token] =
             userTokenBalance[_user][_token] -
             _amount;
@@ -170,5 +180,4 @@ contract TaskTreasuryMatic is Ownable, ReentrancyGuard {
         }
         return whitelistedServices;
     }
-
 }

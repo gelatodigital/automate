@@ -22,18 +22,14 @@ module.exports = async (hre) => {
 
   await deploy("PokeMe", {
     from: deployer,
-    args: [
-      GELATO,
-      (await hre.ethers.getContract("TaskTreasuryFantom")).address,
-    ],
+    args: [GELATO, (await hre.ethers.getContract("TaskTreasuryMatic")).address],
   });
 };
 
 module.exports.skip = async (hre) => {
   const skip =
-    hre.network.name === "mainnet" ||
-    hre.network.name === "rinkeby" ||
-    hre.network.name === "hardhat"; // skip local deployment here for tests to run
+    // hre.network.name === "mainnet" ||
+    hre.network.name === "rinkeby" || hre.network.name === "hardhat"; // skip local deployment here for tests to run
   return skip ? true : false;
 };
 

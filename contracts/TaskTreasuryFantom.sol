@@ -15,6 +15,8 @@ import {
 import {Math} from "@openzeppelin/contracts/utils/math/Math.sol";
 import {_transfer, ETH} from "./FGelato.sol";
 
+// solhint-disable max-states-count
+// solhint-disable max-line-length
 contract TaskTreasuryFantom is Ownable, ReentrancyGuard {
     using EnumerableSet for EnumerableSet.AddressSet;
     using SafeERC20 for IERC20;
