@@ -22,7 +22,7 @@ module.exports = async (hre) => {
 
   await deploy("PokeMe", {
     from: deployer,
-    args: [GELATO, (await hre.ethers.getContract("TaskTreasuryMatic")).address],
+    args: [GELATO, (await hre.ethers.getContract("TaskTreasury")).address],
   });
 };
 
@@ -34,4 +34,4 @@ module.exports.skip = async (hre) => {
 };
 
 module.exports.tags = ["PokeMe"];
-module.exports.dependencies = ["TaskTreasuryFantom"];
+module.exports.dependencies = ["TaskTreasury"];
