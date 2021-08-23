@@ -25,7 +25,10 @@ interface PokeMeInterface extends ethers.utils.Interface {
     "createTask(address,bytes4,address,bytes,bool)": FunctionFragment;
     "exec(uint256,address,address,bool,bytes32,address,bytes)": FunctionFragment;
     "execAddresses(bytes32)": FunctionFragment;
+    "fee()": FunctionFragment;
+    "feeToken()": FunctionFragment;
     "gelato()": FunctionFragment;
+    "getFeeDetails()": FunctionFragment;
     "getResolverHash(address,bytes)": FunctionFragment;
     "getSelector(string)": FunctionFragment;
     "getTaskId(address,address,bytes4,bool,bytes32)": FunctionFragment;
@@ -59,7 +62,13 @@ interface PokeMeInterface extends ethers.utils.Interface {
     functionFragment: "execAddresses",
     values: [BytesLike]
   ): string;
+  encodeFunctionData(functionFragment: "fee", values?: undefined): string;
+  encodeFunctionData(functionFragment: "feeToken", values?: undefined): string;
   encodeFunctionData(functionFragment: "gelato", values?: undefined): string;
+  encodeFunctionData(
+    functionFragment: "getFeeDetails",
+    values?: undefined
+  ): string;
   encodeFunctionData(
     functionFragment: "getResolverHash",
     values: [string, BytesLike]
@@ -90,7 +99,13 @@ interface PokeMeInterface extends ethers.utils.Interface {
     functionFragment: "execAddresses",
     data: BytesLike
   ): Result;
+  decodeFunctionResult(functionFragment: "fee", data: BytesLike): Result;
+  decodeFunctionResult(functionFragment: "feeToken", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "gelato", data: BytesLike): Result;
+  decodeFunctionResult(
+    functionFragment: "getFeeDetails",
+    data: BytesLike
+  ): Result;
   decodeFunctionResult(
     functionFragment: "getResolverHash",
     data: BytesLike
@@ -199,7 +214,13 @@ export class PokeMe extends BaseContract {
       overrides?: CallOverrides
     ): Promise<[string]>;
 
+    fee(overrides?: CallOverrides): Promise<[BigNumber]>;
+
+    feeToken(overrides?: CallOverrides): Promise<[string]>;
+
     gelato(overrides?: CallOverrides): Promise<[string]>;
+
+    getFeeDetails(overrides?: CallOverrides): Promise<[BigNumber, string]>;
 
     getResolverHash(
       _resolverAddress: string,
@@ -257,7 +278,13 @@ export class PokeMe extends BaseContract {
 
   execAddresses(arg0: BytesLike, overrides?: CallOverrides): Promise<string>;
 
+  fee(overrides?: CallOverrides): Promise<BigNumber>;
+
+  feeToken(overrides?: CallOverrides): Promise<string>;
+
   gelato(overrides?: CallOverrides): Promise<string>;
+
+  getFeeDetails(overrides?: CallOverrides): Promise<[BigNumber, string]>;
 
   getResolverHash(
     _resolverAddress: string,
@@ -312,7 +339,13 @@ export class PokeMe extends BaseContract {
 
     execAddresses(arg0: BytesLike, overrides?: CallOverrides): Promise<string>;
 
+    fee(overrides?: CallOverrides): Promise<BigNumber>;
+
+    feeToken(overrides?: CallOverrides): Promise<string>;
+
     gelato(overrides?: CallOverrides): Promise<string>;
+
+    getFeeDetails(overrides?: CallOverrides): Promise<[BigNumber, string]>;
 
     getResolverHash(
       _resolverAddress: string,
@@ -424,7 +457,13 @@ export class PokeMe extends BaseContract {
       overrides?: CallOverrides
     ): Promise<BigNumber>;
 
+    fee(overrides?: CallOverrides): Promise<BigNumber>;
+
+    feeToken(overrides?: CallOverrides): Promise<BigNumber>;
+
     gelato(overrides?: CallOverrides): Promise<BigNumber>;
+
+    getFeeDetails(overrides?: CallOverrides): Promise<BigNumber>;
 
     getResolverHash(
       _resolverAddress: string,
@@ -486,7 +525,13 @@ export class PokeMe extends BaseContract {
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
 
+    fee(overrides?: CallOverrides): Promise<PopulatedTransaction>;
+
+    feeToken(overrides?: CallOverrides): Promise<PopulatedTransaction>;
+
     gelato(overrides?: CallOverrides): Promise<PopulatedTransaction>;
+
+    getFeeDetails(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
     getResolverHash(
       _resolverAddress: string,
