@@ -13,11 +13,11 @@ import {
     ReentrancyGuard
 } from "@openzeppelin/contracts/security/ReentrancyGuard.sol";
 import {Math} from "@openzeppelin/contracts/utils/math/Math.sol";
-import {_transfer, ETH} from "./FGelato.sol";
+import {_transfer, ETH} from "../Gelato/FGelato.sol";
 
 // solhint-disable max-states-count
 // solhint-disable max-line-length
-contract TaskTreasuryFantom is Ownable, ReentrancyGuard {
+contract TaskTreasuryMatic is Ownable, ReentrancyGuard {
     using EnumerableSet for EnumerableSet.AddressSet;
     using SafeERC20 for IERC20;
 
@@ -41,7 +41,7 @@ contract TaskTreasuryFantom is Ownable, ReentrancyGuard {
 
     constructor(address payable _gelato) {
         gelato = _gelato;
-        maxFee = 0.3 ether;
+        maxFee = 1 ether;
     }
 
     modifier onlyWhitelistedServices() {

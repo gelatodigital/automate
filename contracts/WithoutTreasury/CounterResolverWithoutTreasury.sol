@@ -1,15 +1,13 @@
 // SPDX-License-Identifier: UNLICENSED
 pragma solidity 0.8.0;
 
-import {IResolver} from "./interfaces/IResolver.sol";
-
 interface ICounter {
     function lastExecuted() external view returns (uint256);
 
     function increaseCount(uint256 amount) external;
 }
 
-contract CounterResolver is IResolver {
+contract CounterResolverWithoutTreasury {
     // solhint-disable var-name-mixedcase
     address public immutable COUNTER;
 
@@ -17,11 +15,15 @@ contract CounterResolver is IResolver {
         COUNTER = _counter;
     }
 
-    function checker()
+    function checker(address _feeToken)
         external
         view
         override
-        returns (bool canExec, bytes memory execPayload)
+        returns (
+            bool canExec,
+            bytes memory execPayload,
+            address feeToken
+        )
     {
         uint256 lastExecuted = ICounter(COUNTER).lastExecuted();
 
@@ -32,5 +34,7 @@ contract CounterResolver is IResolver {
             ICounter.increaseCount.selector,
             uint256(100)
         );
+
+        feeToken = _feeToken;
     }
 }

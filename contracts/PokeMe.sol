@@ -1,8 +1,8 @@
 // SPDX-License-Identifier: UNLICENSED
 pragma solidity 0.8.0;
 
-import {Gelatofied} from "./Gelatofied.sol";
-import {GelatoBytes} from "./GelatoBytes.sol";
+import {Gelatofied} from "./Gelato/Gelatofied.sol";
+import {GelatoBytes} from "./Gelato/GelatoBytes.sol";
 import {
     EnumerableSet
 } from "@openzeppelin/contracts/utils/structs/EnumerableSet.sol";
@@ -10,8 +10,7 @@ import {
     SafeERC20,
     IERC20
 } from "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
-import {_transfer, ETH} from "./FGelato.sol";
-import {TaskTreasury} from "./TaskTreasury.sol";
+import {TaskTreasury} from "./TaskTreasury/TaskTreasury.sol";
 
 // solhint-disable max-line-length
 // solhint-disable max-states-count

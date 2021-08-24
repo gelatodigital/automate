@@ -13,15 +13,12 @@ import {
     ReentrancyGuard
 } from "@openzeppelin/contracts/security/ReentrancyGuard.sol";
 import {Math} from "@openzeppelin/contracts/utils/math/Math.sol";
-import {_transfer, ETH} from "./FGelato.sol";
+import {_transfer, ETH} from "../Gelato/FGelato.sol";
 
-// solhint-disable max-states-count
-// solhint-disable max-line-length
-contract TaskTreasuryMatic is Ownable, ReentrancyGuard {
+contract TaskTreasury is Ownable, ReentrancyGuard {
     using EnumerableSet for EnumerableSet.AddressSet;
     using SafeERC20 for IERC20;
 
-    uint256 public maxFee;
     mapping(address => mapping(address => uint256)) public userTokenBalance;
     mapping(address => EnumerableSet.AddressSet) internal _tokenCredits;
     EnumerableSet.AddressSet internal _whitelistedServices;
@@ -41,7 +38,6 @@ contract TaskTreasuryMatic is Ownable, ReentrancyGuard {
 
     constructor(address payable _gelato) {
         gelato = _gelato;
-        maxFee = 1 ether;
     }
 
     modifier onlyWhitelistedServices() {
@@ -52,6 +48,7 @@ contract TaskTreasuryMatic is Ownable, ReentrancyGuard {
         _;
     }
 
+    // solhint-disable max-line-length
     /// @notice Function to deposit Funds which will be used to execute transactions on various services
     /// @param _receiver Address receiving the credits
     /// @param _token Token to be credited, use "0xeeee...." for ETH
@@ -113,8 +110,6 @@ contract TaskTreasuryMatic is Ownable, ReentrancyGuard {
         uint256 _amount,
         address _user
     ) external onlyWhitelistedServices {
-        if (maxFee != 0)
-            require(maxFee >= _amount, "TaskTreasury: useFunds: Overchared");
         userTokenBalance[_user][_token] =
             userTokenBalance[_user][_token] -
             _amount;
@@ -145,12 +140,6 @@ contract TaskTreasuryMatic is Ownable, ReentrancyGuard {
             "TaskTreasury: addWhitelistedService: !whitelisted"
         );
         _whitelistedServices.remove(_service);
-    }
-
-    /// @notice Change maxFee charged by Gelato (only relevant on Layer2s)
-    /// @param _newMaxFee New Max Fee to charge
-    function setMaxFee(uint256 _newMaxFee) external onlyOwner {
-        maxFee = _newMaxFee;
     }
 
     // View Funcs
