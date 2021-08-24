@@ -14,6 +14,7 @@ import {_transfer, ETH} from "./FGelato.sol";
 import {TaskTreasury} from "./TaskTreasury.sol";
 
 // solhint-disable max-line-length
+// solhint-disable max-states-count
 /// @notice PokeMe enables everyone to communicate to Gelato Bots to monitor and execute certain transactions
 /// @notice ResolverAddresses determine when Gelato should execute and provides bots with
 /// the payload they should use to execute
@@ -29,6 +30,8 @@ contract PokeMe is Gelatofied {
     mapping(bytes32 => address) public execAddresses;
     mapping(address => EnumerableSet.Bytes32Set) internal _createdTasks;
     address public immutable taskTreasury;
+    uint256 public fee;
+    address public feeToken;
 
     constructor(address payable _gelato, address _taskTreasury)
         Gelatofied(_gelato)
@@ -129,6 +132,10 @@ contract PokeMe is Gelatofied {
         address _execAddress,
         bytes calldata _execData
     ) external onlyGelato {
+        if (!_useTaskTreasuryFunds) {
+            fee = _txFee;
+            feeToken = _feeToken;
+        }
         bytes32 task = getTaskId(
             _taskCreator,
             _execAddress,
@@ -145,12 +152,16 @@ contract PokeMe is Gelatofied {
         (bool success, ) = _execAddress.call(_execData);
         require(success, "PokeMe: exec: Execution failed");
 
-        if (_useTaskTreasuryFunds)
+        if (_useTaskTreasuryFunds) {
             TaskTreasury(taskTreasury).useFunds(
                 _feeToken,
                 _txFee,
                 _taskCreator
             );
+        } else {
+            delete fee;
+            delete feeToken;
+        }
 
         emit ExecSuccess(_txFee, _feeToken, _execAddress, _execData, task);
     }
@@ -211,5 +222,10 @@ contract PokeMe is Gelatofied {
         }
 
         return taskIds;
+    }
+
+    /// @notice Helper func to query fee and feeToken
+    function getFeeDetails() external view returns (uint256, address) {
+        return (fee, feeToken);
     }
 }
