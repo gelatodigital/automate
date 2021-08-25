@@ -11,6 +11,7 @@ import {
   PopulatedTransaction,
   BaseContract,
   ContractTransaction,
+  Overrides,
   CallOverrides,
 } from "ethers";
 import { BytesLike } from "@ethersproject/bytes";
@@ -18,25 +19,46 @@ import { Listener, Provider } from "@ethersproject/providers";
 import { FunctionFragment, EventFragment, Result } from "@ethersproject/abi";
 import { TypedEventFilter, TypedEvent, TypedListener } from "./commons";
 
-interface PokeMeReadyInterface extends ethers.utils.Interface {
+interface CounterWithoutTreasuryInterface extends ethers.utils.Interface {
   functions: {
     "ETH()": FunctionFragment;
+    "count()": FunctionFragment;
     "gelato()": FunctionFragment;
+    "increaseCount(uint256)": FunctionFragment;
+    "lastExecuted()": FunctionFragment;
     "pokeMe()": FunctionFragment;
   };
 
   encodeFunctionData(functionFragment: "ETH", values?: undefined): string;
+  encodeFunctionData(functionFragment: "count", values?: undefined): string;
   encodeFunctionData(functionFragment: "gelato", values?: undefined): string;
+  encodeFunctionData(
+    functionFragment: "increaseCount",
+    values: [BigNumberish]
+  ): string;
+  encodeFunctionData(
+    functionFragment: "lastExecuted",
+    values?: undefined
+  ): string;
   encodeFunctionData(functionFragment: "pokeMe", values?: undefined): string;
 
   decodeFunctionResult(functionFragment: "ETH", data: BytesLike): Result;
+  decodeFunctionResult(functionFragment: "count", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "gelato", data: BytesLike): Result;
+  decodeFunctionResult(
+    functionFragment: "increaseCount",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
+    functionFragment: "lastExecuted",
+    data: BytesLike
+  ): Result;
   decodeFunctionResult(functionFragment: "pokeMe", data: BytesLike): Result;
 
   events: {};
 }
 
-export class PokeMeReady extends BaseContract {
+export class CounterWithoutTreasury extends BaseContract {
   connect(signerOrProvider: Signer | Provider | string): this;
   attach(addressOrName: string): this;
   deployed(): Promise<this>;
@@ -77,26 +99,53 @@ export class PokeMeReady extends BaseContract {
     toBlock?: string | number | undefined
   ): Promise<Array<TypedEvent<EventArgsArray & EventArgsObject>>>;
 
-  interface: PokeMeReadyInterface;
+  interface: CounterWithoutTreasuryInterface;
 
   functions: {
     ETH(overrides?: CallOverrides): Promise<[string]>;
 
+    count(overrides?: CallOverrides): Promise<[BigNumber]>;
+
     gelato(overrides?: CallOverrides): Promise<[string]>;
+
+    increaseCount(
+      amount: BigNumberish,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<ContractTransaction>;
+
+    lastExecuted(overrides?: CallOverrides): Promise<[BigNumber]>;
 
     pokeMe(overrides?: CallOverrides): Promise<[string]>;
   };
 
   ETH(overrides?: CallOverrides): Promise<string>;
 
+  count(overrides?: CallOverrides): Promise<BigNumber>;
+
   gelato(overrides?: CallOverrides): Promise<string>;
+
+  increaseCount(
+    amount: BigNumberish,
+    overrides?: Overrides & { from?: string | Promise<string> }
+  ): Promise<ContractTransaction>;
+
+  lastExecuted(overrides?: CallOverrides): Promise<BigNumber>;
 
   pokeMe(overrides?: CallOverrides): Promise<string>;
 
   callStatic: {
     ETH(overrides?: CallOverrides): Promise<string>;
 
+    count(overrides?: CallOverrides): Promise<BigNumber>;
+
     gelato(overrides?: CallOverrides): Promise<string>;
+
+    increaseCount(
+      amount: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<void>;
+
+    lastExecuted(overrides?: CallOverrides): Promise<BigNumber>;
 
     pokeMe(overrides?: CallOverrides): Promise<string>;
   };
@@ -106,7 +155,16 @@ export class PokeMeReady extends BaseContract {
   estimateGas: {
     ETH(overrides?: CallOverrides): Promise<BigNumber>;
 
+    count(overrides?: CallOverrides): Promise<BigNumber>;
+
     gelato(overrides?: CallOverrides): Promise<BigNumber>;
+
+    increaseCount(
+      amount: BigNumberish,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<BigNumber>;
+
+    lastExecuted(overrides?: CallOverrides): Promise<BigNumber>;
 
     pokeMe(overrides?: CallOverrides): Promise<BigNumber>;
   };
@@ -114,7 +172,16 @@ export class PokeMeReady extends BaseContract {
   populateTransaction: {
     ETH(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
+    count(overrides?: CallOverrides): Promise<PopulatedTransaction>;
+
     gelato(overrides?: CallOverrides): Promise<PopulatedTransaction>;
+
+    increaseCount(
+      amount: BigNumberish,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<PopulatedTransaction>;
+
+    lastExecuted(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
     pokeMe(overrides?: CallOverrides): Promise<PopulatedTransaction>;
   };

@@ -22,7 +22,8 @@ import { TypedEventFilter, TypedEvent, TypedListener } from "./commons";
 interface PokeMeInterface extends ethers.utils.Interface {
   functions: {
     "cancelTask(bytes32)": FunctionFragment;
-    "createTask(address,bytes4,address,bytes,bool)": FunctionFragment;
+    "createTask(address,bytes4,address,bytes)": FunctionFragment;
+    "createTaskNoPrepayment(address,bytes4,address,bytes,address)": FunctionFragment;
     "exec(uint256,address,address,bool,bytes32,address,bytes)": FunctionFragment;
     "execAddresses(bytes32)": FunctionFragment;
     "fee()": FunctionFragment;
@@ -31,7 +32,7 @@ interface PokeMeInterface extends ethers.utils.Interface {
     "getFeeDetails()": FunctionFragment;
     "getResolverHash(address,bytes)": FunctionFragment;
     "getSelector(string)": FunctionFragment;
-    "getTaskId(address,address,bytes4,bool,bytes32)": FunctionFragment;
+    "getTaskId(address,address,bytes4,bool,address,bytes32)": FunctionFragment;
     "getTaskIdsByUser(address)": FunctionFragment;
     "taskCreator(bytes32)": FunctionFragment;
     "taskTreasury()": FunctionFragment;
@@ -44,7 +45,11 @@ interface PokeMeInterface extends ethers.utils.Interface {
   ): string;
   encodeFunctionData(
     functionFragment: "createTask",
-    values: [string, BytesLike, string, BytesLike, boolean]
+    values: [string, BytesLike, string, BytesLike]
+  ): string;
+  encodeFunctionData(
+    functionFragment: "createTaskNoPrepayment",
+    values: [string, BytesLike, string, BytesLike, string]
   ): string;
   encodeFunctionData(
     functionFragment: "exec",
@@ -76,7 +81,7 @@ interface PokeMeInterface extends ethers.utils.Interface {
   encodeFunctionData(functionFragment: "getSelector", values: [string]): string;
   encodeFunctionData(
     functionFragment: "getTaskId",
-    values: [string, string, BytesLike, boolean, BytesLike]
+    values: [string, string, BytesLike, boolean, string, BytesLike]
   ): string;
   encodeFunctionData(
     functionFragment: "getTaskIdsByUser",
@@ -94,6 +99,10 @@ interface PokeMeInterface extends ethers.utils.Interface {
 
   decodeFunctionResult(functionFragment: "cancelTask", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "createTask", data: BytesLike): Result;
+  decodeFunctionResult(
+    functionFragment: "createTaskNoPrepayment",
+    data: BytesLike
+  ): Result;
   decodeFunctionResult(functionFragment: "exec", data: BytesLike): Result;
   decodeFunctionResult(
     functionFragment: "execAddresses",
@@ -132,7 +141,7 @@ interface PokeMeInterface extends ethers.utils.Interface {
   events: {
     "ExecSuccess(uint256,address,address,bytes,bytes32)": EventFragment;
     "TaskCancelled(bytes32,address)": EventFragment;
-    "TaskCreated(address,address,bytes4,address,bytes32,bytes,bool,bytes32)": EventFragment;
+    "TaskCreated(address,address,bytes4,address,bytes32,bytes,bool,address,bytes32)": EventFragment;
   };
 
   getEvent(nameOrSignatureOrTopic: "ExecSuccess"): EventFragment;
@@ -194,7 +203,15 @@ export class PokeMe extends BaseContract {
       _execSelector: BytesLike,
       _resolverAddress: string,
       _resolverData: BytesLike,
-      _useTaskTreasuryFunds: boolean,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<ContractTransaction>;
+
+    createTaskNoPrepayment(
+      _execAddress: string,
+      _execSelector: BytesLike,
+      _resolverAddress: string,
+      _resolverData: BytesLike,
+      _feeToken: string,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
 
@@ -235,6 +252,7 @@ export class PokeMe extends BaseContract {
       _execAddress: string,
       _selector: BytesLike,
       _useTaskTreasuryFunds: boolean,
+      _feeToken: string,
       _resolverHash: BytesLike,
       overrides?: CallOverrides
     ): Promise<[string]>;
@@ -261,7 +279,15 @@ export class PokeMe extends BaseContract {
     _execSelector: BytesLike,
     _resolverAddress: string,
     _resolverData: BytesLike,
-    _useTaskTreasuryFunds: boolean,
+    overrides?: Overrides & { from?: string | Promise<string> }
+  ): Promise<ContractTransaction>;
+
+  createTaskNoPrepayment(
+    _execAddress: string,
+    _execSelector: BytesLike,
+    _resolverAddress: string,
+    _resolverData: BytesLike,
+    _feeToken: string,
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
@@ -299,6 +325,7 @@ export class PokeMe extends BaseContract {
     _execAddress: string,
     _selector: BytesLike,
     _useTaskTreasuryFunds: boolean,
+    _feeToken: string,
     _resolverHash: BytesLike,
     overrides?: CallOverrides
   ): Promise<string>;
@@ -322,7 +349,15 @@ export class PokeMe extends BaseContract {
       _execSelector: BytesLike,
       _resolverAddress: string,
       _resolverData: BytesLike,
-      _useTaskTreasuryFunds: boolean,
+      overrides?: CallOverrides
+    ): Promise<void>;
+
+    createTaskNoPrepayment(
+      _execAddress: string,
+      _execSelector: BytesLike,
+      _resolverAddress: string,
+      _resolverData: BytesLike,
+      _feeToken: string,
       overrides?: CallOverrides
     ): Promise<void>;
 
@@ -360,6 +395,7 @@ export class PokeMe extends BaseContract {
       _execAddress: string,
       _selector: BytesLike,
       _useTaskTreasuryFunds: boolean,
+      _feeToken: string,
       _resolverHash: BytesLike,
       overrides?: CallOverrides
     ): Promise<string>;
@@ -410,9 +446,10 @@ export class PokeMe extends BaseContract {
       taskId?: null,
       resolverData?: null,
       useTaskTreasuryFunds?: null,
+      feeToken?: null,
       resolverHash?: null
     ): TypedEventFilter<
-      [string, string, string, string, string, string, boolean, string],
+      [string, string, string, string, string, string, boolean, string, string],
       {
         taskCreator: string;
         execAddress: string;
@@ -421,6 +458,7 @@ export class PokeMe extends BaseContract {
         taskId: string;
         resolverData: string;
         useTaskTreasuryFunds: boolean;
+        feeToken: string;
         resolverHash: string;
       }
     >;
@@ -437,7 +475,15 @@ export class PokeMe extends BaseContract {
       _execSelector: BytesLike,
       _resolverAddress: string,
       _resolverData: BytesLike,
-      _useTaskTreasuryFunds: boolean,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<BigNumber>;
+
+    createTaskNoPrepayment(
+      _execAddress: string,
+      _execSelector: BytesLike,
+      _resolverAddress: string,
+      _resolverData: BytesLike,
+      _feeToken: string,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
@@ -478,6 +524,7 @@ export class PokeMe extends BaseContract {
       _execAddress: string,
       _selector: BytesLike,
       _useTaskTreasuryFunds: boolean,
+      _feeToken: string,
       _resolverHash: BytesLike,
       overrides?: CallOverrides
     ): Promise<BigNumber>;
@@ -505,7 +552,15 @@ export class PokeMe extends BaseContract {
       _execSelector: BytesLike,
       _resolverAddress: string,
       _resolverData: BytesLike,
-      _useTaskTreasuryFunds: boolean,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<PopulatedTransaction>;
+
+    createTaskNoPrepayment(
+      _execAddress: string,
+      _execSelector: BytesLike,
+      _resolverAddress: string,
+      _resolverData: BytesLike,
+      _feeToken: string,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 
@@ -549,6 +604,7 @@ export class PokeMe extends BaseContract {
       _execAddress: string,
       _selector: BytesLike,
       _useTaskTreasuryFunds: boolean,
+      _feeToken: string,
       _resolverHash: BytesLike,
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;

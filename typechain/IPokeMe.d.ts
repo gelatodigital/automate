@@ -18,25 +18,25 @@ import { Listener, Provider } from "@ethersproject/providers";
 import { FunctionFragment, EventFragment, Result } from "@ethersproject/abi";
 import { TypedEventFilter, TypedEvent, TypedListener } from "./commons";
 
-interface PokeMeReadyInterface extends ethers.utils.Interface {
+interface IPokeMeInterface extends ethers.utils.Interface {
   functions: {
-    "ETH()": FunctionFragment;
-    "gelato()": FunctionFragment;
-    "pokeMe()": FunctionFragment;
+    "getFeeDetails()": FunctionFragment;
   };
 
-  encodeFunctionData(functionFragment: "ETH", values?: undefined): string;
-  encodeFunctionData(functionFragment: "gelato", values?: undefined): string;
-  encodeFunctionData(functionFragment: "pokeMe", values?: undefined): string;
+  encodeFunctionData(
+    functionFragment: "getFeeDetails",
+    values?: undefined
+  ): string;
 
-  decodeFunctionResult(functionFragment: "ETH", data: BytesLike): Result;
-  decodeFunctionResult(functionFragment: "gelato", data: BytesLike): Result;
-  decodeFunctionResult(functionFragment: "pokeMe", data: BytesLike): Result;
+  decodeFunctionResult(
+    functionFragment: "getFeeDetails",
+    data: BytesLike
+  ): Result;
 
   events: {};
 }
 
-export class PokeMeReady extends BaseContract {
+export class IPokeMe extends BaseContract {
   connect(signerOrProvider: Signer | Provider | string): this;
   attach(addressOrName: string): this;
   deployed(): Promise<this>;
@@ -77,45 +77,25 @@ export class PokeMeReady extends BaseContract {
     toBlock?: string | number | undefined
   ): Promise<Array<TypedEvent<EventArgsArray & EventArgsObject>>>;
 
-  interface: PokeMeReadyInterface;
+  interface: IPokeMeInterface;
 
   functions: {
-    ETH(overrides?: CallOverrides): Promise<[string]>;
-
-    gelato(overrides?: CallOverrides): Promise<[string]>;
-
-    pokeMe(overrides?: CallOverrides): Promise<[string]>;
+    getFeeDetails(overrides?: CallOverrides): Promise<[BigNumber, string]>;
   };
 
-  ETH(overrides?: CallOverrides): Promise<string>;
-
-  gelato(overrides?: CallOverrides): Promise<string>;
-
-  pokeMe(overrides?: CallOverrides): Promise<string>;
+  getFeeDetails(overrides?: CallOverrides): Promise<[BigNumber, string]>;
 
   callStatic: {
-    ETH(overrides?: CallOverrides): Promise<string>;
-
-    gelato(overrides?: CallOverrides): Promise<string>;
-
-    pokeMe(overrides?: CallOverrides): Promise<string>;
+    getFeeDetails(overrides?: CallOverrides): Promise<[BigNumber, string]>;
   };
 
   filters: {};
 
   estimateGas: {
-    ETH(overrides?: CallOverrides): Promise<BigNumber>;
-
-    gelato(overrides?: CallOverrides): Promise<BigNumber>;
-
-    pokeMe(overrides?: CallOverrides): Promise<BigNumber>;
+    getFeeDetails(overrides?: CallOverrides): Promise<BigNumber>;
   };
 
   populateTransaction: {
-    ETH(overrides?: CallOverrides): Promise<PopulatedTransaction>;
-
-    gelato(overrides?: CallOverrides): Promise<PopulatedTransaction>;
-
-    pokeMe(overrides?: CallOverrides): Promise<PopulatedTransaction>;
+    getFeeDetails(overrides?: CallOverrides): Promise<PopulatedTransaction>;
   };
 }

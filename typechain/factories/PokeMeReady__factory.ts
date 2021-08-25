@@ -9,10 +9,36 @@ import type { PokeMeReady, PokeMeReadyInterface } from "../PokeMeReady";
 const _abi = [
   {
     inputs: [],
-    name: "pokeMe",
+    name: "ETH",
+    outputs: [
+      {
+        internalType: "address",
+        name: "",
+        type: "address",
+      },
+    ],
+    stateMutability: "view",
+    type: "function",
+  },
+  {
+    inputs: [],
+    name: "gelato",
     outputs: [
       {
         internalType: "address payable",
+        name: "",
+        type: "address",
+      },
+    ],
+    stateMutability: "view",
+    type: "function",
+  },
+  {
+    inputs: [],
+    name: "pokeMe",
+    outputs: [
+      {
+        internalType: "address",
         name: "",
         type: "address",
       },
