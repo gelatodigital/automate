@@ -55,18 +55,18 @@ describe("PokeMeTwo Test", function () {
             resolverData = yield counterResolver.interface.encodeFunctionData("checker");
             selector = yield pokeMe.getSelector("increaseCount(uint256)");
             resolverHash = hardhat_1.ethers.utils.keccak256(new hardhat_1.ethers.utils.AbiCoder().encode(["address", "bytes"], [counterResolver.address, resolverData]));
-            taskHash = yield pokeMe.getTaskId(userAddress, counter.address, selector, true, resolverHash);
+            taskHash = yield pokeMe.getTaskId(userAddress, counter.address, selector, true, hardhat_1.ethers.constants.AddressZero, resolverHash);
             yield chai_1.expect(pokeMe
                 .connect(user)
-                .createTask(counter.address, selector, counterResolver.address, resolverData, true))
+                .createTask(counter.address, selector, counterResolver.address, resolverData))
                 .to.emit(pokeMe, "TaskCreated")
-                .withArgs(userAddress, counter.address, selector, counterResolver.address, taskHash, resolverData, true, resolverHash);
+                .withArgs(userAddress, counter.address, selector, counterResolver.address, taskHash, resolverData, true, hardhat_1.ethers.constants.AddressZero, resolverHash);
         });
     });
     it("sender already started task", () => __awaiter(this, void 0, void 0, function* () {
         yield chai_1.expect(pokeMe
             .connect(user)
-            .createTask(counter.address, selector, counterResolver.address, resolverData, true)).to.be.revertedWith("PokeMe: createTask: Sender already started task");
+            .createTask(counter.address, selector, counterResolver.address, resolverData)).to.be.revertedWith("PokeMe: createTask: Sender already started task");
     }));
     it("sender did not start task", () => __awaiter(this, void 0, void 0, function* () {
         yield pokeMe.connect(user).cancelTask(taskHash);
@@ -218,7 +218,7 @@ describe("PokeMeTwo Test", function () {
         // fake task
         yield pokeMe
             .connect(user)
-            .createTask(userAddress, selector, counterResolver.address, resolverData, true);
+            .createTask(userAddress, selector, counterResolver.address, resolverData);
         const ids = yield pokeMe.getTaskIdsByUser(userAddress);
         chai_1.expect(ids.length).to.be.eql(2);
     }));

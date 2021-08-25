@@ -46,6 +46,7 @@ contract PokeMe is Gelatofied {
         bytes32 taskId,
         bytes resolverData,
         bool useTaskTreasuryFunds,
+        address feeToken,
         bytes32 resolverHash
     );
     event TaskCancelled(bytes32 taskId, address taskCreator);
@@ -58,24 +59,26 @@ contract PokeMe is Gelatofied {
     );
 
     /// @notice Create a task that tells Gelato to monitor and execute transactions on specific contracts
+    /// @dev Requires no funds to be added in Task Treasury, assumes tasks sends fee to Gelato directly
     /// @param _execAddress On which contract should Gelato execute the transactions
     /// @param _execSelector Which function Gelato should eecute on the _execAddress
     /// @param _resolverAddress On which contract should Gelato check when to execute the tx
     /// @param _resolverData Which data should be used to check on the Resolver when to execute the tx
-    /// @param _useTaskTreasuryFunds If msg.sender's balance on TaskTreasury should pay for the tx
-    function createTask(
+    /// @param _feeToken Which token to use as fee payment
+    function createTaskNoPrepayment(
         address _execAddress,
         bytes4 _execSelector,
         address _resolverAddress,
         bytes calldata _resolverData,
-        bool _useTaskTreasuryFunds
+        address _feeToken
     ) external {
         bytes32 resolverHash = getResolverHash(_resolverAddress, _resolverData);
         bytes32 task = getTaskId(
             msg.sender,
             _execAddress,
             _execSelector,
-            _useTaskTreasuryFunds,
+            false,
+            _feeToken,
             resolverHash
         );
 
@@ -95,7 +98,52 @@ contract PokeMe is Gelatofied {
             _resolverAddress,
             task,
             _resolverData,
-            _useTaskTreasuryFunds,
+            false,
+            _feeToken,
+            resolverHash
+        );
+    }
+
+    /// @notice Create a task that tells Gelato to monitor and execute transactions on specific contracts
+    /// @dev Requires funds to be added in Task Treasury, assumes treasury sends fee to Gelato via PokeMe
+    /// @param _execAddress On which contract should Gelato execute the transactions
+    /// @param _execSelector Which function Gelato should eecute on the _execAddress
+    /// @param _resolverAddress On which contract should Gelato check when to execute the tx
+    /// @param _resolverData Which data should be used to check on the Resolver when to execute the tx
+    function createTask(
+        address _execAddress,
+        bytes4 _execSelector,
+        address _resolverAddress,
+        bytes calldata _resolverData
+    ) external {
+        bytes32 resolverHash = getResolverHash(_resolverAddress, _resolverData);
+        bytes32 task = getTaskId(
+            msg.sender,
+            _execAddress,
+            _execSelector,
+            true,
+            address(0),
+            resolverHash
+        );
+
+        require(
+            taskCreator[task] == address(0),
+            "PokeMe: createTask: Sender already started task"
+        );
+
+        _createdTasks[msg.sender].add(task);
+        taskCreator[task] = msg.sender;
+        execAddresses[task] = _execAddress;
+
+        emit TaskCreated(
+            msg.sender,
+            _execAddress,
+            _execSelector,
+            _resolverAddress,
+            task,
+            _resolverData,
+            true,
+            address(0),
             resolverHash
         );
     }
@@ -122,6 +170,7 @@ contract PokeMe is Gelatofied {
     /// @param _useTaskTreasuryFunds If msg.sender's balance on TaskTreasury should pay for the tx
     /// @param _execAddress On which contract should Gelato execute the tx
     /// @param _execData Data used to execute the tx, queried from the Resolver by Gelato
+    // solhint-disable function-max-lines
     function exec(
         uint256 _txFee,
         address _feeToken,
@@ -140,6 +189,7 @@ contract PokeMe is Gelatofied {
             _execAddress,
             _execData.calldataSliceSelector(),
             _useTaskTreasuryFunds,
+            _useTaskTreasuryFunds ? address(0) : _feeToken,
             _resolverHash
         );
 
@@ -170,11 +220,14 @@ contract PokeMe is Gelatofied {
     /// @param _execAddress Address of the contract to be executed by Gelato
     /// @param _selector Function on the _execAddress which should be executed
     /// @param _useTaskTreasuryFunds If msg.sender's balance on TaskTreasury should pay for the tx
+    /// @param _feeToken FeeToken to use, address 0 if task treasury is used
+    /// @param _resolverHash hash of resolver address and data
     function getTaskId(
         address _taskCreator,
         address _execAddress,
         bytes4 _selector,
         bool _useTaskTreasuryFunds,
+        address _feeToken,
         bytes32 _resolverHash
     ) public pure returns (bytes32) {
         return
@@ -184,6 +237,7 @@ contract PokeMe is Gelatofied {
                     _execAddress,
                     _selector,
                     _useTaskTreasuryFunds,
+                    _feeToken,
                     _resolverHash
                 )
             );
