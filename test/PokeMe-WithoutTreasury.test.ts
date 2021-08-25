@@ -5,7 +5,7 @@ import { getTokenFromFaucet } from "./helpers";
 
 const gelatoAddress = "0x3caca7b48d0573d793d3b0279b5f0029180e83b6";
 const ETH = "0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE";
-const DAI = "0x6b175474e89094c44da98b954eedeac495271d0f";
+const DAI = "0x6B175474E89094C44Da98b954EedeAC495271d0F";
 
 import {
   PokeMe,
@@ -28,8 +28,7 @@ describe("PokeMeV3 Test", function () {
   let executor: any;
   let executorAddress: string;
 
-  let resolverDataETH: any;
-  let resolverDataDAI: any;
+  let resolverData: any;
   let taskHashETH: any;
   let taskHashDAI: any;
   let selector: any;
@@ -75,25 +74,20 @@ describe("PokeMeV3 Test", function () {
 
     executor = await ethers.provider.getSigner(executorAddress);
 
-    resolverDataETH = await counterResolver.interface.encodeFunctionData(
-      "checker",
-      [ETH]
-    );
-    resolverDataDAI = await counterResolver.interface.encodeFunctionData(
-      "checker",
-      [DAI]
+    resolverData = await counterResolver.interface.encodeFunctionData(
+      "checker"
     );
 
     selector = await pokeMe.getSelector("increaseCount(uint256)");
 
     resolverHashETH = await pokeMe.getResolverHash(
       counterResolver.address,
-      resolverDataETH
+      resolverData
     );
 
     resolverHashDAI = await pokeMe.getResolverHash(
       counterResolver.address,
-      resolverDataDAI
+      resolverData
     );
 
     taskHashETH = await pokeMe.getTaskId(
@@ -101,6 +95,7 @@ describe("PokeMeV3 Test", function () {
       counter.address,
       selector,
       false,
+      ETH,
       resolverHashETH
     );
 
@@ -109,18 +104,19 @@ describe("PokeMeV3 Test", function () {
       counter.address,
       selector,
       false,
+      DAI,
       resolverHashDAI
     );
 
     await expect(
       pokeMe
         .connect(user)
-        .createTask(
+        .createTaskNoPrepayment(
           counter.address,
           selector,
           counterResolver.address,
-          resolverDataETH,
-          false
+          resolverData,
+          ETH
         )
     )
       .to.emit(pokeMe, "TaskCreated")
@@ -130,20 +126,21 @@ describe("PokeMeV3 Test", function () {
         selector,
         counterResolver.address,
         taskHashETH,
-        resolverDataETH,
+        resolverData,
         false,
+        ETH,
         resolverHashETH
       );
 
     await expect(
       pokeMe
         .connect(user)
-        .createTask(
+        .createTaskNoPrepayment(
           counter.address,
           selector,
           counterResolver.address,
-          resolverDataDAI,
-          false
+          resolverData,
+          DAI
         )
     )
       .to.emit(pokeMe, "TaskCreated")
@@ -153,8 +150,9 @@ describe("PokeMeV3 Test", function () {
         selector,
         counterResolver.address,
         taskHashDAI,
-        resolverDataDAI,
+        resolverData,
         false,
+        DAI,
         resolverHashDAI
       );
   });
@@ -176,7 +174,7 @@ describe("PokeMeV3 Test", function () {
       depositAmount
     );
 
-    const [canExec, execData, feeToken] = await counterResolver.checker(ETH);
+    const [canExec, execData] = await counterResolver.checker();
     expect(canExec).to.be.eq(true);
 
     await expect(
@@ -184,7 +182,7 @@ describe("PokeMeV3 Test", function () {
         .connect(executor)
         .exec(
           ethers.utils.parseEther("1"),
-          feeToken,
+          ETH,
           userAddress,
           false,
           resolverHashETH,
@@ -206,7 +204,7 @@ describe("PokeMeV3 Test", function () {
 
     expect(await dai.balanceOf(counter.address)).to.be.eq(depositAmount);
 
-    const [canExec, execData, feeToken] = await counterResolver.checker(DAI);
+    const [canExec, execData] = await counterResolver.checker();
     expect(canExec).to.be.eq(true);
 
     await expect(
@@ -214,7 +212,7 @@ describe("PokeMeV3 Test", function () {
         .connect(executor)
         .exec(
           ethers.utils.parseEther("1"),
-          feeToken,
+          DAI,
           userAddress,
           false,
           resolverHashDAI,
@@ -243,14 +241,14 @@ describe("PokeMeV3 Test", function () {
 
     const gelatoBalanceBefore = await ethers.provider.getBalance(gelatoAddress);
 
-    const [canExec, execData, feeToken] = await counterResolver.checker(ETH);
+    const [canExec, execData] = await counterResolver.checker();
     expect(canExec).to.be.eq(true);
 
     await pokeMe
       .connect(executor)
       .exec(
         ethers.utils.parseEther("1"),
-        feeToken,
+        ETH,
         userAddress,
         false,
         resolverHashETH,
@@ -277,14 +275,14 @@ describe("PokeMeV3 Test", function () {
 
     const gelatoDaiBefore = await dai.balanceOf(gelatoAddress);
 
-    const [canExec, execData, feeToken] = await counterResolver.checker(DAI);
+    const [canExec, execData] = await counterResolver.checker();
     expect(canExec).to.be.eq(true);
 
     await pokeMe
       .connect(executor)
       .exec(
         ethers.utils.parseEther("1"),
-        feeToken,
+        DAI,
         userAddress,
         false,
         resolverHashDAI,
@@ -297,146 +295,4 @@ describe("PokeMeV3 Test", function () {
     expect(gelatoDaiAfter).to.be.gt(gelatoDaiBefore);
     expect(await counter.count()).to.be.eq(ethers.BigNumber.from("100"));
   });
-
-  //   it("canExec should be true, caller does not have enough DAI", async () => {
-  //     const THREE_MIN = 3 * 60;
-
-  //     await network.provider.send("evm_increaseTime", [THREE_MIN]);
-  //     await network.provider.send("evm_mine", []);
-
-  //     const [canExec, execData] = await counterResolver.checker();
-  //     expect(canExec).to.be.eq(true);
-
-  //     const depositAmount = ethers.utils.parseEther("0.5");
-  //     await getTokenFromFaucet(DAI, userAddress, depositAmount);
-
-  //     await dai.connect(user).approve(taskTreasury.address, depositAmount);
-  //     await taskTreasury
-  //       .connect(user)
-  //       .depositFunds(userAddress, DAI, depositAmount);
-
-  //     await expect(
-  //       pokeMe
-  //         .connect(executor)
-  //         .exec(
-  //           ethers.utils.parseEther("1"),
-  //           DAI,
-  //           userAddress,
-  //           true,
-  //           resolverHash,
-  //           counter.address,
-  //           execData
-  //         )
-  //     ).to.be.revertedWith(
-  //       "reverted with panic code 0x11 (Arithmetic operation underflowed or overflowed outside of an unchecked block)"
-  //     );
-
-  //     expect(await taskTreasury.userTokenBalance(userAddress, DAI)).to.be.eql(
-  //       depositAmount
-  //     );
-  //   });
-
-  //   it("should exec and pay with ETH", async () => {
-  //     const [canExec, execData] = await counterResolver.checker();
-  //     expect(canExec).to.be.eq(true);
-
-  //     const THREE_MIN = 3 * 60;
-
-  //     await network.provider.send("evm_increaseTime", [THREE_MIN]);
-  //     await network.provider.send("evm_mine", []);
-
-  //     expect(await counter.count()).to.be.eq(ethers.BigNumber.from("0"));
-
-  //     const depositAmount = ethers.utils.parseEther("1");
-  //     await taskTreasury
-  //       .connect(user)
-  //       .depositFunds(userAddress, ETH, depositAmount, { value: depositAmount });
-
-  //     expect(
-  //       await taskTreasury.connect(user).userTokenBalance(userAddress, ETH)
-  //     ).to.be.eq(ethers.utils.parseEther("1"));
-
-  //     await pokeMe
-  //       .connect(executor)
-  //       .exec(
-  //         ethers.utils.parseEther("1"),
-  //         ETH,
-  //         userAddress,
-  //         true,
-  //         resolverHash,
-  //         counter.address,
-  //         execData
-  //       );
-
-  //     expect(await counter.count()).to.be.eq(ethers.BigNumber.from("100"));
-  //     expect(
-  //       await taskTreasury.connect(user).userTokenBalance(userAddress, ETH)
-  //     ).to.be.eq(ethers.BigNumber.from("0"));
-
-  //     // time not elapsed
-  //     await expect(
-  //       pokeMe
-  //         .connect(executor)
-  //         .exec(
-  //           ethers.utils.parseEther("1"),
-  //           ETH,
-  //           userAddress,
-  //           true,
-  //           resolverHash,
-  //           counter.address,
-  //           execData
-  //         )
-  //     ).to.be.revertedWith("PokeMe: exec: Execution failed");
-  //   });
-
-  //   it("should exec and pay with DAI", async () => {
-  //     const [canExec, execData] = await counterResolver.checker();
-  //     expect(canExec).to.be.eq(true);
-
-  //     const THREE_MIN = 3 * 60;
-
-  //     await network.provider.send("evm_increaseTime", [THREE_MIN]);
-  //     await network.provider.send("evm_mine", []);
-
-  //     const depositAmount = ethers.utils.parseEther("2");
-  //     await getTokenFromFaucet(DAI, userAddress, depositAmount);
-
-  //     await dai.connect(user).approve(taskTreasury.address, depositAmount);
-  //     await taskTreasury
-  //       .connect(user)
-  //       .depositFunds(userAddress, DAI, depositAmount);
-
-  //     expect(
-  //       await taskTreasury.connect(user).userTokenBalance(userAddress, DAI)
-  //     ).to.be.eq(ethers.utils.parseEther("2"));
-
-  //     await pokeMe
-  //       .connect(executor)
-  //       .exec(
-  //         ethers.utils.parseEther("1"),
-  //         DAI,
-  //         userAddress,
-  //         true,
-  //         resolverHash,
-  //         counter.address,
-  //         execData
-  //       );
-
-  //     expect(await counter.count()).to.be.eq(ethers.BigNumber.from("100"));
-
-  //     // time not elapsed
-  //     await expect(
-  //       pokeMe
-  //         .connect(executor)
-  //         .exec(
-  //           ethers.utils.parseEther("1"),
-  //           DAI,
-  //           userAddress,
-  //           true,
-  //           resolverHash,
-  //           counter.address,
-  //           execData
-  //         )
-  //     ).to.be.revertedWith("PokeMe: exec: Execution failed");
-  //   });
 });

@@ -22,11 +22,11 @@ interface CounterResolverWithoutTreasuryInterface
   extends ethers.utils.Interface {
   functions: {
     "COUNTER()": FunctionFragment;
-    "checker(address)": FunctionFragment;
+    "checker()": FunctionFragment;
   };
 
   encodeFunctionData(functionFragment: "COUNTER", values?: undefined): string;
-  encodeFunctionData(functionFragment: "checker", values: [string]): string;
+  encodeFunctionData(functionFragment: "checker", values?: undefined): string;
 
   decodeFunctionResult(functionFragment: "COUNTER", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "checker", data: BytesLike): Result;
@@ -81,43 +81,22 @@ export class CounterResolverWithoutTreasury extends BaseContract {
     COUNTER(overrides?: CallOverrides): Promise<[string]>;
 
     checker(
-      _feeToken: string,
       overrides?: CallOverrides
-    ): Promise<
-      [boolean, string, string] & {
-        canExec: boolean;
-        execPayload: string;
-        feeToken: string;
-      }
-    >;
+    ): Promise<[boolean, string] & { canExec: boolean; execPayload: string }>;
   };
 
   COUNTER(overrides?: CallOverrides): Promise<string>;
 
   checker(
-    _feeToken: string,
     overrides?: CallOverrides
-  ): Promise<
-    [boolean, string, string] & {
-      canExec: boolean;
-      execPayload: string;
-      feeToken: string;
-    }
-  >;
+  ): Promise<[boolean, string] & { canExec: boolean; execPayload: string }>;
 
   callStatic: {
     COUNTER(overrides?: CallOverrides): Promise<string>;
 
     checker(
-      _feeToken: string,
       overrides?: CallOverrides
-    ): Promise<
-      [boolean, string, string] & {
-        canExec: boolean;
-        execPayload: string;
-        feeToken: string;
-      }
-    >;
+    ): Promise<[boolean, string] & { canExec: boolean; execPayload: string }>;
   };
 
   filters: {};
@@ -125,15 +104,12 @@ export class CounterResolverWithoutTreasury extends BaseContract {
   estimateGas: {
     COUNTER(overrides?: CallOverrides): Promise<BigNumber>;
 
-    checker(_feeToken: string, overrides?: CallOverrides): Promise<BigNumber>;
+    checker(overrides?: CallOverrides): Promise<BigNumber>;
   };
 
   populateTransaction: {
     COUNTER(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
-    checker(
-      _feeToken: string,
-      overrides?: CallOverrides
-    ): Promise<PopulatedTransaction>;
+    checker(overrides?: CallOverrides): Promise<PopulatedTransaction>;
   };
 }
