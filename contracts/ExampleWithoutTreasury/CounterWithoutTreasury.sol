@@ -12,9 +12,7 @@ contract CounterWithoutTreasury is PokeMeReady {
     uint256 public lastExecuted;
 
     // solhint-disable no-empty-blocks
-    constructor(address _pokeMe, address payable _gelato)
-        PokeMeReady(_pokeMe, _gelato)
-    {}
+    constructor(address _pokeMe) PokeMeReady(_pokeMe) {}
 
     receive() external payable {}
 

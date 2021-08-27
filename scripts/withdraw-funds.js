@@ -1,3 +1,4 @@
+/* eslint-disable no-undef */
 const { ethers } = require("hardhat");
 
 const ETH = "0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE";
@@ -22,11 +23,7 @@ async function main() {
   const txn = await taskTreasury.withdrawFunds(
     userAddress,
     ETH,
-    remainingBalance,
-    {
-      gasLimit: 1000000,
-      gasPrice: ethers.utils.parseUnits("2", "gwei"),
-    }
+    remainingBalance
   );
 
   const res = await txn.wait();

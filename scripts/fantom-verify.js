@@ -1,3 +1,4 @@
+/* eslint-disable no-undef */
 const { getGelatoAddress } = require("../hardhat/config/addresses");
 
 const main = async () => {
@@ -9,7 +10,8 @@ const main = async () => {
       constructorArguments: [GELATO],
       contract: "contracts/TaskTreasuryFantom.sol:TaskTreasuryFantom",
     });
-  } catch {
+  } catch (error) {
+    console.error(error);
     console.log("Already Verified");
   }
 
@@ -21,7 +23,8 @@ const main = async () => {
         (await hre.ethers.getContract("TaskTreasuryFantom")).address,
       ],
     });
-  } catch {
+  } catch (error) {
+    console.error(error);
     console.log("Already Verified");
   }
 };

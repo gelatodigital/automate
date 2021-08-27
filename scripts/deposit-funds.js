@@ -1,3 +1,4 @@
+/* eslint-disable no-undef */
 const { ethers } = require("hardhat");
 
 const ETH = "0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE";
@@ -19,8 +20,6 @@ async function main() {
 
   const txn = await taskTreasury.depositFunds(userAddress, ETH, depositAmount, {
     value: depositAmount,
-    gasLimit: 1000000,
-    gasPrice: ethers.utils.parseUnits("2", "gwei"),
   });
 
   const res = await txn.wait();

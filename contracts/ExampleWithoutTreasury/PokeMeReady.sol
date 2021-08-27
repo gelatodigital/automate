@@ -6,14 +6,18 @@ import {
     IERC20
 } from "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
 
+interface IPokeMe {
+    function gelato() external view returns (address payable);
+}
+
 abstract contract PokeMeReady {
     address public immutable pokeMe;
     address payable public immutable gelato;
     address public constant ETH = 0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE;
 
-    constructor(address _pokeMe, address payable _gelato) {
+    constructor(address _pokeMe) {
         pokeMe = _pokeMe;
-        gelato = _gelato;
+        gelato = IPokeMe(_pokeMe).gelato();
     }
 
     modifier onlyPokeMe() {
