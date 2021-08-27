@@ -13,12 +13,12 @@ async function main() {
   ).address;
 
   console.log("Sending ETH to Counter");
-  const depositAmount = ethers.utils.parseEther("0.05");
+  // const depositAmount = ethers.utils.parseEther("0.05");
 
-  await user.sendTransaction({
-    to: COUNTER,
-    value: depositAmount,
-  });
+  // await user.sendTransaction({
+  //   to: COUNTER,
+  //   value: depositAmount,
+  // });
 
   console.log("Submitting Task");
 

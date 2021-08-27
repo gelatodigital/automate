@@ -22,6 +22,9 @@ module.exports = async (hre) => {
 
   await deploy("PokeMe", {
     from: deployer,
+    proxy: {
+      owner: deployer,
+    },
     args: [GELATO, (await hre.ethers.getContract("TaskTreasury")).address],
   });
 };
