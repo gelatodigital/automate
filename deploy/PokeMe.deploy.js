@@ -30,11 +30,9 @@ module.exports = async (hre) => {
 };
 
 module.exports.skip = async (hre) => {
-  const skip =
-    // hre.network.name === "mainnet" ||
-    hre.network.name === "rinkeby" || hre.network.name === "hardhat"; // skip local deployment here for tests to run
+  const skip = hre.network.name === "mainnet" || hre.network.name === "hardhat"; // skip local deployment here for tests to run
   return skip ? true : false;
 };
 
 module.exports.tags = ["PokeMe"];
-// module.exports.dependencies = ["TaskTreasury"];
+module.exports.dependencies = ["TaskTreasury"];
