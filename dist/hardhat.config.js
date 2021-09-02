@@ -65,24 +65,31 @@ const config = {
         matic: {
             url: `https://polygon-mainnet.g.alchemy.com/v2/${ALCHEMY_ID}`,
             accounts: DEPLOYER_PK_MAINNET ? [DEPLOYER_PK_MAINNET] : [],
+            gasPrice: parseInt(ethers_1.utils.parseUnits("30", "gwei").toString()),
         },
         mainnet: {
             accounts: DEPLOYER_PK_MAINNET ? [DEPLOYER_PK_MAINNET] : [],
             chainId: 1,
             url: `https://eth-mainnet.alchemyapi.io/v2/${ALCHEMY_ID}`,
-            gasPrice: parseInt(ethers_1.utils.parseUnits("40", "gwei").toString()),
+            gasPrice: parseInt(ethers_1.utils.parseUnits("100", "gwei").toString()),
+        },
+        rinkeby: {
+            accounts: DEPLOYER_PK_MAINNET ? [DEPLOYER_PK_MAINNET] : [],
+            chainId: 4,
+            url: `https://eth-rinkeby.alchemyapi.io/v2/${ALCHEMY_ID}`,
+            gasPrice: parseInt(ethers_1.utils.parseUnits("7", "gwei").toString()),
         },
         ropsten: {
             accounts: DEPLOYER_PK_ROPSTEN ? [DEPLOYER_PK_ROPSTEN] : [],
             chainId: 3,
             url: `https://eth-ropsten.alchemyapi.io/v2/${ALCHEMY_ID}`,
-            gasPrice: parseInt(ethers_1.utils.parseUnits("90", "gwei").toString()),
+            gasPrice: parseInt(ethers_1.utils.parseUnits("7", "gwei").toString()),
         },
         fantom: {
             accounts: DEPLOYER_PK_MAINNET ? [DEPLOYER_PK_MAINNET] : [],
             chainId: 250,
             url: `https://rpcapi.fantom.network/`,
-            gasPrice: parseInt(ethers_1.utils.parseUnits("70", "gwei").toString()),
+            gasPrice: parseInt(ethers_1.utils.parseUnits("80", "gwei").toString()),
         },
     },
     solidity: {
