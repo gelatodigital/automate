@@ -57,7 +57,7 @@ describe("PokeMeV3 Test", function () {
       await pokeMeFactory.deploy(gelatoAddress, taskTreasury.address)
     );
     counter = <CounterWithoutTreasury>(
-      await counterFactory.deploy(pokeMe.address, gelatoAddress)
+      await counterFactory.deploy(pokeMe.address)
     );
     counterResolver = <CounterResolverWithoutTreasury>(
       await counterResolverFactory.deploy(counter.address)
