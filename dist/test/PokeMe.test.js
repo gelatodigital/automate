@@ -190,7 +190,7 @@ describe("PokeMeTwo Test", function () {
         // time not elapsed
         yield chai_1.expect(pokeMe
             .connect(executor)
-            .exec(hardhat_1.ethers.utils.parseEther("1"), ETH, userAddress, true, resolverHash, counter.address, execData)).to.be.revertedWith("PokeMe: exec: Execution failed");
+            .exec(hardhat_1.ethers.utils.parseEther("1"), ETH, userAddress, true, resolverHash, counter.address, execData)).to.be.revertedWith("PokeMe.exec:Counter: increaseCount: Time not elapsed");
     }));
     it("should exec and pay with DAI", () => __awaiter(this, void 0, void 0, function* () {
         const [canExec, execData] = yield counterResolver.checker();
@@ -212,7 +212,7 @@ describe("PokeMeTwo Test", function () {
         // time not elapsed
         yield chai_1.expect(pokeMe
             .connect(executor)
-            .exec(hardhat_1.ethers.utils.parseEther("1"), DAI, userAddress, true, resolverHash, counter.address, execData)).to.be.revertedWith("PokeMe: exec: Execution failed");
+            .exec(hardhat_1.ethers.utils.parseEther("1"), DAI, userAddress, true, resolverHash, counter.address, execData)).to.be.revertedWith("PokeMe.exec:Counter: increaseCount: Time not elapsed");
     }));
     it("getTaskIdsByUser test", () => __awaiter(this, void 0, void 0, function* () {
         // fake task
