@@ -71,9 +71,9 @@ contract PokeMe is Gelatofied {
         address _resolverAddress,
         bytes calldata _resolverData,
         address _feeToken
-    ) external {
+    ) external returns (bytes32 task) {
         bytes32 resolverHash = getResolverHash(_resolverAddress, _resolverData);
-        bytes32 task = getTaskId(
+        task = getTaskId(
             msg.sender,
             _execAddress,
             _execSelector,
@@ -115,9 +115,9 @@ contract PokeMe is Gelatofied {
         bytes4 _execSelector,
         address _resolverAddress,
         bytes calldata _resolverData
-    ) external {
+    ) external returns (bytes32 task) {
         bytes32 resolverHash = getResolverHash(_resolverAddress, _resolverData);
-        bytes32 task = getTaskId(
+        task = getTaskId(
             msg.sender,
             _execAddress,
             _execSelector,
@@ -198,8 +198,8 @@ contract PokeMe is Gelatofied {
             "PokeMe: exec: No task found"
         );
 
-        (bool success, ) = _execAddress.call(_execData);
-        require(success, "PokeMe: exec: Execution failed");
+        (bool success, bytes memory returnData) = _execAddress.call(_execData);
+        if (!success) returnData.revertWithError("PokeMe.exec:");
 
         if (_useTaskTreasuryFunds) {
             TaskTreasury(taskTreasury).useFunds(
