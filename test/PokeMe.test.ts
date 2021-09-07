@@ -382,7 +382,9 @@ describe("PokeMeTwo Test", function () {
           counter.address,
           execData
         )
-    ).to.be.revertedWith("PokeMe: exec: Execution failed");
+    ).to.be.revertedWith(
+      "PokeMe.exec:Counter: increaseCount: Time not elapsed"
+    );
   });
 
   it("should exec and pay with DAI", async () => {
@@ -433,7 +435,9 @@ describe("PokeMeTwo Test", function () {
           counter.address,
           execData
         )
-    ).to.be.revertedWith("PokeMe: exec: Execution failed");
+    ).to.be.revertedWith(
+      "PokeMe.exec:Counter: increaseCount: Time not elapsed"
+    );
   });
 
   it("getTaskIdsByUser test", async () => {
