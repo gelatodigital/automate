@@ -14,6 +14,7 @@ import {TaskTreasury} from "./TaskTreasury/TaskTreasury.sol";
 
 // solhint-disable max-line-length
 // solhint-disable max-states-count
+// solhint-disable not-rely-on-time
 /// @notice PokeMe enables everyone to communicate to Gelato Bots to monitor and execute certain transactions
 /// @notice ResolverAddresses determine when Gelato should execute and provides bots with
 /// the payload they should use to execute
@@ -23,6 +24,11 @@ contract PokeMe is Gelatofied {
     using GelatoBytes for bytes;
     using EnumerableSet for EnumerableSet.Bytes32Set;
 
+    struct Time {
+        uint128 nextExec;
+        uint128 interval;
+    }
+
     // solhint-disable const-name-snakecase
     string public constant version = "3";
     mapping(bytes32 => address) public taskCreator;
@@ -31,6 +37,7 @@ contract PokeMe is Gelatofied {
     address public immutable taskTreasury;
     uint256 public fee;
     address public feeToken;
+    mapping(bytes32 => Time) public timedTask;
 
     constructor(address payable _gelato, address _taskTreasury)
         Gelatofied(_gelato)
@@ -57,6 +64,45 @@ contract PokeMe is Gelatofied {
         bytes execData,
         bytes32 taskId
     );
+    event TimerSet(
+        bytes32 indexed hash,
+        uint128 indexed nextExec,
+        uint128 indexed interval
+    );
+
+    function createTimedTask(
+        uint128 _interval,
+        address _execAddress,
+        bytes4 _execSelector,
+        address _resolverAddress,
+        bytes calldata _resolverData,
+        address _feeToken,
+        bool _useTreasury
+    ) external returns (bytes32 task) {
+        require(_interval > 0, "PokeMe: createTimedTask: interval cannot be 0");
+
+        if (_useTreasury) {
+            task = createTask(
+                _execAddress,
+                _execSelector,
+                _resolverAddress,
+                _resolverData
+            );
+        } else {
+            task = createTaskNoPrepayment(
+                _execAddress,
+                _execSelector,
+                _resolverAddress,
+                _resolverData,
+                _feeToken
+            );
+        }
+
+        uint128 nextExec = uint128(block.timestamp) + _interval;
+
+        timedTask[task] = Time({nextExec: nextExec, interval: _interval});
+        emit TimerSet(task, nextExec, _interval);
+    }
 
     /// @notice Create a task that tells Gelato to monitor and execute transactions on specific contracts
     /// @dev Requires no funds to be added in Task Treasury, assumes tasks sends fee to Gelato directly
@@ -71,7 +117,7 @@ contract PokeMe is Gelatofied {
         address _resolverAddress,
         bytes calldata _resolverData,
         address _feeToken
-    ) external returns (bytes32 task) {
+    ) public returns (bytes32 task) {
         bytes32 resolverHash = getResolverHash(_resolverAddress, _resolverData);
         task = getTaskId(
             msg.sender,
@@ -115,7 +161,7 @@ contract PokeMe is Gelatofied {
         bytes4 _execSelector,
         address _resolverAddress,
         bytes calldata _resolverData
-    ) external returns (bytes32 task) {
+    ) public returns (bytes32 task) {
         bytes32 resolverHash = getResolverHash(_resolverAddress, _resolverData);
         task = getTaskId(
             msg.sender,
@@ -197,6 +243,10 @@ contract PokeMe is Gelatofied {
             taskCreator[task] == _taskCreator,
             "PokeMe: exec: No task found"
         );
+
+        Time storage time = timedTask[task];
+        if (time.nextExec != 0)
+            time.nextExec = uint128(block.timestamp) + time.interval;
 
         (bool success, bytes memory returnData) = _execAddress.call(_execData);
         if (!success) returnData.revertWithError("PokeMe.exec:");
