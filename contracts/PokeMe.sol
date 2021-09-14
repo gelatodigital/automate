@@ -37,6 +37,7 @@ contract PokeMe is Gelatofied {
     address public immutable taskTreasury;
     uint256 public fee;
     address public feeToken;
+    // Appended State
     mapping(bytes32 => Time) public timedTask;
 
     constructor(address payable _gelato, address _taskTreasury)
@@ -245,8 +246,13 @@ contract PokeMe is Gelatofied {
         );
 
         Time storage time = timedTask[task];
-        if (time.nextExec != 0)
+        if (time.nextExec != 0) {
+            require(
+                time.nextExec <= uint128(block.timestamp),
+                "PokeMe: exec: Too early"
+            );
             time.nextExec = uint128(block.timestamp) + time.interval;
+        }
 
         (bool success, bytes memory returnData) = _execAddress.call(_execData);
         if (!success) returnData.revertWithError("PokeMe.exec:");
