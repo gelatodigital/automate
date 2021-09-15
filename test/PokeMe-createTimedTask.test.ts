@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { SignerWithAddress } from "@nomiclabs/hardhat-ethers/dist/src/signer-with-address";
 import { expect } from "chai";
 import { ethers, network } from "hardhat";
@@ -117,6 +118,20 @@ describe("PokeMe createTimedTask test", function () {
         FEETOKEN,
         resolverHash
       );
+  });
+
+  it("get time", async () => {
+    const blocknumber = await ethers.provider.getBlockNumber();
+    const timestamp = (await ethers.provider.getBlock(blocknumber)).timestamp;
+    const time = await pokeMe.timedTask(taskId);
+    console.log(Number(time.nextExec));
+    console.log(Number(timestamp));
+
+    if (Number(time.nextExec) >= Number(timestamp)) {
+      console.log("Not time to exec");
+    } else {
+      console.log("TIme to exec");
+    }
   });
 
   it("Forwarder should return true, exec should fail", async () => {

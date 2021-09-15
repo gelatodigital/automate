@@ -10,10 +10,3 @@ contract Forwarder {
         return (true, execData);
     }
 }
-
-// solhint-disable no-empty-blocks
-contract MultiPoker {
-    function poke() external {
-        // ......
-    }
-}
