@@ -11,6 +11,7 @@ contract CounterTimedTask is PokeMeReady {
 
     // solhint-disable not-rely-on-time
     function increaseCount(uint256 amount) external onlyPokeMe {
+        require(msg.sender == address(0));
         count += amount;
     }
 }

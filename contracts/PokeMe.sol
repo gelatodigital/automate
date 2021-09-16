@@ -246,7 +246,9 @@ contract PokeMe is Gelatofied {
         );
 
         Time storage time = timedTask[task];
-        if (time.nextExec != 0) {
+        bool isTimedTask = time.nextExec != 0 ? true : false;
+
+        if (isTimedTask) {
             require(
                 time.nextExec <= uint128(block.timestamp),
                 "PokeMe: exec: Too early"
@@ -255,7 +257,8 @@ contract PokeMe is Gelatofied {
         }
 
         (bool success, bytes memory returnData) = _execAddress.call(_execData);
-        if (!success) returnData.revertWithError("PokeMe.exec:");
+        if (!success && !isTimedTask)
+            returnData.revertWithError("PokeMe.exec:");
 
         if (_useTaskTreasuryFunds) {
             TaskTreasury(taskTreasury).useFunds(
