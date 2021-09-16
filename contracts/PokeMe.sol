@@ -66,11 +66,19 @@ contract PokeMe is Gelatofied {
         bytes32 taskId
     );
     event TimerSet(
-        bytes32 indexed hash,
+        bytes32 indexed taskId,
         uint128 indexed nextExec,
         uint128 indexed interval
     );
 
+    /// @notice Create a timed task that executes every so often based on the inputted interval
+    /// @param _interval After how many seconds should each execution be executed?
+    /// @param _execAddress On which contract should Gelato execute the transactions
+    /// @param _execSelector Which function Gelato should eecute on the _execAddress
+    /// @param _resolverAddress On which contract should Gelato check when to execute the tx
+    /// @param _resolverData Which data should be used to check on the Resolver when to execute the tx
+    /// @param _feeToken Which token to use as fee payment
+    /// @param _useTreasury True if Gelato should charge fees from TaskTreasury, false if not
     function createTimedTask(
         uint128 _interval,
         address _execAddress,
