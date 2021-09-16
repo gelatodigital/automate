@@ -72,7 +72,8 @@ contract PokeMe is Gelatofied {
     );
 
     /// @notice Create a timed task that executes every so often based on the inputted interval
-    /// @param _interval After how many seconds should each execution be executed?
+    /// @param _startTime Timestamp when the first task should become executable. 0 for right now
+    /// @param _interval After how many seconds should each task be executed
     /// @param _execAddress On which contract should Gelato execute the transactions
     /// @param _execSelector Which function Gelato should eecute on the _execAddress
     /// @param _resolverAddress On which contract should Gelato check when to execute the tx
@@ -80,6 +81,7 @@ contract PokeMe is Gelatofied {
     /// @param _feeToken Which token to use as fee payment
     /// @param _useTreasury True if Gelato should charge fees from TaskTreasury, false if not
     function createTimedTask(
+        uint128 _startTime,
         uint128 _interval,
         address _execAddress,
         bytes4 _execSelector,
@@ -107,7 +109,9 @@ contract PokeMe is Gelatofied {
             );
         }
 
-        uint128 nextExec = uint128(block.timestamp) + _interval;
+        uint128 nextExec = uint256(_startTime) > block.timestamp
+            ? _startTime
+            : uint128(block.timestamp);
 
         timedTask[task] = Time({nextExec: nextExec, interval: _interval});
         emit TimerSet(task, nextExec, _interval);
@@ -214,6 +218,10 @@ contract PokeMe is Gelatofied {
         _createdTasks[msg.sender].remove(_taskId);
         delete taskCreator[_taskId];
         delete execAddresses[_taskId];
+
+        Time memory time = timedTask[_taskId];
+        bool isTimedTask = time.nextExec != 0 ? true : false;
+        if (isTimedTask) delete timedTask[_taskId];
 
         emit TaskCancelled(_taskId, msg.sender);
     }

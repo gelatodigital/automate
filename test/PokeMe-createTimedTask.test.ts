@@ -99,10 +99,14 @@ describe("PokeMe createTimedTask test", function () {
       resolverHash
     );
 
+    const currentTimestamp = (await user.provider?.getBlock("latest"))
+      ?.timestamp as number;
+
     await expect(
       pokeMe
         .connect(user)
         .createTimedTask(
+          currentTimestamp + interval,
           interval,
           execAddress,
           execSelector,
