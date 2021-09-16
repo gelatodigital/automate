@@ -8,24 +8,19 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
-var __importDefault = (this && this.__importDefault) || function (mod) {
-    return (mod && mod.__esModule) ? mod : { "default": mod };
-};
 Object.defineProperty(exports, "__esModule", { value: true });
 const chai_1 = require("chai");
 const hardhat_1 = require("hardhat");
-const MegaPoker_json_1 = __importDefault(require("./abis/MegaPoker.json"));
 const gelatoAddress = "0x3caca7b48d0573d793d3b0279b5f0029180e83b6";
 const ETH = "0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE";
-const MEGAPOKER = "0x18Bd1a35Caf9F192234C7ABd995FBDbA5bBa81ca";
 const THREE_MINUTES = 3 * 60;
 const FEETOKEN = hardhat_1.ethers.constants.AddressZero;
 describe("PokeMe createTimedTask test", function () {
     this.timeout(0);
     let pokeMe;
     let taskTreasury;
-    let megaPoker;
     let forwarder;
+    let counter;
     let user;
     let userAddress;
     let executor;
@@ -45,10 +40,11 @@ describe("PokeMe createTimedTask test", function () {
             const taskTreasuryFactory = yield hardhat_1.ethers.getContractFactory("TaskTreasury");
             const pokeMeFactory = yield hardhat_1.ethers.getContractFactory("PokeMe");
             const forwarderFactory = yield hardhat_1.ethers.getContractFactory("Forwarder");
-            megaPoker = yield hardhat_1.ethers.getContractAt(MegaPoker_json_1.default, MEGAPOKER);
+            const counterFactory = yield hardhat_1.ethers.getContractFactory("CounterTimedTask");
             taskTreasury = (yield taskTreasuryFactory.deploy(gelatoAddress));
             pokeMe = (yield pokeMeFactory.deploy(gelatoAddress, taskTreasury.address));
             forwarder = (yield forwarderFactory.deploy());
+            counter = (yield counterFactory.deploy(pokeMe.address));
             executorAddress = gelatoAddress;
             yield taskTreasury.addWhitelistedService(pokeMe.address);
             const depositAmount = hardhat_1.ethers.utils.parseEther("1");
@@ -60,10 +56,12 @@ describe("PokeMe createTimedTask test", function () {
                 params: [executorAddress],
             });
             executor = yield hardhat_1.ethers.provider.getSigner(executorAddress);
-            execData = yield megaPoker.interface.encodeFunctionData("poke");
+            execData = yield counter.interface.encodeFunctionData("increaseCount", [
+                100,
+            ]);
             interval = THREE_MINUTES;
-            execAddress = MEGAPOKER;
-            execSelector = yield pokeMe.getSelector("poke()");
+            execAddress = counter.address;
+            execSelector = yield pokeMe.getSelector("increaseCount(uint256)");
             resolverAddress = forwarder.address;
             resolverData = yield forwarder.interface.encodeFunctionData("checker", [
                 execData,
@@ -77,34 +75,26 @@ describe("PokeMe createTimedTask test", function () {
                 .withArgs(userAddress, execAddress, execSelector, resolverAddress, taskId, resolverData, true, FEETOKEN, resolverHash);
         });
     });
-    it("get time", () => __awaiter(this, void 0, void 0, function* () {
-        const blocknumber = yield hardhat_1.ethers.provider.getBlockNumber();
-        const timestamp = (yield hardhat_1.ethers.provider.getBlock(blocknumber)).timestamp;
-        const time = yield pokeMe.timedTask(taskId);
-        console.log(Number(time.nextExec));
-        console.log(Number(timestamp));
-        if (Number(time.nextExec) >= Number(timestamp)) {
-            console.log("Not time to exec");
-        }
-        else {
-            console.log("TIme to exec");
-        }
-    }));
-    it("Forwarder should return true, exec should fail", () => __awaiter(this, void 0, void 0, function* () {
+    it("Exec should fail when time not elapsed", () => __awaiter(this, void 0, void 0, function* () {
         const [canExec, payload] = yield forwarder.checker(execData);
         chai_1.expect(payload).to.be.eql(execData);
         chai_1.expect(canExec).to.be.eql(true);
         yield chai_1.expect(pokeMe
             .connect(executor)
-            .exec(hardhat_1.ethers.utils.parseEther("1"), ETH, userAddress, true, resolverHash, execAddress, execData)).to.be.revertedWith("PokeMe: exec: Too early");
+            .exec(hardhat_1.ethers.utils.parseEther("0.1"), ETH, userAddress, true, resolverHash, execAddress, execData)).to.be.revertedWith("PokeMe: exec: Too early");
     }));
-    it("Forwarder should return true, exec should succeed", () => __awaiter(this, void 0, void 0, function* () {
+    it("Exec should succeed even if txn fails", () => __awaiter(this, void 0, void 0, function* () {
         yield hardhat_1.network.provider.send("evm_increaseTime", [THREE_MINUTES]);
         yield hardhat_1.network.provider.send("evm_mine", []);
+        const nextExecBefore = (yield pokeMe.timedTask(taskId)).nextExec;
         yield chai_1.expect(pokeMe
             .connect(executor)
-            .exec(hardhat_1.ethers.utils.parseEther("1"), ETH, userAddress, true, resolverHash, execAddress, execData))
+            .exec(hardhat_1.ethers.utils.parseEther("0.1"), ETH, userAddress, true, resolverHash, execAddress, execData))
             .to.emit(pokeMe, "ExecSuccess")
-            .withArgs(hardhat_1.ethers.utils.parseEther("1"), ETH, execAddress, execData, taskId);
+            .withArgs(hardhat_1.ethers.utils.parseEther("0.1"), ETH, execAddress, execData, taskId);
+        const nextExecAfter = (yield pokeMe.timedTask(taskId)).nextExec;
+        chai_1.expect(Number(yield counter.count())).to.be.eql(0);
+        chai_1.expect(yield taskTreasury.userTokenBalance(userAddress, ETH)).to.be.eql(hardhat_1.ethers.utils.parseEther("0.9"));
+        chai_1.expect(nextExecAfter).to.be.gt(nextExecBefore);
     }));
 });
