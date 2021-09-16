@@ -4,7 +4,7 @@ pragma solidity 0.8.0;
 contract Forwarder {
     function checker(bytes memory execData)
         external
-        view
+        pure
         returns (bool, bytes memory)
     {
         return (true, execData);

@@ -234,6 +234,7 @@ contract PokeMe is Gelatofied {
     /// @param _execAddress On which contract should Gelato execute the tx
     /// @param _execData Data used to execute the tx, queried from the Resolver by Gelato
     // solhint-disable function-max-lines
+    // solhint-disable code-complexity
     function exec(
         uint256 _txFee,
         address _feeToken,
@@ -269,7 +270,14 @@ contract PokeMe is Gelatofied {
                 time.nextExec <= uint128(block.timestamp),
                 "PokeMe: exec: Too early"
             );
-            time.nextExec = uint128(block.timestamp) + time.interval;
+            // If next execution would also be executed right now, skip forward to
+            // the next execution in the future
+            uint128 nextExec = time.nextExec + time.interval;
+            uint128 timestamp = uint128(block.timestamp);
+            while (timestamp >= nextExec) {
+                nextExec = nextExec + time.interval;
+            }
+            time.nextExec = nextExec;
         }
 
         (bool success, bytes memory returnData) = _execAddress.call(_execData);

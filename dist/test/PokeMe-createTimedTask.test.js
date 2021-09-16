@@ -34,6 +34,7 @@ describe("PokeMe createTimedTask test", function () {
     let taskId;
     let resolverHash;
     before(function () {
+        var _a, _b;
         return __awaiter(this, void 0, void 0, function* () {
             [user] = yield hardhat_1.ethers.getSigners();
             userAddress = yield user.getAddress();
@@ -68,9 +69,10 @@ describe("PokeMe createTimedTask test", function () {
             ]);
             resolverHash = hardhat_1.ethers.utils.keccak256(new hardhat_1.ethers.utils.AbiCoder().encode(["address", "bytes"], [resolverAddress, resolverData]));
             taskId = yield pokeMe.getTaskId(userAddress, execAddress, execSelector, true, FEETOKEN, resolverHash);
+            const currentTimestamp = (_b = (yield ((_a = user.provider) === null || _a === void 0 ? void 0 : _a.getBlock("latest")))) === null || _b === void 0 ? void 0 : _b.timestamp;
             yield chai_1.expect(pokeMe
                 .connect(user)
-                .createTimedTask(interval, execAddress, execSelector, resolverAddress, resolverData, FEETOKEN, true))
+                .createTimedTask(currentTimestamp + interval, interval, execAddress, execSelector, resolverAddress, resolverData, FEETOKEN, true))
                 .to.emit(pokeMe, "TaskCreated")
                 .withArgs(userAddress, execAddress, execSelector, resolverAddress, taskId, resolverData, true, FEETOKEN, resolverHash);
         });
