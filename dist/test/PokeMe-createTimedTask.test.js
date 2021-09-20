@@ -85,18 +85,61 @@ describe("PokeMe createTimedTask test", function () {
             .connect(executor)
             .exec(hardhat_1.ethers.utils.parseEther("0.1"), ETH, userAddress, true, resolverHash, execAddress, execData)).to.be.revertedWith("PokeMe: exec: Too early");
     }));
-    it("Exec should succeed even if txn fails", () => __awaiter(this, void 0, void 0, function* () {
+    it("Exec should succeed when time elapse", () => __awaiter(this, void 0, void 0, function* () {
         yield hardhat_1.network.provider.send("evm_increaseTime", [THREE_MINUTES]);
         yield hardhat_1.network.provider.send("evm_mine", []);
         const nextExecBefore = (yield pokeMe.timedTask(taskId)).nextExec;
+        yield counter.setExecutable(true);
         yield chai_1.expect(pokeMe
             .connect(executor)
             .exec(hardhat_1.ethers.utils.parseEther("0.1"), ETH, userAddress, true, resolverHash, execAddress, execData))
             .to.emit(pokeMe, "ExecSuccess")
             .withArgs(hardhat_1.ethers.utils.parseEther("0.1"), ETH, execAddress, execData, taskId);
         const nextExecAfter = (yield pokeMe.timedTask(taskId)).nextExec;
-        chai_1.expect(Number(yield counter.count())).to.be.eql(0);
         chai_1.expect(yield taskTreasury.userTokenBalance(userAddress, ETH)).to.be.eql(hardhat_1.ethers.utils.parseEther("0.9"));
+        chai_1.expect(Number(yield counter.count())).to.be.eql(100);
         chai_1.expect(nextExecAfter).to.be.gt(nextExecBefore);
+    }));
+    it("Exec should succeed even if txn fails", () => __awaiter(this, void 0, void 0, function* () {
+        yield hardhat_1.network.provider.send("evm_increaseTime", [THREE_MINUTES]);
+        yield hardhat_1.network.provider.send("evm_mine", []);
+        const nextExecBefore = (yield pokeMe.timedTask(taskId)).nextExec;
+        yield counter.setExecutable(false);
+        yield chai_1.expect(pokeMe
+            .connect(executor)
+            .exec(hardhat_1.ethers.utils.parseEther("0.1"), ETH, userAddress, true, resolverHash, execAddress, execData))
+            .to.emit(pokeMe, "ExecSuccess")
+            .withArgs(hardhat_1.ethers.utils.parseEther("0.1"), ETH, execAddress, execData, taskId);
+        const nextExecAfter = (yield pokeMe.timedTask(taskId)).nextExec;
+        chai_1.expect(Number(yield counter.count())).to.be.eql(100);
+        chai_1.expect(yield taskTreasury.userTokenBalance(userAddress, ETH)).to.be.eql(hardhat_1.ethers.utils.parseEther("0.8"));
+        chai_1.expect(nextExecAfter).to.be.gt(nextExecBefore);
+    }));
+    it("should skip one interval", () => __awaiter(this, void 0, void 0, function* () {
+        yield hardhat_1.network.provider.send("evm_increaseTime", [2 * THREE_MINUTES]);
+        yield hardhat_1.network.provider.send("evm_mine", []);
+        const nextExecBefore = (yield pokeMe.timedTask(taskId)).nextExec;
+        yield counter.setExecutable(true);
+        yield chai_1.expect(pokeMe
+            .connect(executor)
+            .exec(hardhat_1.ethers.utils.parseEther("0.1"), ETH, userAddress, true, resolverHash, execAddress, execData))
+            .to.emit(pokeMe, "ExecSuccess")
+            .withArgs(hardhat_1.ethers.utils.parseEther("0.1"), ETH, execAddress, execData, taskId);
+        const nextExecAfter = (yield pokeMe.timedTask(taskId)).nextExec;
+        chai_1.expect(Number(yield counter.count())).to.be.eql(200);
+        chai_1.expect(yield taskTreasury.userTokenBalance(userAddress, ETH)).to.be.eql(hardhat_1.ethers.utils.parseEther("0.7"));
+        chai_1.expect(Number(nextExecAfter.sub(nextExecBefore))).to.be.eql(2 * THREE_MINUTES);
+    }));
+    it("Should account for drift", () => __awaiter(this, void 0, void 0, function* () {
+        yield hardhat_1.network.provider.send("evm_increaseTime", [50 * THREE_MINUTES]);
+        yield hardhat_1.network.provider.send("evm_mine", []);
+        yield pokeMe
+            .connect(executor)
+            .exec(hardhat_1.ethers.utils.parseEther("0.1"), ETH, userAddress, true, resolverHash, execAddress, execData);
+        yield chai_1.expect(pokeMe
+            .connect(executor)
+            .exec(hardhat_1.ethers.utils.parseEther("0.1"), ETH, userAddress, true, resolverHash, execAddress, execData)).to.be.revertedWith("PokeMe: exec: Too early");
+        chai_1.expect(Number(yield counter.count())).to.be.eql(300);
+        chai_1.expect(yield taskTreasury.userTokenBalance(userAddress, ETH)).to.be.eql(hardhat_1.ethers.utils.parseEther("0.6"));
     }));
 });
