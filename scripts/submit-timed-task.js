@@ -27,6 +27,7 @@ async function main() {
   const interval = 3 * 60;
 
   const txn = await pokeMe.createTimedTask(
+    0,
     interval,
     counter.address,
     selector,

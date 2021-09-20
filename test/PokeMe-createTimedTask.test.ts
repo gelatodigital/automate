@@ -151,11 +151,13 @@ describe("PokeMe createTimedTask test", function () {
     ).to.be.revertedWith("PokeMe: exec: Too early");
   });
 
-  it("Exec should succeed even if txn fails", async () => {
+  it("Exec should succeed when time elapse", async () => {
     await network.provider.send("evm_increaseTime", [THREE_MINUTES]);
     await network.provider.send("evm_mine", []);
 
     const nextExecBefore = (await pokeMe.timedTask(taskId)).nextExec;
+
+    await counter.setExecutable(true);
 
     await expect(
       pokeMe
@@ -181,10 +183,127 @@ describe("PokeMe createTimedTask test", function () {
 
     const nextExecAfter = (await pokeMe.timedTask(taskId)).nextExec;
 
-    expect(Number(await counter.count())).to.be.eql(0);
     expect(await taskTreasury.userTokenBalance(userAddress, ETH)).to.be.eql(
       ethers.utils.parseEther("0.9")
     );
+
+    expect(Number(await counter.count())).to.be.eql(100);
     expect(nextExecAfter).to.be.gt(nextExecBefore);
+  });
+
+  it("Exec should succeed even if txn fails", async () => {
+    await network.provider.send("evm_increaseTime", [THREE_MINUTES]);
+    await network.provider.send("evm_mine", []);
+
+    const nextExecBefore = (await pokeMe.timedTask(taskId)).nextExec;
+
+    await counter.setExecutable(false);
+
+    await expect(
+      pokeMe
+        .connect(executor)
+        .exec(
+          ethers.utils.parseEther("0.1"),
+          ETH,
+          userAddress,
+          true,
+          resolverHash,
+          execAddress,
+          execData
+        )
+    )
+      .to.emit(pokeMe, "ExecSuccess")
+      .withArgs(
+        ethers.utils.parseEther("0.1"),
+        ETH,
+        execAddress,
+        execData,
+        taskId
+      );
+
+    const nextExecAfter = (await pokeMe.timedTask(taskId)).nextExec;
+
+    expect(Number(await counter.count())).to.be.eql(100);
+    expect(await taskTreasury.userTokenBalance(userAddress, ETH)).to.be.eql(
+      ethers.utils.parseEther("0.8")
+    );
+    expect(nextExecAfter).to.be.gt(nextExecBefore);
+  });
+
+  it("should skip one interval", async () => {
+    await network.provider.send("evm_increaseTime", [2 * THREE_MINUTES]);
+    await network.provider.send("evm_mine", []);
+
+    const nextExecBefore = (await pokeMe.timedTask(taskId)).nextExec;
+
+    await counter.setExecutable(true);
+
+    await expect(
+      pokeMe
+        .connect(executor)
+        .exec(
+          ethers.utils.parseEther("0.1"),
+          ETH,
+          userAddress,
+          true,
+          resolverHash,
+          execAddress,
+          execData
+        )
+    )
+      .to.emit(pokeMe, "ExecSuccess")
+      .withArgs(
+        ethers.utils.parseEther("0.1"),
+        ETH,
+        execAddress,
+        execData,
+        taskId
+      );
+
+    const nextExecAfter = (await pokeMe.timedTask(taskId)).nextExec;
+
+    expect(Number(await counter.count())).to.be.eql(200);
+    expect(await taskTreasury.userTokenBalance(userAddress, ETH)).to.be.eql(
+      ethers.utils.parseEther("0.7")
+    );
+    expect(Number(nextExecAfter.sub(nextExecBefore))).to.be.eql(
+      2 * THREE_MINUTES
+    );
+  });
+
+  it("Should account for drift", async () => {
+    await network.provider.send("evm_increaseTime", [50 * THREE_MINUTES]);
+    await network.provider.send("evm_mine", []);
+
+    await pokeMe
+      .connect(executor)
+      .exec(
+        ethers.utils.parseEther("0.1"),
+        ETH,
+        userAddress,
+        true,
+        resolverHash,
+        execAddress,
+        execData
+      );
+
+    await expect(
+      pokeMe
+        .connect(executor)
+        .exec(
+          ethers.utils.parseEther("0.1"),
+          ETH,
+          userAddress,
+          true,
+          resolverHash,
+          execAddress,
+          execData
+        )
+    ).to.be.revertedWith("PokeMe: exec: Too early");
+
+    expect(Number(await counter.count())).to.be.eql(300);
+    expect(await taskTreasury.userTokenBalance(userAddress, ETH)).to.be.eql(
+      ethers.utils.parseEther("0.6")
+    );
   });
 });
