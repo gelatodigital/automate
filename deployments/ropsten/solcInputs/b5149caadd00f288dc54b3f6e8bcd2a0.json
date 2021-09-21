@@ -1,0 +1,36 @@
+{
+  "language": "Solidity",
+  "sources": {
+    "contracts/ExampleWithTreasury/CounterTimedTask.sol": {
+      "content": "// SPDX-License-Identifier: UNLICENSED\npragma solidity 0.8.0;\n\nimport {PokeMeReady} from \"./PokeMeReady.sol\";\n\ncontract CounterTimedTask is PokeMeReady {\n    uint256 public count;\n\n    // solhint-disable-next-line no-empty-blocks\n    constructor(address payable _pokeMe) PokeMeReady(_pokeMe) {}\n\n    // solhint-disable not-rely-on-time\n    function increaseCount(uint256 amount) external onlyPokeMe {\n        count += amount;\n    }\n}\n"
+    },
+    "contracts/ExampleWithTreasury/PokeMeReady.sol": {
+      "content": "// SPDX-License-Identifier: UNLICENSED\npragma solidity 0.8.0;\n\nabstract contract PokeMeReady {\n    address payable public immutable pokeMe;\n\n    constructor(address payable _pokeMe) {\n        pokeMe = _pokeMe;\n    }\n\n    modifier onlyPokeMe() {\n        require(msg.sender == pokeMe, \"PokeMeReady: onlyPokeMe\");\n        _;\n    }\n}\n"
+    }
+  },
+  "settings": {
+    "optimizer": {
+      "enabled": false,
+      "runs": 200
+    },
+    "outputSelection": {
+      "*": {
+        "*": [
+          "abi",
+          "evm.bytecode",
+          "evm.deployedBytecode",
+          "evm.methodIdentifiers",
+          "metadata",
+          "devdoc",
+          "userdoc",
+          "storageLayout",
+          "evm.gasEstimates"
+        ],
+        "": ["ast"]
+      }
+    },
+    "metadata": {
+      "useLiteralContent": true
+    }
+  }
+}

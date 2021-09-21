@@ -323,9 +323,7 @@ describe("PokeMeTwo Test", function () {
           counter.address,
           execData
         )
-    ).to.be.revertedWith(
-      "reverted with panic code 0x11 (Arithmetic operation underflowed or overflowed outside of an unchecked block)"
-    );
+    ).to.be.reverted;
 
     expect(await taskTreasury.userTokenBalance(userAddress, DAI)).to.be.eql(
       depositAmount

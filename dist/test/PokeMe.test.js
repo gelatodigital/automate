@@ -167,7 +167,7 @@ describe("PokeMeTwo Test", function () {
             .depositFunds(userAddress, DAI, depositAmount);
         yield chai_1.expect(pokeMe
             .connect(executor)
-            .exec(hardhat_1.ethers.utils.parseEther("1"), DAI, userAddress, true, resolverHash, counter.address, execData)).to.be.revertedWith("reverted with panic code 0x11 (Arithmetic operation underflowed or overflowed outside of an unchecked block)");
+            .exec(hardhat_1.ethers.utils.parseEther("1"), DAI, userAddress, true, resolverHash, counter.address, execData)).to.be.reverted;
         chai_1.expect(yield taskTreasury.userTokenBalance(userAddress, DAI)).to.be.eql(depositAmount);
     }));
     it("should exec and pay with ETH", () => __awaiter(this, void 0, void 0, function* () {
