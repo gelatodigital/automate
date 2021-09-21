@@ -66,12 +66,22 @@ contract PokeMe is Gelatofied {
         bytes32 taskId
     );
     event TimerSet(
-        bytes32 indexed hash,
+        bytes32 indexed taskId,
         uint128 indexed nextExec,
         uint128 indexed interval
     );
 
+    /// @notice Create a timed task that executes every so often based on the inputted interval
+    /// @param _startTime Timestamp when the first task should become executable. 0 for right now
+    /// @param _interval After how many seconds should each task be executed
+    /// @param _execAddress On which contract should Gelato execute the transactions
+    /// @param _execSelector Which function Gelato should eecute on the _execAddress
+    /// @param _resolverAddress On which contract should Gelato check when to execute the tx
+    /// @param _resolverData Which data should be used to check on the Resolver when to execute the tx
+    /// @param _feeToken Which token to use as fee payment
+    /// @param _useTreasury True if Gelato should charge fees from TaskTreasury, false if not
     function createTimedTask(
+        uint128 _startTime,
         uint128 _interval,
         address _execAddress,
         bytes4 _execSelector,
@@ -99,7 +109,9 @@ contract PokeMe is Gelatofied {
             );
         }
 
-        uint128 nextExec = uint128(block.timestamp) + _interval;
+        uint128 nextExec = uint256(_startTime) > block.timestamp
+            ? _startTime
+            : uint128(block.timestamp);
 
         timedTask[task] = Time({nextExec: nextExec, interval: _interval});
         emit TimerSet(task, nextExec, _interval);
@@ -207,6 +219,10 @@ contract PokeMe is Gelatofied {
         delete taskCreator[_taskId];
         delete execAddresses[_taskId];
 
+        Time memory time = timedTask[_taskId];
+        bool isTimedTask = time.nextExec != 0 ? true : false;
+        if (isTimedTask) delete timedTask[_taskId];
+
         emit TaskCancelled(_taskId, msg.sender);
     }
 
@@ -218,6 +234,7 @@ contract PokeMe is Gelatofied {
     /// @param _execAddress On which contract should Gelato execute the tx
     /// @param _execData Data used to execute the tx, queried from the Resolver by Gelato
     // solhint-disable function-max-lines
+    // solhint-disable code-complexity
     function exec(
         uint256 _txFee,
         address _feeToken,
@@ -246,16 +263,26 @@ contract PokeMe is Gelatofied {
         );
 
         Time storage time = timedTask[task];
-        if (time.nextExec != 0) {
+        bool isTimedTask = time.nextExec != 0 ? true : false;
+
+        if (isTimedTask) {
             require(
                 time.nextExec <= uint128(block.timestamp),
                 "PokeMe: exec: Too early"
             );
-            time.nextExec = uint128(block.timestamp) + time.interval;
+            // If next execution would also be executed right now, skip forward to
+            // the next execution in the future
+            uint128 nextExec = time.nextExec + time.interval;
+            uint128 timestamp = uint128(block.timestamp);
+            while (timestamp >= nextExec) {
+                nextExec = nextExec + time.interval;
+            }
+            time.nextExec = nextExec;
         }
 
         (bool success, bytes memory returnData) = _execAddress.call(_execData);
-        if (!success) returnData.revertWithError("PokeMe.exec:");
+        if (!success && !isTimedTask)
+            returnData.revertWithError("PokeMe.exec:");
 
         if (_useTaskTreasuryFunds) {
             TaskTreasury(taskTreasury).useFunds(

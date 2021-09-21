@@ -1,0 +1,9 @@
+[
+    {
+        "inputs": [],
+        "name": "poke",
+        "outputs": [],
+        "stateMutability": "nonpayable",
+        "type": "function"
+    }
+]
