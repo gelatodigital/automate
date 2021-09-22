@@ -54,6 +54,12 @@ const config = {
         },
     },
     networks: {
+        goerli: {
+            accounts: DEPLOYER_PK_ROPSTEN ? [DEPLOYER_PK_ROPSTEN] : [],
+            chainId: 5,
+            url: `https://eth-goerli.alchemyapi.io/v2/${ALCHEMY_ID}`,
+            gasPrice: parseInt(ethers_1.utils.parseUnits("7", "gwei").toString()),
+        },
         hardhat: {
             // Standard config
             // timeout: 150000,

@@ -25,10 +25,7 @@ module.exports = async (hre) => {
     proxy: {
       owner: deployer,
     },
-    args: [
-      GELATO,
-      (await hre.ethers.getContract("TaskTreasuryFantom")).address,
-    ],
+    args: [GELATO, (await hre.ethers.getContract("TaskTreasury")).address],
   });
 };
 
@@ -38,4 +35,4 @@ module.exports.skip = async (hre) => {
 };
 
 module.exports.tags = ["PokeMe"];
-// module.exports.dependencies = ["TaskTreasury"];
+module.exports.dependencies = ["TaskTreasury"];
