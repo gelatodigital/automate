@@ -23,7 +23,7 @@ interface IMultiHarvest {
     function harvest(address[] memory strategies) external;
 }
 
-contract BeefyAutoHarvester {
+contract MultiVaultHarvester {
     IVaultRegistry public immutable vaultRegistry;
     ITaskTreasury public immutable taskTreasury;
     IMultiHarvest public immutable multiHarvest;
