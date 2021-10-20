@@ -71,6 +71,38 @@ contract PokeMe is Gelatofied {
         uint128 indexed interval
     );
 
+    /// @notice Create a task that tells Gelato to monitor and execute transactions on specific contracts
+    /// @dev Requires a polywrap resolver to be deployed
+    /// @param _execAddress On which contract should Gelato execute the transactions
+    /// @param _execSelector Which function Gelato should eecute on the _execAddress
+    /// @param _ipfsCid The ipfs cid which the polywrap resolver is at
+    /// @param _feeToken Which token to use as fee payment
+    /// @param _useTreasury True if Gelato should charge fees from TaskTreasury, false if not
+    function createPolywrapResolverTask(
+        address _execAddress,
+        bytes4 _execSelector,
+        string calldata _ipfsCid,
+        address _feeToken,
+        bool _useTreasury
+    ) external returns (bytes32 task) {
+        if (_useTreasury) {
+            task = createTask(
+                _execAddress,
+                _execSelector,
+                address(0),
+                bytes(_ipfsCid)
+            );
+        } else {
+            task = createTaskNoPrepayment(
+                _execAddress,
+                _execSelector,
+                address(0),
+                bytes(_ipfsCid),
+                _feeToken
+            );
+        }
+    }
+
     /// @notice Create a timed task that executes every so often based on the inputted interval
     /// @param _startTime Timestamp when the first task should become executable. 0 for right now
     /// @param _interval After how many seconds should each task be executed
