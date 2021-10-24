@@ -29,7 +29,7 @@ const config = dotenv_1.default.config();
 let JSONRPCURL;
 if (config.parsed)
     JSONRPCURL = `https://eth-mainnet.alchemyapi.io/v2/${config.parsed.ALCHEMY_ID}`;
-describe("PokeMe createPolywrapResolverTask test", function () {
+describe("PokeMe createPolywrapTask test", function () {
     this.timeout(0);
     let pokeMe;
     let taskTreasury;
@@ -85,7 +85,7 @@ describe("PokeMe createPolywrapResolverTask test", function () {
             taskId = yield pokeMe.getTaskId(userAddress, execAddress, execSelector, true, FEETOKEN, resolverHash);
             yield chai_1.expect(pokeMe
                 .connect(user)
-                .createPolywrapResolverTask(execAddress, execSelector, IPFSCID, resolverData, FEETOKEN, true))
+                .createPolywrapTask(execAddress, execSelector, IPFSCID, resolverData, FEETOKEN, true))
                 .to.emit(pokeMe, "TaskCreated")
                 .withArgs(userAddress, execAddress, execSelector, resolverAddress, taskId, resolverData, true, FEETOKEN, resolverHash);
         });

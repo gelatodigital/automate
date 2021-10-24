@@ -21,7 +21,7 @@ let JSONRPCURL: string;
 if (config.parsed)
   JSONRPCURL = `https://eth-mainnet.alchemyapi.io/v2/${config.parsed.ALCHEMY_ID}`;
 
-describe("PokeMe createPolywrapResolverTask test", function () {
+describe("PokeMe createPolywrapTask test", function () {
   this.timeout(0);
 
   let pokeMe: PokeMe;
@@ -117,7 +117,7 @@ describe("PokeMe createPolywrapResolverTask test", function () {
     await expect(
       pokeMe
         .connect(user)
-        .createPolywrapResolverTask(
+        .createPolywrapTask(
           execAddress,
           execSelector,
           IPFSCID,
