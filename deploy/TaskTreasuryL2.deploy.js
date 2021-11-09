@@ -1,6 +1,10 @@
 const { sleep } = require("@gelatonetwork/core");
+const { getGelatoAddress } = require("../hardhat/config/addresses");
+const ethers = require("ethers");
 
 module.exports = async (hre) => {
+  const maxFee = ethers.utils.parseEther("0.01");
+  const GELATO = getGelatoAddress(hre.network.name);
   if (
     hre.network.name === "arbitrum" ||
     hre.network.name === "avalanche" ||
@@ -13,7 +17,12 @@ module.exports = async (hre) => {
     hre.network.name === "ropsten"
   ) {
     console.log(
-      `Deploying Forwarder to ${hre.network.name}. Hit ctrl + c to abort`
+      `Deploying TaskTreasuryL2 to ${hre.network.name}. Hit ctrl + c to abort`
+    );
+    console.log(
+      `Max fee for network ${hre.network.name}: ${ethers.utils.formatEther(
+        maxFee
+      )} ETH`
     );
     await sleep(10000);
   }
@@ -22,8 +31,9 @@ module.exports = async (hre) => {
   const { deploy } = deployments;
   const { deployer } = await hre.getNamedAccounts();
 
-  await deploy("Forwarder", {
+  await deploy("TaskTreasuryL2", {
     from: deployer,
+    args: [GELATO, maxFee],
   });
 };
 
@@ -42,4 +52,4 @@ module.exports.skip = async (hre) => {
   return skip ? true : false;
 };
 
-module.exports.tags = ["Forwarder"];
+module.exports.tags = ["TaskTreasuryL2"];

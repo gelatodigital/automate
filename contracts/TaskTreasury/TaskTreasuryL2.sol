@@ -17,7 +17,7 @@ import {_transfer, ETH} from "../Gelato/FGelato.sol";
 
 // solhint-disable max-states-count
 // solhint-disable max-line-length
-contract TaskTreasuryMatic is Ownable, ReentrancyGuard {
+contract TaskTreasuryL2 is Ownable, ReentrancyGuard {
     using EnumerableSet for EnumerableSet.AddressSet;
     using SafeERC20 for IERC20;
 
@@ -39,9 +39,9 @@ contract TaskTreasuryMatic is Ownable, ReentrancyGuard {
         uint256 amount
     );
 
-    constructor(address payable _gelato) {
+    constructor(address payable _gelato, uint256 _maxFee) {
         gelato = _gelato;
-        maxFee = 1 ether;
+        maxFee = _maxFee;
     }
 
     modifier onlyWhitelistedServices() {
