@@ -95,7 +95,7 @@ contract PokeMe is Gelatofied {
     ) external returns (bytes32 task) {
         require(_interval > 0, "PokeMe: createTimedTask: interval cannot be 0");
 
-        createPolywrapTask(
+        task = createPolywrapTask(
             _execAddress,
             _execSelector,
             _ipfsCid,
