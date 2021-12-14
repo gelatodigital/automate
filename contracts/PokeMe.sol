@@ -63,7 +63,8 @@ contract PokeMe is Gelatofied {
         address indexed feeToken,
         address indexed execAddress,
         bytes execData,
-        bytes32 taskId
+        bytes32 taskId,
+        bool callSuccess
     );
     event TimerSet(
         bytes32 indexed taskId,
@@ -230,7 +231,7 @@ contract PokeMe is Gelatofied {
     /// @param _txFee Fee paid to Gelato for execution, deducted on the TaskTreasury
     /// @param _feeToken Token used to pay for the execution. ETH = 0xeeeeee...
     /// @param _taskCreator On which contract should Gelato check when to execute the tx
-    /// @param _useTaskTreasuryFunds If msg.sender's balance on TaskTreasury should pay for the tx
+    /// @param _taskTreasury Task treasury address to be used for payment
     /// @param _execAddress On which contract should Gelato execute the tx
     /// @param _execData Data used to execute the tx, queried from the Resolver by Gelato
     // solhint-disable function-max-lines
@@ -239,21 +240,19 @@ contract PokeMe is Gelatofied {
         uint256 _txFee,
         address _feeToken,
         address _taskCreator,
-        bool _useTaskTreasuryFunds,
+        address _taskTreasury,
         bytes32 _resolverHash,
         address _execAddress,
         bytes calldata _execData
     ) external onlyGelato {
-        if (!_useTaskTreasuryFunds) {
-            fee = _txFee;
-            feeToken = _feeToken;
-        }
+        bool useTaskTreasury = _taskTreasury != address(0);
+
         bytes32 task = getTaskId(
             _taskCreator,
             _execAddress,
             _execData.calldataSliceSelector(),
-            _useTaskTreasuryFunds,
-            _useTaskTreasuryFunds ? address(0) : _feeToken,
+            useTaskTreasury,
+            useTaskTreasury ? address(0) : _feeToken,
             _resolverHash
         );
 
@@ -280,22 +279,31 @@ contract PokeMe is Gelatofied {
             time.nextExec = nextExec;
         }
 
-        (bool success, bytes memory returnData) = _execAddress.call(_execData);
-        if (!success && !isTimedTask)
-            returnData.revertWithError("PokeMe.exec:");
-
-        if (_useTaskTreasuryFunds) {
-            TaskTreasury(taskTreasury).useFunds(
+        if (useTaskTreasury) {
+            TaskTreasury(_taskTreasury).useFunds(
                 _feeToken,
                 _txFee,
                 _taskCreator
             );
         } else {
-            delete fee;
-            delete feeToken;
+            fee = _txFee;
+            feeToken = _feeToken;
         }
 
-        emit ExecSuccess(_txFee, _feeToken, _execAddress, _execData, task);
+        (bool success, bytes memory returnData) = _execAddress.call(_execData);
+
+        // For off-chain simultaion
+        if (tx.origin == address(0) && !success)
+            returnData.revertWithError("PokeMe.exec:");
+
+        emit ExecSuccess(
+            _txFee,
+            _feeToken,
+            _execAddress,
+            _execData,
+            task,
+            success
+        );
     }
 
     /// @notice Returns TaskId of a task Creator

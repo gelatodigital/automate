@@ -21,5 +21,7 @@ export const getGelatoAddress = (network: string): string | undefined => {
       return GELATO_RINKEBY;
     case "goerli":
       return GELATO_GOERLI;
+    case "hardhat":
+      return GELATO_MAINNET;
   }
 };

@@ -21,7 +21,10 @@ abstract contract Gelatofied {
     }
 
     modifier onlyGelato() {
-        require(msg.sender == gelato, "Gelatofied: Only gelato");
+        require(
+            msg.sender == gelato || msg.sender == address(0),
+            "Gelatofied: Only gelato"
+        );
         _;
     }
 }

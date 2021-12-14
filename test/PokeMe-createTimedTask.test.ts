@@ -1,7 +1,8 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { SignerWithAddress } from "@nomiclabs/hardhat-ethers/dist/src/signer-with-address";
+import { Signer } from "@ethersproject/abstract-signer";
 import { expect } from "chai";
-import { ethers, network } from "hardhat";
+import hre = require("hardhat");
+const { ethers, deployments } = hre;
 import {
   PokeMe,
   TaskTreasury,
@@ -23,7 +24,7 @@ describe("PokeMe createTimedTask test", function () {
   let forwarder: Forwarder;
   let counter: CounterTimedTask;
 
-  let user: SignerWithAddress;
+  let user: Signer;
   let userAddress: string;
 
   let executor: any;
@@ -39,22 +40,15 @@ describe("PokeMe createTimedTask test", function () {
   let resolverHash: string;
 
   before(async function () {
+    await deployments.fixture();
+
     [user] = await ethers.getSigners();
     userAddress = await user.getAddress();
 
-    const taskTreasuryFactory = await ethers.getContractFactory("TaskTreasury");
-    const pokeMeFactory = await ethers.getContractFactory("PokeMe");
-    const forwarderFactory = await ethers.getContractFactory("Forwarder");
-    const counterFactory = await ethers.getContractFactory("CounterTimedTask");
-
-    taskTreasury = <TaskTreasury>(
-      await taskTreasuryFactory.deploy(gelatoAddress)
-    );
-    pokeMe = <PokeMe>(
-      await pokeMeFactory.deploy(gelatoAddress, taskTreasury.address)
-    );
-    forwarder = <Forwarder>await forwarderFactory.deploy();
-    counter = <CounterTimedTask>await counterFactory.deploy(pokeMe.address);
+    pokeMe = <PokeMe>await ethers.getContract("PokeMe");
+    taskTreasury = <TaskTreasury>await ethers.getContract("TaskTreasury");
+    counter = <CounterTimedTask>await ethers.getContract("CounterTimedTask");
+    forwarder = <Forwarder>await ethers.getContract("Forwarder");
 
     executorAddress = gelatoAddress;
 
@@ -65,7 +59,7 @@ describe("PokeMe createTimedTask test", function () {
       .connect(user)
       .depositFunds(userAddress, ETH, depositAmount, { value: depositAmount });
 
-    await network.provider.request({
+    await hre.network.provider.request({
       method: "hardhat_impersonateAccount",
       params: [executorAddress],
     });
@@ -143,7 +137,7 @@ describe("PokeMe createTimedTask test", function () {
           ethers.utils.parseEther("0.1"),
           ETH,
           userAddress,
-          true,
+          taskTreasury.address,
           resolverHash,
           execAddress,
           execData
@@ -152,8 +146,8 @@ describe("PokeMe createTimedTask test", function () {
   });
 
   it("Exec should succeed when time elapse", async () => {
-    await network.provider.send("evm_increaseTime", [THREE_MINUTES]);
-    await network.provider.send("evm_mine", []);
+    await hre.network.provider.send("evm_increaseTime", [THREE_MINUTES]);
+    await hre.network.provider.send("evm_mine", []);
 
     const nextExecBefore = (await pokeMe.timedTask(taskId)).nextExec;
 
@@ -166,7 +160,7 @@ describe("PokeMe createTimedTask test", function () {
           ethers.utils.parseEther("0.1"),
           ETH,
           userAddress,
-          true,
+          taskTreasury.address,
           resolverHash,
           execAddress,
           execData
@@ -178,7 +172,8 @@ describe("PokeMe createTimedTask test", function () {
         ETH,
         execAddress,
         execData,
-        taskId
+        taskId,
+        true
       );
 
     const nextExecAfter = (await pokeMe.timedTask(taskId)).nextExec;
@@ -192,8 +187,8 @@ describe("PokeMe createTimedTask test", function () {
   });
 
   it("Exec should succeed even if txn fails", async () => {
-    await network.provider.send("evm_increaseTime", [THREE_MINUTES]);
-    await network.provider.send("evm_mine", []);
+    await hre.network.provider.send("evm_increaseTime", [THREE_MINUTES]);
+    await hre.network.provider.send("evm_mine", []);
 
     const nextExecBefore = (await pokeMe.timedTask(taskId)).nextExec;
 
@@ -206,7 +201,7 @@ describe("PokeMe createTimedTask test", function () {
           ethers.utils.parseEther("0.1"),
           ETH,
           userAddress,
-          true,
+          taskTreasury.address,
           resolverHash,
           execAddress,
           execData
@@ -218,7 +213,8 @@ describe("PokeMe createTimedTask test", function () {
         ETH,
         execAddress,
         execData,
-        taskId
+        taskId,
+        false
       );
 
     const nextExecAfter = (await pokeMe.timedTask(taskId)).nextExec;
@@ -231,8 +227,8 @@ describe("PokeMe createTimedTask test", function () {
   });
 
   it("should skip one interval", async () => {
-    await network.provider.send("evm_increaseTime", [2 * THREE_MINUTES]);
-    await network.provider.send("evm_mine", []);
+    await hre.network.provider.send("evm_increaseTime", [2 * THREE_MINUTES]);
+    await hre.network.provider.send("evm_mine", []);
 
     const nextExecBefore = (await pokeMe.timedTask(taskId)).nextExec;
 
@@ -245,7 +241,7 @@ describe("PokeMe createTimedTask test", function () {
           ethers.utils.parseEther("0.1"),
           ETH,
           userAddress,
-          true,
+          taskTreasury.address,
           resolverHash,
           execAddress,
           execData
@@ -257,7 +253,8 @@ describe("PokeMe createTimedTask test", function () {
         ETH,
         execAddress,
         execData,
-        taskId
+        taskId,
+        true
       );
 
     const nextExecAfter = (await pokeMe.timedTask(taskId)).nextExec;
@@ -272,8 +269,8 @@ describe("PokeMe createTimedTask test", function () {
   });
 
   it("Should account for drift", async () => {
-    await network.provider.send("evm_increaseTime", [50 * THREE_MINUTES]);
-    await network.provider.send("evm_mine", []);
+    await hre.network.provider.send("evm_increaseTime", [50 * THREE_MINUTES]);
+    await hre.network.provider.send("evm_mine", []);
 
     await pokeMe
       .connect(executor)
@@ -281,7 +278,7 @@ describe("PokeMe createTimedTask test", function () {
         ethers.utils.parseEther("0.1"),
         ETH,
         userAddress,
-        true,
+        taskTreasury.address,
         resolverHash,
         execAddress,
         execData
@@ -294,7 +291,7 @@ describe("PokeMe createTimedTask test", function () {
           ethers.utils.parseEther("0.1"),
           ETH,
           userAddress,
-          true,
+          taskTreasury.address,
           resolverHash,
           execAddress,
           execData

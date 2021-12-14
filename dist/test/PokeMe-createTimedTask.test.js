@@ -10,11 +10,12 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const chai_1 = require("chai");
-const hardhat_1 = require("hardhat");
+const hre = require("hardhat");
+const { ethers, deployments } = hre;
 const gelatoAddress = "0x3caca7b48d0573d793d3b0279b5f0029180e83b6";
 const ETH = "0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE";
 const THREE_MINUTES = 3 * 60;
-const FEETOKEN = hardhat_1.ethers.constants.AddressZero;
+const FEETOKEN = ethers.constants.AddressZero;
 describe("PokeMe createTimedTask test", function () {
     this.timeout(0);
     let pokeMe;
@@ -36,27 +37,24 @@ describe("PokeMe createTimedTask test", function () {
     before(function () {
         var _a, _b;
         return __awaiter(this, void 0, void 0, function* () {
-            [user] = yield hardhat_1.ethers.getSigners();
+            yield deployments.fixture();
+            [user] = yield ethers.getSigners();
             userAddress = yield user.getAddress();
-            const taskTreasuryFactory = yield hardhat_1.ethers.getContractFactory("TaskTreasury");
-            const pokeMeFactory = yield hardhat_1.ethers.getContractFactory("PokeMe");
-            const forwarderFactory = yield hardhat_1.ethers.getContractFactory("Forwarder");
-            const counterFactory = yield hardhat_1.ethers.getContractFactory("CounterTimedTask");
-            taskTreasury = (yield taskTreasuryFactory.deploy(gelatoAddress));
-            pokeMe = (yield pokeMeFactory.deploy(gelatoAddress, taskTreasury.address));
-            forwarder = (yield forwarderFactory.deploy());
-            counter = (yield counterFactory.deploy(pokeMe.address));
+            pokeMe = (yield ethers.getContract("PokeMe"));
+            taskTreasury = (yield ethers.getContract("TaskTreasury"));
+            counter = (yield ethers.getContract("CounterTimedTask"));
+            forwarder = (yield ethers.getContract("Forwarder"));
             executorAddress = gelatoAddress;
             yield taskTreasury.addWhitelistedService(pokeMe.address);
-            const depositAmount = hardhat_1.ethers.utils.parseEther("1");
+            const depositAmount = ethers.utils.parseEther("1");
             yield taskTreasury
                 .connect(user)
                 .depositFunds(userAddress, ETH, depositAmount, { value: depositAmount });
-            yield hardhat_1.network.provider.request({
+            yield hre.network.provider.request({
                 method: "hardhat_impersonateAccount",
                 params: [executorAddress],
             });
-            executor = yield hardhat_1.ethers.provider.getSigner(executorAddress);
+            executor = yield ethers.provider.getSigner(executorAddress);
             execData = yield counter.interface.encodeFunctionData("increaseCount", [
                 100,
             ]);
@@ -67,7 +65,7 @@ describe("PokeMe createTimedTask test", function () {
             resolverData = yield forwarder.interface.encodeFunctionData("checker", [
                 execData,
             ]);
-            resolverHash = hardhat_1.ethers.utils.keccak256(new hardhat_1.ethers.utils.AbiCoder().encode(["address", "bytes"], [resolverAddress, resolverData]));
+            resolverHash = ethers.utils.keccak256(new ethers.utils.AbiCoder().encode(["address", "bytes"], [resolverAddress, resolverData]));
             taskId = yield pokeMe.getTaskId(userAddress, execAddress, execSelector, true, FEETOKEN, resolverHash);
             const currentTimestamp = (_b = (yield ((_a = user.provider) === null || _a === void 0 ? void 0 : _a.getBlock("latest")))) === null || _b === void 0 ? void 0 : _b.timestamp;
             yield chai_1.expect(pokeMe
@@ -83,63 +81,63 @@ describe("PokeMe createTimedTask test", function () {
         chai_1.expect(canExec).to.be.eql(true);
         yield chai_1.expect(pokeMe
             .connect(executor)
-            .exec(hardhat_1.ethers.utils.parseEther("0.1"), ETH, userAddress, true, resolverHash, execAddress, execData)).to.be.revertedWith("PokeMe: exec: Too early");
+            .exec(ethers.utils.parseEther("0.1"), ETH, userAddress, taskTreasury.address, resolverHash, execAddress, execData)).to.be.revertedWith("PokeMe: exec: Too early");
     }));
     it("Exec should succeed when time elapse", () => __awaiter(this, void 0, void 0, function* () {
-        yield hardhat_1.network.provider.send("evm_increaseTime", [THREE_MINUTES]);
-        yield hardhat_1.network.provider.send("evm_mine", []);
+        yield hre.network.provider.send("evm_increaseTime", [THREE_MINUTES]);
+        yield hre.network.provider.send("evm_mine", []);
         const nextExecBefore = (yield pokeMe.timedTask(taskId)).nextExec;
         yield counter.setExecutable(true);
         yield chai_1.expect(pokeMe
             .connect(executor)
-            .exec(hardhat_1.ethers.utils.parseEther("0.1"), ETH, userAddress, true, resolverHash, execAddress, execData))
+            .exec(ethers.utils.parseEther("0.1"), ETH, userAddress, taskTreasury.address, resolverHash, execAddress, execData))
             .to.emit(pokeMe, "ExecSuccess")
-            .withArgs(hardhat_1.ethers.utils.parseEther("0.1"), ETH, execAddress, execData, taskId);
+            .withArgs(ethers.utils.parseEther("0.1"), ETH, execAddress, execData, taskId, true);
         const nextExecAfter = (yield pokeMe.timedTask(taskId)).nextExec;
-        chai_1.expect(yield taskTreasury.userTokenBalance(userAddress, ETH)).to.be.eql(hardhat_1.ethers.utils.parseEther("0.9"));
+        chai_1.expect(yield taskTreasury.userTokenBalance(userAddress, ETH)).to.be.eql(ethers.utils.parseEther("0.9"));
         chai_1.expect(Number(yield counter.count())).to.be.eql(100);
         chai_1.expect(nextExecAfter).to.be.gt(nextExecBefore);
     }));
     it("Exec should succeed even if txn fails", () => __awaiter(this, void 0, void 0, function* () {
-        yield hardhat_1.network.provider.send("evm_increaseTime", [THREE_MINUTES]);
-        yield hardhat_1.network.provider.send("evm_mine", []);
+        yield hre.network.provider.send("evm_increaseTime", [THREE_MINUTES]);
+        yield hre.network.provider.send("evm_mine", []);
         const nextExecBefore = (yield pokeMe.timedTask(taskId)).nextExec;
         yield counter.setExecutable(false);
         yield chai_1.expect(pokeMe
             .connect(executor)
-            .exec(hardhat_1.ethers.utils.parseEther("0.1"), ETH, userAddress, true, resolverHash, execAddress, execData))
+            .exec(ethers.utils.parseEther("0.1"), ETH, userAddress, taskTreasury.address, resolverHash, execAddress, execData))
             .to.emit(pokeMe, "ExecSuccess")
-            .withArgs(hardhat_1.ethers.utils.parseEther("0.1"), ETH, execAddress, execData, taskId);
+            .withArgs(ethers.utils.parseEther("0.1"), ETH, execAddress, execData, taskId, false);
         const nextExecAfter = (yield pokeMe.timedTask(taskId)).nextExec;
         chai_1.expect(Number(yield counter.count())).to.be.eql(100);
-        chai_1.expect(yield taskTreasury.userTokenBalance(userAddress, ETH)).to.be.eql(hardhat_1.ethers.utils.parseEther("0.8"));
+        chai_1.expect(yield taskTreasury.userTokenBalance(userAddress, ETH)).to.be.eql(ethers.utils.parseEther("0.8"));
         chai_1.expect(nextExecAfter).to.be.gt(nextExecBefore);
     }));
     it("should skip one interval", () => __awaiter(this, void 0, void 0, function* () {
-        yield hardhat_1.network.provider.send("evm_increaseTime", [2 * THREE_MINUTES]);
-        yield hardhat_1.network.provider.send("evm_mine", []);
+        yield hre.network.provider.send("evm_increaseTime", [2 * THREE_MINUTES]);
+        yield hre.network.provider.send("evm_mine", []);
         const nextExecBefore = (yield pokeMe.timedTask(taskId)).nextExec;
         yield counter.setExecutable(true);
         yield chai_1.expect(pokeMe
             .connect(executor)
-            .exec(hardhat_1.ethers.utils.parseEther("0.1"), ETH, userAddress, true, resolverHash, execAddress, execData))
+            .exec(ethers.utils.parseEther("0.1"), ETH, userAddress, taskTreasury.address, resolverHash, execAddress, execData))
             .to.emit(pokeMe, "ExecSuccess")
-            .withArgs(hardhat_1.ethers.utils.parseEther("0.1"), ETH, execAddress, execData, taskId);
+            .withArgs(ethers.utils.parseEther("0.1"), ETH, execAddress, execData, taskId, true);
         const nextExecAfter = (yield pokeMe.timedTask(taskId)).nextExec;
         chai_1.expect(Number(yield counter.count())).to.be.eql(200);
-        chai_1.expect(yield taskTreasury.userTokenBalance(userAddress, ETH)).to.be.eql(hardhat_1.ethers.utils.parseEther("0.7"));
+        chai_1.expect(yield taskTreasury.userTokenBalance(userAddress, ETH)).to.be.eql(ethers.utils.parseEther("0.7"));
         chai_1.expect(Number(nextExecAfter.sub(nextExecBefore))).to.be.eql(2 * THREE_MINUTES);
     }));
     it("Should account for drift", () => __awaiter(this, void 0, void 0, function* () {
-        yield hardhat_1.network.provider.send("evm_increaseTime", [50 * THREE_MINUTES]);
-        yield hardhat_1.network.provider.send("evm_mine", []);
+        yield hre.network.provider.send("evm_increaseTime", [50 * THREE_MINUTES]);
+        yield hre.network.provider.send("evm_mine", []);
         yield pokeMe
             .connect(executor)
-            .exec(hardhat_1.ethers.utils.parseEther("0.1"), ETH, userAddress, true, resolverHash, execAddress, execData);
+            .exec(ethers.utils.parseEther("0.1"), ETH, userAddress, taskTreasury.address, resolverHash, execAddress, execData);
         yield chai_1.expect(pokeMe
             .connect(executor)
-            .exec(hardhat_1.ethers.utils.parseEther("0.1"), ETH, userAddress, true, resolverHash, execAddress, execData)).to.be.revertedWith("PokeMe: exec: Too early");
+            .exec(ethers.utils.parseEther("0.1"), ETH, userAddress, taskTreasury.address, resolverHash, execAddress, execData)).to.be.revertedWith("PokeMe: exec: Too early");
         chai_1.expect(Number(yield counter.count())).to.be.eql(300);
-        chai_1.expect(yield taskTreasury.userTokenBalance(userAddress, ETH)).to.be.eql(hardhat_1.ethers.utils.parseEther("0.6"));
+        chai_1.expect(yield taskTreasury.userTokenBalance(userAddress, ETH)).to.be.eql(ethers.utils.parseEther("0.6"));
     }));
 });
