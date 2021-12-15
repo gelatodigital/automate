@@ -22,6 +22,8 @@ const getGelatoAddress = (network) => {
             return GELATO_RINKEBY;
         case "goerli":
             return GELATO_GOERLI;
+        case "hardhat":
+            return GELATO_MAINNET;
     }
 };
 exports.getGelatoAddress = getGelatoAddress;

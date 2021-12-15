@@ -24,7 +24,7 @@ module.exports = async (hre) => {
 };
 
 module.exports.skip = async (hre) => {
-  const skip = hre.network.name === "mainnet" || hre.network.name === "hardhat"; // skip local deployment here for tests to run
+  const skip = hre.network.name === "mainnet";
   return skip ? true : false;
 };
 
