@@ -63,7 +63,8 @@ contract PokeMe is Gelatofied {
         address indexed feeToken,
         address indexed execAddress,
         bytes execData,
-        bytes32 taskId
+        bytes32 taskId,
+        bool callSuccess
     );
     event TimerSet(
         bytes32 indexed taskId,
@@ -244,10 +245,6 @@ contract PokeMe is Gelatofied {
         address _execAddress,
         bytes calldata _execData
     ) external onlyGelato {
-        if (!_useTaskTreasuryFunds) {
-            fee = _txFee;
-            feeToken = _feeToken;
-        }
         bytes32 task = getTaskId(
             _taskCreator,
             _execAddress,
@@ -261,6 +258,17 @@ contract PokeMe is Gelatofied {
             taskCreator[task] == _taskCreator,
             "PokeMe: exec: No task found"
         );
+
+        if (_useTaskTreasuryFunds) {
+            TaskTreasury(taskTreasury).useFunds(
+                _feeToken,
+                _txFee,
+                _taskCreator
+            );
+        } else {
+            fee = _txFee;
+            feeToken = _feeToken;
+        }
 
         Time storage time = timedTask[task];
         bool isTimedTask = time.nextExec != 0 ? true : false;
@@ -281,21 +289,19 @@ contract PokeMe is Gelatofied {
         }
 
         (bool success, bytes memory returnData) = _execAddress.call(_execData);
-        if (!success && !isTimedTask)
+
+        // For off-chain simultaion
+        if (tx.origin == address(0) && !success)
             returnData.revertWithError("PokeMe.exec:");
 
-        if (_useTaskTreasuryFunds) {
-            TaskTreasury(taskTreasury).useFunds(
-                _feeToken,
-                _txFee,
-                _taskCreator
-            );
-        } else {
-            delete fee;
-            delete feeToken;
-        }
-
-        emit ExecSuccess(_txFee, _feeToken, _execAddress, _execData, task);
+        emit ExecSuccess(
+            _txFee,
+            _feeToken,
+            _execAddress,
+            _execData,
+            task,
+            success
+        );
     }
 
     /// @notice Returns TaskId of a task Creator

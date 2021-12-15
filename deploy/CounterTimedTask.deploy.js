@@ -3,7 +3,7 @@ const { sleep } = require("@gelatonetwork/core");
 module.exports = async (hre) => {
   if (hre.network.name !== "hardhat") {
     console.log(
-      `Deploying Forwarder to ${hre.network.name}. Hit ctrl + c to abort`
+      `Deploying CounterTimedTask to ${hre.network.name}. Hit ctrl + c to abort`
     );
     await sleep(10000);
   }
@@ -12,8 +12,9 @@ module.exports = async (hre) => {
   const { deploy } = deployments;
   const { deployer } = await hre.getNamedAccounts();
 
-  await deploy("Forwarder", {
+  await deploy("CounterTimedTask", {
     from: deployer,
+    args: [(await hre.ethers.getContract("PokeMe")).address],
   });
 };
 
@@ -22,4 +23,4 @@ module.exports.skip = async (hre) => {
   return skip ? true : false;
 };
 
-module.exports.tags = ["Forwarder"];
+module.exports.tags = ["CounterTimedTask"];
