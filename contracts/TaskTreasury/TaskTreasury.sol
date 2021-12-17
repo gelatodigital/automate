@@ -36,16 +36,16 @@ contract TaskTreasury is Ownable, ReentrancyGuard {
         uint256 amount
     );
 
-    constructor(address payable _gelato) {
-        gelato = _gelato;
-    }
-
     modifier onlyWhitelistedServices() {
         require(
             _whitelistedServices.contains(msg.sender),
             "TaskTreasury: onlyWhitelistedServices"
         );
         _;
+    }
+
+    constructor(address payable _gelato) {
+        gelato = _gelato;
     }
 
     // solhint-disable max-line-length
