@@ -15,14 +15,14 @@ abstract contract PokeMeReady {
     address payable public immutable gelato;
     address public constant ETH = 0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE;
 
-    constructor(address _pokeMe) {
-        pokeMe = _pokeMe;
-        gelato = IPokeMe(_pokeMe).gelato();
-    }
-
     modifier onlyPokeMe() {
         require(msg.sender == pokeMe, "PokeMeReady: onlyPokeMe");
         _;
+    }
+
+    constructor(address _pokeMe) {
+        pokeMe = _pokeMe;
+        gelato = IPokeMe(_pokeMe).gelato();
     }
 
     function _transfer(uint256 _amount, address _paymentToken) internal {

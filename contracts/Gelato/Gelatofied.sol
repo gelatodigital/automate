@@ -10,10 +10,6 @@ import {_transfer, ETH} from "./FGelato.sol";
 abstract contract Gelatofied {
     address payable public immutable gelato;
 
-    constructor(address payable _gelato) {
-        gelato = _gelato;
-    }
-
     modifier gelatofy(uint256 _amount, address _paymentToken) {
         require(msg.sender == gelato, "Gelatofied: Only gelato");
         _;
@@ -23,5 +19,9 @@ abstract contract Gelatofied {
     modifier onlyGelato() {
         require(msg.sender == gelato, "Gelatofied: Only gelato");
         _;
+    }
+
+    constructor(address payable _gelato) {
+        gelato = _gelato;
     }
 }
