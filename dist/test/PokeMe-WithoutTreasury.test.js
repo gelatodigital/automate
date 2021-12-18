@@ -24,6 +24,8 @@ describe("PokeMe without treasury test", function () {
     let dai;
     let user;
     let userAddress;
+    let user2;
+    let user2Address;
     let executor;
     let executorAddress;
     let resolverData;
@@ -35,8 +37,9 @@ describe("PokeMe without treasury test", function () {
     beforeEach(function () {
         return __awaiter(this, void 0, void 0, function* () {
             yield deployments.fixture();
-            [user] = yield ethers.getSigners();
+            [user, user2] = yield ethers.getSigners();
             userAddress = yield user.getAddress();
+            user2Address = yield user2.getAddress();
             pokeMe = (yield ethers.getContract("PokeMe"));
             taskTreasury = (yield ethers.getContract("TaskTreasury"));
             counter = (yield ethers.getContract("CounterWithoutTreasury"));
@@ -138,5 +141,23 @@ describe("PokeMe without treasury test", function () {
         const gelatoDaiAfter = yield dai.balanceOf(gelatoAddress);
         chai_1.expect(gelatoDaiAfter).to.be.gt(gelatoDaiBefore);
         chai_1.expect(yield counter.count()).to.be.eq(ethers.BigNumber.from("100"));
+    }));
+    it("can only be executed by task creator's task", () => __awaiter(this, void 0, void 0, function* () {
+        const depositAmount = ethers.utils.parseEther("2");
+        yield user2.sendTransaction({
+            to: counter.address,
+            value: depositAmount,
+        });
+        yield pokeMe
+            .connect(user2)
+            .createTaskNoPrepayment(counter.address, selector, counterResolver.address, resolverData, ETH);
+        const taskId = yield pokeMe.getTaskId(user2Address, counter.address, selector, false, ETH, resolverHashETH);
+        const [, execData] = yield counterResolver.checker();
+        // simulation should have failed
+        yield chai_1.expect(pokeMe
+            .connect(executor)
+            .exec(ethers.utils.parseEther("1"), ETH, user2Address, false, resolverHashETH, counter.address, execData))
+            .to.emit(pokeMe, "ExecSuccess")
+            .withArgs(ethers.utils.parseEther("1"), ETH, counter.address, execData, taskId, false);
     }));
 });

@@ -36,10 +36,10 @@ describe("PokeMe test", function () {
   let owner: Signer;
   let diamondSigner: Signer;
 
-  let resolverData: any;
-  let taskHash: any;
-  let selector: any;
-  let resolverHash: any;
+  let resolverData: string;
+  let taskId: string;
+  let selector: string;
+  let resolverHash: string;
 
   beforeEach(async function () {
     await deployments.fixture();
@@ -84,7 +84,7 @@ describe("PokeMe test", function () {
       )
     );
 
-    taskHash = await pokeMe.getTaskId(
+    taskId = await pokeMe.getTaskId(
       userAddress,
       counter.address,
       selector,
@@ -109,7 +109,7 @@ describe("PokeMe test", function () {
         counter.address,
         selector,
         counterResolver.address,
-        taskHash,
+        taskId,
         resolverData,
         true,
         ethers.constants.AddressZero,
@@ -131,9 +131,9 @@ describe("PokeMe test", function () {
   });
 
   it("sender did not start task", async () => {
-    await pokeMe.connect(user).cancelTask(taskHash);
+    await pokeMe.connect(user).cancelTask(taskId);
 
-    await expect(pokeMe.connect(user).cancelTask(taskHash)).to.be.revertedWith(
+    await expect(pokeMe.connect(user).cancelTask(taskId)).to.be.revertedWith(
       "PokeMe: cancelTask: Sender did not start task yet"
     );
   });
@@ -247,7 +247,7 @@ describe("PokeMe test", function () {
     await hre.network.provider.send("evm_increaseTime", [THREE_MIN]);
     await hre.network.provider.send("evm_mine", []);
 
-    await pokeMe.connect(user).cancelTask(taskHash);
+    await pokeMe.connect(user).cancelTask(taskId);
     const [, execData] = await counterResolver.checker();
 
     await expect(
@@ -380,7 +380,7 @@ describe("PokeMe test", function () {
         execData
       )
     ).to.be.revertedWith(
-      "PokeMe.exec:Counter: increaseCount: Time not elapsed"
+      "PokeMe.exec: Counter: increaseCount: Time not elapsed"
     );
   });
 
@@ -432,7 +432,7 @@ describe("PokeMe test", function () {
         execData
       )
     ).to.be.revertedWith(
-      "PokeMe.exec:Counter: increaseCount: Time not elapsed"
+      "PokeMe.exec: Counter: increaseCount: Time not elapsed"
     );
   });
 
@@ -477,6 +477,37 @@ describe("PokeMe test", function () {
     expect(await taskTreasury.userTokenBalance(userAddress, ETH)).to.be.eq(
       ethers.BigNumber.from("0")
     );
+  });
+
+  it("can only be executed by task creator's task", async () => {
+    const txFee = ethers.utils.parseEther("1");
+    const depositAmount = ethers.utils.parseEther("2");
+    await taskTreasury
+      .connect(user2)
+      .depositFunds(user2Address, ETH, depositAmount, { value: depositAmount });
+
+    await pokeMe
+      .connect(user2)
+      .createTask(
+        counter.address,
+        selector,
+        counterResolver.address,
+        resolverData
+      );
+
+    const [, execData] = await counterResolver.checker();
+
+    await expect(
+      simulateExec(
+        txFee,
+        ETH,
+        user2Address,
+        true,
+        resolverHash,
+        counter.address,
+        execData
+      )
+    ).to.be.revertedWith("PokeMe.exec: Execution not from creator's task");
   });
 
   it("getTaskIdsByUser test", async () => {

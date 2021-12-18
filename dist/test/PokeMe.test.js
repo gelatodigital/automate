@@ -31,7 +31,7 @@ describe("PokeMe test", function () {
     let owner;
     let diamondSigner;
     let resolverData;
-    let taskHash;
+    let taskId;
     let selector;
     let resolverHash;
     beforeEach(function () {
@@ -60,12 +60,12 @@ describe("PokeMe test", function () {
             resolverData = counterResolver.interface.encodeFunctionData("checker");
             selector = yield pokeMe.getSelector("increaseCount(uint256)");
             resolverHash = ethers.utils.keccak256(new ethers.utils.AbiCoder().encode(["address", "bytes"], [counterResolver.address, resolverData]));
-            taskHash = yield pokeMe.getTaskId(userAddress, counter.address, selector, true, ethers.constants.AddressZero, resolverHash);
+            taskId = yield pokeMe.getTaskId(userAddress, counter.address, selector, true, ethers.constants.AddressZero, resolverHash);
             yield chai_1.expect(pokeMe
                 .connect(user)
                 .createTask(counter.address, selector, counterResolver.address, resolverData))
                 .to.emit(pokeMe, "TaskCreated")
-                .withArgs(userAddress, counter.address, selector, counterResolver.address, taskHash, resolverData, true, ethers.constants.AddressZero, resolverHash);
+                .withArgs(userAddress, counter.address, selector, counterResolver.address, taskId, resolverData, true, ethers.constants.AddressZero, resolverHash);
         });
     });
     it("sender already started task", () => __awaiter(this, void 0, void 0, function* () {
@@ -74,8 +74,8 @@ describe("PokeMe test", function () {
             .createTask(counter.address, selector, counterResolver.address, resolverData)).to.be.revertedWith("PokeMe: createTask: Sender already started task");
     }));
     it("sender did not start task", () => __awaiter(this, void 0, void 0, function* () {
-        yield pokeMe.connect(user).cancelTask(taskHash);
-        yield chai_1.expect(pokeMe.connect(user).cancelTask(taskHash)).to.be.revertedWith("PokeMe: cancelTask: Sender did not start task yet");
+        yield pokeMe.connect(user).cancelTask(taskId);
+        yield chai_1.expect(pokeMe.connect(user).cancelTask(taskId)).to.be.revertedWith("PokeMe: cancelTask: Sender did not start task yet");
     }));
     it("deposit and withdraw ETH", () => __awaiter(this, void 0, void 0, function* () {
         const depositAmount = ethers.utils.parseEther("1");
@@ -138,7 +138,7 @@ describe("PokeMe test", function () {
         const THREE_MIN = 3 * 60;
         yield hre.network.provider.send("evm_increaseTime", [THREE_MIN]);
         yield hre.network.provider.send("evm_mine", []);
-        yield pokeMe.connect(user).cancelTask(taskHash);
+        yield pokeMe.connect(user).cancelTask(taskId);
         const [, execData] = yield counterResolver.checker();
         yield chai_1.expect(pokeMe
             .connect(diamondSigner)
@@ -194,7 +194,7 @@ describe("PokeMe test", function () {
         chai_1.expect(yield counter.count()).to.be.eq(ethers.BigNumber.from("100"));
         chai_1.expect(yield taskTreasury.connect(user).userTokenBalance(userAddress, ETH)).to.be.eq(depositAmount.sub(txFee));
         // time not elapsed
-        yield chai_1.expect(simulateExec(txFee, ETH, userAddress, true, resolverHash, counter.address, execData)).to.be.revertedWith("PokeMe.exec:Counter: increaseCount: Time not elapsed");
+        yield chai_1.expect(simulateExec(txFee, ETH, userAddress, true, resolverHash, counter.address, execData)).to.be.revertedWith("PokeMe.exec: Counter: increaseCount: Time not elapsed");
     }));
     it("should exec and pay with DAI", () => __awaiter(this, void 0, void 0, function* () {
         const txFee = ethers.utils.parseEther("1");
@@ -215,7 +215,7 @@ describe("PokeMe test", function () {
             .exec(txFee, DAI, userAddress, true, resolverHash, counter.address, execData);
         chai_1.expect(yield counter.count()).to.be.eq(ethers.BigNumber.from("100"));
         // time not elapsed
-        yield chai_1.expect(simulateExec(txFee, DAI, userAddress, true, resolverHash, counter.address, execData)).to.be.revertedWith("PokeMe.exec:Counter: increaseCount: Time not elapsed");
+        yield chai_1.expect(simulateExec(txFee, DAI, userAddress, true, resolverHash, counter.address, execData)).to.be.revertedWith("PokeMe.exec: Counter: increaseCount: Time not elapsed");
     }));
     it("should exec and charge user even when it reverts", () => __awaiter(this, void 0, void 0, function* () {
         const txFee = ethers.utils.parseEther("1");
@@ -235,6 +235,18 @@ describe("PokeMe test", function () {
             .exec(txFee, ETH, userAddress, true, resolverHash, counter.address, execData);
         chai_1.expect(yield counter.count()).to.be.eq(count);
         chai_1.expect(yield taskTreasury.userTokenBalance(userAddress, ETH)).to.be.eq(ethers.BigNumber.from("0"));
+    }));
+    it("can only be executed by task creator's task", () => __awaiter(this, void 0, void 0, function* () {
+        const txFee = ethers.utils.parseEther("1");
+        const depositAmount = ethers.utils.parseEther("2");
+        yield taskTreasury
+            .connect(user2)
+            .depositFunds(user2Address, ETH, depositAmount, { value: depositAmount });
+        yield pokeMe
+            .connect(user2)
+            .createTask(counter.address, selector, counterResolver.address, resolverData);
+        const [, execData] = yield counterResolver.checker();
+        yield chai_1.expect(simulateExec(txFee, ETH, user2Address, true, resolverHash, counter.address, execData)).to.be.revertedWith("PokeMe.exec: Execution not from creator's task");
     }));
     it("getTaskIdsByUser test", () => __awaiter(this, void 0, void 0, function* () {
         // fake task

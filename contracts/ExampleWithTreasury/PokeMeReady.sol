@@ -9,6 +9,21 @@ abstract contract PokeMeReady {
         _;
     }
 
+    modifier onlyTaskCreator(address _taskCreator) {
+        address taskCreator;
+
+        assembly {
+            taskCreator := shr(96, calldataload(sub(calldatasize(), 20)))
+        }
+
+        require(
+            taskCreator == _taskCreator,
+            "Execution not from creator's task"
+        );
+
+        _;
+    }
+
     constructor(address payable _pokeMe) {
         pokeMe = _pokeMe;
     }
