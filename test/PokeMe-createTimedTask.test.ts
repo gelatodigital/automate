@@ -166,15 +166,8 @@ describe("PokeMe createTimedTask test", function () {
           execData
         )
     )
-      .to.emit(pokeMe, "ExecSuccess")
-      .withArgs(
-        ethers.utils.parseEther("0.1"),
-        ETH,
-        execAddress,
-        execData,
-        taskId,
-        true
-      );
+      .to.emit(pokeMe, "CallSuccess")
+      .withArgs(taskId, true);
 
     const nextExecAfter = (await pokeMe.timedTask(taskId)).nextExec;
 
@@ -207,15 +200,8 @@ describe("PokeMe createTimedTask test", function () {
           execData
         )
     )
-      .to.emit(pokeMe, "ExecSuccess")
-      .withArgs(
-        ethers.utils.parseEther("0.1"),
-        ETH,
-        execAddress,
-        execData,
-        taskId,
-        false
-      );
+      .to.emit(pokeMe, "CallSuccess")
+      .withArgs(taskId, false);
 
     const nextExecAfter = (await pokeMe.timedTask(taskId)).nextExec;
 
@@ -247,15 +233,8 @@ describe("PokeMe createTimedTask test", function () {
           execData
         )
     )
-      .to.emit(pokeMe, "ExecSuccess")
-      .withArgs(
-        ethers.utils.parseEther("0.1"),
-        ETH,
-        execAddress,
-        execData,
-        taskId,
-        true
-      );
+      .to.emit(pokeMe, "CallSuccess")
+      .withArgs(taskId, true);
 
     const nextExecAfter = (await pokeMe.timedTask(taskId)).nextExec;
 
