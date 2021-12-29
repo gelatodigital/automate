@@ -146,7 +146,7 @@ describe("PokeMe test", function () {
         const [, execData] = yield counterResolver.checker();
         yield chai_1.expect(pokeMe
             .connect(diamondSigner)
-            .exec(ethers.utils.parseEther("1"), DAI, userAddress, true, resolverHash, counter.address, execData)).to.be.revertedWith("PokeMe: exec: No task found");
+            .exec(ethers.utils.parseEther("1"), DAI, userAddress, taskTreasury.address, resolverHash, counter.address, execData)).to.be.revertedWith("PokeMe: exec: No task found");
     }));
     it("canExec should be true, caller does not have enough ETH", () => __awaiter(this, void 0, void 0, function* () {
         const THREE_MIN = 3 * 60;
@@ -160,7 +160,7 @@ describe("PokeMe test", function () {
         chai_1.expect(canExec).to.be.eq(true);
         yield chai_1.expect(pokeMe
             .connect(diamondSigner)
-            .exec(ethers.utils.parseEther("1"), ETH, userAddress, true, resolverHash, counter.address, execData)).to.be.reverted;
+            .exec(ethers.utils.parseEther("1"), ETH, userAddress, taskTreasury.address, resolverHash, counter.address, execData)).to.be.reverted;
     }));
     it("canExec should be true, caller does not have enough DAI", () => __awaiter(this, void 0, void 0, function* () {
         const THREE_MIN = 3 * 60;
@@ -176,7 +176,7 @@ describe("PokeMe test", function () {
             .depositFunds(userAddress, DAI, depositAmount);
         yield chai_1.expect(pokeMe
             .connect(diamondSigner)
-            .exec(ethers.utils.parseEther("1"), DAI, userAddress, true, resolverHash, counter.address, execData)).to.be.reverted;
+            .exec(ethers.utils.parseEther("1"), DAI, userAddress, taskTreasury.address, resolverHash, counter.address, execData)).to.be.reverted;
         chai_1.expect(yield taskTreasury.userTokenBalance(userAddress, DAI)).to.be.eql(depositAmount);
     }));
     it("should exec and pay with ETH", () => __awaiter(this, void 0, void 0, function* () {
@@ -194,11 +194,11 @@ describe("PokeMe test", function () {
         chai_1.expect(yield taskTreasury.connect(user).userTokenBalance(userAddress, ETH)).to.be.eq(depositAmount);
         yield pokeMe
             .connect(diamondSigner)
-            .exec(txFee, ETH, userAddress, true, resolverHash, counter.address, execData);
+            .exec(txFee, ETH, userAddress, taskTreasury.address, resolverHash, counter.address, execData);
         chai_1.expect(yield counter.count()).to.be.eq(ethers.BigNumber.from("100"));
         chai_1.expect(yield taskTreasury.connect(user).userTokenBalance(userAddress, ETH)).to.be.eq(depositAmount.sub(txFee));
         // time not elapsed
-        yield chai_1.expect(simulateExec(txFee, ETH, userAddress, true, resolverHash, counter.address, execData)).to.be.revertedWith("PokeMe.exec:Counter: increaseCount: Time not elapsed");
+        yield chai_1.expect(simulateExec(txFee, ETH, userAddress, taskTreasury.address, resolverHash, counter.address, execData)).to.be.revertedWith("PokeMe.exec:Counter: increaseCount: Time not elapsed");
     }));
     it("should exec and pay with DAI", () => __awaiter(this, void 0, void 0, function* () {
         const txFee = ethers.utils.parseEther("1");
@@ -216,10 +216,10 @@ describe("PokeMe test", function () {
         chai_1.expect(yield taskTreasury.connect(user).userTokenBalance(userAddress, DAI)).to.be.eq(depositAmount);
         yield pokeMe
             .connect(diamondSigner)
-            .exec(txFee, DAI, userAddress, true, resolverHash, counter.address, execData);
+            .exec(txFee, DAI, userAddress, taskTreasury.address, resolverHash, counter.address, execData);
         chai_1.expect(yield counter.count()).to.be.eq(ethers.BigNumber.from("100"));
         // time not elapsed
-        yield chai_1.expect(simulateExec(txFee, DAI, userAddress, true, resolverHash, counter.address, execData)).to.be.revertedWith("PokeMe.exec:Counter: increaseCount: Time not elapsed");
+        yield chai_1.expect(simulateExec(txFee, DAI, userAddress, taskTreasury.address, resolverHash, counter.address, execData)).to.be.revertedWith("PokeMe.exec:Counter: increaseCount: Time not elapsed");
     }));
     it("should exec and charge user even when it reverts", () => __awaiter(this, void 0, void 0, function* () {
         const txFee = ethers.utils.parseEther("1");
@@ -231,12 +231,12 @@ describe("PokeMe test", function () {
         // execute twice in a row
         yield pokeMe
             .connect(diamondSigner)
-            .exec(txFee, ETH, userAddress, true, resolverHash, counter.address, execData);
+            .exec(txFee, ETH, userAddress, taskTreasury.address, resolverHash, counter.address, execData);
         const count = yield counter.count();
         chai_1.expect(count).to.be.eq(ethers.BigNumber.from("100"));
         yield pokeMe
             .connect(diamondSigner)
-            .exec(txFee, ETH, userAddress, true, resolverHash, counter.address, execData);
+            .exec(txFee, ETH, userAddress, taskTreasury.address, resolverHash, counter.address, execData);
         chai_1.expect(yield counter.count()).to.be.eq(count);
         chai_1.expect(yield taskTreasury.userTokenBalance(userAddress, ETH)).to.be.eq(ethers.BigNumber.from("0"));
     }));
@@ -261,7 +261,7 @@ describe("PokeMe test", function () {
         chai_1.expect(yield taskTreasury.userTokenBalance(userAddress, ETH)).to.be.eql(depositAmount);
         chai_1.expect(yield taskTreasury.userTokenBalance(userAddress, DAI)).to.be.eql(depositAmount);
     }));
-    const simulateExec = (_txFee, _feeToken, _taskCreator, _useTaskTreasury, _resolverHash, _execAddress, _execData) => __awaiter(this, void 0, void 0, function* () {
+    const simulateExec = (_txFee, _feeToken, _taskCreator, _taskTreasury, _resolverHash, _execAddress, _execData) => __awaiter(this, void 0, void 0, function* () {
         const ZERO = ethers.constants.AddressZero;
         yield hre.network.provider.request({
             method: "hardhat_impersonateAccount",
@@ -273,7 +273,7 @@ describe("PokeMe test", function () {
             _txFee,
             _feeToken,
             _taskCreator,
-            _useTaskTreasury,
+            _taskTreasury,
             _resolverHash,
             _execAddress,
             _execData,

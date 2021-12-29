@@ -16,6 +16,7 @@ const { ethers, deployments } = hre;
 const gelatoAddress = "0x3caca7b48d0573d793d3b0279b5f0029180e83b6";
 const ETH = "0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE";
 const DAI = "0x6B175474E89094C44Da98b954EedeAC495271d0F";
+const ZERO_ADDRESS = ethers.constants.AddressZero;
 describe("PokeMe without treasury test", function () {
     let pokeMe;
     let counter;
@@ -82,7 +83,7 @@ describe("PokeMe without treasury test", function () {
         // simulation should have failed
         yield chai_1.expect(pokeMe
             .connect(executor)
-            .exec(ethers.utils.parseEther("1"), ETH, userAddress, false, resolverHashETH, counter.address, execData))
+            .exec(ethers.utils.parseEther("1"), ETH, userAddress, ZERO_ADDRESS, resolverHashETH, counter.address, execData))
             .to.emit(pokeMe, "CallSuccess")
             .withArgs(taskHashETH, false);
     }));
@@ -98,7 +99,7 @@ describe("PokeMe without treasury test", function () {
         // simulation should have failed
         yield chai_1.expect(pokeMe
             .connect(executor)
-            .exec(ethers.utils.parseEther("1"), DAI, userAddress, false, resolverHashDAI, counter.address, execData))
+            .exec(ethers.utils.parseEther("1"), DAI, userAddress, ZERO_ADDRESS, resolverHashDAI, counter.address, execData))
             .to.emit(pokeMe, "CallSuccess")
             .withArgs(taskHashDAI, false);
     }));
@@ -117,7 +118,7 @@ describe("PokeMe without treasury test", function () {
         chai_1.expect(canExec).to.be.eq(true);
         yield pokeMe
             .connect(executor)
-            .exec(ethers.utils.parseEther("1"), ETH, userAddress, false, resolverHashETH, counter.address, execData);
+            .exec(ethers.utils.parseEther("1"), ETH, userAddress, ZERO_ADDRESS, resolverHashETH, counter.address, execData);
         const gelatoBalanceAfter = yield ethers.provider.getBalance(gelatoAddress);
         chai_1.expect(gelatoBalanceAfter).to.be.gt(gelatoBalanceBefore);
         chai_1.expect(yield counter.count()).to.be.eq(ethers.BigNumber.from("100"));
@@ -134,7 +135,7 @@ describe("PokeMe without treasury test", function () {
         chai_1.expect(canExec).to.be.eq(true);
         yield pokeMe
             .connect(executor)
-            .exec(ethers.utils.parseEther("1"), DAI, userAddress, false, resolverHashDAI, counter.address, execData);
+            .exec(ethers.utils.parseEther("1"), DAI, userAddress, ZERO_ADDRESS, resolverHashDAI, counter.address, execData);
         const gelatoDaiAfter = yield dai.balanceOf(gelatoAddress);
         chai_1.expect(gelatoDaiAfter).to.be.gt(gelatoDaiBefore);
         chai_1.expect(yield counter.count()).to.be.eq(ethers.BigNumber.from("100"));

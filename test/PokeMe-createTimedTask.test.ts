@@ -137,7 +137,7 @@ describe("PokeMe createTimedTask test", function () {
           ethers.utils.parseEther("0.1"),
           ETH,
           userAddress,
-          true,
+          taskTreasury.address,
           resolverHash,
           execAddress,
           execData
@@ -160,7 +160,7 @@ describe("PokeMe createTimedTask test", function () {
           ethers.utils.parseEther("0.1"),
           ETH,
           userAddress,
-          true,
+          taskTreasury.address,
           resolverHash,
           execAddress,
           execData
@@ -194,7 +194,7 @@ describe("PokeMe createTimedTask test", function () {
           ethers.utils.parseEther("0.1"),
           ETH,
           userAddress,
-          true,
+          taskTreasury.address,
           resolverHash,
           execAddress,
           execData
@@ -227,7 +227,7 @@ describe("PokeMe createTimedTask test", function () {
           ethers.utils.parseEther("0.1"),
           ETH,
           userAddress,
-          true,
+          taskTreasury.address,
           resolverHash,
           execAddress,
           execData
@@ -257,7 +257,7 @@ describe("PokeMe createTimedTask test", function () {
         ethers.utils.parseEther("0.1"),
         ETH,
         userAddress,
-        true,
+        taskTreasury.address,
         resolverHash,
         execAddress,
         execData
@@ -270,7 +270,7 @@ describe("PokeMe createTimedTask test", function () {
           ethers.utils.parseEther("0.1"),
           ETH,
           userAddress,
-          true,
+          taskTreasury.address,
           resolverHash,
           execAddress,
           execData

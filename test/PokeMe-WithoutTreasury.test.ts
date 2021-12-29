@@ -7,6 +7,7 @@ const { ethers, deployments } = hre;
 const gelatoAddress = "0x3caca7b48d0573d793d3b0279b5f0029180e83b6";
 const ETH = "0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE";
 const DAI = "0x6B175474E89094C44Da98b954EedeAC495271d0F";
+const ZERO_ADDRESS = ethers.constants.AddressZero;
 
 import {
   PokeMe,
@@ -26,15 +27,15 @@ describe("PokeMe without treasury test", function () {
   let user: Signer;
   let userAddress: string;
 
-  let executor: any;
+  let executor: Signer;
   let executorAddress: string;
 
-  let resolverData: any;
-  let taskHashETH: any;
-  let taskHashDAI: any;
-  let selector: any;
-  let resolverHashETH: any;
-  let resolverHashDAI: any;
+  let resolverData: string;
+  let taskHashETH: string;
+  let taskHashDAI: string;
+  let selector: string;
+  let resolverHashETH: string;
+  let resolverHashDAI: string;
 
   beforeEach(async function () {
     await deployments.fixture();
@@ -174,7 +175,7 @@ describe("PokeMe without treasury test", function () {
           ethers.utils.parseEther("1"),
           ETH,
           userAddress,
-          false,
+          ZERO_ADDRESS,
           resolverHashETH,
           counter.address,
           execData
@@ -207,7 +208,7 @@ describe("PokeMe without treasury test", function () {
           ethers.utils.parseEther("1"),
           DAI,
           userAddress,
-          false,
+          ZERO_ADDRESS,
           resolverHashDAI,
           counter.address,
           execData
@@ -245,7 +246,7 @@ describe("PokeMe without treasury test", function () {
         ethers.utils.parseEther("1"),
         ETH,
         userAddress,
-        false,
+        ZERO_ADDRESS,
         resolverHashETH,
         counter.address,
         execData
@@ -279,7 +280,7 @@ describe("PokeMe without treasury test", function () {
         ethers.utils.parseEther("1"),
         DAI,
         userAddress,
-        false,
+        ZERO_ADDRESS,
         resolverHashDAI,
         counter.address,
         execData

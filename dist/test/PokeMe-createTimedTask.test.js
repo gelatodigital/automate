@@ -81,7 +81,7 @@ describe("PokeMe createTimedTask test", function () {
         chai_1.expect(canExec).to.be.eql(true);
         yield chai_1.expect(pokeMe
             .connect(executor)
-            .exec(ethers.utils.parseEther("0.1"), ETH, userAddress, true, resolverHash, execAddress, execData)).to.be.revertedWith("PokeMe: exec: Too early");
+            .exec(ethers.utils.parseEther("0.1"), ETH, userAddress, taskTreasury.address, resolverHash, execAddress, execData)).to.be.revertedWith("PokeMe: exec: Too early");
     }));
     it("Exec should succeed when time elapse", () => __awaiter(this, void 0, void 0, function* () {
         yield hre.network.provider.send("evm_increaseTime", [THREE_MINUTES]);
@@ -90,7 +90,7 @@ describe("PokeMe createTimedTask test", function () {
         yield counter.setExecutable(true);
         yield chai_1.expect(pokeMe
             .connect(executor)
-            .exec(ethers.utils.parseEther("0.1"), ETH, userAddress, true, resolverHash, execAddress, execData))
+            .exec(ethers.utils.parseEther("0.1"), ETH, userAddress, taskTreasury.address, resolverHash, execAddress, execData))
             .to.emit(pokeMe, "CallSuccess")
             .withArgs(taskId, true);
         const nextExecAfter = (yield pokeMe.timedTask(taskId)).nextExec;
@@ -105,7 +105,7 @@ describe("PokeMe createTimedTask test", function () {
         yield counter.setExecutable(false);
         yield chai_1.expect(pokeMe
             .connect(executor)
-            .exec(ethers.utils.parseEther("0.1"), ETH, userAddress, true, resolverHash, execAddress, execData))
+            .exec(ethers.utils.parseEther("0.1"), ETH, userAddress, taskTreasury.address, resolverHash, execAddress, execData))
             .to.emit(pokeMe, "CallSuccess")
             .withArgs(taskId, false);
         const nextExecAfter = (yield pokeMe.timedTask(taskId)).nextExec;
@@ -120,7 +120,7 @@ describe("PokeMe createTimedTask test", function () {
         yield counter.setExecutable(true);
         yield chai_1.expect(pokeMe
             .connect(executor)
-            .exec(ethers.utils.parseEther("0.1"), ETH, userAddress, true, resolverHash, execAddress, execData))
+            .exec(ethers.utils.parseEther("0.1"), ETH, userAddress, taskTreasury.address, resolverHash, execAddress, execData))
             .to.emit(pokeMe, "CallSuccess")
             .withArgs(taskId, true);
         const nextExecAfter = (yield pokeMe.timedTask(taskId)).nextExec;
@@ -133,10 +133,10 @@ describe("PokeMe createTimedTask test", function () {
         yield hre.network.provider.send("evm_mine", []);
         yield pokeMe
             .connect(executor)
-            .exec(ethers.utils.parseEther("0.1"), ETH, userAddress, true, resolverHash, execAddress, execData);
+            .exec(ethers.utils.parseEther("0.1"), ETH, userAddress, taskTreasury.address, resolverHash, execAddress, execData);
         yield chai_1.expect(pokeMe
             .connect(executor)
-            .exec(ethers.utils.parseEther("0.1"), ETH, userAddress, true, resolverHash, execAddress, execData)).to.be.revertedWith("PokeMe: exec: Too early");
+            .exec(ethers.utils.parseEther("0.1"), ETH, userAddress, taskTreasury.address, resolverHash, execAddress, execData)).to.be.revertedWith("PokeMe: exec: Too early");
         chai_1.expect(Number(yield counter.count())).to.be.eql(300);
         chai_1.expect(yield taskTreasury.userTokenBalance(userAddress, ETH)).to.be.eql(ethers.utils.parseEther("0.6"));
     }));

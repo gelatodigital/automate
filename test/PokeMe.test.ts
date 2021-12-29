@@ -258,7 +258,7 @@ describe("PokeMe test", function () {
           ethers.utils.parseEther("1"),
           DAI,
           userAddress,
-          true,
+          taskTreasury.address,
           resolverHash,
           counter.address,
           execData
@@ -287,7 +287,7 @@ describe("PokeMe test", function () {
           ethers.utils.parseEther("1"),
           ETH,
           userAddress,
-          true,
+          taskTreasury.address,
           resolverHash,
           counter.address,
           execData
@@ -319,7 +319,7 @@ describe("PokeMe test", function () {
           ethers.utils.parseEther("1"),
           DAI,
           userAddress,
-          true,
+          taskTreasury.address,
           resolverHash,
           counter.address,
           execData
@@ -358,7 +358,7 @@ describe("PokeMe test", function () {
         txFee,
         ETH,
         userAddress,
-        true,
+        taskTreasury.address,
         resolverHash,
         counter.address,
         execData
@@ -375,7 +375,7 @@ describe("PokeMe test", function () {
         txFee,
         ETH,
         userAddress,
-        true,
+        taskTreasury.address,
         resolverHash,
         counter.address,
         execData
@@ -413,7 +413,7 @@ describe("PokeMe test", function () {
         txFee,
         DAI,
         userAddress,
-        true,
+        taskTreasury.address,
         resolverHash,
         counter.address,
         execData
@@ -427,7 +427,7 @@ describe("PokeMe test", function () {
         txFee,
         DAI,
         userAddress,
-        true,
+        taskTreasury.address,
         resolverHash,
         counter.address,
         execData
@@ -453,7 +453,7 @@ describe("PokeMe test", function () {
         txFee,
         ETH,
         userAddress,
-        true,
+        taskTreasury.address,
         resolverHash,
         counter.address,
         execData
@@ -468,7 +468,7 @@ describe("PokeMe test", function () {
         txFee,
         ETH,
         userAddress,
-        true,
+        taskTreasury.address,
         resolverHash,
         counter.address,
         execData
@@ -517,7 +517,7 @@ describe("PokeMe test", function () {
     _txFee: BigNumber,
     _feeToken: string,
     _taskCreator: string,
-    _useTaskTreasury: boolean,
+    _taskTreasury: string,
     _resolverHash: string,
     _execAddress: string,
     _execData: string
@@ -536,7 +536,7 @@ describe("PokeMe test", function () {
       _txFee,
       _feeToken,
       _taskCreator,
-      _useTaskTreasury,
+      _taskTreasury,
       _resolverHash,
       _execAddress,
       _execData,
