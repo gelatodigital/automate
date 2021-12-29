@@ -3,21 +3,24 @@ import { expect } from "chai";
 import { getTokenFromFaucet } from "./helpers";
 import hre = require("hardhat");
 const { ethers, deployments } = hre;
-
-const ownerAddress = "0x163407FDA1a93941358c1bfda39a868599553b6D";
-const diamondAddress = "0x3caca7b48d0573d793d3b0279b5f0029180e83b6";
-const ETH = "0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE";
-const DAI = "0x6b175474e89094c44da98b954eedeac495271d0f";
-
 import {
   PokeMe,
   Counter,
   CounterResolver,
   TaskTreasury,
   IERC20,
-  IExecFacet,
 } from "../typechain";
 import { BigNumber } from "ethereum-waffle/node_modules/ethers";
+
+const execFacetAbi = [
+  "function exec(address _service,bytes calldata _data,address _creditToken) external",
+  "function addExecutors(address[] calldata _executors) external",
+];
+
+const ownerAddress = "0x163407FDA1a93941358c1bfda39a868599553b6D";
+const diamondAddress = "0x3caca7b48d0573d793d3b0279b5f0029180e83b6";
+const ETH = "0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE";
+const DAI = "0x6b175474e89094c44da98b954eedeac495271d0f";
 
 describe("PokeMe test", function () {
   let pokeMe: PokeMe;
@@ -25,7 +28,7 @@ describe("PokeMe test", function () {
   let counterResolver: CounterResolver;
   let taskTreasury: TaskTreasury;
   let dai: IERC20;
-  let diamond: IExecFacet;
+  let diamond: any;
 
   let user: Signer;
   let userAddress: string;
@@ -36,10 +39,10 @@ describe("PokeMe test", function () {
   let owner: Signer;
   let diamondSigner: Signer;
 
-  let resolverData: any;
-  let taskHash: any;
-  let selector: any;
-  let resolverHash: any;
+  let resolverData: string;
+  let taskHash: string;
+  let selector: string;
+  let resolverHash: string;
 
   beforeEach(async function () {
     await deployments.fixture();
@@ -55,9 +58,7 @@ describe("PokeMe test", function () {
       await ethers.getContract("CounterResolver")
     );
     dai = <IERC20>await ethers.getContractAt("IERC20", DAI);
-    diamond = <IExecFacet>(
-      await ethers.getContractAt("IExecFacet", diamondAddress)
-    );
+    diamond = await ethers.getContractAt(execFacetAbi, diamondAddress);
 
     await taskTreasury.addWhitelistedService(pokeMe.address);
 

@@ -13,6 +13,10 @@ const chai_1 = require("chai");
 const helpers_1 = require("./helpers");
 const hre = require("hardhat");
 const { ethers, deployments } = hre;
+const execFacetAbi = [
+    "function exec(address _service,bytes calldata _data,address _creditToken) external",
+    "function addExecutors(address[] calldata _executors) external",
+];
 const ownerAddress = "0x163407FDA1a93941358c1bfda39a868599553b6D";
 const diamondAddress = "0x3caca7b48d0573d793d3b0279b5f0029180e83b6";
 const ETH = "0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE";
@@ -45,7 +49,7 @@ describe("PokeMe test", function () {
             counter = (yield ethers.getContract("Counter"));
             counterResolver = (yield ethers.getContract("CounterResolver"));
             dai = (yield ethers.getContractAt("IERC20", DAI));
-            diamond = (yield ethers.getContractAt("IExecFacet", diamondAddress));
+            diamond = yield ethers.getContractAt(execFacetAbi, diamondAddress);
             yield taskTreasury.addWhitelistedService(pokeMe.address);
             yield hre.network.provider.request({
                 method: "hardhat_impersonateAccount",
