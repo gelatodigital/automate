@@ -104,13 +104,7 @@ contract PokeMe is Gelatofied {
             "PokeMe: exec: No task found"
         );
 
-        if (_useTaskTreasuryFunds) {
-            TaskTreasury(taskTreasury).useFunds(
-                _feeToken,
-                _txFee,
-                _taskCreator
-            );
-        } else {
+        if (!_useTaskTreasuryFunds) {
             fee = _txFee;
             feeToken = _feeToken;
         }
@@ -138,6 +132,17 @@ contract PokeMe is Gelatofied {
         // For off-chain simultaion
         if (tx.origin == address(0) && !success)
             returnData.revertWithError("PokeMe.exec:");
+
+        if (_useTaskTreasuryFunds) {
+            TaskTreasury(taskTreasury).useFunds(
+                _feeToken,
+                _txFee,
+                _taskCreator
+            );
+        } else {
+            delete fee;
+            delete feeToken;
+        }
 
         emit ExecSuccess(_txFee, _feeToken, _execAddress, _execData, task);
         emit CallSuccess(task, success);
