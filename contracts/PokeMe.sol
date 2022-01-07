@@ -72,71 +72,6 @@ contract PokeMe is Gelatofied {
         taskTreasury = _taskTreasury;
     }
 
-    /// @notice Cancel a task so that Gelato can no longer execute it
-    /// @param _taskId The hash of the task, can be computed using getTaskId()
-    function cancelTask(bytes32 _taskId) external {
-        require(
-            taskCreator[_taskId] == msg.sender,
-            "PokeMe: cancelTask: Sender did not start task yet"
-        );
-
-        _createdTasks[msg.sender].remove(_taskId);
-        delete taskCreator[_taskId];
-        delete execAddresses[_taskId];
-
-        Time memory time = timedTask[_taskId];
-        bool isTimedTask = time.nextExec != 0 ? true : false;
-        if (isTimedTask) delete timedTask[_taskId];
-
-        emit TaskCancelled(_taskId, msg.sender);
-    }
-
-    /// @notice Create a timed task that executes every so often based on the inputted interval
-    /// @param _startTime Timestamp when the first task should become executable. 0 for right now
-    /// @param _interval After how many seconds should each task be executed
-    /// @param _execAddress On which contract should Gelato execute the transactions
-    /// @param _execSelector Which function Gelato should eecute on the _execAddress
-    /// @param _resolverAddress On which contract should Gelato check when to execute the tx
-    /// @param _resolverData Which data should be used to check on the Resolver when to execute the tx
-    /// @param _feeToken Which token to use as fee payment
-    /// @param _useTreasury True if Gelato should charge fees from TaskTreasury, false if not
-    function createTimedTask(
-        uint128 _startTime,
-        uint128 _interval,
-        address _execAddress,
-        bytes4 _execSelector,
-        address _resolverAddress,
-        bytes calldata _resolverData,
-        address _feeToken,
-        bool _useTreasury
-    ) external returns (bytes32 task) {
-        require(_interval > 0, "PokeMe: createTimedTask: interval cannot be 0");
-
-        if (_useTreasury) {
-            task = createTask(
-                _execAddress,
-                _execSelector,
-                _resolverAddress,
-                _resolverData
-            );
-        } else {
-            task = createTaskNoPrepayment(
-                _execAddress,
-                _execSelector,
-                _resolverAddress,
-                _resolverData,
-                _feeToken
-            );
-        }
-
-        uint128 nextExec = uint256(_startTime) > block.timestamp
-            ? _startTime
-            : uint128(block.timestamp);
-
-        timedTask[task] = Time({nextExec: nextExec, interval: _interval});
-        emit TimerSet(task, nextExec, _interval);
-    }
-
     /// @notice Execution API called by Gelato
     /// @param _txFee Fee paid to Gelato for execution, deducted on the TaskTreasury
     /// @param _feeToken Token used to pay for the execution. ETH = 0xeeeeee...
@@ -237,6 +172,52 @@ contract PokeMe is Gelatofied {
         return bytes4(keccak256(bytes(_func)));
     }
 
+    /// @notice Create a timed task that executes every so often based on the inputted interval
+    /// @param _startTime Timestamp when the first task should become executable. 0 for right now
+    /// @param _interval After how many seconds should each task be executed
+    /// @param _execAddress On which contract should Gelato execute the transactions
+    /// @param _execSelector Which function Gelato should eecute on the _execAddress
+    /// @param _resolverAddress On which contract should Gelato check when to execute the tx
+    /// @param _resolverData Which data should be used to check on the Resolver when to execute the tx
+    /// @param _feeToken Which token to use as fee payment
+    /// @param _useTreasury True if Gelato should charge fees from TaskTreasury, false if not
+    function createTimedTask(
+        uint128 _startTime,
+        uint128 _interval,
+        address _execAddress,
+        bytes4 _execSelector,
+        address _resolverAddress,
+        bytes calldata _resolverData,
+        address _feeToken,
+        bool _useTreasury
+    ) public returns (bytes32 task) {
+        require(_interval > 0, "PokeMe: createTimedTask: interval cannot be 0");
+
+        if (_useTreasury) {
+            task = createTask(
+                _execAddress,
+                _execSelector,
+                _resolverAddress,
+                _resolverData
+            );
+        } else {
+            task = createTaskNoPrepayment(
+                _execAddress,
+                _execSelector,
+                _resolverAddress,
+                _resolverData,
+                _feeToken
+            );
+        }
+
+        uint128 nextExec = uint256(_startTime) > block.timestamp
+            ? _startTime
+            : uint128(block.timestamp);
+
+        timedTask[task] = Time({nextExec: nextExec, interval: _interval});
+        emit TimerSet(task, nextExec, _interval);
+    }
+
     /// @notice Create a task that tells Gelato to monitor and execute transactions on specific contracts
     /// @dev Requires funds to be added in Task Treasury, assumes treasury sends fee to Gelato via PokeMe
     /// @param _execAddress On which contract should Gelato execute the transactions
@@ -325,6 +306,25 @@ contract PokeMe is Gelatofied {
             _feeToken,
             resolverHash
         );
+    }
+
+    /// @notice Cancel a task so that Gelato can no longer execute it
+    /// @param _taskId The hash of the task, can be computed using getTaskId()
+    function cancelTask(bytes32 _taskId) public {
+        require(
+            taskCreator[_taskId] == msg.sender,
+            "PokeMe: cancelTask: Sender did not start task yet"
+        );
+
+        _createdTasks[msg.sender].remove(_taskId);
+        delete taskCreator[_taskId];
+        delete execAddresses[_taskId];
+
+        Time memory time = timedTask[_taskId];
+        bool isTimedTask = time.nextExec != 0 ? true : false;
+        if (isTimedTask) delete timedTask[_taskId];
+
+        emit TaskCancelled(_taskId, msg.sender);
     }
 
     /// @notice Helper func to query the resolverHash
