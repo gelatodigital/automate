@@ -91,8 +91,8 @@ describe("PokeMe createTimedTask test", function () {
         yield chai_1.expect(pokeMe
             .connect(executor)
             .exec(ethers.utils.parseEther("0.1"), ETH, userAddress, true, resolverHash, execAddress, execData))
-            .to.emit(pokeMe, "CallSuccess")
-            .withArgs(taskId, true);
+            .to.emit(pokeMe, "ExecSuccess")
+            .withArgs(ethers.utils.parseEther("0.1"), ETH, execAddress, execData, taskId, true);
         const nextExecAfter = (yield pokeMe.timedTask(taskId)).nextExec;
         chai_1.expect(yield taskTreasury.userTokenBalance(userAddress, ETH)).to.be.eql(ethers.utils.parseEther("0.9"));
         chai_1.expect(Number(yield counter.count())).to.be.eql(100);
@@ -106,8 +106,8 @@ describe("PokeMe createTimedTask test", function () {
         yield chai_1.expect(pokeMe
             .connect(executor)
             .exec(ethers.utils.parseEther("0.1"), ETH, userAddress, true, resolverHash, execAddress, execData))
-            .to.emit(pokeMe, "CallSuccess")
-            .withArgs(taskId, false);
+            .to.emit(pokeMe, "ExecSuccess")
+            .withArgs(ethers.utils.parseEther("0.1"), ETH, execAddress, execData, taskId, false);
         const nextExecAfter = (yield pokeMe.timedTask(taskId)).nextExec;
         chai_1.expect(Number(yield counter.count())).to.be.eql(100);
         chai_1.expect(yield taskTreasury.userTokenBalance(userAddress, ETH)).to.be.eql(ethers.utils.parseEther("0.8"));
@@ -121,8 +121,8 @@ describe("PokeMe createTimedTask test", function () {
         yield chai_1.expect(pokeMe
             .connect(executor)
             .exec(ethers.utils.parseEther("0.1"), ETH, userAddress, true, resolverHash, execAddress, execData))
-            .to.emit(pokeMe, "CallSuccess")
-            .withArgs(taskId, true);
+            .to.emit(pokeMe, "ExecSuccess")
+            .withArgs(ethers.utils.parseEther("0.1"), ETH, execAddress, execData, taskId, true);
         const nextExecAfter = (yield pokeMe.timedTask(taskId)).nextExec;
         chai_1.expect(Number(yield counter.count())).to.be.eql(200);
         chai_1.expect(yield taskTreasury.userTokenBalance(userAddress, ETH)).to.be.eql(ethers.utils.parseEther("0.7"));

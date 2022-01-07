@@ -180,8 +180,15 @@ describe("PokeMe without treasury test", function () {
           execData
         )
     )
-      .to.emit(pokeMe, "CallSuccess")
-      .withArgs(taskHashETH, false);
+      .to.emit(pokeMe, "ExecSuccess")
+      .withArgs(
+        ethers.utils.parseEther("1"),
+        ETH,
+        counter.address,
+        execData,
+        taskHashETH,
+        false
+      );
   });
 
   it("canExec should be true, counter does not have enough DAI", async () => {
@@ -213,8 +220,15 @@ describe("PokeMe without treasury test", function () {
           execData
         )
     )
-      .to.emit(pokeMe, "CallSuccess")
-      .withArgs(taskHashDAI, false);
+      .to.emit(pokeMe, "ExecSuccess")
+      .withArgs(
+        ethers.utils.parseEther("1"),
+        DAI,
+        counter.address,
+        execData,
+        taskHashDAI,
+        false
+      );
   });
 
   it("canExec should be true, counter have enough ETH", async () => {

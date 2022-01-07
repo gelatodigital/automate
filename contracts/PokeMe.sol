@@ -45,7 +45,8 @@ contract PokeMe is Gelatofied {
         address indexed feeToken,
         address indexed execAddress,
         bytes execData,
-        bytes32 taskId
+        bytes32 taskId,
+        bool callSuccess
     );
     event TaskCreated(
         address taskCreator,
@@ -64,7 +65,6 @@ contract PokeMe is Gelatofied {
         uint128 indexed nextExec,
         uint128 indexed interval
     );
-    event CallSuccess(bytes32 indexed taskId, bool callSuccess);
 
     constructor(address payable _gelato, address _taskTreasury)
         Gelatofied(_gelato)
@@ -144,8 +144,14 @@ contract PokeMe is Gelatofied {
             delete feeToken;
         }
 
-        emit ExecSuccess(_txFee, _feeToken, _execAddress, _execData, task);
-        emit CallSuccess(task, success);
+        emit ExecSuccess(
+            _txFee,
+            _feeToken,
+            _execAddress,
+            _execData,
+            task,
+            success
+        );
     }
 
     /// @notice Helper func to query fee and feeToken

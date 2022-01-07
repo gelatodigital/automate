@@ -83,8 +83,8 @@ describe("PokeMe without treasury test", function () {
         yield chai_1.expect(pokeMe
             .connect(executor)
             .exec(ethers.utils.parseEther("1"), ETH, userAddress, false, resolverHashETH, counter.address, execData))
-            .to.emit(pokeMe, "CallSuccess")
-            .withArgs(taskHashETH, false);
+            .to.emit(pokeMe, "ExecSuccess")
+            .withArgs(ethers.utils.parseEther("1"), ETH, counter.address, execData, taskHashETH, false);
     }));
     it("canExec should be true, counter does not have enough DAI", () => __awaiter(this, void 0, void 0, function* () {
         const THREE_MIN = 3 * 60;
@@ -99,8 +99,8 @@ describe("PokeMe without treasury test", function () {
         yield chai_1.expect(pokeMe
             .connect(executor)
             .exec(ethers.utils.parseEther("1"), DAI, userAddress, false, resolverHashDAI, counter.address, execData))
-            .to.emit(pokeMe, "CallSuccess")
-            .withArgs(taskHashDAI, false);
+            .to.emit(pokeMe, "ExecSuccess")
+            .withArgs(ethers.utils.parseEther("1"), DAI, counter.address, execData, taskHashDAI, false);
     }));
     it("canExec should be true, counter have enough ETH", () => __awaiter(this, void 0, void 0, function* () {
         const THREE_MIN = 3 * 60;

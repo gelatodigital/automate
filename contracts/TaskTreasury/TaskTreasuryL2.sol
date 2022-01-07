@@ -39,17 +39,17 @@ contract TaskTreasuryL2 is Ownable, ReentrancyGuard {
         uint256 amount
     );
 
-    constructor(address payable _gelato, uint256 _maxFee) {
-        gelato = _gelato;
-        maxFee = _maxFee;
-    }
-
     modifier onlyWhitelistedServices() {
         require(
             _whitelistedServices.contains(msg.sender),
             "TaskTreasury: onlyWhitelistedServices"
         );
         _;
+    }
+
+    constructor(address payable _gelato, uint256 _maxFee) {
+        gelato = _gelato;
+        maxFee = _maxFee;
     }
 
     /// @notice Function to deposit Funds which will be used to execute transactions on various services
