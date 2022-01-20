@@ -25,9 +25,9 @@ async function main() {
   console.log("Counter address: ", COUNTER);
   console.log("Counter resolver address: ", RESOLVER);
 
-  const POKEME = (await hre.ethers.getContract("PokeMe")).address;
+  const POKEME = (await hre.ethers.getContract("Ops")).address;
 
-  const pokeMe = await ethers.getContractAt("PokeMe", POKEME, user);
+  const ops = await ethers.getContractAt("Ops", POKEME, user);
   const counter = await ethers.getContractAt(
     "CounterWithoutTreasury",
     COUNTER,
@@ -39,10 +39,10 @@ async function main() {
     user
   );
 
-  const selector = await pokeMe.getSelector("increaseCount(uint256)");
-  const resolverData = await pokeMe.getSelector("checker()");
+  const selector = await ops.getSelector("increaseCount(uint256)");
+  const resolverData = await ops.getSelector("checker()");
 
-  const txn = await pokeMe.createTaskNoPrepayment(
+  const txn = await ops.createTaskNoPrepayment(
     counter.address,
     selector,
     counterResolver.address,
