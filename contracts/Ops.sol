@@ -1,8 +1,8 @@
 // SPDX-License-Identifier: UNLICENSED
 pragma solidity 0.8.0;
 
-import {Gelatofied} from "./Gelato/Gelatofied.sol";
-import {GelatoBytes} from "./Gelato/GelatoBytes.sol";
+import {Gelatofied} from "./gelato/Gelatofied.sol";
+import {GelatoBytes} from "./gelato/GelatoBytes.sol";
 import {
     EnumerableSet
 } from "@openzeppelin/contracts/utils/structs/EnumerableSet.sol";
@@ -10,16 +10,16 @@ import {
     SafeERC20,
     IERC20
 } from "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
-import {TaskTreasury} from "./TaskTreasury/TaskTreasury.sol";
+import {TaskTreasury} from "./taskTreasury/TaskTreasury.sol";
 
 // solhint-disable max-line-length
 // solhint-disable max-states-count
 // solhint-disable not-rely-on-time
-/// @notice PokeMe enables everyone to communicate to Gelato Bots to monitor and execute certain transactions
+/// @notice Ops enables everyone to communicate to Gelato Bots to monitor and execute certain transactions
 /// @notice ResolverAddresses determine when Gelato should execute and provides bots with
 /// the payload they should use to execute
 /// @notice ExecAddress determine the actual contracts to execute a function on
-contract PokeMe is Gelatofied {
+contract Ops is Gelatofied {
     using SafeERC20 for IERC20;
     using GelatoBytes for bytes;
     using EnumerableSet for EnumerableSet.Bytes32Set;
@@ -99,10 +99,7 @@ contract PokeMe is Gelatofied {
             _resolverHash
         );
 
-        require(
-            taskCreator[task] == _taskCreator,
-            "PokeMe: exec: No task found"
-        );
+        require(taskCreator[task] == _taskCreator, "Ops: exec: No task found");
 
         if (!_useTaskTreasuryFunds) {
             fee = _txFee;
@@ -115,7 +112,7 @@ contract PokeMe is Gelatofied {
         if (isTimedTask) {
             require(
                 time.nextExec <= uint128(block.timestamp),
-                "PokeMe: exec: Too early"
+                "Ops: exec: Too early"
             );
             // If next execution would also be executed right now, skip forward to
             // the next execution in the future
@@ -131,7 +128,7 @@ contract PokeMe is Gelatofied {
 
         // For off-chain simultaion
         if (tx.origin == address(0) && !success)
-            returnData.revertWithError("PokeMe.exec:");
+            returnData.revertWithError("Ops.exec:");
 
         if (_useTaskTreasuryFunds) {
             TaskTreasury(taskTreasury).useFunds(
@@ -202,7 +199,7 @@ contract PokeMe is Gelatofied {
         address _feeToken,
         bool _useTreasury
     ) public returns (bytes32 task) {
-        require(_interval > 0, "PokeMe: createTimedTask: interval cannot be 0");
+        require(_interval > 0, "Ops: createTimedTask: interval cannot be 0");
 
         if (_useTreasury) {
             task = createTask(
@@ -230,7 +227,7 @@ contract PokeMe is Gelatofied {
     }
 
     /// @notice Create a task that tells Gelato to monitor and execute transactions on specific contracts
-    /// @dev Requires funds to be added in Task Treasury, assumes treasury sends fee to Gelato via PokeMe
+    /// @dev Requires funds to be added in Task Treasury, assumes treasury sends fee to Gelato via Ops
     /// @param _execAddress On which contract should Gelato execute the transactions
     /// @param _execSelector Which function Gelato should eecute on the _execAddress
     /// @param _resolverAddress On which contract should Gelato check when to execute the tx
@@ -253,7 +250,7 @@ contract PokeMe is Gelatofied {
 
         require(
             taskCreator[task] == address(0),
-            "PokeMe: createTask: Sender already started task"
+            "Ops: createTask: Sender already started task"
         );
 
         _createdTasks[msg.sender].add(task);
@@ -299,7 +296,7 @@ contract PokeMe is Gelatofied {
 
         require(
             taskCreator[task] == address(0),
-            "PokeMe: createTask: Sender already started task"
+            "Ops: createTask: Sender already started task"
         );
 
         _createdTasks[msg.sender].add(task);
@@ -324,7 +321,7 @@ contract PokeMe is Gelatofied {
     function cancelTask(bytes32 _taskId) public {
         require(
             taskCreator[_taskId] == msg.sender,
-            "PokeMe: cancelTask: Sender did not start task yet"
+            "Ops: cancelTask: Sender did not start task yet"
         );
 
         _createdTasks[msg.sender].remove(_taskId);

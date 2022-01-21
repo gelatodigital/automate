@@ -12,13 +12,13 @@ async function main() {
   console.log("Counter address: ", COUNTER);
   console.log("Counter resolver address: ", RESOLVER);
 
-  const POKEME = (await hre.ethers.getContract("PokeMe")).address;
+  const OPS = (await hre.ethers.getContract("Ops")).address;
 
-  const pokeMe = await ethers.getContractAt("PokeMe", POKEME, user);
+  const ops = await ethers.getContractAt("Ops", OPS, user);
   const counter = await ethers.getContractAt("Counter", COUNTER, user);
   const forwarder = await ethers.getContractAt("Forwarder", RESOLVER, user);
 
-  const selector = await pokeMe.getSelector("increaseCount(uint256)");
+  const selector = await ops.getSelector("increaseCount(uint256)");
   const execData = counter.interface.encodeFunctionData("increaseCount", [100]);
   const resolverData = forwarder.interface.encodeFunctionData("checker", [
     execData,
@@ -26,7 +26,7 @@ async function main() {
 
   const interval = 3 * 60;
 
-  const txn = await pokeMe.createTimedTask(
+  const txn = await ops.createTimedTask(
     0,
     interval,
     counter.address,

@@ -14,7 +14,7 @@ module.exports = async (hre) => {
 
   await deploy("CounterTimedTask", {
     from: deployer,
-    args: [(await hre.ethers.getContract("PokeMe")).address],
+    args: [(await hre.ethers.getContract("Ops")).address],
   });
 };
 

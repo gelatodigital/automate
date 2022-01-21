@@ -14,7 +14,7 @@ module.exports = async (hre) => {
 
   await deploy("Counter", {
     from: deployer,
-    args: [(await hre.ethers.getContract("PokeMe")).address],
+    args: [(await hre.ethers.getContract("Ops")).address],
   });
 };
 
@@ -24,4 +24,4 @@ module.exports.skip = async (hre) => {
 };
 
 module.exports.tags = ["Counter"];
-module.exports.dependencies = ["PokeMe"];
+module.exports.dependencies = ["Ops"];
