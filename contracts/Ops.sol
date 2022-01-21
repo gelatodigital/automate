@@ -127,7 +127,7 @@ contract Ops is Gelatofied {
         (bool success, bytes memory returnData) = _execAddress.call(_execData);
 
         // For off-chain simultaion
-        if (tx.origin == address(0) && !success)
+        if (tx.origin == address(0) && !success && !isTimedTask)
             returnData.revertWithError("Ops.exec:");
 
         if (_useTaskTreasuryFunds) {
