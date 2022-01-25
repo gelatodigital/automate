@@ -11,5 +11,7 @@ contract EIP173ProxyWithReceive is EIP173Proxy {
         bytes memory data
     ) payable EIP173Proxy(implementationAddress, ownerAddress, data) {}
 
-    receive() external payable override {}
+    receive() external payable override {
+        _fallback();
+    }
 }

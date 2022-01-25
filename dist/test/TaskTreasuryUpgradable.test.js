@@ -117,6 +117,18 @@ describe("TaskTreasuryUpgradable test", function () {
                 .createTask(execAddress, execSelector, resolverAddress, resolverData);
         });
     });
+    it("deposit by transfering ETH", () => __awaiter(this, void 0, void 0, function* () {
+        const depositAmount = ethers.utils.parseEther("1");
+        const oldBalanceBefore = yield oldTreasury.userTokenBalance(userAddress, ETH);
+        yield user.sendTransaction({
+            to: treasury.address,
+            value: depositAmount,
+        });
+        const oldBalanceAfter = yield oldTreasury.userTokenBalance(userAddress, ETH);
+        const newBalanceAfter = yield treasury.userTokenBalance(userAddress, ETH);
+        chai_1.expect(oldBalanceAfter).to.be.eq(ethers.BigNumber.from("0"));
+        chai_1.expect(newBalanceAfter).to.be.eql(oldBalanceBefore.add(depositAmount));
+    }));
     it("deposit when no funds in old treasury", () => __awaiter(this, void 0, void 0, function* () {
         const balance = yield oldTreasury.userTokenBalance(userAddress, ETH);
         yield oldTreasury.connect(user).withdrawFunds(userAddress, ETH, balance);
