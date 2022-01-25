@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: UNLICENSED
-pragma solidity 0.8.0;
+pragma solidity 0.8.11;
 
-import {OpsReady} from "../gelato/OpsReady.sol";
+import {OpsReady} from "../vendor/gelato/OpsReady.sol";
 
 contract CounterTimedTask is OpsReady {
     uint256 public count;

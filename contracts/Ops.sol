@@ -1,8 +1,8 @@
 // SPDX-License-Identifier: UNLICENSED
-pragma solidity 0.8.0;
+pragma solidity 0.8.11;
 
-import {Gelatofied} from "./gelato/Gelatofied.sol";
-import {GelatoBytes} from "./gelato/GelatoBytes.sol";
+import {Gelatofied} from "./vendor/gelato/Gelatofied.sol";
+import {GelatoBytes} from "./vendor/gelato/GelatoBytes.sol";
 import {
     EnumerableSet
 } from "@openzeppelin/contracts/utils/structs/EnumerableSet.sol";
