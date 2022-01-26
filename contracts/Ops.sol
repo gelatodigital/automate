@@ -30,7 +30,7 @@ contract Ops is Gelatofied {
     }
 
     // solhint-disable const-name-snakecase
-    string public constant version = "3";
+    string public constant version = "4";
     mapping(bytes32 => address) public taskCreator;
     mapping(bytes32 => address) public execAddresses;
     mapping(address => EnumerableSet.Bytes32Set) internal _createdTasks;
