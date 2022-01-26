@@ -23,7 +23,7 @@
     "private-vars-leading-underscore": ["error", { "strict": false }],
     "var-name-mixedcase": "error",
     "imports-on-top": "error",
-    "ordering": "off",
+    "ordering": "error",
     "visibility-modifier-order": "error",
     "avoid-call-value": "off",
     "avoid-low-level-calls": "off",

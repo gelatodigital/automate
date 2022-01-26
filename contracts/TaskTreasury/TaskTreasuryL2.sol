@@ -13,7 +13,7 @@ import {
     ReentrancyGuard
 } from "@openzeppelin/contracts/security/ReentrancyGuard.sol";
 import {Math} from "@openzeppelin/contracts/utils/math/Math.sol";
-import {_transfer, ETH} from "../Gelato/FGelato.sol";
+import {_transfer, ETH} from "../gelato/FGelato.sol";
 
 // solhint-disable max-states-count
 // solhint-disable max-line-length
@@ -39,17 +39,17 @@ contract TaskTreasuryL2 is Ownable, ReentrancyGuard {
         uint256 amount
     );
 
-    constructor(address payable _gelato, uint256 _maxFee) {
-        gelato = _gelato;
-        maxFee = _maxFee;
-    }
-
     modifier onlyWhitelistedServices() {
         require(
             _whitelistedServices.contains(msg.sender),
             "TaskTreasury: onlyWhitelistedServices"
         );
         _;
+    }
+
+    constructor(address payable _gelato, uint256 _maxFee) {
+        gelato = _gelato;
+        maxFee = _maxFee;
     }
 
     /// @notice Function to deposit Funds which will be used to execute transactions on various services
@@ -104,7 +104,7 @@ contract TaskTreasuryL2 is Ownable, ReentrancyGuard {
         emit FundsWithdrawn(_receiver, msg.sender, _token, withdrawAmount);
     }
 
-    /// @notice Function called by whitelisted services to handle payments, e.g. PokeMe"
+    /// @notice Function called by whitelisted services to handle payments, e.g. Ops"
     /// @param _token Token to be used for payment by users
     /// @param _amount Amount to be deducted
     /// @param _user Address of user whose balance will be deducted

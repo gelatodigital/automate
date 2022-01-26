@@ -6,23 +6,23 @@ import {
     IERC20
 } from "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
 
-interface IPokeMe {
+interface IOps {
     function gelato() external view returns (address payable);
 }
 
-abstract contract PokeMeReady {
-    address public immutable pokeMe;
+abstract contract OpsReady {
+    address public immutable ops;
     address payable public immutable gelato;
     address public constant ETH = 0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE;
 
-    constructor(address _pokeMe) {
-        pokeMe = _pokeMe;
-        gelato = IPokeMe(_pokeMe).gelato();
+    modifier onlyOps() {
+        require(msg.sender == ops, "OpsReady: onlyOps");
+        _;
     }
 
-    modifier onlyPokeMe() {
-        require(msg.sender == pokeMe, "PokeMeReady: onlyPokeMe");
-        _;
+    constructor(address _ops) {
+        ops = _ops;
+        gelato = IOps(_ops).gelato();
     }
 
     function _transfer(uint256 _amount, address _paymentToken) internal {

@@ -1,17 +1,7 @@
 const { sleep } = require("@gelatonetwork/core");
 
 module.exports = async (hre) => {
-  if (
-    hre.network.name === "arbitrum" ||
-    hre.network.name === "avalanche" ||
-    hre.network.name === "bsc" ||
-    hre.network.name === "fantom" ||
-    hre.network.name === "goerli" ||
-    hre.network.name === "mainnet" ||
-    hre.network.name === "matic" ||
-    hre.network.name === "rinkeby" ||
-    hre.network.name === "ropsten"
-  ) {
+  if (hre.network.name !== "hardhat") {
     console.log(
       `Deploying Counter to ${hre.network.name}. Hit ctrl + c to abort`
     );
@@ -24,23 +14,14 @@ module.exports = async (hre) => {
 
   await deploy("Counter", {
     from: deployer,
-    args: [(await hre.ethers.getContract("PokeMe")).address],
+    args: [(await hre.ethers.getContract("Ops")).address],
   });
 };
 
 module.exports.skip = async (hre) => {
-  const skip =
-    hre.network.name === "arbitrum" ||
-    hre.network.name === "avalanche" ||
-    hre.network.name === "bsc" ||
-    hre.network.name === "fantom" ||
-    hre.network.name === "goerli" ||
-    hre.network.name === "mainnet" ||
-    hre.network.name === "matic" ||
-    hre.network.name === "rinkeby" ||
-    hre.network.name === "ropsten" ||
-    hre.network.name === "hardhat"; // skip local deployment here for tests to run
+  const skip = hre.network.name !== "hardhat";
   return skip ? true : false;
 };
 
 module.exports.tags = ["Counter"];
+module.exports.dependencies = ["Ops"];

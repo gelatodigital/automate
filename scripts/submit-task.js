@@ -1,8 +1,6 @@
 /* eslint-disable no-undef */
 const { ethers } = require("hardhat");
 
-const ETH = "0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE";
-
 async function main() {
   [user] = await hre.ethers.getSigners();
   userAddress = await user.getAddress();
@@ -14,9 +12,9 @@ async function main() {
   console.log("Counter address: ", COUNTER);
   console.log("Counter resolver address: ", RESOLVER);
 
-  const POKEME = (await hre.ethers.getContract("PokeMe")).address;
+  const OPS = (await hre.ethers.getContract("Ops")).address;
 
-  const pokeMe = await ethers.getContractAt("PokeMe", POKEME, user);
+  const ops = await ethers.getContractAt("Ops", OPS, user);
   const counter = await ethers.getContractAt("Counter", COUNTER, user);
   const counterResolver = await ethers.getContractAt(
     "CounterResolver",
@@ -24,10 +22,10 @@ async function main() {
     user
   );
 
-  const selector = await pokeMe.getSelector("increaseCount(uint256)");
-  const resolverData = await pokeMe.getSelector("checker()");
+  const selector = await ops.getSelector("increaseCount(uint256)");
+  const resolverData = await ops.getSelector("checker()");
 
-  const txn = await pokeMe.createTask(
+  const txn = await ops.createTask(
     counter.address,
     selector,
     counterResolver.address,
