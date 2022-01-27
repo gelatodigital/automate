@@ -8,21 +8,33 @@ import {
     SafeERC20,
     IERC20
 } from "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
-import {Ownable} from "@openzeppelin/contracts/access/Ownable.sol";
 import {
-    ReentrancyGuard
-} from "@openzeppelin/contracts/security/ReentrancyGuard.sol";
+    OwnableUpgradeable
+} from "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
+import {
+    ReentrancyGuardUpgradeable
+} from "@openzeppelin/contracts-upgradeable/security/ReentrancyGuardUpgradeable.sol";
+import {
+    Initializable
+} from "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol";
 import {Math} from "@openzeppelin/contracts/utils/math/Math.sol";
 import {_transfer, ETH} from "../vendor/gelato/FGelato.sol";
+import {ITaskTreasury} from "../interfaces/ITaskTreasury.sol";
 
-contract TaskTreasury is Ownable, ReentrancyGuard {
+contract TaskTreasuryUpgradable is
+    Initializable,
+    OwnableUpgradeable,
+    ReentrancyGuardUpgradeable
+{
     using EnumerableSet for EnumerableSet.AddressSet;
     using SafeERC20 for IERC20;
+
+    address payable public immutable gelato;
+    ITaskTreasury public immutable oldTreasury;
 
     mapping(address => mapping(address => uint256)) public userTokenBalance;
     mapping(address => EnumerableSet.AddressSet) internal _tokenCredits;
     EnumerableSet.AddressSet internal _whitelistedServices;
-    address payable public immutable gelato;
 
     event FundsDeposited(
         address indexed sender,
@@ -36,16 +48,29 @@ contract TaskTreasury is Ownable, ReentrancyGuard {
         uint256 amount
     );
 
+    event LogDeductFees(
+        address indexed user,
+        address indexed executor,
+        address indexed token,
+        uint256 fees,
+        address service
+    );
+
     modifier onlyWhitelistedServices() {
         require(
             _whitelistedServices.contains(msg.sender),
-            "TaskTreasury: onlyWhitelistedServices"
+            "TaskTreasuryAccounting: onlyWhitelistedServices"
         );
         _;
     }
 
-    constructor(address payable _gelato) {
+    constructor(address payable _gelato, address _oldTreasury) {
         gelato = _gelato;
+        oldTreasury = ITaskTreasury(_oldTreasury);
+    }
+
+    function initialize() external initializer {
+        __Ownable_init();
     }
 
     // solhint-disable max-line-length
@@ -69,12 +94,9 @@ contract TaskTreasury is Ownable, ReentrancyGuard {
             depositAmount = postBalance - preBalance;
         }
 
-        userTokenBalance[_receiver][_token] =
-            userTokenBalance[_receiver][_token] +
-            depositAmount;
+        _creditUser(_receiver, _token, depositAmount);
 
-        if (!_tokenCredits[_receiver].contains(_token))
-            _tokenCredits[_receiver].add(_token);
+        migrateFunds(_receiver);
 
         emit FundsDeposited(_receiver, _token, depositAmount);
     }
@@ -92,16 +114,14 @@ contract TaskTreasury is Ownable, ReentrancyGuard {
 
         uint256 withdrawAmount = Math.min(balance, _amount);
 
-        userTokenBalance[msg.sender][_token] = balance - withdrawAmount;
+        _chargeUser(msg.sender, _token, withdrawAmount);
 
         _transfer(_receiver, _token, withdrawAmount);
-
-        if (withdrawAmount == balance) _tokenCredits[msg.sender].remove(_token);
 
         emit FundsWithdrawn(_receiver, msg.sender, _token, withdrawAmount);
     }
 
-    /// @notice Function called by whitelisted services to handle payments, e.g. Ops"
+    /// @notice Function called by whitelisted services to handle payments, e.g. PokeMe"
     /// @param _token Token to be used for payment by users
     /// @param _amount Amount to be deducted
     /// @param _user Address of user whose balance will be deducted
@@ -110,14 +130,13 @@ contract TaskTreasury is Ownable, ReentrancyGuard {
         uint256 _amount,
         address _user
     ) external onlyWhitelistedServices {
-        userTokenBalance[_user][_token] =
-            userTokenBalance[_user][_token] -
-            _amount;
+        migrateFunds(_user);
 
-        if (userTokenBalance[_user][_token] == 0)
-            _tokenCredits[_user].remove(_token);
+        _chargeUser(_user, _token, _amount);
 
-        _transfer(gelato, _token, _amount);
+        _creditUser(owner(), _token, _amount);
+
+        emit LogDeductFees(_user, tx.origin, _token, _amount, msg.sender);
     }
 
     // Governance functions
@@ -127,7 +146,7 @@ contract TaskTreasury is Ownable, ReentrancyGuard {
     function addWhitelistedService(address _service) external onlyOwner {
         require(
             !_whitelistedServices.contains(_service),
-            "TaskTreasury: addWhitelistedService: whitelisted"
+            "TaskTreasuryAccounting: addWhitelistedService: whitelisted"
         );
         _whitelistedServices.add(_service);
     }
@@ -137,17 +156,41 @@ contract TaskTreasury is Ownable, ReentrancyGuard {
     function removeWhitelistedService(address _service) external onlyOwner {
         require(
             _whitelistedServices.contains(_service),
-            "TaskTreasury: addWhitelistedService: !whitelisted"
+            "TaskTreasuryAccounting: addWhitelistedService: !whitelisted"
         );
         _whitelistedServices.remove(_service);
     }
 
     // View Funcs
 
+    function getWhitelistedServices() external view returns (address[] memory) {
+        uint256 length = _whitelistedServices.length();
+        address[] memory whitelistedServices = new address[](length);
+
+        for (uint256 i; i < length; i++) {
+            whitelistedServices[i] = _whitelistedServices.at(i);
+        }
+        return whitelistedServices;
+    }
+
+    function migrateFunds(address _user) public {
+        address[] memory creditTokens = oldTreasury.getCreditTokensByUser(
+            _user
+        );
+
+        for (uint256 i; i < creditTokens.length; i++) {
+            address token = creditTokens[i];
+            uint256 amount = oldTreasury.userTokenBalance(_user, token);
+
+            oldTreasury.useFunds(token, amount, _user);
+            _creditUser(_user, token, amount);
+        }
+    }
+
     /// @notice Helper func to get all deposited tokens by a user
     /// @param _user User to get the balances from
     function getCreditTokensByUser(address _user)
-        external
+        public
         view
         returns (address[] memory)
     {
@@ -160,13 +203,28 @@ contract TaskTreasury is Ownable, ReentrancyGuard {
         return creditTokens;
     }
 
-    function getWhitelistedServices() external view returns (address[] memory) {
-        uint256 length = _whitelistedServices.length();
-        address[] memory whitelistedServices = new address[](length);
+    function _creditUser(
+        address _user,
+        address _token,
+        uint256 _amount
+    ) internal {
+        uint256 balance = userTokenBalance[_user][_token];
 
-        for (uint256 i; i < length; i++) {
-            whitelistedServices[i] = _whitelistedServices.at(i);
-        }
-        return whitelistedServices;
+        userTokenBalance[_user][_token] = balance + _amount;
+
+        if (!_tokenCredits[_user].contains(_token))
+            _tokenCredits[_user].add(_token);
+    }
+
+    function _chargeUser(
+        address _user,
+        address _token,
+        uint256 _amount
+    ) internal {
+        uint256 balance = userTokenBalance[_user][_token];
+
+        userTokenBalance[_user][_token] = balance - _amount;
+
+        if (_amount == balance) _tokenCredits[_user].remove(_token);
     }
 }
