@@ -37,7 +37,7 @@ const dotenv = __importStar(require("dotenv"));
 const config = dotenv.config();
 const ALCHEMY_ID = (_a = config === null || config === void 0 ? void 0 : config.parsed) === null || _a === void 0 ? void 0 : _a.ALCHEMY_ID;
 const GELATO = "0x3CACa7b48D0573D793d3b0279b5F0029180E83b6";
-const OPS = "0xB3f5503f93d5Ef84b06993a1975B9D21B962892F";
+const OPS_PROXY = "0xB3f5503f93d5Ef84b06993a1975B9D21B962892F";
 const OLD_TASK_TREASURY = "0x66e2F69df68C8F56837142bE2E8C290EfE76DA9f";
 const ETH = "0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee";
 describe("TaskTreasuryUpgradable test", function () {
@@ -70,9 +70,8 @@ describe("TaskTreasuryUpgradable test", function () {
             treasury = yield ethers.getContract("TaskTreasuryUpgradable");
             counter = yield ethers.getContract("Counter");
             const opsFactory = yield ethers.getContractFactory("Ops");
-            ops = (yield opsFactory.deploy(GELATO, treasury.address));
-            const opsProxy = yield ethers.getContractAt(EIP173Proxy_json_1.abi, OPS);
-            chai_1.expect(yield ops.taskTreasury()).to.be.eql(treasury.address);
+            const opsImplementation = yield opsFactory.deploy(GELATO, treasury.address);
+            const opsProxy = yield ethers.getContractAt(EIP173Proxy_json_1.abi, OPS_PROXY);
             // get accounts
             treasuryOwnerAddress = yield oldTreasury.owner();
             opsOwnerAddress = yield opsProxy.owner();
@@ -101,7 +100,9 @@ describe("TaskTreasuryUpgradable test", function () {
                 .connect(user)
                 .depositFunds(userAddress, ETH, value, { value });
             // upgrade opsProxy
-            yield opsProxy.connect(opsOwner).upgradeTo(ops.address);
+            yield opsProxy.connect(opsOwner).upgradeTo(opsImplementation.address);
+            ops = yield ethers.getContractAt("Ops", OPS_PROXY);
+            chai_1.expect(yield ops.taskTreasury()).to.be.eql(treasury.address);
             // whitelist
             oldTreasury.connect(treasuryOwner).addWhitelistedService(treasury.address);
             treasury.connect(deployer).addWhitelistedService(ops.address);
