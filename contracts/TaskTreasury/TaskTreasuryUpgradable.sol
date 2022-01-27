@@ -69,8 +69,60 @@ contract TaskTreasuryUpgradable is
         oldTreasury = ITaskTreasury(_oldTreasury);
     }
 
+    receive() external payable {
+        depositFunds(msg.sender, ETH, msg.value);
+    }
+
     function initialize() external initializer {
         __Ownable_init();
+    }
+
+    /// @notice Function called by whitelisted services to handle payments, e.g. PokeMe"
+    /// @param _token Token to be used for payment by users
+    /// @param _amount Amount to be deducted
+    /// @param _user Address of user whose balance will be deducted
+    function useFunds(
+        address _token,
+        uint256 _amount,
+        address _user
+    ) external onlyWhitelistedServices {
+        migrateFunds(_user);
+
+        _chargeUser(_user, _token, _amount);
+
+        _creditUser(owner(), _token, _amount);
+
+        emit LogDeductFees(_user, tx.origin, _token, _amount, msg.sender);
+    }
+
+    /// @notice Add new service that can call useFunds. Gelato Governance
+    /// @param _service New service to add
+    function addWhitelistedService(address _service) external onlyOwner {
+        require(
+            !_whitelistedServices.contains(_service),
+            "TaskTreasuryAccounting: addWhitelistedService: whitelisted"
+        );
+        _whitelistedServices.add(_service);
+    }
+
+    /// @notice Remove old service that can call useFunds. Gelato Governance
+    /// @param _service Old service to remove
+    function removeWhitelistedService(address _service) external onlyOwner {
+        require(
+            _whitelistedServices.contains(_service),
+            "TaskTreasuryAccounting: addWhitelistedService: !whitelisted"
+        );
+        _whitelistedServices.remove(_service);
+    }
+
+    function getWhitelistedServices() external view returns (address[] memory) {
+        uint256 length = _whitelistedServices.length();
+        address[] memory whitelistedServices = new address[](length);
+
+        for (uint256 i; i < length; i++) {
+            whitelistedServices[i] = _whitelistedServices.at(i);
+        }
+        return whitelistedServices;
     }
 
     // solhint-disable max-line-length
@@ -82,7 +134,7 @@ contract TaskTreasuryUpgradable is
         address _receiver,
         address _token,
         uint256 _amount
-    ) external payable {
+    ) public payable {
         uint256 depositAmount;
         if (_token == ETH) {
             depositAmount = msg.value;
@@ -109,7 +161,7 @@ contract TaskTreasuryUpgradable is
         address payable _receiver,
         address _token,
         uint256 _amount
-    ) external nonReentrant {
+    ) public nonReentrant {
         uint256 balance = userTokenBalance[msg.sender][_token];
 
         uint256 withdrawAmount = Math.min(balance, _amount);
@@ -119,58 +171,6 @@ contract TaskTreasuryUpgradable is
         _transfer(_receiver, _token, withdrawAmount);
 
         emit FundsWithdrawn(_receiver, msg.sender, _token, withdrawAmount);
-    }
-
-    /// @notice Function called by whitelisted services to handle payments, e.g. PokeMe"
-    /// @param _token Token to be used for payment by users
-    /// @param _amount Amount to be deducted
-    /// @param _user Address of user whose balance will be deducted
-    function useFunds(
-        address _token,
-        uint256 _amount,
-        address _user
-    ) external onlyWhitelistedServices {
-        migrateFunds(_user);
-
-        _chargeUser(_user, _token, _amount);
-
-        _creditUser(owner(), _token, _amount);
-
-        emit LogDeductFees(_user, tx.origin, _token, _amount, msg.sender);
-    }
-
-    // Governance functions
-
-    /// @notice Add new service that can call useFunds. Gelato Governance
-    /// @param _service New service to add
-    function addWhitelistedService(address _service) external onlyOwner {
-        require(
-            !_whitelistedServices.contains(_service),
-            "TaskTreasuryAccounting: addWhitelistedService: whitelisted"
-        );
-        _whitelistedServices.add(_service);
-    }
-
-    /// @notice Remove old service that can call useFunds. Gelato Governance
-    /// @param _service Old service to remove
-    function removeWhitelistedService(address _service) external onlyOwner {
-        require(
-            _whitelistedServices.contains(_service),
-            "TaskTreasuryAccounting: addWhitelistedService: !whitelisted"
-        );
-        _whitelistedServices.remove(_service);
-    }
-
-    // View Funcs
-
-    function getWhitelistedServices() external view returns (address[] memory) {
-        uint256 length = _whitelistedServices.length();
-        address[] memory whitelistedServices = new address[](length);
-
-        for (uint256 i; i < length; i++) {
-            whitelistedServices[i] = _whitelistedServices.at(i);
-        }
-        return whitelistedServices;
     }
 
     function migrateFunds(address _user) public {
