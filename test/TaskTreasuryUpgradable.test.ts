@@ -92,7 +92,6 @@ describe("TaskTreasuryUpgradable test", function () {
     // upgrade opsProxy
     await opsProxy.connect(opsOwner).upgradeTo(opsImplementation.address);
     ops = await ethers.getContractAt("Ops", OPS_PROXY);
-    expect(await ops.taskTreasury()).to.be.eql(treasury.address);
 
     // whitelist
     oldTreasury.connect(treasuryOwner).addWhitelistedService(treasury.address);
@@ -110,6 +109,11 @@ describe("TaskTreasuryUpgradable test", function () {
     await ops
       .connect(user)
       .createTask(execAddress, execSelector, resolverAddress, resolverData);
+  });
+
+  it("ops proxy should have correct treasury and gelato address", async () => {
+    expect(await ops.gelato()).to.be.eql(GELATO);
+    expect(await ops.taskTreasury()).to.be.eql(treasury.address);
   });
 
   it("deposit by transfering ETH", async () => {
@@ -132,6 +136,23 @@ describe("TaskTreasuryUpgradable test", function () {
 
     expect(oldBalanceAfter).to.be.eq(ethers.BigNumber.from("0"));
     expect(newBalanceAfter).to.be.eql(oldBalanceBefore.add(depositAmount));
+  });
+
+  it("users should not be able to send ETH to implementation", async () => {
+    const depositAmount = ethers.utils.parseEther("1");
+
+    const res = await ethers.provider.getStorageAt(
+      treasury.address,
+      "0x360894a13ba1a3210667c828492db98dca3e2076cc3735a920a3ca505d382bbc"
+    );
+    const treasuryImplementationAddress = ethers.utils.hexStripZeros(res);
+
+    await expect(
+      user.sendTransaction({
+        to: treasuryImplementationAddress,
+        value: depositAmount,
+      })
+    ).to.be.revertedWith("TaskTreasury: onlyWhitelistedServices");
   });
 
   it("deposit when no funds in old treasury", async () => {

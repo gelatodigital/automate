@@ -20,7 +20,7 @@ module.exports = async (hre) => {
   await deploy("TaskTreasuryUpgradable", {
     from: deployer,
     proxy: {
-      proxyContract: "EIP173ProxyWithReceive",
+      proxyContract: "EIP173ProxyWithCustomReceive",
       owner: deployer,
       execute: {
         init: {
