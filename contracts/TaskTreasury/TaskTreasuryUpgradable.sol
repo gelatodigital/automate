@@ -75,6 +75,7 @@ contract TaskTreasuryUpgradable is
 
     function initialize() external initializer {
         __Ownable_init();
+        __ReentrancyGuard_init();
     }
 
     /// @notice Function called by whitelisted services to handle payments, e.g. PokeMe"
