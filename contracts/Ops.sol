@@ -110,8 +110,9 @@ contract Ops is Gelatofied {
 
         _updateTime(task);
 
-        (bool success, bytes memory returnData) = _execAddress.call(_execData);
-
+        (bool success, bytes memory returnData) = _execAddress.call(
+            abi.encodePacked(_execData, _taskCreator)
+        );
         // For off-chain simultaion
         if (!success && _revertOnFailure)
             returnData.revertWithError("Ops.exec:");

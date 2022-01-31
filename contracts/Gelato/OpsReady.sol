@@ -20,6 +20,21 @@ abstract contract OpsReady {
         _;
     }
 
+    modifier onlyTaskCreator(address _taskCreator) {
+        address taskCreator;
+
+        assembly {
+            taskCreator := shr(96, calldataload(sub(calldatasize(), 20)))
+        }
+
+        require(
+            taskCreator == _taskCreator,
+            "Execution not from creator's task"
+        );
+
+        _;
+    }
+
     constructor(address _ops) {
         ops = _ops;
         gelato = IOps(_ops).gelato();

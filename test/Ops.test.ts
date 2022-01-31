@@ -469,6 +469,39 @@ describe("Ops test", function () {
     );
   });
 
+  it("can only be executed by task creator's task", async () => {
+    const txFee = ethers.utils.parseEther("1");
+    const depositAmount = ethers.utils.parseEther("2");
+    await taskTreasury
+      .connect(user2)
+      .depositFunds(user2Address, ETH, depositAmount, { value: depositAmount });
+
+    await ops
+      .connect(user2)
+      .createTask(
+        counter.address,
+        selector,
+        counterResolver.address,
+        resolverData
+      );
+
+    const [, execData] = await counterResolver.checker();
+
+    await expect(
+      simulateExec(
+        txFee,
+        ETH,
+        user2Address,
+        true,
+        resolverHash,
+        counter.address,
+        execData
+      )
+    ).to.be.revertedWith(
+      "ExecFacet.exec:Ops.exec:Execution not from creator's task"
+    );
+  });
+
   it("getTaskIdsByUser test", async () => {
     // fake task
     await ops
