@@ -82,7 +82,7 @@ describe("Ops without treasury test", function () {
         // simulation should have failed
         yield chai_1.expect(ops
             .connect(executor)
-            .exec(ethers.utils.parseEther("1"), ETH, userAddress, false, resolverHashETH, counter.address, execData))
+            .exec(ethers.utils.parseEther("1"), ETH, userAddress, false, false, resolverHashETH, counter.address, execData))
             .to.emit(ops, "ExecSuccess")
             .withArgs(ethers.utils.parseEther("1"), ETH, counter.address, execData, taskHashETH, false);
     }));
@@ -98,7 +98,7 @@ describe("Ops without treasury test", function () {
         // simulation should have failed
         yield chai_1.expect(ops
             .connect(executor)
-            .exec(ethers.utils.parseEther("1"), DAI, userAddress, false, resolverHashDAI, counter.address, execData))
+            .exec(ethers.utils.parseEther("1"), DAI, userAddress, false, false, resolverHashDAI, counter.address, execData))
             .to.emit(ops, "ExecSuccess")
             .withArgs(ethers.utils.parseEther("1"), DAI, counter.address, execData, taskHashDAI, false);
     }));
@@ -117,7 +117,7 @@ describe("Ops without treasury test", function () {
         chai_1.expect(canExec).to.be.eq(true);
         yield ops
             .connect(executor)
-            .exec(ethers.utils.parseEther("1"), ETH, userAddress, false, resolverHashETH, counter.address, execData);
+            .exec(ethers.utils.parseEther("1"), ETH, userAddress, false, false, resolverHashETH, counter.address, execData);
         const gelatoBalanceAfter = yield ethers.provider.getBalance(gelatoAddress);
         chai_1.expect(gelatoBalanceAfter).to.be.gt(gelatoBalanceBefore);
         chai_1.expect(yield counter.count()).to.be.eq(ethers.BigNumber.from("100"));
@@ -134,7 +134,7 @@ describe("Ops without treasury test", function () {
         chai_1.expect(canExec).to.be.eq(true);
         yield ops
             .connect(executor)
-            .exec(ethers.utils.parseEther("1"), DAI, userAddress, false, resolverHashDAI, counter.address, execData);
+            .exec(ethers.utils.parseEther("1"), DAI, userAddress, false, false, resolverHashDAI, counter.address, execData);
         const gelatoDaiAfter = yield dai.balanceOf(gelatoAddress);
         chai_1.expect(gelatoDaiAfter).to.be.gt(gelatoDaiBefore);
         chai_1.expect(yield counter.count()).to.be.eq(ethers.BigNumber.from("100"));
