@@ -41,9 +41,9 @@ assert_1.default.ok(ALCHEMY_ID, "no Alchemy ID in process.env");
 // @dev fill this out
 const DEPLOYER_PK_MAINNET = process.env.DEPLOYER_PK_MAINNET;
 const DEPLOYER_PK_ROPSTEN = process.env.DEPLOYER_PK_ROPSTEN;
-// const ETHERSCAN_API = process.env.ETHERSCAN_API;
+const ETHERSCAN_API = process.env.ETHERSCAN_API;
 // const ETHERSCAN_MATIC_API = process.env.ETHERSCAN_MATIC_API;
-const ETHERSCAN_FANTOM_API = process.env.ETHERSCAN_FANTOM_API;
+// const ETHERSCAN_FANTOM_API = process.env.ETHERSCAN_FANTOM_API;
 // const ETHERSCAN_ARBITRUM_API = process.env.ETHERSCAN_ARBITRUM_API;
 // const ETHERSCAN_BSC_API = process.env.ETHERSCAN_BSC_API;
 // const ETHERSCAN_AVALANCHE_API = process.env.ETHERSCAN_AVALANCHE_API;
@@ -128,7 +128,7 @@ const config = {
         target: "ethers-v5",
     },
     etherscan: {
-        apiKey: ETHERSCAN_FANTOM_API,
+        apiKey: ETHERSCAN_API,
     },
 };
 exports.default = config;
