@@ -81,7 +81,7 @@ describe("Ops createTimedTask test", function () {
         chai_1.expect(canExec).to.be.eql(true);
         yield chai_1.expect(ops
             .connect(executor)
-            .exec(ethers.utils.parseEther("0.1"), ETH, userAddress, true, resolverHash, execAddress, execData)).to.be.revertedWith("Ops: exec: Too early");
+            .exec(ethers.utils.parseEther("0.1"), ETH, userAddress, true, false, resolverHash, execAddress, execData)).to.be.revertedWith("Ops: exec: Too early");
     }));
     it("Exec should succeed when time elapse", () => __awaiter(this, void 0, void 0, function* () {
         yield hre.network.provider.send("evm_increaseTime", [THREE_MINUTES]);
@@ -90,7 +90,7 @@ describe("Ops createTimedTask test", function () {
         yield counter.setExecutable(true);
         yield chai_1.expect(ops
             .connect(executor)
-            .exec(ethers.utils.parseEther("0.1"), ETH, userAddress, true, resolverHash, execAddress, execData))
+            .exec(ethers.utils.parseEther("0.1"), ETH, userAddress, true, false, resolverHash, execAddress, execData))
             .to.emit(ops, "ExecSuccess")
             .withArgs(ethers.utils.parseEther("0.1"), ETH, execAddress, execData, taskId, true);
         const nextExecAfter = (yield ops.timedTask(taskId)).nextExec;
@@ -105,7 +105,7 @@ describe("Ops createTimedTask test", function () {
         yield counter.setExecutable(false);
         yield chai_1.expect(ops
             .connect(executor)
-            .exec(ethers.utils.parseEther("0.1"), ETH, userAddress, true, resolverHash, execAddress, execData))
+            .exec(ethers.utils.parseEther("0.1"), ETH, userAddress, true, false, resolverHash, execAddress, execData))
             .to.emit(ops, "ExecSuccess")
             .withArgs(ethers.utils.parseEther("0.1"), ETH, execAddress, execData, taskId, false);
         const nextExecAfter = (yield ops.timedTask(taskId)).nextExec;
@@ -120,7 +120,7 @@ describe("Ops createTimedTask test", function () {
         yield counter.setExecutable(true);
         yield chai_1.expect(ops
             .connect(executor)
-            .exec(ethers.utils.parseEther("0.1"), ETH, userAddress, true, resolverHash, execAddress, execData))
+            .exec(ethers.utils.parseEther("0.1"), ETH, userAddress, true, false, resolverHash, execAddress, execData))
             .to.emit(ops, "ExecSuccess")
             .withArgs(ethers.utils.parseEther("0.1"), ETH, execAddress, execData, taskId, true);
         const nextExecAfter = (yield ops.timedTask(taskId)).nextExec;
@@ -133,10 +133,10 @@ describe("Ops createTimedTask test", function () {
         yield hre.network.provider.send("evm_mine", []);
         yield ops
             .connect(executor)
-            .exec(ethers.utils.parseEther("0.1"), ETH, userAddress, true, resolverHash, execAddress, execData);
+            .exec(ethers.utils.parseEther("0.1"), ETH, userAddress, true, false, resolverHash, execAddress, execData);
         yield chai_1.expect(ops
             .connect(executor)
-            .exec(ethers.utils.parseEther("0.1"), ETH, userAddress, true, resolverHash, execAddress, execData)).to.be.revertedWith("Ops: exec: Too early");
+            .exec(ethers.utils.parseEther("0.1"), ETH, userAddress, true, false, resolverHash, execAddress, execData)).to.be.revertedWith("Ops: exec: Too early");
         chai_1.expect(Number(yield counter.count())).to.be.eql(300);
         chai_1.expect(yield taskTreasury.userTokenBalance(userAddress, ETH)).to.be.eql(ethers.utils.parseEther("0.6"));
     }));

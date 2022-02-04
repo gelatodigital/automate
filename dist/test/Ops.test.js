@@ -13,11 +13,6 @@ const chai_1 = require("chai");
 const helpers_1 = require("./helpers");
 const hre = require("hardhat");
 const { ethers, deployments } = hre;
-const execFacetAbi = [
-    "function exec(address _service,bytes calldata _data,address _creditToken) external",
-    "function addExecutors(address[] calldata _executors) external",
-];
-const ownerAddress = "0x163407FDA1a93941358c1bfda39a868599553b6D";
 const diamondAddress = "0x3caca7b48d0573d793d3b0279b5f0029180e83b6";
 const ETH = "0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE";
 const DAI = "0x6b175474e89094c44da98b954eedeac495271d0f";
@@ -27,12 +22,10 @@ describe("Ops test", function () {
     let counterResolver;
     let taskTreasury;
     let dai;
-    let diamond;
     let user;
     let userAddress;
     let user2;
     let user2Address;
-    let owner;
     let diamondSigner;
     let resolverData;
     let taskHash;
@@ -49,17 +42,11 @@ describe("Ops test", function () {
             counter = (yield ethers.getContract("Counter"));
             counterResolver = (yield ethers.getContract("CounterResolver"));
             dai = (yield ethers.getContractAt("IERC20", DAI));
-            diamond = yield ethers.getContractAt(execFacetAbi, diamondAddress);
             yield taskTreasury.addWhitelistedService(ops.address);
-            yield hre.network.provider.request({
-                method: "hardhat_impersonateAccount",
-                params: [ownerAddress],
-            });
             yield hre.network.provider.request({
                 method: "hardhat_impersonateAccount",
                 params: [diamondAddress],
             });
-            owner = yield ethers.provider.getSigner(ownerAddress);
             diamondSigner = yield ethers.provider.getSigner(diamondAddress);
             resolverData = counterResolver.interface.encodeFunctionData("checker");
             selector = yield ops.getSelector("increaseCount(uint256)");
@@ -146,7 +133,7 @@ describe("Ops test", function () {
         const [, execData] = yield counterResolver.checker();
         yield chai_1.expect(ops
             .connect(diamondSigner)
-            .exec(ethers.utils.parseEther("1"), DAI, userAddress, true, resolverHash, counter.address, execData)).to.be.revertedWith("Ops: exec: No task found");
+            .exec(ethers.utils.parseEther("1"), DAI, userAddress, true, false, resolverHash, counter.address, execData)).to.be.revertedWith("Ops: exec: No task found");
     }));
     it("canExec should be true, caller does not have enough ETH", () => __awaiter(this, void 0, void 0, function* () {
         const THREE_MIN = 3 * 60;
@@ -160,7 +147,7 @@ describe("Ops test", function () {
         chai_1.expect(canExec).to.be.eq(true);
         yield chai_1.expect(ops
             .connect(diamondSigner)
-            .exec(ethers.utils.parseEther("1"), ETH, userAddress, true, resolverHash, counter.address, execData)).to.be.reverted;
+            .exec(ethers.utils.parseEther("1"), ETH, userAddress, true, false, resolverHash, counter.address, execData)).to.be.reverted;
     }));
     it("canExec should be true, caller does not have enough DAI", () => __awaiter(this, void 0, void 0, function* () {
         const THREE_MIN = 3 * 60;
@@ -176,7 +163,7 @@ describe("Ops test", function () {
             .depositFunds(userAddress, DAI, depositAmount);
         yield chai_1.expect(ops
             .connect(diamondSigner)
-            .exec(ethers.utils.parseEther("1"), DAI, userAddress, true, resolverHash, counter.address, execData)).to.be.reverted;
+            .exec(ethers.utils.parseEther("1"), DAI, userAddress, true, false, resolverHash, counter.address, execData)).to.be.reverted;
         chai_1.expect(yield taskTreasury.userTokenBalance(userAddress, DAI)).to.be.eql(depositAmount);
     }));
     it("should exec and pay with ETH", () => __awaiter(this, void 0, void 0, function* () {
@@ -194,7 +181,7 @@ describe("Ops test", function () {
         chai_1.expect(yield taskTreasury.connect(user).userTokenBalance(userAddress, ETH)).to.be.eq(depositAmount);
         yield ops
             .connect(diamondSigner)
-            .exec(txFee, ETH, userAddress, true, resolverHash, counter.address, execData);
+            .exec(txFee, ETH, userAddress, true, false, resolverHash, counter.address, execData);
         chai_1.expect(yield counter.count()).to.be.eq(ethers.BigNumber.from("100"));
         chai_1.expect(yield taskTreasury.connect(user).userTokenBalance(userAddress, ETH)).to.be.eq(depositAmount.sub(txFee));
         // time not elapsed
@@ -216,7 +203,7 @@ describe("Ops test", function () {
         chai_1.expect(yield taskTreasury.connect(user).userTokenBalance(userAddress, DAI)).to.be.eq(depositAmount);
         yield ops
             .connect(diamondSigner)
-            .exec(txFee, DAI, userAddress, true, resolverHash, counter.address, execData);
+            .exec(txFee, DAI, userAddress, true, false, resolverHash, counter.address, execData);
         chai_1.expect(yield counter.count()).to.be.eq(ethers.BigNumber.from("100"));
         // time not elapsed
         yield chai_1.expect(simulateExec(txFee, DAI, userAddress, true, resolverHash, counter.address, execData)).to.be.revertedWith("Ops.exec:Counter: increaseCount: Time not elapsed");
@@ -231,12 +218,12 @@ describe("Ops test", function () {
         // execute twice in a row
         yield ops
             .connect(diamondSigner)
-            .exec(txFee, ETH, userAddress, true, resolverHash, counter.address, execData);
+            .exec(txFee, ETH, userAddress, true, false, resolverHash, counter.address, execData);
         const count = yield counter.count();
         chai_1.expect(count).to.be.eq(ethers.BigNumber.from("100"));
         yield ops
             .connect(diamondSigner)
-            .exec(txFee, ETH, userAddress, true, resolverHash, counter.address, execData);
+            .exec(txFee, ETH, userAddress, true, false, resolverHash, counter.address, execData);
         chai_1.expect(yield counter.count()).to.be.eq(count);
         chai_1.expect(yield taskTreasury.userTokenBalance(userAddress, ETH)).to.be.eq(ethers.BigNumber.from("0"));
     }));
@@ -262,27 +249,8 @@ describe("Ops test", function () {
         chai_1.expect(yield taskTreasury.userTokenBalance(userAddress, DAI)).to.be.eql(depositAmount);
     }));
     const simulateExec = (_txFee, _feeToken, _taskCreator, _useTaskTreasury, _resolverHash, _execAddress, _execData) => __awaiter(this, void 0, void 0, function* () {
-        const ZERO = ethers.constants.AddressZero;
-        yield hre.network.provider.request({
-            method: "hardhat_impersonateAccount",
-            params: [ZERO],
-        });
-        const mockProvider = yield ethers.getSigner(ZERO);
-        yield diamond.connect(owner).addExecutors([ZERO]);
-        const pokeMeData = ops.interface.encodeFunctionData("exec", [
-            _txFee,
-            _feeToken,
-            _taskCreator,
-            _useTaskTreasury,
-            _resolverHash,
-            _execAddress,
-            _execData,
-        ]);
-        const execData = diamond.interface.encodeFunctionData("exec", [
-            ops.address,
-            pokeMeData,
-            _feeToken,
-        ]);
-        yield mockProvider.call({ to: diamondAddress, data: execData });
+        yield ops
+            .connect(diamondSigner)
+            .exec(_txFee, _feeToken, _taskCreator, _useTaskTreasury, true, _resolverHash, _execAddress, _execData);
     });
 });
