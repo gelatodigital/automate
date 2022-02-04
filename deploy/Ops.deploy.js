@@ -1,10 +1,10 @@
-// const { sleep } = require("@gelatonetwork/core");
+const { sleep } = require("@gelatonetwork/core");
 const { getGelatoAddress } = require("../hardhat/config/addresses");
 
 module.exports = async (hre) => {
   if (hre.network.name !== "hardhat") {
     console.log(`Deploying Ops to ${hre.network.name}. Hit ctrl + c to abort`);
-    // await sleep(10000);
+    await sleep(10000);
   }
 
   const { deployments } = hre;
@@ -23,11 +23,11 @@ module.exports = async (hre) => {
   });
 };
 
-// module.exports.skip = async (hre) => {
-//   const skip = true;
-//   // const skip = hre.network.name !== "hardhat";
-//   return skip ? true : false;
-// };
+module.exports.skip = async (hre) => {
+  const skip = hre.network.name !== "hardhat";
+  return skip ? true : false;
+};
 
 module.exports.tags = ["Ops"];
-// module.exports.dependencies = ["TaskTreasuryFantom"];
+// Comment out if deploy to Fantom or Matic
+module.exports.dependencies = ["TaskTreasury"];
