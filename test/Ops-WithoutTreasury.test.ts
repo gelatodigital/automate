@@ -175,6 +175,7 @@ describe("Ops without treasury test", function () {
           ETH,
           userAddress,
           false,
+          false,
           resolverHashETH,
           counter.address,
           execData
@@ -214,6 +215,7 @@ describe("Ops without treasury test", function () {
           ethers.utils.parseEther("1"),
           DAI,
           userAddress,
+          false,
           false,
           resolverHashDAI,
           counter.address,
@@ -260,6 +262,7 @@ describe("Ops without treasury test", function () {
         ETH,
         userAddress,
         false,
+        false,
         resolverHashETH,
         counter.address,
         execData
@@ -293,6 +296,7 @@ describe("Ops without treasury test", function () {
         ethers.utils.parseEther("1"),
         DAI,
         userAddress,
+        false,
         false,
         resolverHashDAI,
         counter.address,

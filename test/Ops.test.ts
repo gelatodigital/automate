@@ -12,12 +12,6 @@ import {
 } from "../typechain";
 import { BigNumber } from "ethereum-waffle/node_modules/ethers";
 
-const execFacetAbi = [
-  "function exec(address _service,bytes calldata _data,address _creditToken) external",
-  "function addExecutors(address[] calldata _executors) external",
-];
-
-const ownerAddress = "0x163407FDA1a93941358c1bfda39a868599553b6D";
 const diamondAddress = "0x3caca7b48d0573d793d3b0279b5f0029180e83b6";
 const ETH = "0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE";
 const DAI = "0x6b175474e89094c44da98b954eedeac495271d0f";
@@ -28,7 +22,6 @@ describe("Ops test", function () {
   let counterResolver: CounterResolver;
   let taskTreasury: TaskTreasury;
   let dai: IERC20;
-  let diamond: any;
 
   let user: Signer;
   let userAddress: string;
@@ -36,7 +29,6 @@ describe("Ops test", function () {
   let user2: Signer;
   let user2Address: string;
 
-  let owner: Signer;
   let diamondSigner: Signer;
 
   let resolverData: string;
@@ -58,20 +50,14 @@ describe("Ops test", function () {
       await ethers.getContract("CounterResolver")
     );
     dai = <IERC20>await ethers.getContractAt("IERC20", DAI);
-    diamond = await ethers.getContractAt(execFacetAbi, diamondAddress);
 
     await taskTreasury.addWhitelistedService(ops.address);
 
     await hre.network.provider.request({
       method: "hardhat_impersonateAccount",
-      params: [ownerAddress],
-    });
-    await hre.network.provider.request({
-      method: "hardhat_impersonateAccount",
       params: [diamondAddress],
     });
 
-    owner = await ethers.provider.getSigner(ownerAddress);
     diamondSigner = await ethers.provider.getSigner(diamondAddress);
 
     resolverData = counterResolver.interface.encodeFunctionData("checker");
@@ -259,6 +245,7 @@ describe("Ops test", function () {
           DAI,
           userAddress,
           true,
+          false,
           resolverHash,
           counter.address,
           execData
@@ -288,6 +275,7 @@ describe("Ops test", function () {
           ETH,
           userAddress,
           true,
+          false,
           resolverHash,
           counter.address,
           execData
@@ -320,6 +308,7 @@ describe("Ops test", function () {
           DAI,
           userAddress,
           true,
+          false,
           resolverHash,
           counter.address,
           execData
@@ -359,6 +348,7 @@ describe("Ops test", function () {
         ETH,
         userAddress,
         true,
+        false,
         resolverHash,
         counter.address,
         execData
@@ -412,6 +402,7 @@ describe("Ops test", function () {
         DAI,
         userAddress,
         true,
+        false,
         resolverHash,
         counter.address,
         execData
@@ -450,6 +441,7 @@ describe("Ops test", function () {
         ETH,
         userAddress,
         true,
+        false,
         resolverHash,
         counter.address,
         execData
@@ -465,6 +457,7 @@ describe("Ops test", function () {
         ETH,
         userAddress,
         true,
+        false,
         resolverHash,
         counter.address,
         execData
@@ -518,32 +511,17 @@ describe("Ops test", function () {
     _execAddress: string,
     _execData: string
   ) => {
-    const ZERO = ethers.constants.AddressZero;
-    await hre.network.provider.request({
-      method: "hardhat_impersonateAccount",
-      params: [ZERO],
-    });
-
-    const mockProvider = await ethers.getSigner(ZERO);
-
-    await diamond.connect(owner).addExecutors([ZERO]);
-
-    const pokeMeData = ops.interface.encodeFunctionData("exec", [
-      _txFee,
-      _feeToken,
-      _taskCreator,
-      _useTaskTreasury,
-      _resolverHash,
-      _execAddress,
-      _execData,
-    ]);
-
-    const execData = diamond.interface.encodeFunctionData("exec", [
-      ops.address,
-      pokeMeData,
-      _feeToken,
-    ]);
-
-    await mockProvider.call({ to: diamondAddress, data: execData });
+    await ops
+      .connect(diamondSigner)
+      .exec(
+        _txFee,
+        _feeToken,
+        _taskCreator,
+        _useTaskTreasury,
+        true,
+        _resolverHash,
+        _execAddress,
+        _execData
+      );
   };
 });

@@ -77,6 +77,7 @@ contract Ops is Gelatofied {
     /// @param _feeToken Token used to pay for the execution. ETH = 0xeeeeee...
     /// @param _taskCreator On which contract should Gelato check when to execute the tx
     /// @param _useTaskTreasuryFunds If msg.sender's balance on TaskTreasury should pay for the tx
+    /// @param _revertOnFailure To revert or not if call to execAddress fails
     /// @param _execAddress On which contract should Gelato execute the tx
     /// @param _execData Data used to execute the tx, queried from the Resolver by Gelato
     // solhint-disable function-max-lines
@@ -86,6 +87,7 @@ contract Ops is Gelatofied {
         address _feeToken,
         address _taskCreator,
         bool _useTaskTreasuryFunds,
+        bool _revertOnFailure,
         bytes32 _resolverHash,
         address _execAddress,
         bytes calldata _execData
@@ -106,28 +108,12 @@ contract Ops is Gelatofied {
             feeToken = _feeToken;
         }
 
-        Time storage time = timedTask[task];
-        bool isTimedTask = time.nextExec != 0 ? true : false;
-
-        if (isTimedTask) {
-            require(
-                time.nextExec <= uint128(block.timestamp),
-                "Ops: exec: Too early"
-            );
-            // If next execution would also be executed right now, skip forward to
-            // the next execution in the future
-            uint128 nextExec = time.nextExec + time.interval;
-            uint128 timestamp = uint128(block.timestamp);
-            while (timestamp >= nextExec) {
-                nextExec = nextExec + time.interval;
-            }
-            time.nextExec = nextExec;
-        }
+        _updateTime(task);
 
         (bool success, bytes memory returnData) = _execAddress.call(_execData);
 
         // For off-chain simultaion
-        if (tx.origin == address(0) && !success)
+        if (!success && _revertOnFailure)
             returnData.revertWithError("Ops.exec:");
 
         if (_useTaskTreasuryFunds) {
@@ -371,5 +357,25 @@ contract Ops is Gelatofied {
                     _resolverHash
                 )
             );
+    }
+
+    function _updateTime(bytes32 task) internal {
+        Time storage time = timedTask[task];
+        bool isTimedTask = time.nextExec != 0 ? true : false;
+
+        if (isTimedTask) {
+            require(
+                time.nextExec <= uint128(block.timestamp),
+                "Ops: exec: Too early"
+            );
+            // If next execution would also be executed right now, skip forward to
+            // the next execution in the future
+            uint128 nextExec = time.nextExec + time.interval;
+            uint128 timestamp = uint128(block.timestamp);
+            while (timestamp >= nextExec) {
+                nextExec = nextExec + time.interval;
+            }
+            time.nextExec = nextExec;
+        }
     }
 }
