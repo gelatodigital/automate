@@ -51,7 +51,9 @@ describe("TaskTreasuryUpgradable test", function () {
 
     oldTreasury = await ethers.getContractAt("TaskTreasury", OLD_TASK_TREASURY);
     treasury = await ethers.getContract("TaskTreasuryUpgradable");
-    counter = await ethers.getContract("Counter");
+
+    const counterFactory = await ethers.getContractFactory("Counter");
+    counter = <Counter>await counterFactory.deploy(OPS_PROXY);
 
     const opsFactory = await ethers.getContractFactory("Ops");
     const opsImplementation = await opsFactory.deploy(GELATO, treasury.address);
@@ -191,7 +193,16 @@ describe("TaskTreasuryUpgradable test", function () {
     const txFee = ethers.utils.parseEther("1");
     await ops
       .connect(executor)
-      .exec(txFee, ETH, userAddress, true, resolverHash, execAddress, execData);
+      .exec(
+        txFee,
+        ETH,
+        userAddress,
+        true,
+        true,
+        resolverHash,
+        execAddress,
+        execData
+      );
 
     const newBalanceAfter = await treasury.userTokenBalance(userAddress, ETH);
 
@@ -231,7 +242,16 @@ describe("TaskTreasuryUpgradable test", function () {
     const txFee = ethers.utils.parseEther("1");
     await ops
       .connect(executor)
-      .exec(txFee, ETH, userAddress, true, resolverHash, execAddress, execData);
+      .exec(
+        txFee,
+        ETH,
+        userAddress,
+        true,
+        true,
+        resolverHash,
+        execAddress,
+        execData
+      );
 
     const newBalanceAfter = await treasury.userTokenBalance(userAddress, ETH);
     const oldBalanceAfter = await oldTreasury.userTokenBalance(
