@@ -9,9 +9,6 @@ import {
     IERC20
 } from "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
 import {
-    OwnableUpgradeable
-} from "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
-import {
     ReentrancyGuardUpgradeable
 } from "@openzeppelin/contracts-upgradeable/security/ReentrancyGuardUpgradeable.sol";
 import {
@@ -19,11 +16,12 @@ import {
 } from "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol";
 import {Math} from "@openzeppelin/contracts/utils/math/Math.sol";
 import {_transfer, ETH} from "../vendor/gelato/FGelato.sol";
+import {Proxied} from "../vendor/proxy/Proxied.sol";
 import {ITaskTreasury} from "../interfaces/ITaskTreasury.sol";
 
 contract TaskTreasuryUpgradable is
+    Proxied,
     Initializable,
-    OwnableUpgradeable,
     ReentrancyGuardUpgradeable
 {
     using EnumerableSet for EnumerableSet.AddressSet;
@@ -74,7 +72,6 @@ contract TaskTreasuryUpgradable is
     }
 
     function initialize() external initializer {
-        __Ownable_init();
         __ReentrancyGuard_init();
     }
 
@@ -91,14 +88,14 @@ contract TaskTreasuryUpgradable is
 
         _chargeUser(_user, _token, _amount);
 
-        _creditUser(owner(), _token, _amount);
+        _creditUser(_proxyAdmin(), _token, _amount);
 
         emit LogDeductFees(_user, tx.origin, _token, _amount, msg.sender);
     }
 
     /// @notice Add new service that can call useFunds. Gelato Governance
     /// @param _service New service to add
-    function addWhitelistedService(address _service) external onlyOwner {
+    function addWhitelistedService(address _service) external onlyProxyAdmin {
         require(
             !_whitelistedServices.contains(_service),
             "TaskTreasuryAccounting: addWhitelistedService: whitelisted"
@@ -108,7 +105,10 @@ contract TaskTreasuryUpgradable is
 
     /// @notice Remove old service that can call useFunds. Gelato Governance
     /// @param _service Old service to remove
-    function removeWhitelistedService(address _service) external onlyOwner {
+    function removeWhitelistedService(address _service)
+        external
+        onlyProxyAdmin
+    {
         require(
             _whitelistedServices.contains(_service),
             "TaskTreasuryAccounting: addWhitelistedService: !whitelisted"
