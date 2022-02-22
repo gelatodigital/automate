@@ -169,7 +169,6 @@ describe("Ops without treasury test", function () {
     const [canExec, execData] = await counterResolver.checker();
     expect(canExec).to.be.eq(true);
 
-    // simulation should have failed
     await expect(
       ops
         .connect(executor)
@@ -178,21 +177,12 @@ describe("Ops without treasury test", function () {
           ETH,
           userAddress,
           false,
-          false,
+          true,
           resolverHashETH,
           counter.address,
           execData
         )
-    )
-      .to.emit(ops, "ExecSuccess")
-      .withArgs(
-        ethers.utils.parseEther("1"),
-        ETH,
-        counter.address,
-        execData,
-        taskHashETH,
-        false
-      );
+    ).to.be.revertedWith("Ops.exec:_transfer: ETH transfer failed");
   });
 
   it("canExec should be true, counter does not have enough DAI", async () => {
@@ -210,7 +200,6 @@ describe("Ops without treasury test", function () {
     const [canExec, execData] = await counterResolver.checker();
     expect(canExec).to.be.eq(true);
 
-    // simulation should have failed
     await expect(
       ops
         .connect(executor)
@@ -219,21 +208,12 @@ describe("Ops without treasury test", function () {
           DAI,
           userAddress,
           false,
-          false,
+          true,
           resolverHashDAI,
           counter.address,
           execData
         )
-    )
-      .to.emit(ops, "ExecSuccess")
-      .withArgs(
-        ethers.utils.parseEther("1"),
-        DAI,
-        counter.address,
-        execData,
-        taskHashDAI,
-        false
-      );
+    ).to.be.revertedWith("Ops.exec:Dai/insufficient-balance");
   });
 
   it("canExec should be true, counter have enough ETH", async () => {
@@ -265,7 +245,7 @@ describe("Ops without treasury test", function () {
         ETH,
         userAddress,
         false,
-        false,
+        true,
         resolverHashETH,
         counter.address,
         execData
@@ -300,7 +280,7 @@ describe("Ops without treasury test", function () {
         DAI,
         userAddress,
         false,
-        false,
+        true,
         resolverHashDAI,
         counter.address,
         execData
@@ -330,18 +310,8 @@ describe("Ops without treasury test", function () {
         ETH
       );
 
-    const taskId = await ops.getTaskId(
-      user2Address,
-      counter.address,
-      selector,
-      false,
-      ETH,
-      resolverHashETH
-    );
-
     const [, execData] = await counterResolver.checker();
 
-    // simulation should have failed
     await expect(
       ops
         .connect(executor)
@@ -350,19 +320,11 @@ describe("Ops without treasury test", function () {
           ETH,
           user2Address,
           false,
+          true,
           resolverHashETH,
           counter.address,
           execData
         )
-    )
-      .to.emit(ops, "ExecSuccess")
-      .withArgs(
-        ethers.utils.parseEther("1"),
-        ETH,
-        counter.address,
-        execData,
-        taskId,
-        false
-      );
+    ).to.be.revertedWith("Ops.exec:Execution not from creator's task");
   });
 });

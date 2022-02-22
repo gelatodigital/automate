@@ -133,7 +133,7 @@ describe("Ops createTimedTask test", function () {
           ETH,
           userAddress,
           true,
-          false,
+          true,
           resolverHash,
           execAddress,
           execData
@@ -292,7 +292,7 @@ describe("Ops createTimedTask test", function () {
           ETH,
           userAddress,
           true,
-          false,
+          true,
           resolverHash,
           execAddress,
           execData

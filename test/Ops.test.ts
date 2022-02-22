@@ -10,7 +10,6 @@ import {
   TaskTreasury,
   IERC20,
 } from "../typechain";
-import { BigNumber } from "ethereum-waffle/node_modules/ethers";
 
 const diamondAddress = "0x3caca7b48d0573d793d3b0279b5f0029180e83b6";
 const ETH = "0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE";
@@ -361,15 +360,18 @@ describe("Ops test", function () {
 
     // time not elapsed
     await expect(
-      simulateExec(
-        txFee,
-        ETH,
-        userAddress,
-        true,
-        resolverHash,
-        counter.address,
-        execData
-      )
+      ops
+        .connect(diamondSigner)
+        .exec(
+          txFee,
+          ETH,
+          userAddress,
+          true,
+          true,
+          resolverHash,
+          counter.address,
+          execData
+        )
     ).to.be.revertedWith("Ops.exec:Counter: increaseCount: Time not elapsed");
   });
 
@@ -412,15 +414,18 @@ describe("Ops test", function () {
 
     // time not elapsed
     await expect(
-      simulateExec(
-        txFee,
-        DAI,
-        userAddress,
-        true,
-        resolverHash,
-        counter.address,
-        execData
-      )
+      ops
+        .connect(diamondSigner)
+        .exec(
+          txFee,
+          DAI,
+          userAddress,
+          true,
+          true,
+          resolverHash,
+          counter.address,
+          execData
+        )
     ).to.be.revertedWith("Ops.exec:Counter: increaseCount: Time not elapsed");
   });
 
@@ -488,18 +493,19 @@ describe("Ops test", function () {
     const [, execData] = await counterResolver.checker();
 
     await expect(
-      simulateExec(
-        txFee,
-        ETH,
-        user2Address,
-        true,
-        resolverHash,
-        counter.address,
-        execData
-      )
-    ).to.be.revertedWith(
-      "ExecFacet.exec:Ops.exec:Execution not from creator's task"
-    );
+      ops
+        .connect(diamondSigner)
+        .exec(
+          txFee,
+          ETH,
+          user2Address,
+          true,
+          true,
+          resolverHash,
+          counter.address,
+          execData
+        )
+    ).to.be.revertedWith("Ops.exec:Execution not from creator's task");
   });
 
   it("getTaskIdsByUser test", async () => {
@@ -534,27 +540,4 @@ describe("Ops test", function () {
       depositAmount
     );
   });
-
-  const simulateExec = async (
-    _txFee: BigNumber,
-    _feeToken: string,
-    _taskCreator: string,
-    _useTaskTreasury: boolean,
-    _resolverHash: string,
-    _execAddress: string,
-    _execData: string
-  ) => {
-    await ops
-      .connect(diamondSigner)
-      .exec(
-        _txFee,
-        _feeToken,
-        _taskCreator,
-        _useTaskTreasury,
-        true,
-        _resolverHash,
-        _execAddress,
-        _execData
-      );
-  };
 });
