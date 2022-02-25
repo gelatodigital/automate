@@ -358,7 +358,7 @@ contract Ops is Gelatofied {
     }
 
     function _updateTime(bytes32 task) internal {
-        Time storage time = timedTask[task];
+        Time memory time = timedTask[task];
         bool isTimedTask = time.nextExec != 0 ? true : false;
 
         if (isTimedTask) {
@@ -370,10 +370,12 @@ contract Ops is Gelatofied {
             // the next execution in the future
             uint128 nextExec = time.nextExec + time.interval;
             uint128 timestamp = uint128(block.timestamp);
+
             while (timestamp >= nextExec) {
                 nextExec = nextExec + time.interval;
             }
-            time.nextExec = nextExec;
+
+            timedTask[task].nextExec = nextExec;
         }
     }
 }
