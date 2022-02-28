@@ -107,8 +107,7 @@ describe("Ops createTimedTask test", function () {
           execSelector,
           resolverAddress,
           resolverData,
-          FEETOKEN,
-          true
+          FEETOKEN
         )
     )
       .to.emit(ops, "TaskCreated")
@@ -144,7 +143,7 @@ describe("Ops createTimedTask test", function () {
           execAddress,
           execData
         )
-    ).to.be.revertedWith("Ops: exec: Too early");
+    ).to.be.revertedWith("Ops: _updateTime: Too early");
   });
 
   it("Exec should succeed when time elapse", async () => {
@@ -303,7 +302,7 @@ describe("Ops createTimedTask test", function () {
           execAddress,
           execData
         )
-    ).to.be.revertedWith("Ops: exec: Too early");
+    ).to.be.revertedWith("Ops: _updateTime: Too early");
 
     expect(Number(await counter.count())).to.be.eql(300);
     expect(await taskTreasury.userTokenBalance(userAddress, ETH)).to.be.eql(

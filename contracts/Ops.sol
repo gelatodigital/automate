@@ -7,12 +7,10 @@ import {
     EnumerableSet
 } from "@openzeppelin/contracts/utils/structs/EnumerableSet.sol";
 import {
-    SafeERC20,
-    IERC20
-} from "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
-import {
     ITaskTreasuryUpgradable
 } from "./interfaces/ITaskTreasuryUpgradable.sol";
+import {IOps} from "./interfaces/IOps.sol";
+import {LibOps} from "./libraries/LibOps.sol";
 
 // solhint-disable max-line-length
 // solhint-disable max-states-count
@@ -21,15 +19,9 @@ import {
 /// @notice ResolverAddresses determine when Gelato should execute and provides bots with
 /// the payload they should use to execute
 /// @notice ExecAddress determine the actual contracts to execute a function on
-contract Ops is Gelatofied {
-    using SafeERC20 for IERC20;
+contract Ops is Gelatofied, LibOps, IOps {
     using GelatoBytes for bytes;
     using EnumerableSet for EnumerableSet.Bytes32Set;
-
-    struct Time {
-        uint128 nextExec;
-        uint128 interval;
-    }
 
     // solhint-disable const-name-snakecase
     string public constant version = "4";
@@ -41,32 +33,6 @@ contract Ops is Gelatofied {
     address public feeToken;
     // Appended State
     mapping(bytes32 => Time) public timedTask;
-
-    event ExecSuccess(
-        uint256 indexed txFee,
-        address indexed feeToken,
-        address indexed execAddress,
-        bytes execData,
-        bytes32 taskId,
-        bool callSuccess
-    );
-    event TaskCreated(
-        address taskCreator,
-        address execAddress,
-        bytes4 selector,
-        address resolverAddress,
-        bytes32 taskId,
-        bytes resolverData,
-        bool useTaskTreasuryFunds,
-        address feeToken,
-        bytes32 resolverHash
-    );
-    event TaskCancelled(bytes32 taskId, address taskCreator);
-    event TimerSet(
-        bytes32 indexed taskId,
-        uint128 indexed nextExec,
-        uint128 indexed interval
-    );
 
     constructor(address payable _gelato, ITaskTreasuryUpgradable _taskTreasury)
         Gelatofied(_gelato)
@@ -93,8 +59,8 @@ contract Ops is Gelatofied {
         bytes32 _resolverHash,
         address _execAddress,
         bytes calldata _execData
-    ) external onlyGelato {
-        bytes32 task = getTaskId(
+    ) external override onlyGelato {
+        bytes32 taskId = getTaskId(
             _taskCreator,
             _execAddress,
             _execData.calldataSliceSelector(),
@@ -103,14 +69,17 @@ contract Ops is Gelatofied {
             _resolverHash
         );
 
-        require(taskCreator[task] == _taskCreator, "Ops: exec: No task found");
+        require(
+            taskCreator[taskId] == _taskCreator,
+            "Ops: exec: No task found"
+        );
 
         if (!_useTaskTreasuryFunds) {
             fee = _txFee;
             feeToken = _feeToken;
         }
 
-        _updateTime(task);
+        _updateTime(taskId);
 
         (bool success, bytes memory returnData) = _execAddress.call(_execData);
 
@@ -130,13 +99,13 @@ contract Ops is Gelatofied {
             _feeToken,
             _execAddress,
             _execData,
-            task,
+            taskId,
             success
         );
     }
 
     /// @notice Helper func to query fee and feeToken
-    function getFeeDetails() external view returns (uint256, address) {
+    function getFeeDetails() external view override returns (uint256, address) {
         return (fee, feeToken);
     }
 
@@ -145,6 +114,7 @@ contract Ops is Gelatofied {
     function getTaskIdsByUser(address _taskCreator)
         external
         view
+        override
         returns (bytes32[] memory)
     {
         uint256 length = _createdTasks[_taskCreator].length();
@@ -157,13 +127,6 @@ contract Ops is Gelatofied {
         return taskIds;
     }
 
-    /// @notice Helper func to query the _selector of a function you want to automate
-    /// @param _func String of the function you want the selector from
-    /// @dev Example: "transferFrom(address,address,uint256)" => 0x23b872dd
-    function getSelector(string calldata _func) external pure returns (bytes4) {
-        return bytes4(keccak256(bytes(_func)));
-    }
-
     /// @notice Create a timed task that executes every so often based on the inputted interval
     /// @param _startTime Timestamp when the first task should become executable. 0 for right now
     /// @param _interval After how many seconds should each task be executed
@@ -171,8 +134,7 @@ contract Ops is Gelatofied {
     /// @param _execSelector Which function Gelato should eecute on the _execAddress
     /// @param _resolverAddress On which contract should Gelato check when to execute the tx
     /// @param _resolverData Which data should be used to check on the Resolver when to execute the tx
-    /// @param _feeToken Which token to use as fee payment
-    /// @param _useTreasury True if Gelato should charge fees from TaskTreasury, false if not
+    /// @param _feeToken Which token to use as fee payment for no prepayment option. Otherwise use address(0).
     function createTimedTask(
         uint128 _startTime,
         uint128 _interval,
@@ -180,34 +142,25 @@ contract Ops is Gelatofied {
         bytes4 _execSelector,
         address _resolverAddress,
         bytes calldata _resolverData,
-        address _feeToken,
-        bool _useTreasury
-    ) public returns (bytes32 task) {
+        address _feeToken
+    ) public override returns (bytes32 taskId) {
         require(_interval > 0, "Ops: createTimedTask: interval cannot be 0");
 
-        if (_useTreasury) {
-            task = createTask(
-                _execAddress,
-                _execSelector,
-                _resolverAddress,
-                _resolverData
-            );
-        } else {
-            task = createTaskNoPrepayment(
-                _execAddress,
-                _execSelector,
-                _resolverAddress,
-                _resolverData,
-                _feeToken
-            );
-        }
+        taskId = _createTask(
+            msg.sender,
+            _execAddress,
+            _execSelector,
+            _resolverAddress,
+            _resolverData,
+            _feeToken
+        );
 
         uint128 nextExec = uint256(_startTime) > block.timestamp
             ? _startTime
             : uint128(block.timestamp);
 
-        timedTask[task] = Time({nextExec: nextExec, interval: _interval});
-        emit TimerSet(task, nextExec, _interval);
+        timedTask[taskId] = Time({nextExec: nextExec, interval: _interval});
+        emit TimerSet(taskId, nextExec, _interval);
     }
 
     /// @notice Create a task that tells Gelato to monitor and execute transactions on specific contracts
@@ -221,36 +174,14 @@ contract Ops is Gelatofied {
         bytes4 _execSelector,
         address _resolverAddress,
         bytes calldata _resolverData
-    ) public returns (bytes32 task) {
-        bytes32 resolverHash = getResolverHash(_resolverAddress, _resolverData);
-        task = getTaskId(
-            msg.sender,
-            _execAddress,
-            _execSelector,
-            true,
-            address(0),
-            resolverHash
-        );
-
-        require(
-            taskCreator[task] == address(0),
-            "Ops: createTask: Sender already started task"
-        );
-
-        _createdTasks[msg.sender].add(task);
-        taskCreator[task] = msg.sender;
-        execAddresses[task] = _execAddress;
-
-        emit TaskCreated(
+    ) public override returns (bytes32 taskId) {
+        taskId = _createTask(
             msg.sender,
             _execAddress,
             _execSelector,
             _resolverAddress,
-            task,
             _resolverData,
-            true,
-            address(0),
-            resolverHash
+            address(0)
         );
     }
 
@@ -267,42 +198,20 @@ contract Ops is Gelatofied {
         address _resolverAddress,
         bytes calldata _resolverData,
         address _feeToken
-    ) public returns (bytes32 task) {
-        bytes32 resolverHash = getResolverHash(_resolverAddress, _resolverData);
-        task = getTaskId(
-            msg.sender,
-            _execAddress,
-            _execSelector,
-            false,
-            _feeToken,
-            resolverHash
-        );
-
-        require(
-            taskCreator[task] == address(0),
-            "Ops: createTask: Sender already started task"
-        );
-
-        _createdTasks[msg.sender].add(task);
-        taskCreator[task] = msg.sender;
-        execAddresses[task] = _execAddress;
-
-        emit TaskCreated(
+    ) public override returns (bytes32 taskId) {
+        taskId = _createTask(
             msg.sender,
             _execAddress,
             _execSelector,
             _resolverAddress,
-            task,
             _resolverData,
-            false,
-            _feeToken,
-            resolverHash
+            _feeToken
         );
     }
 
     /// @notice Cancel a task so that Gelato can no longer execute it
     /// @param _taskId The hash of the task, can be computed using getTaskId()
-    function cancelTask(bytes32 _taskId) public {
+    function cancelTask(bytes32 _taskId) public override {
         require(
             taskCreator[_taskId] == msg.sender,
             "Ops: cancelTask: Sender did not start task yet"
@@ -313,58 +222,62 @@ contract Ops is Gelatofied {
         delete execAddresses[_taskId];
 
         Time memory time = timedTask[_taskId];
-        bool isTimedTask = time.nextExec != 0 ? true : false;
+        bool isTimedTask = time.nextExec != 0;
         if (isTimedTask) delete timedTask[_taskId];
 
         emit TaskCancelled(_taskId, msg.sender);
     }
 
-    /// @notice Helper func to query the resolverHash
-    /// @param _resolverAddress Address of resolver
-    /// @param _resolverData Data passed to resolver
-    function getResolverHash(
-        address _resolverAddress,
-        bytes memory _resolverData
-    ) public pure returns (bytes32) {
-        return keccak256(abi.encode(_resolverAddress, _resolverData));
-    }
-
-    /// @notice Returns TaskId of a task Creator
-    /// @param _taskCreator Address of the task creator
-    /// @param _execAddress Address of the contract to be executed by Gelato
-    /// @param _selector Function on the _execAddress which should be executed
-    /// @param _useTaskTreasuryFunds If msg.sender's balance on TaskTreasury should pay for the tx
-    /// @param _feeToken FeeToken to use, address 0 if task treasury is used
-    /// @param _resolverHash hash of resolver address and data
-    function getTaskId(
+    function _createTask(
         address _taskCreator,
         address _execAddress,
-        bytes4 _selector,
-        bool _useTaskTreasuryFunds,
-        address _feeToken,
-        bytes32 _resolverHash
-    ) public pure returns (bytes32) {
-        return
-            keccak256(
-                abi.encode(
-                    _taskCreator,
-                    _execAddress,
-                    _selector,
-                    _useTaskTreasuryFunds,
-                    _feeToken,
-                    _resolverHash
-                )
-            );
+        bytes4 _execSelector,
+        address _resolverAddress,
+        bytes calldata _resolverData,
+        address _feeToken
+    ) internal returns (bytes32 taskId) {
+        bool useTaskTreasuryFunds = _feeToken == address(0);
+        bytes32 resolverHash = getResolverHash(_resolverAddress, _resolverData);
+
+        taskId = getTaskId(
+            _taskCreator,
+            _execAddress,
+            _execSelector,
+            useTaskTreasuryFunds,
+            _feeToken,
+            resolverHash
+        );
+
+        require(
+            taskCreator[taskId] == address(0),
+            "Ops: _createTask: Sender already started task"
+        );
+
+        _createdTasks[_taskCreator].add(taskId);
+        taskCreator[taskId] = _taskCreator;
+        execAddresses[taskId] = _execAddress;
+
+        emit TaskCreated(
+            msg.sender,
+            _execAddress,
+            _execSelector,
+            _resolverAddress,
+            taskId,
+            _resolverData,
+            useTaskTreasuryFunds,
+            _feeToken,
+            resolverHash
+        );
     }
 
     function _updateTime(bytes32 task) internal {
         Time memory time = timedTask[task];
-        bool isTimedTask = time.nextExec != 0 ? true : false;
+        bool isTimedTask = time.nextExec != 0;
 
         if (isTimedTask) {
             require(
                 time.nextExec <= uint128(block.timestamp),
-                "Ops: exec: Too early"
+                "Ops: _updateTime: Too early"
             );
             // If next execution would also be executed right now, skip forward to
             // the next execution in the future
