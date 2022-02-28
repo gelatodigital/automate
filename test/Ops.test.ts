@@ -116,7 +116,7 @@ describe("Ops test", function () {
           counterResolver.address,
           resolverData
         )
-    ).to.be.revertedWith("Ops: createTask: Sender already started task");
+    ).to.be.revertedWith("Ops: _createTask: Sender already started task");
   });
 
   it("sender did not start task", async () => {
