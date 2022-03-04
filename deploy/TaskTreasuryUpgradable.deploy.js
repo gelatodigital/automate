@@ -1,5 +1,4 @@
 const { sleep } = require("@gelatonetwork/core");
-const { getGelatoAddress } = require("../hardhat/config/addresses");
 
 module.exports = async (hre) => {
   const TASKTREASURY = "0x66e2f69df68c8f56837142be2e8c290efe76da9f";
@@ -15,7 +14,6 @@ module.exports = async (hre) => {
   const { deployments } = hre;
   const { deploy } = deployments;
   const { deployer } = await hre.getNamedAccounts();
-  const GELATO = getGelatoAddress(hre.network.name);
 
   await deploy("TaskTreasuryUpgradable", {
     from: deployer,
@@ -29,7 +27,7 @@ module.exports = async (hre) => {
         },
       },
     },
-    args: [GELATO, TASKTREASURY],
+    args: [TASKTREASURY],
     log: hre.network.name !== "hardhat" ? true : false,
   });
 };

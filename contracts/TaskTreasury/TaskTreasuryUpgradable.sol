@@ -27,7 +27,6 @@ contract TaskTreasuryUpgradable is
     using EnumerableSet for EnumerableSet.AddressSet;
     using SafeERC20 for IERC20;
 
-    address payable public immutable gelato;
     ITaskTreasury public immutable oldTreasury;
 
     mapping(address => mapping(address => uint256)) public userTokenBalance;
@@ -57,13 +56,12 @@ contract TaskTreasuryUpgradable is
     modifier onlyWhitelistedServices() {
         require(
             _whitelistedServices.contains(msg.sender),
-            "TaskTreasuryAccounting: onlyWhitelistedServices"
+            "TaskTreasury: onlyWhitelistedServices"
         );
         _;
     }
 
-    constructor(address payable _gelato, address _oldTreasury) {
-        gelato = _gelato;
+    constructor(address _oldTreasury) {
         oldTreasury = ITaskTreasury(_oldTreasury);
     }
 
@@ -98,7 +96,7 @@ contract TaskTreasuryUpgradable is
     function addWhitelistedService(address _service) external onlyProxyAdmin {
         require(
             !_whitelistedServices.contains(_service),
-            "TaskTreasuryAccounting: addWhitelistedService: whitelisted"
+            "TaskTreasury: addWhitelistedService: whitelisted"
         );
         _whitelistedServices.add(_service);
     }
@@ -111,7 +109,7 @@ contract TaskTreasuryUpgradable is
     {
         require(
             _whitelistedServices.contains(_service),
-            "TaskTreasuryAccounting: addWhitelistedService: !whitelisted"
+            "TaskTreasury: addWhitelistedService: !whitelisted"
         );
         _whitelistedServices.remove(_service);
     }
@@ -135,11 +133,12 @@ contract TaskTreasuryUpgradable is
         address _receiver,
         address _token,
         uint256 _amount
-    ) public payable {
+    ) public payable nonReentrant {
         uint256 depositAmount;
         if (_token == ETH) {
             depositAmount = msg.value;
         } else {
+            require(msg.value == 0, "TaskTreasury: No ETH");
             IERC20 token = IERC20(_token);
             uint256 preBalance = token.balanceOf(address(this));
             token.safeTransferFrom(msg.sender, address(this), _amount);
@@ -163,6 +162,8 @@ contract TaskTreasuryUpgradable is
         address _token,
         uint256 _amount
     ) public nonReentrant {
+        migrateFunds(msg.sender);
+
         uint256 balance = userTokenBalance[msg.sender][_token];
 
         uint256 withdrawAmount = Math.min(balance, _amount);

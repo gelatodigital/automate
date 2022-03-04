@@ -113,8 +113,7 @@ describe("TaskTreasuryUpgradable test", function () {
       .createTask(execAddress, execSelector, resolverAddress, resolverData);
   });
 
-  it("ops proxy should have correct treasury and gelato address", async () => {
-    expect(await ops.gelato()).to.be.eql(GELATO);
+  it("ops proxy should have correct treasury address", async () => {
     expect(await ops.taskTreasury()).to.be.eql(treasury.address);
   });
 
