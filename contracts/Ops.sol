@@ -281,14 +281,12 @@ contract Ops is Gelatofied, LibOps, IOps {
             );
             // If next execution would also be executed right now, skip forward to
             // the next execution in the future
-            uint128 nextExec = time.nextExec + time.interval;
-            uint128 timestamp = uint128(block.timestamp);
+            uint128 timeDiff = uint128(block.timestamp) - time.nextExec;
+            uint128 intervals = timeDiff / time.interval + 1;
 
-            while (timestamp >= nextExec) {
-                nextExec = nextExec + time.interval;
-            }
-
-            timedTask[task].nextExec = nextExec;
+            timedTask[task].nextExec =
+                time.nextExec +
+                (intervals * time.interval);
         }
     }
 }
