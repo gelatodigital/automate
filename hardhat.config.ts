@@ -3,10 +3,8 @@ import { HardhatUserConfig } from "hardhat/config";
 // PLUGINS
 import "@nomiclabs/hardhat-ethers";
 import "@nomiclabs/hardhat-waffle";
-import "@nomiclabs/hardhat-etherscan";
 import "@typechain/hardhat";
 import "hardhat-deploy";
-import "hardhat-deploy-ethers";
 
 // Process Env Variables
 import * as dotenv from "dotenv";
@@ -33,12 +31,13 @@ const ETHERSCAN_API = process.env.ETHERSCAN_API;
 // ================================= CONFIG =========================================
 const config: HardhatUserConfig = {
   defaultNetwork: "hardhat",
-  // hardhat-deploy
+
   namedAccounts: {
     deployer: {
       default: 0,
     },
   },
+
   networks: {
     hardhat: {
       // Standard config
@@ -119,6 +118,7 @@ const config: HardhatUserConfig = {
       url: `https://eth-ropsten.alchemyapi.io/v2/${ALCHEMY_ID}`,
     },
   },
+
   solidity: {
     compilers: [
       {
@@ -126,12 +126,16 @@ const config: HardhatUserConfig = {
       },
     ],
   },
+
   typechain: {
     outDir: "typechain",
     target: "ethers-v5",
   },
-  etherscan: {
-    apiKey: ETHERSCAN_API,
+
+  verify: {
+    etherscan: {
+      apiKey: ETHERSCAN_API,
+    },
   },
 };
 
