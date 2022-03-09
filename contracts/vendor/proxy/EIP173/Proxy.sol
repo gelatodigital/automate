@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: GPL-3.0
-pragma solidity 0.8.11;
+pragma solidity ^0.8.12;
 
 // EIP-1967
 abstract contract Proxy {
@@ -41,12 +41,12 @@ abstract contract Proxy {
             let retSz := returndatasize()
             returndatacopy(0, 0, retSz)
             switch success
-                case 0 {
-                    revert(0, retSz)
-                }
-                default {
-                    return(0, retSz)
-                }
+            case 0 {
+                revert(0, retSz)
+            }
+            default {
+                return(0, retSz)
+            }
         }
     }
 

@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: UNLICENSED
-pragma solidity 0.8.11;
+pragma solidity 0.8.12;
 
 import {
     EnumerableSet
@@ -14,12 +14,16 @@ import {
 import {
     Initializable
 } from "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol";
-import {Math} from "@openzeppelin/contracts/utils/math/Math.sol";
 import {_transfer, ETH} from "../vendor/gelato/FGelato.sol";
-import {Proxied} from "../vendor/proxy/Proxied.sol";
+import {Proxied} from "../vendor/proxy/EIP173/Proxied.sol";
 import {ITaskTreasury} from "../interfaces/ITaskTreasury.sol";
+import {
+    ITaskTreasuryUpgradable
+} from "../interfaces/ITaskTreasuryUpgradable.sol";
+import {LibShares} from "../libraries/LibShares.sol";
 
 contract TaskTreasuryUpgradable is
+    ITaskTreasuryUpgradable,
     Proxied,
     Initializable,
     ReentrancyGuardUpgradeable
@@ -29,29 +33,16 @@ contract TaskTreasuryUpgradable is
 
     ITaskTreasury public immutable oldTreasury;
 
-    mapping(address => mapping(address => uint256)) public userTokenBalance;
-    mapping(address => EnumerableSet.AddressSet) internal _tokenCredits;
+    ///@dev tracks token shares of users
+    mapping(address => mapping(address => uint256)) public shares;
+
+    ///@dev tracks total shares of tokens
+    mapping(address => uint256) public totalShares;
+
+    ///@dev tracks the tokens deposited by users
+    mapping(address => EnumerableSet.AddressSet) internal _tokens;
+
     EnumerableSet.AddressSet internal _whitelistedServices;
-
-    event FundsDeposited(
-        address indexed sender,
-        address indexed token,
-        uint256 indexed amount
-    );
-    event FundsWithdrawn(
-        address indexed receiver,
-        address indexed initiator,
-        address indexed token,
-        uint256 amount
-    );
-
-    event LogDeductFees(
-        address indexed user,
-        address indexed executor,
-        address indexed token,
-        uint256 fees,
-        address service
-    );
 
     modifier onlyWhitelistedServices() {
         require(
@@ -61,8 +52,8 @@ contract TaskTreasuryUpgradable is
         _;
     }
 
-    constructor(address _oldTreasury) {
-        oldTreasury = ITaskTreasury(_oldTreasury);
+    constructor(ITaskTreasury _oldTreasury) {
+        oldTreasury = _oldTreasury;
     }
 
     receive() external payable {
@@ -73,48 +64,68 @@ contract TaskTreasuryUpgradable is
         __ReentrancyGuard_init();
     }
 
-    /// @notice Function called by whitelisted services to handle payments, e.g. PokeMe"
+    /// @notice Function called by whitelisted services to handle payments, e.g. Gelato Ops
+    /// @param _user Address of user whose balance will be deducted
     /// @param _token Token to be used for payment by users
     /// @param _amount Amount to be deducted
-    /// @param _user Address of user whose balance will be deducted
     function useFunds(
+        address _user,
         address _token,
-        uint256 _amount,
-        address _user
-    ) external onlyWhitelistedServices {
-        migrateFunds(_user);
+        uint256 _amount
+    ) external override onlyWhitelistedServices {
+        uint256 balanceInOld = oldTreasury.userTokenBalance(_user, _token);
 
-        _chargeUser(_user, _token, _amount);
+        if (_amount <= balanceInOld) {
+            oldTreasury.useFunds(_token, _amount, _user);
+        } else {
+            if (balanceInOld > 0)
+                oldTreasury.useFunds(_token, balanceInOld, _user);
 
-        _creditUser(_proxyAdmin(), _token, _amount);
+            _pay(_user, _token, _amount - balanceInOld);
+        }
 
         emit LogDeductFees(_user, tx.origin, _token, _amount, msg.sender);
     }
 
-    /// @notice Add new service that can call useFunds. Gelato Governance
-    /// @param _service New service to add
-    function addWhitelistedService(address _service) external onlyProxyAdmin {
-        require(
-            !_whitelistedServices.contains(_service),
-            "TaskTreasury: addWhitelistedService: whitelisted"
-        );
-        _whitelistedServices.add(_service);
-    }
-
-    /// @notice Remove old service that can call useFunds. Gelato Governance
-    /// @param _service Old service to remove
-    function removeWhitelistedService(address _service)
+    /// @notice Add or remove service that can call useFunds. Gelato Governance
+    /// @param _service Service to add or remove from whitelist
+    /// @param _isWhitelist Add to whitelist if true, else remove from whitelist
+    function updateWhitelistedService(address _service, bool _isWhitelist)
         external
+        override
         onlyProxyAdmin
     {
-        require(
-            _whitelistedServices.contains(_service),
-            "TaskTreasury: addWhitelistedService: !whitelisted"
-        );
-        _whitelistedServices.remove(_service);
+        if (_isWhitelist) {
+            _whitelistedServices.add(_service);
+        } else {
+            _whitelistedServices.remove(_service);
+        }
     }
 
-    function getWhitelistedServices() external view returns (address[] memory) {
+    /// @notice Helper func to get all deposited tokens by a user.
+    /// @param _user User to get the balances from
+    function getCreditTokensByUser(address _user)
+        external
+        view
+        override
+        returns (address[] memory)
+    {
+        uint256 length = _tokens[_user].length();
+        address[] memory creditTokens = new address[](length);
+
+        for (uint256 i; i < length; i++) {
+            creditTokens[i] = _tokens[_user].at(i);
+        }
+        return creditTokens;
+    }
+
+    /// @notice Get list of services that can call useFunds.
+    function getWhitelistedServices()
+        external
+        view
+        override
+        returns (address[] memory)
+    {
         uint256 length = _whitelistedServices.length();
         address[] memory whitelistedServices = new address[](length);
 
@@ -122,6 +133,24 @@ contract TaskTreasuryUpgradable is
             whitelistedServices[i] = _whitelistedServices.at(i);
         }
         return whitelistedServices;
+    }
+
+    /// @notice Get balance of a token owned by user
+    /// @param _user User to get balance from
+    /// @param _token Token to check balance of
+    function userTokenBalance(address _user, address _token)
+        external
+        view
+        override
+        returns (uint256)
+    {
+        uint256 totalBalance = LibShares.contractBalance(_token);
+        return
+            LibShares.sharesToToken(
+                shares[_user][_token],
+                totalShares[_token],
+                totalBalance
+            );
     }
 
     // solhint-disable max-line-length
@@ -133,22 +162,25 @@ contract TaskTreasuryUpgradable is
         address _receiver,
         address _token,
         uint256 _amount
-    ) public payable nonReentrant {
+    ) public payable override nonReentrant {
         uint256 depositAmount;
+        uint256 totalBalance;
         if (_token == ETH) {
             depositAmount = msg.value;
         } else {
             require(msg.value == 0, "TaskTreasury: No ETH");
             IERC20 token = IERC20(_token);
+
             uint256 preBalance = token.balanceOf(address(this));
             token.safeTransferFrom(msg.sender, address(this), _amount);
             uint256 postBalance = token.balanceOf(address(this));
+
             depositAmount = postBalance - preBalance;
         }
 
-        _creditUser(_receiver, _token, depositAmount);
+        totalBalance = LibShares.contractBalance(_token) - depositAmount;
 
-        migrateFunds(_receiver);
+        _creditUser(_receiver, _token, depositAmount, totalBalance);
 
         emit FundsDeposited(_receiver, _token, depositAmount);
     }
@@ -161,72 +193,66 @@ contract TaskTreasuryUpgradable is
         address payable _receiver,
         address _token,
         uint256 _amount
-    ) public nonReentrant {
-        migrateFunds(msg.sender);
+    ) public override nonReentrant {
+        _deductUser(msg.sender, _token, _amount);
 
-        uint256 balance = userTokenBalance[msg.sender][_token];
+        _transfer(_receiver, _token, _amount);
 
-        uint256 withdrawAmount = Math.min(balance, _amount);
-
-        _chargeUser(msg.sender, _token, withdrawAmount);
-
-        _transfer(_receiver, _token, withdrawAmount);
-
-        emit FundsWithdrawn(_receiver, msg.sender, _token, withdrawAmount);
-    }
-
-    function migrateFunds(address _user) public {
-        address[] memory creditTokens = oldTreasury.getCreditTokensByUser(
-            _user
-        );
-
-        for (uint256 i; i < creditTokens.length; i++) {
-            address token = creditTokens[i];
-            uint256 amount = oldTreasury.userTokenBalance(_user, token);
-
-            oldTreasury.useFunds(token, amount, _user);
-            _creditUser(_user, token, amount);
-        }
-    }
-
-    /// @notice Helper func to get all deposited tokens by a user
-    /// @param _user User to get the balances from
-    function getCreditTokensByUser(address _user)
-        public
-        view
-        returns (address[] memory)
-    {
-        uint256 length = _tokenCredits[_user].length();
-        address[] memory creditTokens = new address[](length);
-
-        for (uint256 i; i < length; i++) {
-            creditTokens[i] = _tokenCredits[_user].at(i);
-        }
-        return creditTokens;
+        emit FundsWithdrawn(_receiver, msg.sender, _token, _amount);
     }
 
     function _creditUser(
         address _user,
         address _token,
-        uint256 _amount
+        uint256 _amount,
+        uint256 _totalBalance
     ) internal {
-        uint256 balance = userTokenBalance[_user][_token];
+        uint256 sharesToCredit = LibShares.tokenToShares(
+            _amount,
+            totalShares[_token],
+            _totalBalance
+        );
 
-        userTokenBalance[_user][_token] = balance + _amount;
+        shares[_user][_token] += sharesToCredit;
+        totalShares[_token] += sharesToCredit;
 
-        if (!_tokenCredits[_user].contains(_token))
-            _tokenCredits[_user].add(_token);
+        _tokens[_user].add(_token);
     }
 
-    function _chargeUser(
+    function _deductUser(
         address _user,
         address _token,
         uint256 _amount
     ) internal {
-        uint256 balance = userTokenBalance[_user][_token];
+        uint256 totalBalance = LibShares.contractBalance(_token);
+        uint256 sharesToCharge = LibShares.tokenToShares(
+            _amount,
+            totalShares[_token],
+            totalBalance
+        );
+        uint256 sharesOfUser = shares[_user][_token];
 
-        userTokenBalance[_user][_token] = balance - _amount;
+        shares[_user][_token] = sharesOfUser - sharesToCharge;
+        totalShares[_token] -= sharesToCharge;
 
-        if (_amount == balance) _tokenCredits[_user].remove(_token);
+        if (sharesOfUser == sharesToCharge) _tokens[_user].remove(_token);
+    }
+
+    function _pay(
+        address _user,
+        address _token,
+        uint256 _amount
+    ) internal {
+        require(_user != _proxyAdmin(), "TaskTreasury: No proxy admin");
+
+        uint256 totalBalance = LibShares.contractBalance(_token);
+        uint256 sharesToPay = LibShares.tokenToShares(
+            _amount,
+            totalShares[_token],
+            totalBalance
+        );
+
+        shares[_user][_token] -= sharesToPay;
+        shares[_proxyAdmin()][_token] += sharesToPay;
     }
 }

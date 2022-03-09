@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.0;
 
-interface ITaskTreasury {
+interface ITaskTreasuryUpgradable {
     /// @notice Events ///
     event FundsDeposited(
         address indexed sender,
@@ -14,6 +14,14 @@ interface ITaskTreasury {
         address indexed initiator,
         address indexed token,
         uint256 amount
+    );
+
+    event LogDeductFees(
+        address indexed user,
+        address indexed executor,
+        address indexed token,
+        uint256 fees,
+        address service
     );
 
     /// @notice External functions ///
@@ -31,18 +39,15 @@ interface ITaskTreasury {
     ) external;
 
     function useFunds(
+        address user,
         address token,
-        uint256 amount,
-        address user
+        uint256 amount
     ) external;
 
-    function addWhitelistedService(address service) external;
-
-    function removeWhitelistedService(address service) external;
+    function updateWhitelistedService(address service, bool isWhitelist)
+        external;
 
     /// @notice External view functions ///
-
-    function gelato() external view returns (address);
 
     function getCreditTokensByUser(address user)
         external

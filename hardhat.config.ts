@@ -45,7 +45,7 @@ const config: HardhatUserConfig = {
       // timeout: 150000,
       forking: {
         url: `https://eth-mainnet.alchemyapi.io/v2/${ALCHEMY_ID}`,
-        blockNumber: 12901600,
+        blockNumber: 14068500,
       },
     },
     arbitrum: {
@@ -107,7 +107,7 @@ const config: HardhatUserConfig = {
   solidity: {
     compilers: [
       {
-        version: "0.8.11",
+        version: "0.8.12",
       },
     ],
   },

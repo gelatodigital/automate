@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: UNLICENSED
-pragma solidity 0.8.11;
+pragma solidity 0.8.12;
 
 import {Gelatofied} from "./vendor/gelato/Gelatofied.sol";
 import {GelatoBytes} from "./vendor/gelato/GelatoBytes.sol";
@@ -10,7 +10,9 @@ import {
     SafeERC20,
     IERC20
 } from "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
-import {TaskTreasury} from "./taskTreasury/TaskTreasury.sol";
+import {
+    ITaskTreasuryUpgradable
+} from "./interfaces/ITaskTreasuryUpgradable.sol";
 
 // solhint-disable max-line-length
 // solhint-disable max-states-count
@@ -34,7 +36,7 @@ contract Ops is Gelatofied {
     mapping(bytes32 => address) public taskCreator;
     mapping(bytes32 => address) public execAddresses;
     mapping(address => EnumerableSet.Bytes32Set) internal _createdTasks;
-    address public immutable taskTreasury;
+    ITaskTreasuryUpgradable public immutable taskTreasury;
     uint256 public fee;
     address public feeToken;
     // Appended State
@@ -66,7 +68,7 @@ contract Ops is Gelatofied {
         uint128 indexed interval
     );
 
-    constructor(address payable _gelato, address _taskTreasury)
+    constructor(address payable _gelato, ITaskTreasuryUpgradable _taskTreasury)
         Gelatofied(_gelato)
     {
         taskTreasury = _taskTreasury;
@@ -117,11 +119,7 @@ contract Ops is Gelatofied {
             returnData.revertWithError("Ops.exec:");
 
         if (_useTaskTreasuryFunds) {
-            TaskTreasury(taskTreasury).useFunds(
-                _feeToken,
-                _txFee,
-                _taskCreator
-            );
+            taskTreasury.useFunds(_taskCreator, _feeToken, _txFee);
         } else {
             delete fee;
             delete feeToken;

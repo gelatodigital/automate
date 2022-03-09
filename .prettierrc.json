@@ -3,7 +3,7 @@
     {
       "files": "*.sol",
       "options": {
-        "compiler": "0.8.11"
+        "compiler": "0.8.12"
       }
     }
   ]

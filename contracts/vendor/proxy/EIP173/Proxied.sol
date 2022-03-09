@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: GPL-3.0
-pragma solidity 0.8.11;
+pragma solidity ^0.8.12;
 
 abstract contract Proxied {
     /// @notice to be used by initialisation / postUpgrade function so that only the proxy's admin can execute them

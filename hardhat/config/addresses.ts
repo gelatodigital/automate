@@ -36,6 +36,45 @@ export const getGelatoAddress = (network: string): string | undefined => {
     case "hardhat":
       return GELATO_MAINNET;
     default:
-      throw new Error("Gelato contract address not found");
+      throw new Error("No gelato address for network");
+  }
+};
+
+export const getOldTaskTreasuryAddress = (
+  network: string
+): string | undefined => {
+  const TREASURY_MAINNET = "0x66e2F69df68C8F56837142bE2E8C290EfE76DA9f";
+  const TREASURY_ROPSTEN = "0x2705aCca70CdB3E326C1013eEA2c03A4f2935b66";
+  const TREASURY_RINKEBY = "0x90F609c73F7498dD031e0dAfF3B40e93c04a6C60";
+  const TREASURY_GOERLI = "0xA0Cc0CC82d945D96D4F481A62C968AfCCea1C54F";
+  const TREASURY_MATIC = "0xA8a7BBe83960B29789d5CB06Dcd2e6C1DF20581C";
+  const TREASURY_FANTOM = "0x6c3224f9b3feE000A444681d5D45e4532D5BA531";
+  const TREASURY_AVALANCHE = "0x63C51b1D80B209Cf336Bec5a3E17D3523B088cdb";
+  const TREASURY_ARBITRUM = "0x527a819db1eb0e34426297b03bae11F2f8B3A19E";
+  const TREASURY_BSC = "0x63C51b1D80B209Cf336Bec5a3E17D3523B088cdb";
+
+  switch (network) {
+    case "mainnet":
+      return TREASURY_MAINNET;
+    case "ropsten":
+      return TREASURY_ROPSTEN;
+    case "rinkeby":
+      return TREASURY_RINKEBY;
+    case "goerli":
+      return TREASURY_GOERLI;
+    case "matic":
+      return TREASURY_MATIC;
+    case "fantom":
+      return TREASURY_FANTOM;
+    case "avalanche":
+      return TREASURY_AVALANCHE;
+    case "arbitrum":
+      return TREASURY_ARBITRUM;
+    case "bsc":
+      return TREASURY_BSC;
+    case "hardhat":
+      return TREASURY_MAINNET;
+    default:
+      throw new Error("No old task treasury address for network");
   }
 };

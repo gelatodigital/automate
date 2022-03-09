@@ -1,13 +1,14 @@
 const { sleep } = require("@gelatonetwork/core");
+const { getOldTaskTreasuryAddress } = require("../hardhat/config/addresses");
 
 module.exports = async (hre) => {
-  const TASKTREASURY = "0x66e2f69df68c8f56837142be2e8c290efe76da9f";
+  const taskTreasuryAddress = getOldTaskTreasuryAddress(hre.network.name);
 
   if (hre.network.name !== "hardhat") {
     console.log(
       `Deploying TaskTreasuryUpgradable to ${hre.network.name}. Hit ctrl + c to abort`
     );
-    console.log(`Using Old TaskTreasury: ${TASKTREASURY}`);
+    console.log(`Using Old TaskTreasury: ${taskTreasuryAddress}`);
     await sleep(10000);
   }
 
@@ -27,7 +28,7 @@ module.exports = async (hre) => {
         },
       },
     },
-    args: [TASKTREASURY],
+    args: [taskTreasuryAddress],
     log: hre.network.name !== "hardhat" ? true : false,
   });
 };
@@ -38,4 +39,3 @@ module.exports.skip = async (hre) => {
 };
 
 module.exports.tags = ["TaskTreasuryUpgradable"];
-module.exports.dependencies = ["TaskTreasury"];
