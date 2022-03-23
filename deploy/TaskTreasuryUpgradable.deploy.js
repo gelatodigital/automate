@@ -3,12 +3,14 @@ const { getOldTaskTreasuryAddress } = require("../hardhat/config/addresses");
 
 module.exports = async (hre) => {
   const taskTreasuryAddress = getOldTaskTreasuryAddress(hre.network.name);
+  const maxFee = 0; // NOTE: Change max fee before deploying
 
   if (hre.network.name !== "hardhat") {
     console.log(
       `Deploying TaskTreasuryUpgradable to ${hre.network.name}. Hit ctrl + c to abort`
     );
     console.log(`Using Old TaskTreasury: ${taskTreasuryAddress}`);
+    console.log(`Max fee: ${maxFee}`);
     await sleep(10000);
   }
 
@@ -28,7 +30,7 @@ module.exports = async (hre) => {
         },
       },
     },
-    args: [taskTreasuryAddress],
+    args: [taskTreasuryAddress, maxFee],
     log: hre.network.name !== "hardhat" ? true : false,
   });
 };

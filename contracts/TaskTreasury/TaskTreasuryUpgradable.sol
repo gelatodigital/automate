@@ -5,8 +5,8 @@ import {
     EnumerableSet
 } from "@openzeppelin/contracts/utils/structs/EnumerableSet.sol";
 import {
-    SafeERC20,
-    IERC20
+    IERC20,
+    SafeERC20
 } from "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
 import {
     ReentrancyGuardUpgradeable
@@ -32,6 +32,8 @@ contract TaskTreasuryUpgradable is
     using SafeERC20 for IERC20;
 
     ITaskTreasury public immutable oldTreasury;
+    uint256 public constant MIN_SHARES_IN_TREASURY = 1e12;
+    uint256 public maxFee;
 
     ///@dev tracks token shares of users
     mapping(address => mapping(address => uint256)) public shares;
@@ -52,8 +54,9 @@ contract TaskTreasuryUpgradable is
         _;
     }
 
-    constructor(ITaskTreasury _oldTreasury) {
+    constructor(ITaskTreasury _oldTreasury, uint256 _maxFee) {
         oldTreasury = _oldTreasury;
+        maxFee = _maxFee;
     }
 
     receive() external payable {
@@ -73,6 +76,9 @@ contract TaskTreasuryUpgradable is
         address _token,
         uint256 _amount
     ) external override onlyWhitelistedServices {
+        if (maxFee != 0)
+            require(maxFee >= _amount, "TaskTreasury: Overcharged");
+
         uint256 balanceInOld = oldTreasury.userTokenBalance(_user, _token);
 
         if (_amount <= balanceInOld) {
@@ -85,6 +91,14 @@ contract TaskTreasuryUpgradable is
         }
 
         emit LogDeductFees(_user, tx.origin, _token, _amount, msg.sender);
+    }
+
+    /// @notice Change maxFee charged by Gelato (only relevant on Layer2s)
+    /// @param _newMaxFee New Max Fee to charge
+    function updateMaxFee(uint256 _newMaxFee) external override onlyProxyAdmin {
+        maxFee = _newMaxFee;
+
+        emit UpdatedMaxFee(_newMaxFee);
     }
 
     /// @notice Add or remove service that can call useFunds. Gelato Governance
@@ -100,6 +114,8 @@ contract TaskTreasuryUpgradable is
         } else {
             _whitelistedServices.remove(_service);
         }
+
+        emit UpdatedService(_service, _isWhitelist);
     }
 
     /// @notice Helper func to get all deposited tokens by a user.
@@ -110,13 +126,7 @@ contract TaskTreasuryUpgradable is
         override
         returns (address[] memory)
     {
-        uint256 length = _tokens[_user].length();
-        address[] memory creditTokens = new address[](length);
-
-        for (uint256 i; i < length; i++) {
-            creditTokens[i] = _tokens[_user].at(i);
-        }
-        return creditTokens;
+        return _tokens[_user].values();
     }
 
     /// @notice Get list of services that can call useFunds.
@@ -126,13 +136,7 @@ contract TaskTreasuryUpgradable is
         override
         returns (address[] memory)
     {
-        uint256 length = _whitelistedServices.length();
-        address[] memory whitelistedServices = new address[](length);
-
-        for (uint256 i; i < length; i++) {
-            whitelistedServices[i] = _whitelistedServices.at(i);
-        }
-        return whitelistedServices;
+        return _whitelistedServices.values();
     }
 
     /// @notice Get balance of a token owned by user
@@ -207,14 +211,24 @@ contract TaskTreasuryUpgradable is
         uint256 _amount,
         uint256 _totalBalance
     ) internal {
+        uint256 sharesTotal = totalShares[_token];
         uint256 sharesToCredit = LibShares.tokenToShares(
+            _token,
             _amount,
-            totalShares[_token],
+            sharesTotal,
             _totalBalance
         );
 
+        if (sharesTotal == 0)
+            require(
+                sharesToCredit >= MIN_SHARES_IN_TREASURY,
+                "TaskTreasury: Require MIN_SHARES_IN_TREASURY"
+            );
+
+        require(sharesToCredit > 0, "TaskTreasury: Zero shares to credit");
+
         shares[_user][_token] += sharesToCredit;
-        totalShares[_token] += sharesToCredit;
+        totalShares[_token] = sharesTotal + sharesToCredit;
 
         _tokens[_user].add(_token);
     }
@@ -225,15 +239,23 @@ contract TaskTreasuryUpgradable is
         uint256 _amount
     ) internal {
         uint256 totalBalance = LibShares.contractBalance(_token);
+        uint256 sharesTotal = totalShares[_token];
         uint256 sharesToCharge = LibShares.tokenToShares(
+            _token,
             _amount,
-            totalShares[_token],
+            sharesTotal,
             totalBalance
         );
+
+        require(
+            sharesTotal - sharesToCharge >= MIN_SHARES_IN_TREASURY,
+            "TaskTreasury: Below MIN_SHARES_IN_TREASURY"
+        );
+
         uint256 sharesOfUser = shares[_user][_token];
 
         shares[_user][_token] = sharesOfUser - sharesToCharge;
-        totalShares[_token] -= sharesToCharge;
+        totalShares[_token] = sharesTotal - sharesToCharge;
 
         if (sharesOfUser == sharesToCharge) _tokens[_user].remove(_token);
     }
@@ -243,16 +265,18 @@ contract TaskTreasuryUpgradable is
         address _token,
         uint256 _amount
     ) internal {
-        require(_user != _proxyAdmin(), "TaskTreasury: No proxy admin");
+        address admin = _proxyAdmin();
+        require(_user != admin, "TaskTreasury: No proxy admin");
 
         uint256 totalBalance = LibShares.contractBalance(_token);
         uint256 sharesToPay = LibShares.tokenToShares(
+            _token,
             _amount,
             totalShares[_token],
             totalBalance
         );
 
         shares[_user][_token] -= sharesToPay;
-        shares[_proxyAdmin()][_token] += sharesToPay;
+        shares[admin][_token] += sharesToPay;
     }
 }

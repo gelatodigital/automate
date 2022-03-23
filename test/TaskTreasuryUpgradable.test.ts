@@ -19,6 +19,7 @@ const OPS_173PROXY = "0xB3f5503f93d5Ef84b06993a1975B9D21B962892F";
 const OLD_TASK_TREASURY = "0x66e2F69df68C8F56837142bE2E8C290EfE76DA9f";
 const ETH = "0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee";
 const DAI = "0x6B175474E89094C44Da98b954EedeAC495271d0F";
+const WBTC = "0x2260FAC5E5542a773Aa44fBCfeDf7C193bc2C599";
 
 describe("TaskTreasuryUpgradable test", function () {
   this.timeout(0);
@@ -39,6 +40,7 @@ describe("TaskTreasuryUpgradable test", function () {
   let treasury: TaskTreasuryUpgradable;
   let counter: Counter;
   let dai: IERC20;
+  let wbtc: IERC20;
 
   let execData: string;
   let execAddress: string;
@@ -54,6 +56,7 @@ describe("TaskTreasuryUpgradable test", function () {
     oldTreasury = await ethers.getContractAt("TaskTreasury", OLD_TASK_TREASURY);
     treasury = await ethers.getContract("TaskTreasuryUpgradable");
     dai = await ethers.getContractAt("IERC20", DAI);
+    wbtc = await ethers.getContractAt("IERC20", WBTC);
 
     const counterFactory = await ethers.getContractFactory("Counter");
     counter = <Counter>await counterFactory.deploy(OPS_173PROXY);
@@ -88,8 +91,12 @@ describe("TaskTreasuryUpgradable test", function () {
 
     // account set-up
     const value = ethers.utils.parseEther("100");
+    const wbtcValue = ethers.utils.parseUnits("0.5", "gwei"); // 2WBTC
     await getTokenFromFaucet(DAI, userAddress, value);
     await getTokenFromFaucet(DAI, user2Address, value);
+    await getTokenFromFaucet(WBTC, userAddress, wbtcValue);
+    await getTokenFromFaucet(WBTC, user2Address, wbtcValue);
+
     await deployer.sendTransaction({
       to: treasuryOwnerAddress,
       value,
@@ -130,7 +137,24 @@ describe("TaskTreasuryUpgradable test", function () {
   it("deposit DAI", async () => {
     const depositAmount = ethers.utils.parseEther("5");
 
-    await depositDai(user, depositAmount);
+    await depositErc20(user, DAI, depositAmount);
+  });
+
+  it("deposit WBTC", async () => {
+    const depositAmount = ethers.utils.parseUnits("0.1", "gwei");
+
+    await depositErc20(user, WBTC, depositAmount);
+  });
+
+  it("first deposit less than MIN_SHARES_IN_TREASURY", async () => {
+    const depositAmount = ethers.BigNumber.from("1");
+
+    await expect(depositEth(user, depositAmount)).to.be.revertedWith(
+      "TaskTreasury: Require MIN_SHARES_IN_TREASURY"
+    );
+    await expect(depositErc20(user, DAI, depositAmount)).to.be.revertedWith(
+      "TaskTreasury: Require MIN_SHARES_IN_TREASURY"
+    );
   });
 
   it("multiple users deposit ETH", async () => {
@@ -145,8 +169,16 @@ describe("TaskTreasuryUpgradable test", function () {
     const depositAmount1 = ethers.utils.parseEther("2");
     const depositAmount2 = ethers.utils.parseEther("3");
 
-    await depositDai(user, depositAmount1);
-    await depositDai(user2, depositAmount2);
+    await depositErc20(user, DAI, depositAmount1);
+    await depositErc20(user2, DAI, depositAmount2);
+  });
+
+  it("multiple users deposit WBTC", async () => {
+    const depositAmount1 = ethers.utils.parseUnits("0.2", "gwei");
+    const depositAmount2 = ethers.utils.parseUnits("0.3", "gwei");
+
+    await depositErc20(user, WBTC, depositAmount1);
+    await depositErc20(user2, WBTC, depositAmount2);
   });
 
   it("multiple users deposit then withdraw eth", async () => {
@@ -166,13 +198,42 @@ describe("TaskTreasuryUpgradable test", function () {
     const depositAmount1 = ethers.utils.parseEther("10");
     const depositAmount2 = ethers.utils.parseEther("12");
 
-    await depositDai(user, depositAmount1);
-    await depositDai(user2, depositAmount2);
+    await depositErc20(user, DAI, depositAmount1);
+    await depositErc20(user2, DAI, depositAmount2);
 
     const withdrawAmount = ethers.utils.parseEther("3");
 
     await withdraw(user, "dai", withdrawAmount);
     await withdraw(user2, "dai", withdrawAmount);
+  });
+
+  it("multiple users deposit then withdraw WBTC", async () => {
+    const depositAmount1 = ethers.utils.parseUnits("0.02", "gwei");
+    const depositAmount2 = ethers.utils.parseUnits("0.03", "gwei");
+
+    await depositErc20(user, WBTC, depositAmount1);
+    await depositErc20(user2, WBTC, depositAmount2);
+
+    const withdrawAmount = ethers.utils.parseUnits("0.01", "gwei");
+
+    await withdraw(user, "wbtc", withdrawAmount);
+    await withdraw(user2, "wbtc", withdrawAmount);
+  });
+
+  it("withdraw below MIN_SHARES_IN_TREASURY", async () => {
+    const depositAmount1 = ethers.utils.parseEther("10");
+    const depositAmount2 = ethers.utils.parseUnits("0.2", "gwei");
+    const withdrawAmount1 = depositAmount1.sub(10);
+    const withdrawAmount2 = depositAmount2.sub(10);
+
+    await depositEth(user, depositAmount1);
+    await expect(withdraw(user, "eth", withdrawAmount1)).to.be.revertedWith(
+      "TaskTreasury: Below MIN_SHARES_IN_TREASURY"
+    );
+    await depositErc20(user, WBTC, depositAmount2);
+    await expect(withdraw(user, "wbtc", withdrawAmount2)).to.be.revertedWith(
+      "TaskTreasury: Below MIN_SHARES_IN_TREASURY"
+    );
   });
 
   it("useFunds in ETH - no funds in old treasury", async () => {
@@ -221,8 +282,8 @@ describe("TaskTreasuryUpgradable test", function () {
     const depositAmount = ethers.utils.parseEther("8");
     const txFee = ethers.utils.parseEther("0.5");
 
-    await depositDai(user, depositAmount);
-    await depositDai(user2, depositAmount);
+    await depositErc20(user, DAI, depositAmount);
+    await depositErc20(user2, DAI, depositAmount);
 
     const expectedTreasuryBalance = depositAmount.sub(txFee);
     await execute("dai", txFee, expectedTreasuryBalance);
@@ -232,8 +293,8 @@ describe("TaskTreasuryUpgradable test", function () {
     const depositAmount = ethers.utils.parseEther("1");
     const txFee = ethers.utils.parseEther("1.5");
 
-    await depositDai(user, depositAmount);
-    await depositDai(user2, depositAmount);
+    await depositErc20(user, DAI, depositAmount);
+    await depositErc20(user2, DAI, depositAmount);
     await dai.connect(user).approve(oldTreasury.address, depositAmount);
     await oldTreasury
       .connect(user)
@@ -247,8 +308,8 @@ describe("TaskTreasuryUpgradable test", function () {
     const depositAmount = ethers.utils.parseEther("1");
     const txFee = ethers.utils.parseEther("1");
 
-    await depositDai(user, depositAmount);
-    await depositDai(user2, depositAmount);
+    await depositErc20(user, DAI, depositAmount);
+    await depositErc20(user2, DAI, depositAmount);
     await dai.connect(user).approve(oldTreasury.address, depositAmount);
     await oldTreasury
       .connect(user)
@@ -305,27 +366,38 @@ describe("TaskTreasuryUpgradable test", function () {
     expect(balanceAfter).to.be.eql(balanceBefore.add(depositAmount));
   };
 
-  const depositDai = async (signer: Signer, depositAmount: BigNumber) => {
+  const depositErc20 = async (
+    signer: Signer,
+    tokenAddress: string,
+    depositAmount: BigNumber
+  ) => {
     const signerAddress = await signer.getAddress();
-    const balanceBefore = await treasury.userTokenBalance(signerAddress, DAI);
+    const balanceBefore = await treasury.userTokenBalance(
+      signerAddress,
+      tokenAddress
+    );
 
-    await dai.connect(signer).approve(treasury.address, depositAmount);
+    const erc20 = await ethers.getContractAt("IERC20", tokenAddress);
+    await erc20.connect(signer).approve(treasury.address, depositAmount);
     await treasury
       .connect(signer)
-      .depositFunds(signerAddress, DAI, depositAmount);
+      .depositFunds(signerAddress, tokenAddress, depositAmount);
 
-    const balanceAfter = await treasury.userTokenBalance(signerAddress, DAI);
+    const balanceAfter = await treasury.userTokenBalance(
+      signerAddress,
+      tokenAddress
+    );
 
     expect(balanceAfter).to.be.eql(balanceBefore.add(depositAmount));
   };
 
   const withdraw = async (
     signer: Signer,
-    token: "eth" | "dai",
+    token: "eth" | "dai" | "wbtc",
     withdrawAmount: BigNumber
   ) => {
     const signerAddress = await signer.getAddress();
-    const tokenAddress = token == "eth" ? ETH : DAI;
+    const tokenAddress = token == "eth" ? ETH : token == "dai" ? DAI : WBTC;
 
     const treasuryBalanceBefore = await treasury.userTokenBalance(
       signerAddress,
@@ -352,12 +424,12 @@ describe("TaskTreasuryUpgradable test", function () {
 
   const getBalance = async (
     address: string,
-    token: "eth" | "dai"
+    token: "eth" | "dai" | "wbtc"
   ): Promise<BigNumber> => {
     if (token == "eth") {
       return await ethers.provider.getBalance(address);
-    } else {
+    } else if (token == "dai") {
       return await dai.balanceOf(address);
-    }
+    } else return await wbtc.balanceOf(address);
   };
 });

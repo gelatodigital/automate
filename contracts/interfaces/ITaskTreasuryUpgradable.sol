@@ -24,6 +24,10 @@ interface ITaskTreasuryUpgradable {
         address service
     );
 
+    event UpdatedService(address indexed service, bool isWhitelist);
+
+    event UpdatedMaxFee(uint256 indexed maxFee);
+
     /// @notice External functions ///
 
     function depositFunds(
@@ -43,6 +47,8 @@ interface ITaskTreasuryUpgradable {
         address token,
         uint256 amount
     ) external;
+
+    function updateMaxFee(uint256 _newMaxFee) external;
 
     function updateWhitelistedService(address service, bool isWhitelist)
         external;

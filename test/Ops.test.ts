@@ -128,31 +128,31 @@ describe("Ops test", function () {
   });
 
   it("deposit and withdraw ETH", async () => {
-    const depositAmount = ethers.utils.parseEther("1");
+    const depositAmount = ethers.utils.parseEther("2");
+    const withdrawAmount = ethers.utils.parseEther("1");
 
     await taskTreasury
       .connect(user)
       .depositFunds(userAddress, ETH, depositAmount, { value: depositAmount });
 
     expect(await taskTreasury.userTokenBalance(userAddress, ETH)).to.be.eq(
-      ethers.utils.parseEther("1")
+      depositAmount
     );
 
     await expect(
-      taskTreasury
-        .connect(user)
-        .withdrawFunds(userAddress, ETH, ethers.utils.parseEther("1"))
+      taskTreasury.connect(user).withdrawFunds(userAddress, ETH, withdrawAmount)
     )
       .to.emit(taskTreasury, "FundsWithdrawn")
-      .withArgs(userAddress, userAddress, ETH, depositAmount);
+      .withArgs(userAddress, userAddress, ETH, withdrawAmount);
 
-    expect(await taskTreasury.userTokenBalance(userAddress, ETH)).to.be.eq(
-      ethers.BigNumber.from("0")
+    expect(await taskTreasury.userTokenBalance(userAddress, ETH)).to.be.eql(
+      depositAmount.sub(withdrawAmount)
     );
   });
 
   it("deposit and withdraw DAI", async () => {
-    const depositAmount = ethers.utils.parseEther("1");
+    const depositAmount = ethers.utils.parseEther("2");
+    const withdrawAmount = ethers.utils.parseEther("1");
     const DAI_CHECKSUM = ethers.utils.getAddress(DAI);
 
     await getTokenFromFaucet(DAI, userAddress, depositAmount);
@@ -165,17 +165,17 @@ describe("Ops test", function () {
       .withArgs(userAddress, DAI_CHECKSUM, depositAmount);
 
     expect(await taskTreasury.userTokenBalance(userAddress, DAI)).to.be.eq(
-      ethers.utils.parseEther("1")
+      depositAmount
     );
 
     await expect(
-      taskTreasury.connect(user).withdrawFunds(userAddress, DAI, depositAmount)
+      taskTreasury.connect(user).withdrawFunds(userAddress, DAI, withdrawAmount)
     )
       .to.emit(taskTreasury, "FundsWithdrawn")
-      .withArgs(userAddress, userAddress, DAI_CHECKSUM, depositAmount);
+      .withArgs(userAddress, userAddress, DAI_CHECKSUM, withdrawAmount);
 
-    expect(await taskTreasury.userTokenBalance(userAddress, DAI)).to.be.eq(
-      ethers.BigNumber.from("0")
+    expect(await taskTreasury.userTokenBalance(userAddress, DAI)).to.be.eql(
+      depositAmount.sub(withdrawAmount)
     );
   });
 
