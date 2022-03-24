@@ -1,14 +1,14 @@
 // SPDX-License-Identifier: UNLICENSED
 pragma solidity ^0.8.12;
 import {ETH} from "../vendor/gelato/FGelato.sol";
-import {IERC20WithDecimals} from "../interfaces/IERC20.sol";
+import {IERC20Extended} from "../interfaces/IERC20Extended.sol";
 
 library LibShares {
     function contractBalance(address _token) internal view returns (uint256) {
         if (_token == ETH) {
             return address(this).balance;
         } else {
-            return IERC20WithDecimals(_token).balanceOf(address(this));
+            return IERC20Extended(_token).balanceOf(address(this));
         }
     }
 
@@ -42,7 +42,7 @@ library LibShares {
         returns (uint256)
     {
         if (_token == ETH) return _amount;
-        uint256 decimals = IERC20WithDecimals(_token).decimals();
+        uint256 decimals = IERC20Extended(_token).decimals();
 
         if (decimals < 18) {
             return _amount * 10**(18 - decimals);
