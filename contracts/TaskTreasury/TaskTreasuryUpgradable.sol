@@ -103,30 +103,19 @@ contract TaskTreasuryUpgradable is
 
     /// @notice Add or remove service that can call useFunds. Gelato Governance
     /// @param _service Service to add or remove from whitelist
-    /// @param _isWhitelist Add to whitelist if true, else remove from whitelist
-    function updateWhitelistedService(address _service, bool _isWhitelist)
+    /// @param _add Add to whitelist if true, else remove from whitelist
+    function updateWhitelistedService(address _service, bool _add)
         external
         override
         onlyProxyAdmin
     {
-        if (_isWhitelist) {
+        if (_add) {
             _whitelistedServices.add(_service);
         } else {
             _whitelistedServices.remove(_service);
         }
 
-        emit UpdatedService(_service, _isWhitelist);
-    }
-
-    /// @notice Helper func to get all deposited tokens by a user.
-    /// @param _user User to get the balances from
-    function getCreditTokensByUser(address _user)
-        external
-        view
-        override
-        returns (address[] memory)
-    {
-        return _tokens[_user].values();
+        emit UpdatedService(_service, _add);
     }
 
     /// @notice Get list of services that can call useFunds.
@@ -137,24 +126,6 @@ contract TaskTreasuryUpgradable is
         returns (address[] memory)
     {
         return _whitelistedServices.values();
-    }
-
-    /// @notice Get balance of a token owned by user
-    /// @param _user User to get balance from
-    /// @param _token Token to check balance of
-    function userTokenBalance(address _user, address _token)
-        external
-        view
-        override
-        returns (uint256)
-    {
-        uint256 totalBalance = LibShares.contractBalance(_token);
-        return
-            LibShares.sharesToToken(
-                shares[_user][_token],
-                totalShares[_token],
-                totalBalance
-            );
     }
 
     // solhint-disable max-line-length
@@ -203,6 +174,81 @@ contract TaskTreasuryUpgradable is
         _transfer(_receiver, _token, _amount);
 
         emit FundsWithdrawn(_receiver, msg.sender, _token, _amount);
+    }
+
+    /// @notice Helper func to get all deposited tokens by a user.
+    /// @param _user User to get the balances from
+    function getCreditTokensByUser(address _user)
+        public
+        view
+        override
+        returns (address[] memory)
+    {
+        return _tokens[_user].values();
+    }
+
+    /// @notice Helper func to get all deposited tokens by a user across treasuries.
+    /// @param _user User to get the balances from
+    function getTotalCreditTokensByUser(address _user)
+        public
+        view
+        override
+        returns (address[] memory)
+    {
+        address[] memory tokensInNew = _tokens[_user].values();
+        address[] memory tokensInOld = oldTreasury.getCreditTokensByUser(_user);
+
+        uint256 length = tokensInNew.length + tokensInOld.length;
+        address[] memory tokens = new address[](length);
+
+        for (uint256 i; i < length; i++) {
+            uint256 j;
+            if (i < tokensInNew.length) {
+                tokens[i] = tokensInNew[i];
+            } else {
+                if (!_tokens[_user].contains(tokensInOld[j]))
+                    tokens[i] = tokensInOld[j];
+
+                j++;
+            }
+        }
+
+        return tokens;
+    }
+
+    /// @notice Get balance of a token owned by user
+    /// @param _user User to get balance from
+    /// @param _token Token to check balance of
+    function userTokenBalance(address _user, address _token)
+        public
+        view
+        override
+        returns (uint256)
+    {
+        uint256 totalBalance = LibShares.contractBalance(_token);
+        return
+            LibShares.sharesToToken(
+                shares[_user][_token],
+                totalShares[_token],
+                totalBalance
+            );
+    }
+
+    /// @notice Get balance of a token owned by user across treasuries
+    /// @param _user User to get balance from
+    /// @param _token Token to check balance of
+    function totalUserTokenBalance(address _user, address _token)
+        public
+        view
+        override
+        returns (uint256)
+    {
+        uint256 balanceInNew = userTokenBalance(_user, _token);
+        uint256 balanceInOld = oldTreasury.userTokenBalance(_user, _token);
+
+        uint256 balance = balanceInNew + balanceInOld;
+
+        return balance;
     }
 
     function _creditUser(
@@ -276,6 +322,10 @@ contract TaskTreasuryUpgradable is
             totalBalance
         );
 
+        require(
+            shares[_user][_token] >= sharesToPay,
+            "TaskTreasury: Not enough funds"
+        );
         shares[_user][_token] -= sharesToPay;
         shares[admin][_token] += sharesToPay;
     }

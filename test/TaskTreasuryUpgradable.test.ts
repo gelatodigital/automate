@@ -17,7 +17,7 @@ const { ethers, deployments } = hre;
 const GELATO = "0x3CACa7b48D0573D793d3b0279b5F0029180E83b6";
 const OPS_173PROXY = "0xB3f5503f93d5Ef84b06993a1975B9D21B962892F";
 const OLD_TASK_TREASURY = "0x66e2F69df68C8F56837142bE2E8C290EfE76DA9f";
-const ETH = "0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee";
+const ETH = "0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE";
 const DAI = "0x6B175474E89094C44Da98b954EedeAC495271d0F";
 const WBTC = "0x2260FAC5E5542a773Aa44fBCfeDf7C193bc2C599";
 
@@ -317,6 +317,41 @@ describe("TaskTreasuryUpgradable test", function () {
 
     const expectedTreasuryBalance = depositAmount.mul(2).sub(txFee);
     await execute("dai", txFee, expectedTreasuryBalance);
+  });
+
+  it("getCreditTokensByUser & totalUserTokenBalance", async () => {
+    const depositAmount = ethers.utils.parseEther("1");
+    const depositAmount2 = ethers.utils.parseUnits("0.2", "gwei");
+
+    await oldTreasury
+      .connect(user)
+      .depositFunds(userAddress, ETH, depositAmount, { value: depositAmount });
+
+    await dai.connect(user).approve(oldTreasury.address, depositAmount);
+    await oldTreasury
+      .connect(user)
+      .depositFunds(userAddress, DAI, depositAmount);
+
+    await depositEth(user, depositAmount);
+    await depositErc20(user, DAI, depositAmount);
+    await depositErc20(user, WBTC, depositAmount2);
+
+    const tokens = await treasury.getTotalCreditTokensByUser(userAddress);
+    expect(tokens.includes(ETH)).to.be.eql(true);
+    expect(tokens.includes(DAI)).to.be.eql(true);
+    expect(tokens.includes(WBTC)).to.be.eql(true);
+    expect(tokens.includes(ethers.constants.AddressZero)).to.be.eql(true);
+
+    const daiTokenBalance = await treasury.totalUserTokenBalance(
+      userAddress,
+      DAI
+    );
+    const ethTokenBalance = await treasury.totalUserTokenBalance(
+      userAddress,
+      ETH
+    );
+    expect(daiTokenBalance).to.be.eql(depositAmount.mul(2));
+    expect(ethTokenBalance).to.be.eql(depositAmount.mul(2));
   });
 
   //---------------------------Helper functions-------------------------------

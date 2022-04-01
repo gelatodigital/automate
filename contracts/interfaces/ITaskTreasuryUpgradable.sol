@@ -24,7 +24,7 @@ interface ITaskTreasuryUpgradable {
         address service
     );
 
-    event UpdatedService(address indexed service, bool isWhitelist);
+    event UpdatedService(address indexed service, bool add);
 
     event UpdatedMaxFee(uint256 indexed maxFee);
 
@@ -60,7 +60,17 @@ interface ITaskTreasuryUpgradable {
         view
         returns (address[] memory);
 
+    function getTotalCreditTokensByUser(address user)
+        external
+        view
+        returns (address[] memory);
+
     function getWhitelistedServices() external view returns (address[] memory);
+
+    function totalUserTokenBalance(address user, address token)
+        external
+        view
+        returns (uint256);
 
     function userTokenBalance(address user, address token)
         external
