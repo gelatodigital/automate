@@ -54,16 +54,16 @@ contract TaskTreasuryUpgradable is
         _;
     }
 
-    constructor(ITaskTreasury _oldTreasury, uint256 _maxFee) {
+    constructor(ITaskTreasury _oldTreasury) {
         oldTreasury = _oldTreasury;
-        maxFee = _maxFee;
     }
 
     receive() external payable {
         depositFunds(msg.sender, ETH, msg.value);
     }
 
-    function initialize() external initializer {
+    function initialize(uint256 _maxFee) external initializer {
+        maxFee = _maxFee;
         __ReentrancyGuard_init();
     }
 

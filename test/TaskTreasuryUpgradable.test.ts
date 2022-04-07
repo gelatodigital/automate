@@ -128,6 +128,10 @@ describe("TaskTreasuryUpgradable test", function () {
     expect(await ops.taskTreasury()).to.be.eql(treasury.address);
   });
 
+  it("maxFee should be correct", async () => {
+    expect(await treasury.maxFee()).to.be.eql(ethers.utils.parseEther("100"));
+  });
+
   it("deposit ETH", async () => {
     const depositAmount = ethers.utils.parseEther("5");
 

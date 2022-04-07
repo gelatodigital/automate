@@ -14,7 +14,6 @@ dotenv.config({ path: __dirname + "/.env" });
 
 // Libraries
 import assert from "assert";
-import { utils } from "ethers";
 
 // @dev Put this in .env
 const ALCHEMY_ID = process.env.ALCHEMY_ID;
@@ -67,7 +66,6 @@ const config: HardhatUserConfig = {
       accounts: DEPLOYER_PK_MAINNET ? [DEPLOYER_PK_MAINNET] : [],
       chainId: 250,
       url: `https://rpcapi.fantom.network/`,
-      gasPrice: parseInt(utils.parseUnits("80", "gwei").toString()),
     },
     gnosis: {
       url: "https://rpc.gnosischain.com",
@@ -78,30 +76,25 @@ const config: HardhatUserConfig = {
       accounts: DEPLOYER_PK_ROPSTEN ? [DEPLOYER_PK_ROPSTEN] : [],
       chainId: 5,
       url: `https://eth-goerli.alchemyapi.io/v2/${ALCHEMY_ID}`,
-      gasPrice: parseInt(utils.parseUnits("7", "gwei").toString()),
     },
     mainnet: {
       accounts: DEPLOYER_PK_MAINNET ? [DEPLOYER_PK_MAINNET] : [],
       chainId: 1,
       url: `https://eth-mainnet.alchemyapi.io/v2/${ALCHEMY_ID}`,
-      gasPrice: parseInt(utils.parseUnits("100", "gwei").toString()),
     },
     matic: {
       url: `https://polygon-mainnet.g.alchemy.com/v2/${ALCHEMY_ID}`,
       accounts: DEPLOYER_PK_MAINNET ? [DEPLOYER_PK_MAINNET] : [],
-      gasPrice: parseInt(utils.parseUnits("30", "gwei").toString()),
     },
     rinkeby: {
       accounts: DEPLOYER_PK_MAINNET ? [DEPLOYER_PK_MAINNET] : [],
       chainId: 4,
       url: `https://eth-rinkeby.alchemyapi.io/v2/${ALCHEMY_ID}`,
-      gasPrice: parseInt(utils.parseUnits("7", "gwei").toString()),
     },
     ropsten: {
       accounts: DEPLOYER_PK_ROPSTEN ? [DEPLOYER_PK_ROPSTEN] : [],
       chainId: 3,
       url: `https://eth-ropsten.alchemyapi.io/v2/${ALCHEMY_ID}`,
-      gasPrice: parseInt(utils.parseUnits("7", "gwei").toString()),
     },
   },
   solidity: {
