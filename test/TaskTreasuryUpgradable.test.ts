@@ -340,7 +340,6 @@ describe("TaskTreasuryUpgradable test", function () {
     expect(tokens.includes(ETH)).to.be.eql(true);
     expect(tokens.includes(DAI)).to.be.eql(true);
     expect(tokens.includes(WBTC)).to.be.eql(true);
-    expect(tokens.includes(ethers.constants.AddressZero)).to.be.eql(true);
 
     const daiTokenBalance = await treasury.totalUserTokenBalance(
       userAddress,

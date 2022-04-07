@@ -198,18 +198,23 @@ contract TaskTreasuryUpgradable is
         address[] memory tokensInNew = _tokens[_user].values();
         address[] memory tokensInOld = oldTreasury.getCreditTokensByUser(_user);
 
-        uint256 length = tokensInNew.length + tokensInOld.length;
-        address[] memory tokens = new address[](length);
+        uint256 tokensInOldOnlyLength;
+        for (uint256 i; i < tokensInOld.length; i++) {
+            if (!_tokens[_user].contains(tokensInOld[i])) {
+                tokensInOld[tokensInOldOnlyLength] = tokensInOld[i];
+                tokensInOldOnlyLength++;
+            }
+        }
 
-        for (uint256 i; i < length; i++) {
-            uint256 j;
+        uint256 uniqTokensLength = tokensInNew.length + tokensInOldOnlyLength;
+        address[] memory tokens = new address[](uniqTokensLength);
+
+        for (uint256 i; i < uniqTokensLength; i++) {
             if (i < tokensInNew.length) {
                 tokens[i] = tokensInNew[i];
             } else {
-                if (!_tokens[_user].contains(tokensInOld[j]))
-                    tokens[i] = tokensInOld[j];
-
-                j++;
+                uint256 j = i - tokensInNew.length;
+                tokens[i] = tokensInOld[j];
             }
         }
 
