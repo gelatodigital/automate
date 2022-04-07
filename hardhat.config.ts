@@ -69,6 +69,11 @@ const config: HardhatUserConfig = {
       url: `https://rpcapi.fantom.network/`,
       gasPrice: parseInt(utils.parseUnits("80", "gwei").toString()),
     },
+    gnosis: {
+      url: "https://rpc.gnosischain.com",
+      chainId: 100,
+      accounts: DEPLOYER_PK_MAINNET ? [DEPLOYER_PK_MAINNET] : [],
+    },
     goerli: {
       accounts: DEPLOYER_PK_ROPSTEN ? [DEPLOYER_PK_ROPSTEN] : [],
       chainId: 5,
