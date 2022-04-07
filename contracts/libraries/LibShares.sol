@@ -47,7 +47,7 @@ library LibShares {
         if (decimals < 18) {
             return _amount * 10**(18 - decimals);
         } else {
-            return _amount * 10**(decimals - 18);
+            return _amount / 10**(decimals - 18);
         }
     }
 
