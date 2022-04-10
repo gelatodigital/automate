@@ -17,8 +17,6 @@ module.exports = async (hre) => {
     proxy: {
       owner: deployer,
     },
-    // IMPORTANT: FOR FANTOM AND POLYGON HARDCODE THE ADDRESS
-    // (await hre.ethers.getContract("TaskTreasuryFantom")).address,
     args: [
       GELATO,
       (await hre.ethers.getContract("TaskTreasuryUpgradable")).address,
@@ -26,11 +24,10 @@ module.exports = async (hre) => {
   });
 };
 
-module.exports.skip = async (hre) => {
-  const skip = hre.network.name !== "hardhat";
-  return skip ? true : false;
-};
+// module.exports.skip = async (hre) => {
+//   const skip = hre.network.name !== "hardhat";
+//   return skip ? true : false;
+// };
 
 module.exports.tags = ["Ops"];
-// Comment out if deploy to Fantom or Matic
 module.exports.dependencies = ["TaskTreasuryUpgradable"];
