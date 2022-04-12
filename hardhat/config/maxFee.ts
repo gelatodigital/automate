@@ -23,6 +23,8 @@ export const getMaxFee = (network: string): BigNumber | undefined => {
       return ethers.utils.parseEther("0.01");
     case "bsc":
       return ethers.utils.parseEther("0.01");
+    case "gnosis":
+      return ethers.utils.parseEther("2");
     case "hardhat":
       return ethers.utils.parseEther("100");
     default:

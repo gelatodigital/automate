@@ -24,10 +24,10 @@ module.exports = async (hre) => {
   });
 };
 
-// module.exports.skip = async (hre) => {
-//   const skip = hre.network.name !== "hardhat";
-//   return skip ? true : false;
-// };
+module.exports.skip = async (hre) => {
+  const skip = hre.network.name !== "hardhat";
+  return skip ? true : false;
+};
 
 module.exports.tags = ["Ops"];
 module.exports.dependencies = ["TaskTreasuryUpgradable"];

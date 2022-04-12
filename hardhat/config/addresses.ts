@@ -52,6 +52,7 @@ export const getOldTaskTreasuryAddress = (
   const TREASURY_AVALANCHE = "0x63C51b1D80B209Cf336Bec5a3E17D3523B088cdb";
   const TREASURY_ARBITRUM = "0x527a819db1eb0e34426297b03bae11F2f8B3A19E";
   const TREASURY_BSC = "0x63C51b1D80B209Cf336Bec5a3E17D3523B088cdb";
+  const TREASURY_GNOSIS = "0x95f4538C3950CE0EF5821f2049aE2aC5cCade68D";
 
   switch (network) {
     case "mainnet":
@@ -72,6 +73,8 @@ export const getOldTaskTreasuryAddress = (
       return TREASURY_ARBITRUM;
     case "bsc":
       return TREASURY_BSC;
+    case "gnosis":
+      return TREASURY_GNOSIS;
     case "hardhat":
       return TREASURY_MAINNET;
     default:
