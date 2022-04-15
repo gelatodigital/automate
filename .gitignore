@@ -21,3 +21,5 @@ typechain
 # yarn
 yarn-error.log
 package-lock.json
+
+dist

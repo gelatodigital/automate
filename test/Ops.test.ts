@@ -7,8 +7,8 @@ import {
   Ops,
   Counter,
   CounterResolver,
-  TaskTreasury,
   IERC20,
+  TaskTreasuryUpgradable,
 } from "../typechain";
 import { BigNumber } from "ethereum-waffle/node_modules/ethers";
 
@@ -20,7 +20,7 @@ describe("Ops test", function () {
   let ops: Ops;
   let counter: Counter;
   let counterResolver: CounterResolver;
-  let taskTreasury: TaskTreasury;
+  let taskTreasury: TaskTreasuryUpgradable;
   let dai: IERC20;
 
   let user: Signer;
@@ -39,19 +39,21 @@ describe("Ops test", function () {
   beforeEach(async function () {
     await deployments.fixture();
 
-    [user, user2] = await hre.ethers.getSigners();
+    [, user, user2] = await hre.ethers.getSigners();
     userAddress = await user.getAddress();
     user2Address = await user2.getAddress();
 
     ops = <Ops>await ethers.getContract("Ops");
-    taskTreasury = <TaskTreasury>await ethers.getContract("TaskTreasury");
+    taskTreasury = <TaskTreasuryUpgradable>(
+      await ethers.getContract("TaskTreasuryUpgradable")
+    );
     counter = <Counter>await ethers.getContract("Counter");
     counterResolver = <CounterResolver>(
       await ethers.getContract("CounterResolver")
     );
     dai = <IERC20>await ethers.getContractAt("IERC20", DAI);
 
-    await taskTreasury.addWhitelistedService(ops.address);
+    await taskTreasury.updateWhitelistedService(ops.address, true);
 
     await hre.network.provider.request({
       method: "hardhat_impersonateAccount",
@@ -126,36 +128,36 @@ describe("Ops test", function () {
   });
 
   it("deposit and withdraw ETH", async () => {
-    const depositAmount = ethers.utils.parseEther("1");
+    const depositAmount = ethers.utils.parseEther("2");
+    const withdrawAmount = ethers.utils.parseEther("1");
 
     await taskTreasury
       .connect(user)
       .depositFunds(userAddress, ETH, depositAmount, { value: depositAmount });
 
     expect(await taskTreasury.userTokenBalance(userAddress, ETH)).to.be.eq(
-      ethers.utils.parseEther("1")
+      depositAmount
     );
 
     await expect(
-      taskTreasury
-        .connect(user)
-        .withdrawFunds(userAddress, ETH, ethers.utils.parseEther("1"))
+      taskTreasury.connect(user).withdrawFunds(userAddress, ETH, withdrawAmount)
     )
       .to.emit(taskTreasury, "FundsWithdrawn")
-      .withArgs(userAddress, userAddress, ETH, depositAmount);
+      .withArgs(userAddress, userAddress, ETH, withdrawAmount);
 
-    expect(await taskTreasury.userTokenBalance(userAddress, ETH)).to.be.eq(
-      ethers.BigNumber.from("0")
+    expect(await taskTreasury.userTokenBalance(userAddress, ETH)).to.be.eql(
+      depositAmount.sub(withdrawAmount)
     );
   });
 
   it("deposit and withdraw DAI", async () => {
-    const depositAmount = ethers.utils.parseEther("1");
+    const depositAmount = ethers.utils.parseEther("2");
+    const withdrawAmount = ethers.utils.parseEther("1");
     const DAI_CHECKSUM = ethers.utils.getAddress(DAI);
 
     await getTokenFromFaucet(DAI, userAddress, depositAmount);
 
-    await dai.approve(taskTreasury.address, depositAmount);
+    await dai.connect(user).approve(taskTreasury.address, depositAmount);
     await expect(
       taskTreasury.connect(user).depositFunds(userAddress, DAI, depositAmount)
     )
@@ -163,17 +165,17 @@ describe("Ops test", function () {
       .withArgs(userAddress, DAI_CHECKSUM, depositAmount);
 
     expect(await taskTreasury.userTokenBalance(userAddress, DAI)).to.be.eq(
-      ethers.utils.parseEther("1")
+      depositAmount
     );
 
     await expect(
-      taskTreasury.connect(user).withdrawFunds(userAddress, DAI, depositAmount)
+      taskTreasury.connect(user).withdrawFunds(userAddress, DAI, withdrawAmount)
     )
       .to.emit(taskTreasury, "FundsWithdrawn")
-      .withArgs(userAddress, userAddress, DAI_CHECKSUM, depositAmount);
+      .withArgs(userAddress, userAddress, DAI_CHECKSUM, withdrawAmount);
 
-    expect(await taskTreasury.userTokenBalance(userAddress, DAI)).to.be.eq(
-      ethers.BigNumber.from("0")
+    expect(await taskTreasury.userTokenBalance(userAddress, DAI)).to.be.eql(
+      depositAmount.sub(withdrawAmount)
     );
   });
 
@@ -186,9 +188,11 @@ describe("Ops test", function () {
 
     const balanceBefore = await ethers.provider.getBalance(ops.address);
 
-    await taskTreasury
-      .connect(user)
-      .withdrawFunds(userAddress, ETH, ethers.utils.parseEther("1"));
+    await expect(
+      taskTreasury
+        .connect(user)
+        .withdrawFunds(userAddress, ETH, ethers.utils.parseEther("1"))
+    ).to.be.reverted;
 
     const balanceAfter = await ethers.provider.getBalance(ops.address);
 
@@ -213,9 +217,11 @@ describe("Ops test", function () {
 
     const balanceBefore = await dai.balanceOf(taskTreasury.address);
 
-    await taskTreasury
-      .connect(user)
-      .withdrawFunds(userAddress, DAI, ethers.utils.parseEther("1"));
+    await expect(
+      taskTreasury
+        .connect(user)
+        .withdrawFunds(userAddress, DAI, ethers.utils.parseEther("1"))
+    ).to.be.reverted;
 
     const balanceAfter = await dai.balanceOf(taskTreasury.address);
 
@@ -484,7 +490,7 @@ describe("Ops test", function () {
 
     await getTokenFromFaucet(DAI, userAddress, depositAmount);
 
-    await dai.approve(taskTreasury.address, depositAmount);
+    await dai.connect(user).approve(taskTreasury.address, depositAmount);
 
     await taskTreasury
       .connect(user)

@@ -3,7 +3,12 @@ import { Signer } from "@ethersproject/abstract-signer";
 import { expect } from "chai";
 import hre = require("hardhat");
 const { ethers, deployments } = hre;
-import { Ops, TaskTreasury, Forwarder, CounterTimedTask } from "../typechain";
+import {
+  Ops,
+  TaskTreasuryUpgradable,
+  Forwarder,
+  CounterTimedTask,
+} from "../typechain";
 
 const gelatoAddress = "0x3caca7b48d0573d793d3b0279b5f0029180e83b6";
 const ETH = "0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE";
@@ -15,7 +20,7 @@ describe("Ops createTimedTask test", function () {
 
   let ops: Ops;
 
-  let taskTreasury: TaskTreasury;
+  let taskTreasury: TaskTreasuryUpgradable;
   let forwarder: Forwarder;
   let counter: CounterTimedTask;
 
@@ -37,17 +42,18 @@ describe("Ops createTimedTask test", function () {
   before(async function () {
     await deployments.fixture();
 
-    [user] = await ethers.getSigners();
+    [, user] = await ethers.getSigners();
     userAddress = await user.getAddress();
 
     ops = <Ops>await ethers.getContract("Ops");
-    taskTreasury = <TaskTreasury>await ethers.getContract("TaskTreasury");
+    taskTreasury = await ethers.getContract("TaskTreasuryUpgradable");
+
     counter = <CounterTimedTask>await ethers.getContract("CounterTimedTask");
     forwarder = <Forwarder>await ethers.getContract("Forwarder");
 
     executorAddress = gelatoAddress;
 
-    await taskTreasury.addWhitelistedService(ops.address);
+    await taskTreasury.updateWhitelistedService(ops.address, true);
 
     const depositAmount = ethers.utils.parseEther("1");
     await taskTreasury
@@ -157,7 +163,7 @@ describe("Ops createTimedTask test", function () {
           ETH,
           userAddress,
           true,
-          false,
+          true,
           resolverHash,
           execAddress,
           execData

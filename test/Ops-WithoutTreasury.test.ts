@@ -12,7 +12,6 @@ import {
   Ops,
   CounterWithoutTreasury,
   CounterResolverWithoutTreasury,
-  TaskTreasury,
   IERC20,
 } from "../typechain";
 
@@ -20,7 +19,7 @@ describe("Ops without treasury test", function () {
   let ops: Ops;
   let counter: CounterWithoutTreasury;
   let counterResolver: CounterResolverWithoutTreasury;
-  let taskTreasury: TaskTreasury;
+
   let dai: IERC20;
 
   let user: Signer;
@@ -43,7 +42,6 @@ describe("Ops without treasury test", function () {
     userAddress = await user.getAddress();
 
     ops = <Ops>await ethers.getContract("Ops");
-    taskTreasury = <TaskTreasury>await ethers.getContract("TaskTreasury");
     counter = <CounterWithoutTreasury>(
       await ethers.getContract("CounterWithoutTreasury")
     );
@@ -53,8 +51,6 @@ describe("Ops without treasury test", function () {
     dai = <IERC20>await ethers.getContractAt("IERC20", DAI);
 
     executorAddress = gelatoAddress;
-
-    await taskTreasury.addWhitelistedService(ops.address);
 
     await hre.network.provider.request({
       method: "hardhat_impersonateAccount",
