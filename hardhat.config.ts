@@ -84,6 +84,12 @@ const config: HardhatUserConfig = {
     },
     matic: {
       url: `https://polygon-mainnet.g.alchemy.com/v2/${ALCHEMY_ID}`,
+      chainId: 137,
+      accounts: DEPLOYER_PK_MAINNET ? [DEPLOYER_PK_MAINNET] : [],
+    },
+    mumbai: {
+      url: `https://polygon-mumbai.g.alchemy.com/v2/${ALCHEMY_ID}`,
+      chainId: 80001,
       accounts: DEPLOYER_PK_MAINNET ? [DEPLOYER_PK_MAINNET] : [],
     },
     rinkeby: {
