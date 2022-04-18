@@ -6,11 +6,15 @@ import {GelatoBytes} from "./vendor/gelato/GelatoBytes.sol";
 import {
     EnumerableSet
 } from "@openzeppelin/contracts/utils/structs/EnumerableSet.sol";
+import {LibOps} from "./libraries/LibOps.sol";
 import {
     ITaskTreasuryUpgradable
 } from "./interfaces/ITaskTreasuryUpgradable.sol";
 import {IOps} from "./interfaces/IOps.sol";
-import {LibOps} from "./libraries/LibOps.sol";
+import {IOpsProxy} from "./vendor/proxy/opsProxy/interfaces/IOpsProxy.sol";
+import {
+    IOpsProxyFactory
+} from "./vendor/proxy/opsProxy/interfaces/IOpsProxyFactory.sol";
 
 // solhint-disable max-line-length
 // solhint-disable max-states-count
@@ -28,16 +32,20 @@ contract Ops is Gelatofied, LibOps, IOps {
     mapping(bytes32 => address) public taskCreator;
     mapping(bytes32 => address) public execAddresses;
     mapping(address => EnumerableSet.Bytes32Set) internal _createdTasks;
-    ITaskTreasuryUpgradable public immutable taskTreasury;
+    ITaskTreasuryUpgradable public immutable override taskTreasury;
     uint256 public fee;
     address public feeToken;
     // Appended State
     mapping(bytes32 => Time) public timedTask;
+    IOpsProxyFactory public immutable override opsProxyFactory;
 
-    constructor(address payable _gelato, ITaskTreasuryUpgradable _taskTreasury)
-        Gelatofied(_gelato)
-    {
+    constructor(
+        address payable _gelato,
+        ITaskTreasuryUpgradable _taskTreasury,
+        IOpsProxyFactory _opsProxyFactory
+    ) Gelatofied(_gelato) {
         taskTreasury = _taskTreasury;
+        opsProxyFactory = _opsProxyFactory;
     }
 
     /// @notice Execution API called by Gelato
@@ -236,6 +244,8 @@ contract Ops is Gelatofied, LibOps, IOps {
         bytes calldata _resolverData,
         address _feeToken
     ) internal returns (bytes32 taskId) {
+        _proxyRestriction(_execAddress, _taskCreator);
+
         bool useTaskTreasuryFunds = _feeToken == address(0);
         bytes32 resolverHash = getResolverHash(_resolverAddress, _resolverData);
 
@@ -287,6 +297,18 @@ contract Ops is Gelatofied, LibOps, IOps {
             timedTask[task].nextExec =
                 time.nextExec +
                 (intervals * time.interval);
+        }
+    }
+
+    function _proxyRestriction(address _execAddress, address _taskCreator)
+        internal
+        view
+    {
+        if (opsProxyFactory.isProxy(_execAddress)) {
+            require(
+                IOpsProxy(_execAddress).canCreateTask(_taskCreator),
+                "Ops: _createTask: Not allowed"
+            );
         }
     }
 }

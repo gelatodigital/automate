@@ -1,6 +1,9 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.0;
 import {ITaskTreasuryUpgradable} from "./ITaskTreasuryUpgradable.sol";
+import {
+    IOpsProxyFactory
+} from "../vendor/proxy/opsProxy/interfaces/IOpsProxyFactory.sol";
 
 interface IOps {
     /// @notice Structs ///
@@ -20,6 +23,7 @@ interface IOps {
         bytes32 taskId,
         bool callSuccess
     );
+
     event TaskCreated(
         address taskCreator,
         address execAddress,
@@ -31,7 +35,9 @@ interface IOps {
         address feeToken,
         bytes32 resolverHash
     );
+
     event TaskCancelled(bytes32 taskId, address taskCreator);
+
     event TimerSet(
         bytes32 indexed taskId,
         uint128 indexed nextExec,
@@ -86,6 +92,8 @@ interface IOps {
         external
         view
         returns (bytes32[] memory);
+
+    function opsProxyFactory() external view returns (IOpsProxyFactory);
 
     function taskTreasury() external view returns (ITaskTreasuryUpgradable);
 }

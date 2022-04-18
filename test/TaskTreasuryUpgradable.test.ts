@@ -53,6 +53,7 @@ describe("TaskTreasuryUpgradable test", function () {
     userAddress = await user.getAddress();
     user2Address = await user2.getAddress();
 
+    const opsProxyFactory = await ethers.getContract("OpsProxyFactory");
     oldTreasury = await ethers.getContractAt("TaskTreasury", OLD_TASK_TREASURY);
     treasury = await ethers.getContract("TaskTreasuryUpgradable");
     dai = await ethers.getContractAt("IERC20", DAI);
@@ -62,7 +63,11 @@ describe("TaskTreasuryUpgradable test", function () {
     counter = <Counter>await counterFactory.deploy(OPS_173PROXY);
 
     const opsFactory = await ethers.getContractFactory("Ops");
-    const opsImplementation = await opsFactory.deploy(GELATO, treasury.address);
+    const opsImplementation = await opsFactory.deploy(
+      GELATO,
+      treasury.address,
+      opsProxyFactory.address
+    );
     const ops173Proxy = await ethers.getContractAt(
       EIP173PROXY_ABI,
       OPS_173PROXY

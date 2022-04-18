@@ -4,7 +4,7 @@ const { addresses } = require("../hardhat/config/addresses");
 module.exports = async (hre) => {
   if (hre.network.name !== "hardhat") {
     console.log(
-      `Deploying TaskTreasury to ${hre.network.name}. Hit ctrl + c to abort`
+      `Deploying OpsProxyFactory to ${hre.network.name}. Hit ctrl + c to abort`
     );
     await sleep(10000);
   }
@@ -14,11 +14,11 @@ module.exports = async (hre) => {
   const { deployer } = await hre.getNamedAccounts();
 
   const address = addresses[hre.network.name];
-  const GELATO = address.gelato;
+  const OPS = address.ops;
 
-  await deploy("TaskTreasury", {
+  await deploy("OpsProxyFactory", {
     from: deployer,
-    args: [GELATO],
+    args: [OPS],
   });
 };
 
@@ -27,4 +27,4 @@ module.exports.skip = async (hre) => {
   return skip ? true : false;
 };
 
-module.exports.tags = ["TaskTreasury"];
+module.exports.tags = ["OpsProxyFactory"];

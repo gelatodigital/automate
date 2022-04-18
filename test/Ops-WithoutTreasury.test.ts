@@ -155,10 +155,6 @@ describe("Ops without treasury test", function () {
       value: depositAmount,
     });
 
-    expect(await ethers.provider.getBalance(counter.address)).to.be.eq(
-      depositAmount
-    );
-
     const [canExec, execData] = await counterResolver.checker();
     expect(canExec).to.be.eq(true);
 
@@ -241,10 +237,6 @@ describe("Ops without treasury test", function () {
       to: counter.address,
       value: depositAmount,
     });
-
-    expect(await ethers.provider.getBalance(counter.address)).to.be.eq(
-      depositAmount
-    );
 
     const gelatoBalanceBefore = await ethers.provider.getBalance(gelatoAddress);
 

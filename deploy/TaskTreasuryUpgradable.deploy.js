@@ -10,7 +10,7 @@ module.exports = async (hre) => {
     console.log(
       `Deploying TaskTreasuryUpgradable to ${hre.network.name}. Hit ctrl + c to abort`
     );
-    console.log(`Using Old TaskTreasury: ${taskTreasuryAddress}`);
+    console.log(`Using Old TaskTreasury: ${OLD_TREASURY}`);
     console.log(`Max fee: ${maxFee}`);
     await sleep(10000);
   }
@@ -31,7 +31,7 @@ module.exports = async (hre) => {
         },
       },
     },
-    args: [taskTreasuryAddress],
+    args: [OLD_TREASURY],
     log: hre.network.name !== "hardhat" ? true : false,
   });
 };

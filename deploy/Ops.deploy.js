@@ -1,5 +1,5 @@
 const { sleep } = require("@gelatonetwork/core");
-const { getGelatoAddress } = require("../hardhat/config/addresses");
+const { addresses } = require("../hardhat/config/addresses");
 
 module.exports = async (hre) => {
   if (hre.network.name !== "hardhat") {
@@ -10,17 +10,22 @@ module.exports = async (hre) => {
   const { deployments } = hre;
   const { deploy } = deployments;
   const { deployer } = await hre.getNamedAccounts();
-  const GELATO = getGelatoAddress(hre.network.name);
+
+  const address = addresses[hre.network.name];
+
+  const GELATO = address.gelato;
+  const UPGRADABLE_TREASURY = (
+    await hre.ethers.getContract("TaskTreasuryUpgradable")
+  ).address;
+  const OPS_PROXY_FACTORY = (await hre.ethers.getContract("OpsProxyFactory"))
+    .address;
 
   await deploy("Ops", {
     from: deployer,
     proxy: {
       owner: deployer,
     },
-    args: [
-      GELATO,
-      (await hre.ethers.getContract("TaskTreasuryUpgradable")).address,
-    ],
+    args: [GELATO, UPGRADABLE_TREASURY, OPS_PROXY_FACTORY],
   });
 };
 
@@ -30,4 +35,4 @@ module.exports.skip = async (hre) => {
 };
 
 module.exports.tags = ["Ops"];
-module.exports.dependencies = ["TaskTreasuryUpgradable"];
+module.exports.dependencies = ["TaskTreasuryUpgradable", "OpsProxyFactory"];

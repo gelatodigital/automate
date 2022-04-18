@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: UNLICENSED
-pragma solidity ^0.8.0;
+pragma solidity ^0.8.12;
 
 contract LibOps {
     /// @notice Helper func to query the _selector of a function you want to automate
