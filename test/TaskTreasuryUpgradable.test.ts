@@ -1,7 +1,7 @@
 import { expect } from "chai";
 import { Signer } from "@ethersproject/abstract-signer";
 import { abi as EIP173PROXY_ABI } from "hardhat-deploy/extendedArtifacts/EIP173Proxy.json";
-import { BigNumber } from "ethereum-waffle/node_modules/ethers";
+import { BigNumber } from "ethers";
 import { getTokenFromFaucet } from "./helpers";
 import {
   IERC20,
