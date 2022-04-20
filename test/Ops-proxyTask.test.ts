@@ -117,11 +117,11 @@ describe("Ops proxy task test", function () {
   });
 
   it("add and remove admins", async () => {
-    expect(await opsProxy.canCreateTask(user2Address)).to.be.false;
+    expect(await opsProxy.admins(user2Address)).to.be.false;
     await opsProxy.connect(user).setAdmin(user2Address, true);
-    expect(await opsProxy.canCreateTask(user2Address)).to.be.true;
+    expect(await opsProxy.admins(user2Address)).to.be.true;
     await opsProxy.connect(user).setAdmin(user2Address, false);
-    expect(await opsProxy.canCreateTask(user2Address)).to.be.false;
+    expect(await opsProxy.admins(user2Address)).to.be.false;
   });
 
   it("deposit funds", async () => {
@@ -162,23 +162,10 @@ describe("Ops proxy task test", function () {
     expect(balanceAfter).to.be.eql(balanceBefore.sub(withdrawAmount));
   });
 
-  it("owner/admin can create task for proxy", async () => {
-    // task creator will be user, exec address is proxy address
-    const task = await createTaskForProxy(user, "executeCall");
-    expect(await ops.taskCreator(task.taskId)).to.be.eql(userAddress);
-
-    const txFee = ethers.utils.parseEther("0.5");
-    await treasury
-      .connect(user)
-      .depositFunds(userAddress, ETH, txFee, { value: txFee });
-
-    await executeAndCompareCount(task);
-  });
-
-  it("non owner/admin cannot create task for proxy", async () => {
-    await expect(
-      createTaskForProxy(deployer, "executeCall")
-    ).to.be.revertedWith("Ops: _createTask: Not allowed");
+  it("owner/admin cannot create task for proxy", async () => {
+    await expect(createTaskForProxy(user, "executeCall")).to.be.revertedWith(
+      "Ops: _createTask: Only ops proxy"
+    );
   });
 
   it("owner/admin can create task with proxy", async () => {
@@ -201,12 +188,6 @@ describe("Ops proxy task test", function () {
     expect(await ops.taskCreator(task.taskId)).to.be.eql(opsProxy.address);
 
     await executeAndCompareCount(task);
-  });
-
-  it("transfer ownership", async () => {
-    await opsProxy.connect(user).transferOwnership(user2Address);
-
-    expect(await opsProxy.owner()).to.be.eql(user2Address);
   });
 
   //---------------------------------Helper functions---------------------------

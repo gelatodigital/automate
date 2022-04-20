@@ -68,7 +68,7 @@ contract OpsProxyFactory is IOpsProxyFactory {
 
         bytes memory bytecode = abi.encodePacked(
             type(OpsProxy).creationCode,
-            abi.encode(ops)
+            abi.encode(ops, owner)
         );
 
         assembly {
@@ -77,8 +77,6 @@ contract OpsProxyFactory is IOpsProxyFactory {
             let bytecodeLength := mload(bytecode)
             proxy := create2(endowment, bytecodeStart, bytecodeLength, salt)
         }
-
-        IOpsProxy(proxy).transferOwnership(owner);
 
         _proxies[proxy] = true;
         _proxyOf[owner] = proxy;

@@ -17,11 +17,15 @@ interface IOpsProxy {
         bytes returnData
     );
 
-    event TransferOwnership(address indexed oldOwner, address indexed newOwner);
-
     event SetAdmin(address indexed account, bool isAdmin);
 
     /// @notice External functions ///
+
+    function batchExecuteCall(
+        address[] calldata _targets,
+        bytes[] calldata _datas,
+        uint256[] calldata _values
+    ) external payable;
 
     function executeCall(
         address target,
@@ -33,11 +37,9 @@ interface IOpsProxy {
 
     function setAdmin(address account, bool isAdmin) external;
 
-    function transferOwnership(address newOwner) external;
-
     /// @notice External view functions ///
 
-    function canCreateTask(address account) external view returns (bool);
+    function admins(address account) external view returns (bool);
 
     function ops() external view returns (address);
 

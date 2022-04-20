@@ -11,7 +11,6 @@ import {
     ITaskTreasuryUpgradable
 } from "./interfaces/ITaskTreasuryUpgradable.sol";
 import {IOps} from "./interfaces/IOps.sol";
-import {IOpsProxy} from "./vendor/proxy/opsProxy/interfaces/IOpsProxy.sol";
 import {
     IOpsProxyFactory
 } from "./vendor/proxy/opsProxy/interfaces/IOpsProxyFactory.sol";
@@ -306,8 +305,8 @@ contract Ops is Gelatofied, LibOps, IOps {
     {
         if (opsProxyFactory.isProxy(_execAddress)) {
             require(
-                IOpsProxy(_execAddress).canCreateTask(_taskCreator),
-                "Ops: _createTask: Not allowed"
+                _execAddress == _taskCreator,
+                "Ops: _createTask: Only ops proxy"
             );
         }
     }

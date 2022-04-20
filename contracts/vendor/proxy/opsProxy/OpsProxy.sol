@@ -15,7 +15,10 @@ contract OpsProxy is IOpsProxy {
 
     modifier onlyAuth() {
         require(
-            msg.sender == ops || canCreateTask(msg.sender),
+            msg.sender == ops ||
+                msg.sender == owner ||
+                _admins[msg.sender] ||
+                msg.sender == address(this),
             "OpsProxy: Not authorised"
         );
         _;
@@ -31,46 +34,12 @@ contract OpsProxy is IOpsProxy {
         _;
     }
 
-    constructor(address _ops) {
+    constructor(address _ops, address _owner) {
         ops = _ops;
-        owner = msg.sender;
-        emit TransferOwnership(address(0), msg.sender);
+        owner = _owner;
     }
 
     receive() external payable {}
-
-    function executeCall(
-        address _target,
-        bytes calldata _data,
-        uint256 _value
-    ) external payable override onlyAuth onlyContract(_target) {
-        (bool success, bytes memory returndata) = _target.call{value: _value}(
-            _data
-        );
-
-        emit ExecuteCall(_target, _data, _value, returndata);
-
-        if (!success) returndata.revertWithError("OpsProxy: _callTo: ");
-    }
-
-    function executeDelegateCall(address _target, bytes calldata _data)
-        external
-        override
-        onlyAuth
-        onlyContract(_target)
-    {
-        (bool success, bytes memory returndata) = _target.delegatecall(_data);
-
-        emit ExecuteDelegateCall(_target, _data, returndata);
-
-        if (!success) returndata.revertWithError("OpsProxy: _delegateCallTo: ");
-    }
-
-    function transferOwnership(address _newOwner) external override onlyOwner {
-        owner = _newOwner;
-
-        emit TransferOwnership(owner, _newOwner);
-    }
 
     function setAdmin(address _account, bool _isAdmin)
         external
@@ -82,14 +51,49 @@ contract OpsProxy is IOpsProxy {
         emit SetAdmin(_account, _isAdmin);
     }
 
-    /// @dev called by Ops to check if the user creating task has permission
-    function canCreateTask(address _account)
+    function admins(address _account) external view override returns (bool) {
+        return _admins[_account];
+    }
+
+    function batchExecuteCall(
+        address[] calldata _targets,
+        bytes[] calldata _datas,
+        uint256[] calldata _values
+    ) public payable override onlyAuth {
+        uint256 length = _targets.length;
+        require(
+            length == _datas.length && length == _values.length,
+            "OpsProxy: Length mismatch"
+        );
+
+        for (uint256 i; i < length; i++)
+            executeCall(_targets[i], _datas[i], _values[i]);
+    }
+
+    function executeCall(
+        address _target,
+        bytes calldata _data,
+        uint256 _value
+    ) public payable override onlyAuth onlyContract(_target) {
+        (bool success, bytes memory returndata) = _target.call{value: _value}(
+            _data
+        );
+
+        if (!success) returndata.revertWithError("OpsProxy: _callTo: ");
+
+        emit ExecuteCall(_target, _data, _value, returndata);
+    }
+
+    function executeDelegateCall(address _target, bytes calldata _data)
         public
-        view
         override
-        returns (bool)
+        onlyAuth
+        onlyContract(_target)
     {
-        return
-            _account == owner || _admins[_account] || _account == address(this);
+        (bool success, bytes memory returndata) = _target.delegatecall(_data);
+
+        if (!success) returndata.revertWithError("OpsProxy: _delegateCallTo: ");
+
+        emit ExecuteDelegateCall(_target, _data, returndata);
     }
 }
