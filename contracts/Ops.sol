@@ -70,7 +70,7 @@ contract Ops is Gelatofied, LibOps, IOps {
         );
 
         require(
-            taskCreator[taskId] == _taskCreator,
+            _taskCreator != address(0) && taskCreator[taskId] == _taskCreator,
             "Ops: exec: No task found"
         );
 
@@ -258,7 +258,7 @@ contract Ops is Gelatofied, LibOps, IOps {
         execAddresses[taskId] = _execAddress;
 
         emit TaskCreated(
-            msg.sender,
+            _taskCreator,
             _execAddress,
             _execSelector,
             _resolverAddress,
