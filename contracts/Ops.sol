@@ -243,7 +243,7 @@ contract Ops is Gelatofied, LibOps, IOps {
         bytes calldata _resolverData,
         address _feeToken
     ) internal returns (bytes32 taskId) {
-        _proxyRestriction(_execAddress, _taskCreator);
+        _checkForProxy(_execAddress, _taskCreator);
 
         bool useTaskTreasuryFunds = _feeToken == address(0);
         bytes32 resolverHash = getResolverHash(_resolverAddress, _resolverData);
@@ -299,14 +299,15 @@ contract Ops is Gelatofied, LibOps, IOps {
         }
     }
 
-    function _proxyRestriction(address _execAddress, address _taskCreator)
+    function _checkForProxy(address _execAddress, address _taskCreator)
         internal
         view
     {
         if (opsProxyFactory.isProxy(_execAddress)) {
+            address opsProxyOwner = opsProxyFactory.getOwnerOf(_execAddress);
             require(
-                _execAddress == _taskCreator,
-                "Ops: _createTask: Only ops proxy"
+                _taskCreator == _execAddress || _taskCreator == opsProxyOwner,
+                "Ops: _createTask: Not authorised"
             );
         }
     }

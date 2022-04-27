@@ -33,7 +33,6 @@ describe("Ops proxy task test", function () {
 
   let opsOwnerAddress: string;
   let userAddress: string;
-  let user2Address: string;
 
   let ops: Ops;
   let opsProxy: OpsProxy;
@@ -51,7 +50,6 @@ describe("Ops proxy task test", function () {
     await deployments.fixture();
     [deployer, user, user2] = await ethers.getSigners();
     userAddress = await user.getAddress();
-    user2Address = await user2.getAddress();
 
     treasury = await ethers.getContractAt(
       "TaskTreasuryUpgradable",
@@ -127,14 +125,6 @@ describe("Ops proxy task test", function () {
     expect(await opsProxy.owner()).to.be.eql(userAddress);
   });
 
-  it("add and remove admins", async () => {
-    expect(await opsProxy.admins(user2Address)).to.be.false;
-    await opsProxy.connect(user).setAdmin(user2Address, true);
-    expect(await opsProxy.admins(user2Address)).to.be.true;
-    await opsProxy.connect(user).setAdmin(user2Address, false);
-    expect(await opsProxy.admins(user2Address)).to.be.false;
-  });
-
   it("deposit funds", async () => {
     const depositAmount = ethers.utils.parseEther("8");
     const depositFundsData = treasury.interface.encodeFunctionData(
@@ -142,9 +132,8 @@ describe("Ops proxy task test", function () {
       [opsProxy.address, ETH, depositAmount]
     );
 
-    await opsProxy.connect(user).setAdmin(user2Address, true);
     await opsProxy
-      .connect(user2)
+      .connect(user)
       .executeCall(treasury.address, depositFundsData, depositAmount, {
         value: depositAmount,
       });
@@ -173,24 +162,38 @@ describe("Ops proxy task test", function () {
     expect(balanceAfter).to.be.eql(balanceBefore.sub(withdrawAmount));
   });
 
-  it("owner/admin cannot create task for proxy", async () => {
-    await expect(createTaskForProxy(user, "executeCall")).to.be.revertedWith(
-      "Ops: _createTask: Only ops proxy"
+  it("owner can create task for proxy", async () => {
+    // task creator will be user, exec address is proxy address
+    const task = await createTaskForProxy(user, "executeCall");
+    expect(await ops.taskCreator(task.taskId)).to.be.eql(userAddress);
+
+    const txFee = ethers.utils.parseEther("0.5");
+    await treasury
+      .connect(user)
+      .depositFunds(userAddress, ETH, txFee, { value: txFee });
+
+    await executeAndCompareCount(task);
+    await ops.connect(user).cancelTask(task.taskId);
+  });
+
+  it("non owner cannot create task for proxy", async () => {
+    await expect(createTaskForProxy(user2, "executeCall")).to.be.revertedWith(
+      "Ops: _createTask: Not authorised"
     );
   });
 
-  it("owner/admin can create task with proxy", async () => {
-    // task creator will be proxy, exec address is proxy address
+  it("owner can create task with proxy", async () => {
+    // task creator will be user, exec address is proxy address
     const task = await createTaskWithProxy(user, "executeCall");
     expect(await ops.taskCreator(task.taskId)).to.be.eql(opsProxy.address);
 
     await executeAndCompareCount(task);
   });
 
-  it("non owner/admin cannot create task with proxy", async () => {
-    await expect(
-      createTaskWithProxy(deployer, "executeCall")
-    ).to.be.revertedWith("OpsProxy: Not authorised");
+  it("non owner cannot create task with proxy", async () => {
+    await expect(createTaskWithProxy(user2, "executeCall")).to.be.revertedWith(
+      "OpsProxy: Not authorised"
+    );
   });
 
   it("delegate call", async () => {

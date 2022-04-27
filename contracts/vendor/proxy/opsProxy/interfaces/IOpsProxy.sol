@@ -39,11 +39,7 @@ interface IOpsProxy {
 
     function executeDelegateCall(address target, bytes calldata data) external;
 
-    function setAdmin(address account, bool isAdmin) external;
-
     /// @notice External view functions ///
-
-    function admins(address account) external view returns (bool);
 
     function ops() external view returns (address);
 

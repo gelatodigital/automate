@@ -20,7 +20,6 @@ contract OpsProxy is IOpsProxy, Initializable {
         require(
             msg.sender == ops ||
                 msg.sender == owner ||
-                _admins[msg.sender] ||
                 msg.sender == address(this),
             "OpsProxy: Not authorised"
         );
@@ -42,20 +41,6 @@ contract OpsProxy is IOpsProxy, Initializable {
     function initialize(address _ops, address _owner) external initializer {
         ops = _ops;
         owner = _owner;
-    }
-
-    function setAdmin(address _account, bool _isAdmin)
-        external
-        override
-        onlyOwner
-    {
-        _admins[_account] = _isAdmin;
-
-        emit SetAdmin(_account, _isAdmin);
-    }
-
-    function admins(address _account) external view override returns (bool) {
-        return _admins[_account];
     }
 
     function batchExecuteCall(
