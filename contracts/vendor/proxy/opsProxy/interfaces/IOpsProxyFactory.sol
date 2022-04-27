@@ -5,7 +5,6 @@ interface IOpsProxyFactory {
     /// @notice Events ///
 
     event DeployProxy(
-        address indexed origin,
         address indexed deployer,
         address indexed owner,
         bytes32 seed,
@@ -25,7 +24,12 @@ interface IOpsProxyFactory {
 
     /// @notice External view functions ///
 
-    function getNextSeed(address eoa) external view returns (bytes32);
+    function determineProxyAddress(address _account)
+        external
+        view
+        returns (address);
+
+    function getNextSeed(address account) external view returns (bytes32);
 
     function getProxyOf(address account) external view returns (address);
 

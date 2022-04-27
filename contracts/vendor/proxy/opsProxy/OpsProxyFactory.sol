@@ -63,13 +63,13 @@ contract OpsProxyFactory is IOpsProxyFactory, IBeacon, Proxied, Initializable {
         proxy = deployFor(msg.sender);
     }
 
-    function getNextSeed(address _eoa)
+    function getNextSeed(address _account)
         external
         view
         override
         returns (bytes32)
     {
-        return _nextSeeds[_eoa];
+        return _nextSeeds[_account];
     }
 
     function getProxyOf(address _account)
@@ -92,6 +92,28 @@ contract OpsProxyFactory is IOpsProxyFactory, IBeacon, Proxied, Initializable {
         return IOpsProxy(_proxy).owner();
     }
 
+    function determineProxyAddress(address _account)
+        external
+        view
+        override
+        returns (address)
+    {
+        (, bytes32 salt) = _getSeedAndSalt(_account);
+
+        bytes memory bytecode = _getBytecode(_account);
+
+        bytes32 codeHash = keccak256(
+            abi.encodePacked(
+                bytes1(0xff),
+                address(this),
+                salt,
+                keccak256(bytecode)
+            )
+        );
+
+        return address(uint160(uint256(codeHash)));
+    }
+
     function deployFor(address owner)
         public
         override
@@ -99,20 +121,9 @@ contract OpsProxyFactory is IOpsProxyFactory, IBeacon, Proxied, Initializable {
         notProxy(owner)
         returns (address payable proxy)
     {
-        bytes32 seed = _nextSeeds[tx.origin];
+        (bytes32 seed, bytes32 salt) = _getSeedAndSalt(owner);
 
-        bytes32 salt = keccak256(abi.encode(tx.origin, seed));
-
-        bytes memory opsProxyInitializeData = abi.encodeWithSelector(
-            IOpsProxy.initialize.selector,
-            ops,
-            owner
-        );
-
-        bytes memory bytecode = abi.encodePacked(
-            type(BeaconProxy).creationCode,
-            abi.encode(address(this), opsProxyInitializeData)
-        );
+        bytes memory bytecode = _getBytecode(owner);
 
         proxy = _deploy(salt, bytecode);
 
@@ -120,17 +131,10 @@ contract OpsProxyFactory is IOpsProxyFactory, IBeacon, Proxied, Initializable {
         _proxyOf[owner] = proxy;
 
         unchecked {
-            _nextSeeds[tx.origin] = bytes32(uint256(seed) + 1);
+            _nextSeeds[owner] = bytes32(uint256(seed) + 1);
         }
 
-        emit DeployProxy(
-            tx.origin,
-            msg.sender,
-            owner,
-            seed,
-            salt,
-            address(proxy)
-        );
+        emit DeployProxy(msg.sender, owner, seed, salt, address(proxy));
     }
 
     function isProxy(address proxy) public view override returns (bool) {
@@ -147,5 +151,29 @@ contract OpsProxyFactory is IOpsProxyFactory, IBeacon, Proxied, Initializable {
             let bytecodeLength := mload(_bytecode)
             proxy := create2(endowment, bytecodeStart, bytecodeLength, _salt)
         }
+    }
+
+    function _getSeedAndSalt(address _account)
+        internal
+        view
+        returns (bytes32 seed, bytes32 salt)
+    {
+        seed = _nextSeeds[_account];
+
+        salt = keccak256(abi.encode(_account, seed));
+    }
+
+    function _getBytecode(address _owner) internal view returns (bytes memory) {
+        bytes memory opsProxyInitializeData = abi.encodeWithSelector(
+            IOpsProxy.initialize.selector,
+            ops,
+            _owner
+        );
+
+        return
+            abi.encodePacked(
+                type(BeaconProxy).creationCode,
+                abi.encode(address(this), opsProxyInitializeData)
+            );
     }
 }

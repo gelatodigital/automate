@@ -219,12 +219,16 @@ contract Ops is Gelatofied, LibOps, IOps {
     /// @notice Cancel a task so that Gelato can no longer execute it
     /// @param _taskId The hash of the task, can be computed using getTaskId()
     function cancelTask(bytes32 _taskId) public override {
+        address creator = taskCreator[_taskId];
+
         require(
-            taskCreator[_taskId] == msg.sender,
+            creator == msg.sender ||
+                (opsProxyFactory.isProxy(msg.sender) &&
+                    creator == opsProxyFactory.getOwnerOf(msg.sender)),
             "Ops: cancelTask: Sender did not start task yet"
         );
 
-        _createdTasks[msg.sender].remove(_taskId);
+        _createdTasks[creator].remove(_taskId);
         delete taskCreator[_taskId];
         delete execAddresses[_taskId];
 
@@ -232,7 +236,7 @@ contract Ops is Gelatofied, LibOps, IOps {
         bool isTimedTask = time.nextExec != 0;
         if (isTimedTask) delete timedTask[_taskId];
 
-        emit TaskCancelled(_taskId, msg.sender);
+        emit TaskCancelled(_taskId, creator);
     }
 
     function _createTask(
@@ -243,7 +247,10 @@ contract Ops is Gelatofied, LibOps, IOps {
         bytes calldata _resolverData,
         address _feeToken
     ) internal returns (bytes32 taskId) {
-        _checkForProxy(_execAddress, _taskCreator);
+        _taskCreator = _checkForOpsProxyAndGetTaskCreator(
+            _execAddress,
+            _taskCreator
+        );
 
         bool useTaskTreasuryFunds = _feeToken == address(0);
         bytes32 resolverHash = getResolverHash(_resolverAddress, _resolverData);
@@ -299,16 +306,29 @@ contract Ops is Gelatofied, LibOps, IOps {
         }
     }
 
-    function _checkForProxy(address _execAddress, address _taskCreator)
-        internal
-        view
-    {
+    function _checkForOpsProxyAndGetTaskCreator(
+        address _execAddress,
+        address _taskCreator
+    ) internal returns (address) {
+        _deployOpsProxy(_taskCreator);
+
         if (opsProxyFactory.isProxy(_execAddress)) {
             address opsProxyOwner = opsProxyFactory.getOwnerOf(_execAddress);
             require(
                 _taskCreator == _execAddress || _taskCreator == opsProxyOwner,
                 "Ops: _createTask: Not authorised"
             );
+
+            return opsProxyOwner;
         }
+
+        return _taskCreator;
+    }
+
+    function _deployOpsProxy(address _taskCreator) internal {
+        if (
+            !opsProxyFactory.isProxy(_taskCreator) &&
+            opsProxyFactory.getProxyOf(_taskCreator) == address(0)
+        ) opsProxyFactory.deployFor(_taskCreator);
     }
 }

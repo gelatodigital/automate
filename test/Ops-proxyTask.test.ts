@@ -33,6 +33,7 @@ describe("Ops proxy task test", function () {
 
   let opsOwnerAddress: string;
   let userAddress: string;
+  let user2Address: string;
 
   let ops: Ops;
   let opsProxy: OpsProxy;
@@ -50,6 +51,7 @@ describe("Ops proxy task test", function () {
     await deployments.fixture();
     [deployer, user, user2] = await ethers.getSigners();
     userAddress = await user.getAddress();
+    user2Address = await user2.getAddress();
 
     treasury = await ethers.getContractAt(
       "TaskTreasuryUpgradable",
@@ -73,9 +75,10 @@ describe("Ops proxy task test", function () {
 
     // get accounts
     opsOwnerAddress = await ops173Proxy.owner();
+    const depositAmount = ethers.utils.parseEther("10");
 
     await deployer.sendTransaction({
-      value: ethers.utils.parseEther("3"),
+      value: depositAmount,
       to: opsOwnerAddress,
     });
 
@@ -94,13 +97,22 @@ describe("Ops proxy task test", function () {
     // upgrade opsProxy
     await ops173Proxy.connect(opsOwner).upgradeTo(opsImplementation.address);
     ops = await ethers.getContractAt("Ops", OPS_173PROXY);
+
+    await treasury
+      .connect(user)
+      .depositFunds(userAddress, ETH, depositAmount, { value: depositAmount });
   });
 
   it("deploy ops proxy", async () => {
+    const determinedProxyAddress = await opsProxyFactory.determineProxyAddress(
+      userAddress
+    );
     await opsProxyFactory.connect(user).deploy();
 
     const proxyAddress = await opsProxyFactory.getProxyOf(userAddress);
     opsProxy = await ethers.getContractAt("OpsProxy", proxyAddress);
+
+    expect(proxyAddress).to.be.eql(determinedProxyAddress);
 
     expect(await opsProxy.ops()).to.be.eql(ops.address);
     expect(await opsProxy.owner()).to.be.eql(userAddress);
@@ -125,83 +137,87 @@ describe("Ops proxy task test", function () {
     expect(await opsProxy.owner()).to.be.eql(userAddress);
   });
 
-  it("deposit funds", async () => {
-    const depositAmount = ethers.utils.parseEther("8");
-    const depositFundsData = treasury.interface.encodeFunctionData(
-      "depositFunds",
-      [opsProxy.address, ETH, depositAmount]
+  it("deploy proxy by creating task", async () => {
+    const determinedProxyAddress = await opsProxyFactory.determineProxyAddress(
+      user2Address
     );
 
-    await opsProxy
-      .connect(user)
-      .executeCall(treasury.address, depositFundsData, depositAmount, {
-        value: depositAmount,
-      });
-
-    const balance = await treasury.userTokenBalance(opsProxy.address, ETH);
-    expect(balance).to.be.eql(depositAmount);
-  });
-
-  it("withdraw funds", async () => {
-    const withdrawAmount = ethers.utils.parseEther("2");
-    const balanceBefore = await treasury.userTokenBalance(
-      opsProxy.address,
-      ETH
+    const task = await createTaskForProxy(
+      user2,
+      determinedProxyAddress,
+      "executeCall"
     );
+    const proxyAddress = await opsProxyFactory.getProxyOf(user2Address);
 
-    const withdrawFundsData = treasury.interface.encodeFunctionData(
-      "withdrawFunds",
-      [opsProxy.address, ETH, withdrawAmount]
-    );
-    await opsProxy
-      .connect(user)
-      .executeCall(treasury.address, withdrawFundsData, 0);
-
-    const balanceAfter = await treasury.userTokenBalance(opsProxy.address, ETH);
-
-    expect(balanceAfter).to.be.eql(balanceBefore.sub(withdrawAmount));
+    expect(proxyAddress).to.be.eql(determinedProxyAddress);
+    expect(await ops.taskCreator(task.taskId)).to.be.eql(user2Address);
   });
 
   it("owner can create task for proxy", async () => {
     // task creator will be user, exec address is proxy address
-    const task = await createTaskForProxy(user, "executeCall");
+    const task = await createTaskForProxy(
+      user,
+      opsProxy.address,
+      "executeCall"
+    );
     expect(await ops.taskCreator(task.taskId)).to.be.eql(userAddress);
-
-    const txFee = ethers.utils.parseEther("0.5");
-    await treasury
-      .connect(user)
-      .depositFunds(userAddress, ETH, txFee, { value: txFee });
 
     await executeAndCompareCount(task);
     await ops.connect(user).cancelTask(task.taskId);
   });
 
   it("non owner cannot create task for proxy", async () => {
-    await expect(createTaskForProxy(user2, "executeCall")).to.be.revertedWith(
-      "Ops: _createTask: Not authorised"
-    );
+    await expect(
+      createTaskForProxy(user2, opsProxy.address, "executeCall")
+    ).to.be.revertedWith("Ops: _createTask: Not authorised");
   });
 
   it("owner can create task with proxy", async () => {
     // task creator will be user, exec address is proxy address
-    const task = await createTaskWithProxy(user, "executeCall");
-    expect(await ops.taskCreator(task.taskId)).to.be.eql(opsProxy.address);
+    const task = await createTaskWithProxy(
+      user,
+      opsProxy.address,
+      "executeCall"
+    );
+    expect(await ops.taskCreator(task.taskId)).to.be.eql(userAddress);
 
     await executeAndCompareCount(task);
   });
 
   it("non owner cannot create task with proxy", async () => {
-    await expect(createTaskWithProxy(user2, "executeCall")).to.be.revertedWith(
-      "OpsProxy: Not authorised"
-    );
+    await expect(
+      createTaskWithProxy(user2, opsProxy.address, "executeCall")
+    ).to.be.revertedWith("OpsProxy: Not authorised");
   });
 
   it("delegate call", async () => {
     await fastForwardTime();
-    const task = await createTaskWithProxy(user, "executeDelegateCall");
-    expect(await ops.taskCreator(task.taskId)).to.be.eql(opsProxy.address);
+    const task = await createTaskWithProxy(
+      user,
+      opsProxy.address,
+      "executeDelegateCall"
+    );
+    expect(await ops.taskCreator(task.taskId)).to.be.eql(userAddress);
 
     await executeAndCompareCount(task);
+  });
+
+  it("cancel tasks with proxy", async () => {
+    const taskIds = await ops.getTaskIdsByUser(userAddress);
+    const datas = [];
+    const targets = [];
+    const values = [];
+
+    for (const taskId of taskIds) {
+      datas.push(ops.interface.encodeFunctionData("cancelTask", [taskId]));
+      targets.push(ops.address);
+      values.push(0);
+    }
+
+    await opsProxy.connect(user).batchExecuteCall(targets, datas, values);
+
+    const tasks = await ops.getTaskIdsByUser(userAddress);
+    expect(tasks.length).to.be.eql(0);
   });
 
   //---------------------------------Helper functions---------------------------
@@ -229,9 +245,10 @@ describe("Ops proxy task test", function () {
 
   const createTaskForProxy = async (
     signer: Signer,
+    proxyAddress: string,
     callType: "executeCall" | "executeDelegateCall"
   ): Promise<TaskDetails> => {
-    const task = await getTaskDetails(signer, false, callType);
+    const task = await getTaskDetails(signer, proxyAddress, callType);
 
     await expect(
       ops
@@ -261,9 +278,10 @@ describe("Ops proxy task test", function () {
 
   const createTaskWithProxy = async (
     signer: Signer,
+    proxyAddress: string,
     callType: "executeCall" | "executeDelegateCall"
   ): Promise<TaskDetails> => {
-    const task = await getTaskDetails(signer, true, callType);
+    const task = await getTaskDetails(signer, proxyAddress, callType);
 
     const createTaskData = ops.interface.encodeFunctionData("createTask", [
       task.execAddress,
@@ -293,15 +311,13 @@ describe("Ops proxy task test", function () {
 
   const getTaskDetails = async (
     signer: Signer,
-    isWithProxy: boolean,
+    proxyAddress: string,
     callType: "executeCall" | "executeDelegateCall"
   ): Promise<TaskDetails> => {
-    const taskCreator = isWithProxy
-      ? opsProxy.address
-      : await signer.getAddress();
+    const taskCreator = await signer.getAddress();
 
-    const execAddress = opsProxy.address;
-    const execSelector = opsProxy.interface.getSighash(callType);
+    const execAddress = proxyAddress;
+    const execSelector = opsProxyImplementation.interface.getSighash(callType);
     const increaseCountData = counter.interface.encodeFunctionData(
       "increaseCount",
       [5]
@@ -309,15 +325,15 @@ describe("Ops proxy task test", function () {
 
     const execData =
       callType == "executeCall"
-        ? opsProxy.interface.encodeFunctionData("executeCall", [
+        ? opsProxyImplementation.interface.encodeFunctionData("executeCall", [
             counter.address,
             increaseCountData,
             0,
           ])
-        : opsProxy.interface.encodeFunctionData("executeDelegateCall", [
-            proxyHandler.address,
-            increaseCountData,
-          ]);
+        : opsProxyImplementation.interface.encodeFunctionData(
+            "executeDelegateCall",
+            [proxyHandler.address, increaseCountData]
+          );
 
     const resolverAddress = ZERO_ADDRESS;
     const resolverData = "0x00";
