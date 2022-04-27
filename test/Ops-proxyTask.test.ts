@@ -37,6 +37,7 @@ describe("Ops proxy task test", function () {
 
   let ops: Ops;
   let opsProxy: OpsProxy;
+  let opsProxyImplementation: OpsProxy;
   let opsProxyFactory: OpsProxyFactory;
   let proxyHandler: ProxyHandler;
   let treasury: TaskTreasuryUpgradable;
@@ -58,6 +59,7 @@ describe("Ops proxy task test", function () {
     );
     counter = await ethers.getContract("Counter");
     opsProxyFactory = await ethers.getContract("OpsProxyFactory");
+    opsProxyImplementation = await ethers.getContract("OpsProxy");
 
     const opsFactory = await ethers.getContractFactory("Ops");
 
@@ -114,6 +116,15 @@ describe("Ops proxy task test", function () {
     proxyHandler = <ProxyHandler>(
       await proxyHandlerFactory.deploy(counter.address)
     );
+  });
+
+  it("opsProxy and opsProxyFactory properly initialized", async () => {
+    expect(await opsProxyFactory.implementation()).to.be.eql(
+      opsProxyImplementation.address
+    );
+
+    expect(await opsProxy.ops()).to.be.eql(ops.address);
+    expect(await opsProxy.owner()).to.be.eql(userAddress);
   });
 
   it("add and remove admins", async () => {

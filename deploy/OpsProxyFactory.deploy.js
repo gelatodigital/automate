@@ -15,9 +15,20 @@ module.exports = async (hre) => {
 
   const address = addresses[hre.network.name];
   const OPS = address.ops;
+  const OPSPROXY = (await hre.ethers.getContract("OpsProxy")).address;
 
   await deploy("OpsProxyFactory", {
     from: deployer,
+    proxy: {
+      proxyContract: "EIP173Proxy",
+      owner: deployer,
+      execute: {
+        init: {
+          methodName: "initialize",
+          args: [OPSPROXY],
+        },
+      },
+    },
     args: [OPS],
   });
 };
@@ -28,3 +39,4 @@ module.exports.skip = async (hre) => {
 };
 
 module.exports.tags = ["OpsProxyFactory"];
+module.exports.dependencies = ["OpsProxy"];

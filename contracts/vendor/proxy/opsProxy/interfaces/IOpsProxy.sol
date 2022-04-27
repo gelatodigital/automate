@@ -19,6 +19,10 @@ interface IOpsProxy {
 
     event SetAdmin(address indexed account, bool isAdmin);
 
+    /// @notice Constructor ///
+
+    function initialize(address _ops, address _owner) external;
+
     /// @notice External functions ///
 
     function batchExecuteCall(

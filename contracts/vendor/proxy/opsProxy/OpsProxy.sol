@@ -3,11 +3,14 @@ pragma solidity ^0.8.12;
 
 import {GelatoBytes} from "../../gelato/GelatoBytes.sol";
 import {IOpsProxy} from "./interfaces/IOpsProxy.sol";
+import {
+    Initializable
+} from "@openzeppelin/contracts/proxy/utils/Initializable.sol";
 
-contract OpsProxy is IOpsProxy {
+contract OpsProxy is IOpsProxy, Initializable {
     using GelatoBytes for bytes;
 
-    address public immutable override ops;
+    address public override ops;
     address public override owner;
 
     /// @dev track admins of proxy
@@ -34,12 +37,12 @@ contract OpsProxy is IOpsProxy {
         _;
     }
 
-    constructor(address _ops, address _owner) {
+    receive() external payable {}
+
+    function initialize(address _ops, address _owner) external initializer {
         ops = _ops;
         owner = _owner;
     }
-
-    receive() external payable {}
 
     function setAdmin(address _account, bool _isAdmin)
         external

@@ -2,12 +2,21 @@
 pragma solidity ^0.8.12;
 
 import {OpsProxy} from "./OpsProxy.sol";
+import {
+    BeaconProxy
+} from "@openzeppelin/contracts/proxy/beacon/BeaconProxy.sol";
+import {Proxied} from "../EIP173/Proxied.sol";
+import {
+    Initializable
+} from "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol";
 import {IOpsProxy} from "./interfaces/IOpsProxy.sol";
 import {IOpsProxyFactory} from "./interfaces/IOpsProxyFactory.sol";
+import {IBeacon} from "@openzeppelin/contracts/proxy/beacon/IBeacon.sol";
 
-contract OpsProxyFactory is IOpsProxyFactory {
+contract OpsProxyFactory is IOpsProxyFactory, IBeacon, Proxied, Initializable {
     uint256 public constant override version = 1;
     address public immutable ops;
+    address public override implementation;
 
     /// @dev track the next seed to be used by an EOA.
     mapping(address => bytes32) internal _nextSeeds;
@@ -26,8 +35,28 @@ contract OpsProxyFactory is IOpsProxyFactory {
         _;
     }
 
+    modifier notProxy(address _account) {
+        require(!isProxy(_account), "OpsProxyFactory: No proxy");
+        _;
+    }
+
     constructor(address _ops) {
         ops = _ops;
+    }
+
+    function initialize(address _implementation) external initializer {
+        implementation = _implementation;
+    }
+
+    function updateBeaconImplementation(address _implementation)
+        external
+        override
+        onlyProxyAdmin
+    {
+        address oldImplementation = implementation;
+        implementation = _implementation;
+
+        emit BeaconUpdated(oldImplementation, _implementation);
     }
 
     function deploy() external override returns (address payable proxy) {
@@ -52,31 +81,40 @@ contract OpsProxyFactory is IOpsProxyFactory {
         return _proxyOf[_account];
     }
 
-    function isProxy(address proxy) external view override returns (bool) {
-        return _proxies[proxy];
+    function getOwnerOf(address _proxy)
+        external
+        view
+        override
+        returns (address)
+    {
+        require(isProxy(_proxy), "OpsProxyFactory: Not proxy");
+
+        return IOpsProxy(_proxy).owner();
     }
 
     function deployFor(address owner)
         public
         override
         onlyOneProxy(owner)
+        notProxy(owner)
         returns (address payable proxy)
     {
         bytes32 seed = _nextSeeds[tx.origin];
 
         bytes32 salt = keccak256(abi.encode(tx.origin, seed));
 
-        bytes memory bytecode = abi.encodePacked(
-            type(OpsProxy).creationCode,
-            abi.encode(ops, owner)
+        bytes memory opsProxyInitializeData = abi.encodeWithSelector(
+            IOpsProxy.initialize.selector,
+            ops,
+            owner
         );
 
-        assembly {
-            let endowment := 0
-            let bytecodeStart := add(bytecode, 0x20)
-            let bytecodeLength := mload(bytecode)
-            proxy := create2(endowment, bytecodeStart, bytecodeLength, salt)
-        }
+        bytes memory bytecode = abi.encodePacked(
+            type(BeaconProxy).creationCode,
+            abi.encode(address(this), opsProxyInitializeData)
+        );
+
+        proxy = _deploy(salt, bytecode);
 
         _proxies[proxy] = true;
         _proxyOf[owner] = proxy;
@@ -93,5 +131,21 @@ contract OpsProxyFactory is IOpsProxyFactory {
             salt,
             address(proxy)
         );
+    }
+
+    function isProxy(address proxy) public view override returns (bool) {
+        return _proxies[proxy];
+    }
+
+    function _deploy(bytes32 _salt, bytes memory _bytecode)
+        internal
+        returns (address payable proxy)
+    {
+        assembly {
+            let endowment := 0
+            let bytecodeStart := add(_bytecode, 0x20)
+            let bytecodeLength := mload(_bytecode)
+            proxy := create2(endowment, bytecodeStart, bytecodeLength, _salt)
+        }
     }
 }
