@@ -13,9 +13,6 @@ contract OpsProxy is IOpsProxy, Initializable {
     address public override ops;
     address public override owner;
 
-    /// @dev track admins of proxy
-    mapping(address => bool) internal _admins;
-
     modifier onlyAuth() {
         require(
             msg.sender == ops ||
@@ -23,16 +20,6 @@ contract OpsProxy is IOpsProxy, Initializable {
                 msg.sender == address(this),
             "OpsProxy: Not authorised"
         );
-        _;
-    }
-
-    modifier onlyOwner() {
-        require(msg.sender == owner, "OpsProxy: Not Owner");
-        _;
-    }
-
-    modifier onlyContract(address _addr) {
-        require(_addr.code.length > 0, "OpsProxy: Not Contract");
         _;
     }
 
@@ -62,7 +49,7 @@ contract OpsProxy is IOpsProxy, Initializable {
         address _target,
         bytes calldata _data,
         uint256 _value
-    ) public payable override onlyAuth onlyContract(_target) {
+    ) public payable override onlyAuth {
         (bool success, bytes memory returndata) = _target.call{value: _value}(
             _data
         );
@@ -70,18 +57,5 @@ contract OpsProxy is IOpsProxy, Initializable {
         if (!success) returndata.revertWithError("OpsProxy: _callTo: ");
 
         emit ExecuteCall(_target, _data, _value, returndata);
-    }
-
-    function executeDelegateCall(address _target, bytes calldata _data)
-        public
-        override
-        onlyAuth
-        onlyContract(_target)
-    {
-        (bool success, bytes memory returndata) = _target.delegatecall(_data);
-
-        if (!success) returndata.revertWithError("OpsProxy: _delegateCallTo: ");
-
-        emit ExecuteDelegateCall(_target, _data, returndata);
     }
 }

@@ -76,9 +76,14 @@ contract OpsProxyFactory is IOpsProxyFactory, IBeacon, Proxied, Initializable {
         external
         view
         override
-        returns (address)
+        returns (address, bool)
     {
-        return _proxyOf[_account];
+        address proxyAddress = _proxyOf[_account];
+
+        if (proxyAddress != address(0)) return (proxyAddress, true);
+
+        proxyAddress = determineProxyAddress(_account);
+        return (proxyAddress, false);
     }
 
     function getOwnerOf(address _proxy)
@@ -90,28 +95,6 @@ contract OpsProxyFactory is IOpsProxyFactory, IBeacon, Proxied, Initializable {
         require(isProxy(_proxy), "OpsProxyFactory: Not proxy");
 
         return IOpsProxy(_proxy).owner();
-    }
-
-    function determineProxyAddress(address _account)
-        external
-        view
-        override
-        returns (address)
-    {
-        (, bytes32 salt) = _getSeedAndSalt(_account);
-
-        bytes memory bytecode = _getBytecode(_account);
-
-        bytes32 codeHash = keccak256(
-            abi.encodePacked(
-                bytes1(0xff),
-                address(this),
-                salt,
-                keccak256(bytecode)
-            )
-        );
-
-        return address(uint160(uint256(codeHash)));
     }
 
     function deployFor(address owner)
@@ -135,6 +118,28 @@ contract OpsProxyFactory is IOpsProxyFactory, IBeacon, Proxied, Initializable {
         }
 
         emit DeployProxy(msg.sender, owner, seed, salt, address(proxy));
+    }
+
+    function determineProxyAddress(address _account)
+        public
+        view
+        override
+        returns (address)
+    {
+        (, bytes32 salt) = _getSeedAndSalt(_account);
+
+        bytes memory bytecode = _getBytecode(_account);
+
+        bytes32 codeHash = keccak256(
+            abi.encodePacked(
+                bytes1(0xff),
+                address(this),
+                salt,
+                keccak256(bytecode)
+            )
+        );
+
+        return address(uint160(uint256(codeHash)));
     }
 
     function isProxy(address proxy) public view override returns (bool) {

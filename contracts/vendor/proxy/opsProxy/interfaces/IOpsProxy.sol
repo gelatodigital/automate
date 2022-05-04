@@ -1,4 +1,4 @@
-// SPDX-License-Identifier: Unlicense
+// SPDX-License-Identifier: MIT
 pragma solidity ^0.8.12;
 
 interface IOpsProxy {
@@ -8,12 +8,6 @@ interface IOpsProxy {
         address indexed target,
         bytes data,
         uint256 value,
-        bytes returnData
-    );
-
-    event ExecuteDelegateCall(
-        address indexed target,
-        bytes data,
         bytes returnData
     );
 
@@ -36,8 +30,6 @@ interface IOpsProxy {
         bytes calldata data,
         uint256 value
     ) external payable;
-
-    function executeDelegateCall(address target, bytes calldata data) external;
 
     /// @notice External view functions ///
 

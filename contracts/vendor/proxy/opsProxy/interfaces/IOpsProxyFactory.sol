@@ -1,4 +1,4 @@
-// SPDX-License-Identifier: Unlicense
+// SPDX-License-Identifier: MIT
 pragma solidity ^0.8.12;
 
 interface IOpsProxyFactory {
@@ -31,7 +31,7 @@ interface IOpsProxyFactory {
 
     function getNextSeed(address account) external view returns (bytes32);
 
-    function getProxyOf(address account) external view returns (address);
+    function getProxyOf(address account) external view returns (address, bool);
 
     function getOwnerOf(address proxy) external view returns (address);
 

@@ -306,11 +306,12 @@ contract Ops is Gelatofied, LibOps, IOps {
         }
     }
 
+    /// @notice Only owner can create task with _execAddress as their proxy
     function _checkForOpsProxyAndGetTaskCreator(
         address _execAddress,
         address _taskCreator
     ) internal returns (address) {
-        _deployOpsProxy(_taskCreator);
+        _deployOpsProxy(_execAddress, _taskCreator);
 
         if (opsProxyFactory.isProxy(_execAddress)) {
             address opsProxyOwner = opsProxyFactory.getOwnerOf(_execAddress);
@@ -325,10 +326,16 @@ contract Ops is Gelatofied, LibOps, IOps {
         return _taskCreator;
     }
 
-    function _deployOpsProxy(address _taskCreator) internal {
-        if (
-            !opsProxyFactory.isProxy(_taskCreator) &&
-            opsProxyFactory.getProxyOf(_taskCreator) == address(0)
-        ) opsProxyFactory.deployFor(_taskCreator);
+    /// @notice Deploys proxy if _taskCreator does not have proxy and _execAddress is predetermined proxy address
+    function _deployOpsProxy(address _execAddress, address _taskCreator)
+        internal
+    {
+        if (!opsProxyFactory.isProxy(_taskCreator)) {
+            (address opsProxyAddress, bool deployed) = opsProxyFactory
+                .getProxyOf(_taskCreator);
+
+            if (_execAddress == opsProxyAddress && !deployed)
+                opsProxyFactory.deployFor(_taskCreator);
+        }
     }
 }

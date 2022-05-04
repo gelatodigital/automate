@@ -6,7 +6,6 @@ import {
   Ops,
   OpsProxy,
   OpsProxyFactory,
-  ProxyHandler,
   TaskTreasuryUpgradable,
 } from "../typechain";
 
@@ -39,7 +38,6 @@ describe("Ops proxy task test", function () {
   let opsProxy: OpsProxy;
   let opsProxyImplementation: OpsProxy;
   let opsProxyFactory: OpsProxyFactory;
-  let proxyHandler: ProxyHandler;
   let treasury: TaskTreasuryUpgradable;
   let counter: Counter;
 
@@ -109,10 +107,13 @@ describe("Ops proxy task test", function () {
     );
     await opsProxyFactory.connect(user).deploy();
 
-    const proxyAddress = await opsProxyFactory.getProxyOf(userAddress);
+    const [proxyAddress, isDeployed] = await opsProxyFactory.getProxyOf(
+      userAddress
+    );
     opsProxy = await ethers.getContractAt("OpsProxy", proxyAddress);
 
     expect(proxyAddress).to.be.eql(determinedProxyAddress);
+    expect(isDeployed).to.be.true;
 
     expect(await opsProxy.ops()).to.be.eql(ops.address);
     expect(await opsProxy.owner()).to.be.eql(userAddress);
@@ -121,11 +122,6 @@ describe("Ops proxy task test", function () {
     // whitelist proxy on counter
     await counter.connect(deployer).setWhitelist(opsProxy.address, true);
     expect(await counter.whitelisted(opsProxy.address)).to.be.true;
-    // deploy proxyHandler
-    const proxyHandlerFactory = await ethers.getContractFactory("ProxyHandler");
-    proxyHandler = <ProxyHandler>(
-      await proxyHandlerFactory.deploy(counter.address)
-    );
   });
 
   it("opsProxy and opsProxyFactory properly initialized", async () => {
@@ -142,24 +138,19 @@ describe("Ops proxy task test", function () {
       user2Address
     );
 
-    const task = await createTaskForProxy(
-      user2,
-      determinedProxyAddress,
-      "executeCall"
+    const task = await createTaskForProxy(user2, determinedProxyAddress);
+    const [proxyAddress, isDeployed] = await opsProxyFactory.getProxyOf(
+      user2Address
     );
-    const proxyAddress = await opsProxyFactory.getProxyOf(user2Address);
 
     expect(proxyAddress).to.be.eql(determinedProxyAddress);
+    expect(isDeployed).to.be.true;
     expect(await ops.taskCreator(task.taskId)).to.be.eql(user2Address);
   });
 
   it("owner can create task for proxy", async () => {
     // task creator will be user, exec address is proxy address
-    const task = await createTaskForProxy(
-      user,
-      opsProxy.address,
-      "executeCall"
-    );
+    const task = await createTaskForProxy(user, opsProxy.address);
     expect(await ops.taskCreator(task.taskId)).to.be.eql(userAddress);
 
     await executeAndCompareCount(task);
@@ -168,17 +159,13 @@ describe("Ops proxy task test", function () {
 
   it("non owner cannot create task for proxy", async () => {
     await expect(
-      createTaskForProxy(user2, opsProxy.address, "executeCall")
+      createTaskForProxy(user2, opsProxy.address)
     ).to.be.revertedWith("Ops: _createTask: Not authorised");
   });
 
   it("owner can create task with proxy", async () => {
     // task creator will be user, exec address is proxy address
-    const task = await createTaskWithProxy(
-      user,
-      opsProxy.address,
-      "executeCall"
-    );
+    const task = await createTaskWithProxy(user, opsProxy.address);
     expect(await ops.taskCreator(task.taskId)).to.be.eql(userAddress);
 
     await executeAndCompareCount(task);
@@ -186,20 +173,8 @@ describe("Ops proxy task test", function () {
 
   it("non owner cannot create task with proxy", async () => {
     await expect(
-      createTaskWithProxy(user2, opsProxy.address, "executeCall")
+      createTaskWithProxy(user2, opsProxy.address)
     ).to.be.revertedWith("OpsProxy: Not authorised");
-  });
-
-  it("delegate call", async () => {
-    await fastForwardTime();
-    const task = await createTaskWithProxy(
-      user,
-      opsProxy.address,
-      "executeDelegateCall"
-    );
-    expect(await ops.taskCreator(task.taskId)).to.be.eql(userAddress);
-
-    await executeAndCompareCount(task);
   });
 
   it("cancel tasks with proxy", async () => {
@@ -245,10 +220,9 @@ describe("Ops proxy task test", function () {
 
   const createTaskForProxy = async (
     signer: Signer,
-    proxyAddress: string,
-    callType: "executeCall" | "executeDelegateCall"
+    proxyAddress: string
   ): Promise<TaskDetails> => {
-    const task = await getTaskDetails(signer, proxyAddress, callType);
+    const task = await getTaskDetails(signer, proxyAddress);
 
     await expect(
       ops
@@ -278,10 +252,9 @@ describe("Ops proxy task test", function () {
 
   const createTaskWithProxy = async (
     signer: Signer,
-    proxyAddress: string,
-    callType: "executeCall" | "executeDelegateCall"
+    proxyAddress: string
   ): Promise<TaskDetails> => {
-    const task = await getTaskDetails(signer, proxyAddress, callType);
+    const task = await getTaskDetails(signer, proxyAddress);
 
     const createTaskData = ops.interface.encodeFunctionData("createTask", [
       task.execAddress,
@@ -311,29 +284,22 @@ describe("Ops proxy task test", function () {
 
   const getTaskDetails = async (
     signer: Signer,
-    proxyAddress: string,
-    callType: "executeCall" | "executeDelegateCall"
+    proxyAddress: string
   ): Promise<TaskDetails> => {
     const taskCreator = await signer.getAddress();
 
     const execAddress = proxyAddress;
-    const execSelector = opsProxyImplementation.interface.getSighash(callType);
+    const execSelector =
+      opsProxyImplementation.interface.getSighash("executeCall");
     const increaseCountData = counter.interface.encodeFunctionData(
       "increaseCount",
       [5]
     );
 
-    const execData =
-      callType == "executeCall"
-        ? opsProxyImplementation.interface.encodeFunctionData("executeCall", [
-            counter.address,
-            increaseCountData,
-            0,
-          ])
-        : opsProxyImplementation.interface.encodeFunctionData(
-            "executeDelegateCall",
-            [proxyHandler.address, increaseCountData]
-          );
+    const execData = opsProxyImplementation.interface.encodeFunctionData(
+      "executeCall",
+      [counter.address, increaseCountData, 0]
+    );
 
     const resolverAddress = ZERO_ADDRESS;
     const resolverData = "0x00";
