@@ -1,10 +1,12 @@
-const { sleep } = require("@gelatonetwork/core");
-const { getMaxFee } = require("../hardhat/config/maxFee");
-const { getTaskTreasuryAddress } = require("../hardhat/config/addresses");
+import { HardhatRuntimeEnvironment } from "hardhat/types";
+import { DeployFunction } from "hardhat-deploy/types";
+import { sleep } from "../hardhat/utils";
+import { getTaskTreasuryAddress } from "../hardhat/config/addresses";
+import { getMaxFee } from "../hardhat/config/maxFee";
 
-module.exports = async (hre) => {
+const func: DeployFunction = async (hre: HardhatRuntimeEnvironment) => {
+  const OLD_TREASURY = await getTaskTreasuryAddress(hre);
   const maxFee = getMaxFee(hre.network.name);
-  const taskTreasuryAddress = await getTaskTreasuryAddress(hre);
 
   if (hre.network.name !== "hardhat") {
     console.log(
@@ -36,9 +38,11 @@ module.exports = async (hre) => {
   });
 };
 
-module.exports.skip = async (hre) => {
-  const skip = hre.network.name !== "hardhat";
-  return skip ? true : false;
+export default func;
+
+func.skip = async (hre: HardhatRuntimeEnvironment) => {
+  const shouldSkip = hre.network.name !== "hardhat";
+  return shouldSkip;
 };
 
-module.exports.tags = ["TaskTreasuryUpgradable"];
+func.tags = ["TaskTreasuryUpgradable"];

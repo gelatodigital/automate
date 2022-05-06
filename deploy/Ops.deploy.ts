@@ -1,7 +1,9 @@
-const { sleep } = require("@gelatonetwork/core");
-const { addresses } = require("../hardhat/config/addresses");
+import { HardhatRuntimeEnvironment } from "hardhat/types";
+import { DeployFunction } from "hardhat-deploy/types";
+import { sleep } from "../hardhat/utils";
+import { getGelatoAddress } from "../hardhat/config/addresses";
 
-module.exports = async (hre) => {
+const func: DeployFunction = async (hre: HardhatRuntimeEnvironment) => {
   if (hre.network.name !== "hardhat") {
     console.log(`Deploying Ops to ${hre.network.name}. Hit ctrl + c to abort`);
     await sleep(10000);
@@ -11,9 +13,7 @@ module.exports = async (hre) => {
   const { deploy } = deployments;
   const { deployer } = await hre.getNamedAccounts();
 
-  const address = addresses[hre.network.name];
-
-  const GELATO = address.gelato;
+  const GELATO = getGelatoAddress(hre.network.name);
   const UPGRADABLE_TREASURY = (
     await hre.ethers.getContract("TaskTreasuryUpgradable")
   ).address;
@@ -29,10 +29,12 @@ module.exports = async (hre) => {
   });
 };
 
-module.exports.skip = async (hre) => {
-  const skip = hre.network.name !== "hardhat";
-  return skip ? true : false;
+export default func;
+
+func.skip = async (hre: HardhatRuntimeEnvironment) => {
+  const shouldSkip = hre.network.name !== "hardhat";
+  return shouldSkip;
 };
 
-module.exports.tags = ["Ops"];
-module.exports.dependencies = ["TaskTreasuryUpgradable", "OpsProxyFactory"];
+func.tags = ["Ops"];
+func.dependencies = ["TaskTreasuryUpgradable", "OpsProxyFactory"];

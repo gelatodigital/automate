@@ -28,10 +28,7 @@ contract OpsProxyFactory is IOpsProxyFactory, IBeacon, Proxied, Initializable {
     mapping(address => address) internal _proxyOf;
 
     modifier onlyOneProxy(address _account) {
-        require(
-            _proxyOf[_account] == address(0),
-            "OpsProxyFactory: Owns proxy"
-        );
+        require(_proxyOf[_account] == address(0), "OpsProxyFactory: One proxy");
         _;
     }
 

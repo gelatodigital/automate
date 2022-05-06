@@ -1,0 +1,44 @@
+// SPDX-License-Identifier: UNLICENSED
+pragma solidity ^0.8.0;
+
+import {IResolver} from "../../interfaces/IResolver.sol";
+import {IOpsProxy} from "../../vendor/proxy/opsProxy/interfaces/IOpsProxy.sol";
+
+interface ICounter {
+    function increaseCount(uint256 amount) external;
+
+    function lastExecuted() external view returns (uint256);
+}
+
+contract CounterResolverWithWhitelist is IResolver {
+    // solhint-disable var-name-mixedcase
+    address public immutable COUNTER;
+
+    constructor(address _counter) {
+        COUNTER = _counter;
+    }
+
+    function checker()
+        external
+        view
+        override
+        returns (bool canExec, bytes memory execPayload)
+    {
+        uint256 lastExecuted = ICounter(COUNTER).lastExecuted();
+
+        // solhint-disable not-rely-on-time
+        canExec = (block.timestamp - lastExecuted) > 180;
+
+        bytes memory increaseCountPayload = abi.encodeWithSelector(
+            ICounter.increaseCount.selector,
+            uint256(100)
+        );
+
+        execPayload = abi.encodeWithSelector(
+            IOpsProxy.executeCall.selector,
+            COUNTER,
+            increaseCountPayload,
+            0
+        );
+    }
+}

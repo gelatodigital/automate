@@ -306,36 +306,49 @@ contract Ops is Gelatofied, LibOps, IOps {
         }
     }
 
-    /// @notice Only owner can create task with _execAddress as their proxy
     function _checkForOpsProxyAndGetTaskCreator(
         address _execAddress,
         address _taskCreator
     ) internal returns (address) {
-        _deployOpsProxy(_execAddress, _taskCreator);
+        bool taskCreatorIsProxy = opsProxyFactory.isProxy(_taskCreator);
 
-        if (opsProxyFactory.isProxy(_execAddress)) {
-            address opsProxyOwner = opsProxyFactory.getOwnerOf(_execAddress);
-            require(
-                _taskCreator == _execAddress || _taskCreator == opsProxyOwner,
-                "Ops: _createTask: Not authorised"
+        // user creating task
+        if (!taskCreatorIsProxy) {
+            (address opsProxyAddress, bool deployed) = opsProxyFactory
+                .getProxyOf(_taskCreator);
+
+            bool execAddressIsProxy = opsProxyFactory.isProxy(_execAddress);
+            bool execAddressIsProxyOfCreator = _execAddress == opsProxyAddress;
+
+            if (!deployed && execAddressIsProxyOfCreator)
+                opsProxyFactory.deployFor(_taskCreator);
+
+            // user creating task for proxy
+            if (execAddressIsProxy)
+                _onlyOwnerOrProxy(_execAddress, _taskCreator);
+
+            return _taskCreator;
+        } else {
+            // proxy creating task
+            address opsProxyOwner = _onlyOwnerOrProxy(
+                _taskCreator,
+                _taskCreator
             );
 
             return opsProxyOwner;
         }
-
-        return _taskCreator;
     }
 
-    /// @notice Deploys proxy if _taskCreator does not have proxy and _execAddress is predetermined proxy address
-    function _deployOpsProxy(address _execAddress, address _taskCreator)
+    function _onlyOwnerOrProxy(address _opsProxyAddress, address _taskCreator)
         internal
+        view
+        returns (address opsProxyOwner)
     {
-        if (!opsProxyFactory.isProxy(_taskCreator)) {
-            (address opsProxyAddress, bool deployed) = opsProxyFactory
-                .getProxyOf(_taskCreator);
+        opsProxyOwner = opsProxyFactory.getOwnerOf(_opsProxyAddress);
 
-            if (_execAddress == opsProxyAddress && !deployed)
-                opsProxyFactory.deployFor(_taskCreator);
-        }
+        require(
+            _taskCreator == _opsProxyAddress || _taskCreator == opsProxyOwner,
+            "Ops: _onlyOwnerOrProxy"
+        );
     }
 }
