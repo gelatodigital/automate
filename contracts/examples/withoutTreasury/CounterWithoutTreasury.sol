@@ -2,7 +2,6 @@
 pragma solidity ^0.8.0;
 
 import {OpsReady} from "../../vendor/gelato/OpsReady.sol";
-import {Ownable} from "@openzeppelin/contracts/access/Ownable.sol";
 import {IOps} from "../../interfaces/IOps.sol";
 
 contract CounterWithoutTreasury is OpsReady {
