@@ -23,11 +23,12 @@ assert.ok(ALCHEMY_ID, "no Alchemy ID in process.env");
 const DEPLOYER_PK_MAINNET = process.env.DEPLOYER_PK_MAINNET;
 const DEPLOYER_PK_ROPSTEN = process.env.DEPLOYER_PK_ROPSTEN;
 const ETHERSCAN_API = process.env.ETHERSCAN_API;
-// const ETHERSCAN_MATIC_API = process.env.ETHERSCAN_MATIC_API;
-// const ETHERSCAN_FANTOM_API = process.env.ETHERSCAN_FANTOM_API;
-// const ETHERSCAN_ARBITRUM_API = process.env.ETHERSCAN_ARBITRUM_API;
-// const ETHERSCAN_BSC_API = process.env.ETHERSCAN_BSC_API;
-// const ETHERSCAN_AVALANCHE_API = process.env.ETHERSCAN_AVALANCHE_API;
+// ETHERSCAN_MATIC_API;
+// ETHERSCAN_FANTOM_API;
+// ETHERSCAN_ARBITRUM_API;
+// ETHERSCAN_BSC_API;
+// ETHERSCAN_AVALANCHE_API;
+// ETHERSCAN_OPTIMISM_API
 
 // ================================= CONFIG =========================================
 const config: HardhatUserConfig = {
@@ -90,6 +91,11 @@ const config: HardhatUserConfig = {
     mumbai: {
       url: `https://polygon-mumbai.g.alchemy.com/v2/${ALCHEMY_ID}`,
       chainId: 80001,
+      accounts: DEPLOYER_PK_MAINNET ? [DEPLOYER_PK_MAINNET] : [],
+    },
+    optimism: {
+      url: `https://opt-mainnet.g.alchemy.com/v2/${ALCHEMY_ID}`,
+      chainId: 10,
       accounts: DEPLOYER_PK_MAINNET ? [DEPLOYER_PK_MAINNET] : [],
     },
     rinkeby: {

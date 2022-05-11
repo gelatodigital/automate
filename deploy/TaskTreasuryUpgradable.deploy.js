@@ -1,10 +1,10 @@
 const { sleep } = require("@gelatonetwork/core");
-const { getOldTaskTreasuryAddress } = require("../hardhat/config/addresses");
 const { getMaxFee } = require("../hardhat/config/maxFee");
+const { getTaskTreasuryAddress } = require("../hardhat/config/addresses");
 
 module.exports = async (hre) => {
-  const taskTreasuryAddress = getOldTaskTreasuryAddress(hre.network.name);
-  const maxFee = getMaxFee(hre.network.name); // NOTE: Check max fee before deploying
+  const maxFee = getMaxFee(hre.network.name);
+  const taskTreasuryAddress = await getTaskTreasuryAddress(hre);
 
   if (hre.network.name !== "hardhat") {
     console.log(

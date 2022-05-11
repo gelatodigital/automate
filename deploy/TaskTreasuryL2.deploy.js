@@ -1,9 +1,10 @@
 const { sleep } = require("@gelatonetwork/core");
 const { getGelatoAddress } = require("../hardhat/config/addresses");
+const { getMaxFee } = require("../hardhat/config/maxFee");
 const ethers = require("ethers");
 
 module.exports = async (hre) => {
-  const maxFee = ethers.utils.parseEther("0.01");
+  const maxFee = getMaxFee(hre.network.name);
   const GELATO = getGelatoAddress(hre.network.name);
   if (hre.network.name !== "hardhat") {
     console.log(
