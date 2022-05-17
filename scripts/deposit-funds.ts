@@ -1,19 +1,17 @@
-/* eslint-disable no-undef */
-const { ethers } = require("hardhat");
+import { ethers } from "hardhat";
+import { TaskTreasuryUpgradable } from "../typechain";
 
 const ETH = "0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE";
 
 async function main() {
-  [user] = await hre.ethers.getSigners();
-  userAddress = await user.getAddress();
-  console.log("Depositing 0.1 ETH");
+  const [user] = await ethers.getSigners();
+  const userAddress = await user.getAddress();
+  console.log("User Address: ", userAddress);
 
-  const TASK_TREASURY = (await hre.ethers.getContract("TaskTreasury")).address;
+  console.log("Depositing funds into treasury");
 
-  const taskTreasury = await ethers.getContractAt(
-    "TaskTreasury",
-    TASK_TREASURY,
-    user
+  const taskTreasury = <TaskTreasuryUpgradable>(
+    await ethers.getContract("TaskTreasuryUpgradable")
   );
 
   const depositAmount = ethers.utils.parseEther("0.1");
