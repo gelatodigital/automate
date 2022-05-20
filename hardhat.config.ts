@@ -21,7 +21,6 @@ assert.ok(ALCHEMY_ID, "no Alchemy ID in process.env");
 
 // @dev fill this out
 const DEPLOYER_PK_MAINNET = process.env.DEPLOYER_PK_MAINNET;
-const DEPLOYER_PK_ROPSTEN = process.env.DEPLOYER_PK_ROPSTEN;
 const ETHERSCAN_API = process.env.ETHERSCAN_API;
 // ETHERSCAN_MATIC_API;
 // ETHERSCAN_FANTOM_API;
@@ -74,9 +73,14 @@ const config: HardhatUserConfig = {
       accounts: DEPLOYER_PK_MAINNET ? [DEPLOYER_PK_MAINNET] : [],
     },
     goerli: {
-      accounts: DEPLOYER_PK_ROPSTEN ? [DEPLOYER_PK_ROPSTEN] : [],
+      accounts: DEPLOYER_PK_MAINNET ? [DEPLOYER_PK_MAINNET] : [],
       chainId: 5,
       url: `https://eth-goerli.alchemyapi.io/v2/${ALCHEMY_ID}`,
+    },
+    kovan: {
+      accounts: DEPLOYER_PK_MAINNET ? [DEPLOYER_PK_MAINNET] : [],
+      chainId: 42,
+      url: `https://eth-kovan.alchemyapi.io/v2/${ALCHEMY_ID}`,
     },
     mainnet: {
       accounts: DEPLOYER_PK_MAINNET ? [DEPLOYER_PK_MAINNET] : [],
@@ -104,7 +108,7 @@ const config: HardhatUserConfig = {
       url: `https://eth-rinkeby.alchemyapi.io/v2/${ALCHEMY_ID}`,
     },
     ropsten: {
-      accounts: DEPLOYER_PK_ROPSTEN ? [DEPLOYER_PK_ROPSTEN] : [],
+      accounts: DEPLOYER_PK_MAINNET ? [DEPLOYER_PK_MAINNET] : [],
       chainId: 3,
       url: `https://eth-ropsten.alchemyapi.io/v2/${ALCHEMY_ID}`,
     },

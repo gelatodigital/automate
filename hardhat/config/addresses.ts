@@ -17,6 +17,7 @@ export const getGelatoAddress = (network: string): string => {
   const GELATO_ROPSTEN = "0xCc4CcD69D31F9FfDBD3BFfDe49c6aA886DaB98d9";
   const GELATO_RINKEBY = "0x0630d1b8C2df3F0a68Df578D02075027a6397173";
   const GELATO_GOERLI = "0x683913B3A32ada4F8100458A3E1675425BdAa7DF";
+  const GELATO_KOVAN = "0xDf592cB2d32445F8e831d211AB20D3233cA41bD8";
   const GELATO_MUMBAI = "0x25aD59adbe00C2d80c86d01e2E05e1294DA84823";
 
   switch (network) {
@@ -28,6 +29,8 @@ export const getGelatoAddress = (network: string): string => {
       return GELATO_RINKEBY;
     case "goerli":
       return GELATO_GOERLI;
+    case "kovan":
+      return GELATO_KOVAN;
     case "matic":
       return GELATO_MATIC;
     case "fantom":
