@@ -28,6 +28,7 @@ const ETHERSCAN_API = process.env.ETHERSCAN_API;
 // ETHERSCAN_BSC_API;
 // ETHERSCAN_AVALANCHE_API;
 // ETHERSCAN_OPTIMISM_API
+// ETHERSCAN_MOONBEAM_API
 
 // ================================= CONFIG =========================================
 const config: HardhatUserConfig = {
@@ -90,6 +91,11 @@ const config: HardhatUserConfig = {
     matic: {
       url: `https://polygon-mainnet.g.alchemy.com/v2/${ALCHEMY_ID}`,
       chainId: 137,
+      accounts: DEPLOYER_PK_MAINNET ? [DEPLOYER_PK_MAINNET] : [],
+    },
+    moonbeam: {
+      url: `https://rpc.api.moonbeam.network`,
+      chainId: 1284,
       accounts: DEPLOYER_PK_MAINNET ? [DEPLOYER_PK_MAINNET] : [],
     },
     mumbai: {
