@@ -1,60 +1,81 @@
 // SPDX-License-Identifier: UNLICENSED
 pragma solidity 0.8.12;
 
-import {Gelatofied} from "./vendor/gelato/Gelatofied.sol";
-import {GelatoBytes} from "./vendor/gelato/GelatoBytes.sol";
 import {
     EnumerableSet
 } from "@openzeppelin/contracts/utils/structs/EnumerableSet.sol";
+import {Gelatofied} from "./vendor/gelato/Gelatofied.sol";
+import {GelatoBytes} from "./vendor/gelato/GelatoBytes.sol";
 import {LibOps} from "./libraries/LibOps.sol";
-import {
-    ITaskTreasuryUpgradable
-} from "./interfaces/ITaskTreasuryUpgradable.sol";
+import {LibLegacyTask} from "./libraries/LibLegacyTask.sol";
 import {IOps} from "./interfaces/IOps.sol";
-import {
-    IOpsProxyFactory
-} from "./vendor/proxy/opsProxy/interfaces/IOpsProxyFactory.sol";
+import {DataTypes} from "./libraries/DataTypes.sol";
+import {Events} from "./libraries/Events.sol";
+import {TaskModules} from "./taskModules/TaskModules.sol";
+import {OpsProxied} from "./vendor/proxy/opsProxy/OpsProxied.sol";
 
 // solhint-disable max-line-length
-// solhint-disable max-states-count
 // solhint-disable not-rely-on-time
 /// @notice Ops enables everyone to communicate to Gelato Bots to monitor and execute certain transactions
 /// @notice ResolverAddresses determine when Gelato should execute and provides bots with
 /// the payload they should use to execute
 /// @notice ExecAddress determine the actual contracts to execute a function on
-contract Ops is Gelatofied, LibOps, IOps {
-    using GelatoBytes for bytes;
+contract Ops is Gelatofied, LibOps, TaskModules, OpsProxied, IOps {
     using EnumerableSet for EnumerableSet.Bytes32Set;
-
-    // solhint-disable const-name-snakecase
-    string public constant version = "4";
-    mapping(bytes32 => address) public taskCreator;
-    mapping(bytes32 => address) public execAddresses;
-    mapping(address => EnumerableSet.Bytes32Set) internal _createdTasks;
-    ITaskTreasuryUpgradable public immutable override taskTreasury;
-    uint256 public fee;
-    address public feeToken;
-    // Appended State
-    mapping(bytes32 => Time) public timedTask;
-    IOpsProxyFactory public immutable override opsProxyFactory;
+    using GelatoBytes for bytes;
 
     constructor(
         address payable _gelato,
-        ITaskTreasuryUpgradable _taskTreasury,
-        IOpsProxyFactory _opsProxyFactory
-    ) Gelatofied(_gelato) {
-        taskTreasury = _taskTreasury;
-        opsProxyFactory = _opsProxyFactory;
+        address _taskTreasury,
+        address _opsProxyFactory
+    ) Gelatofied(_gelato) TaskModules(_taskTreasury, _opsProxyFactory) {}
+
+    // prettier-ignore
+    fallback(bytes calldata _callData) external returns(bytes memory returnData){
+        bytes4 funcSig = _callData.calldataSliceSelector();
+        returnData = _handleLegacyTaskCreations(funcSig, _callData);
     }
 
-    /// @notice Execution API called by Gelato
-    /// @param _txFee Fee paid to Gelato for execution, deducted on the TaskTreasury
-    /// @param _feeToken Token used to pay for the execution. ETH = 0xeeeeee...
-    /// @param _taskCreator On which contract should Gelato check when to execute the tx
-    /// @param _useTaskTreasuryFunds If msg.sender's balance on TaskTreasury should pay for the tx
-    /// @param _revertOnFailure To revert or not if call to execAddress fails
-    /// @param _execAddress On which contract should Gelato execute the tx
-    /// @param _execData Data used to execute the tx, queried from the Resolver by Gelato
+    function createTask(
+        address _execAddress,
+        bytes4 _execSelector,
+        address _resolverAddress,
+        bytes calldata _resolverData,
+        address _feeToken,
+        DataTypes.Modules[] calldata _taskModules,
+        bytes[] calldata _taskModuleArgs
+    ) external returns (bytes32 taskId) {
+        taskId = _createTask(
+            msg.sender,
+            _execAddress,
+            _execSelector,
+            _resolverAddress,
+            _resolverData,
+            _feeToken,
+            _taskModules,
+            _taskModuleArgs
+        );
+    }
+
+    function cancelTask(bytes32 _taskId) external override {
+        address creator = taskCreator[_taskId];
+
+        require(
+            creator == msg.sender ||
+                (opsProxyFactory.isProxy(msg.sender) &&
+                    creator == opsProxyFactory.getOwnerOf(msg.sender)),
+            "Ops: cancelTask: Sender did not start task yet"
+        );
+
+        _createdTasks[creator].remove(_taskId);
+        delete taskCreator[_taskId];
+        delete execAddresses[_taskId];
+
+        _handleTaskModuleOnCancel(_taskId);
+
+        emit Events.TaskCancelled(_taskId, creator);
+    }
+
     // solhint-disable function-max-lines
     // solhint-disable code-complexity
     function exec(
@@ -86,9 +107,9 @@ contract Ops is Gelatofied, LibOps, IOps {
             feeToken = _feeToken;
         }
 
-        _updateTime(taskId);
-
         (bool success, bytes memory returnData) = _execAddress.call(_execData);
+
+        _handleTaskModuleOnExec(taskId, _taskCreator);
 
         // For off-chain simultaion
         if (!success && _revertOnFailure)
@@ -101,7 +122,7 @@ contract Ops is Gelatofied, LibOps, IOps {
             delete feeToken;
         }
 
-        emit ExecSuccess(
+        emit Events.ExecSuccess(
             _txFee,
             _feeToken,
             _execAddress,
@@ -111,13 +132,10 @@ contract Ops is Gelatofied, LibOps, IOps {
         );
     }
 
-    /// @notice Helper func to query fee and feeToken
     function getFeeDetails() external view override returns (uint256, address) {
         return (fee, feeToken);
     }
 
-    /// @notice Helper func to query all open tasks by a task creator
-    /// @param _taskCreator Address who created the task
     function getTaskIdsByUser(address _taskCreator)
         external
         view
@@ -134,120 +152,18 @@ contract Ops is Gelatofied, LibOps, IOps {
         return taskIds;
     }
 
-    /// @notice Create a timed task that executes every so often based on the inputted interval
-    /// @param _startTime Timestamp when the first task should become executable. 0 for right now
-    /// @param _interval After how many seconds should each task be executed
-    /// @param _execAddress On which contract should Gelato execute the transactions
-    /// @param _execSelector Which function Gelato should eecute on the _execAddress
-    /// @param _resolverAddress On which contract should Gelato check when to execute the tx
-    /// @param _resolverData Which data should be used to check on the Resolver when to execute the tx
-    /// @param _feeToken Which token to use as fee payment for no prepayment option. Otherwise use address(0).
-    function createTimedTask(
-        uint128 _startTime,
-        uint128 _interval,
-        address _execAddress,
-        bytes4 _execSelector,
-        address _resolverAddress,
-        bytes calldata _resolverData,
-        address _feeToken
-    ) public override returns (bytes32 taskId) {
-        require(_interval > 0, "Ops: createTimedTask: interval cannot be 0");
-
-        taskId = _createTask(
-            msg.sender,
-            _execAddress,
-            _execSelector,
-            _resolverAddress,
-            _resolverData,
-            _feeToken
-        );
-
-        uint128 nextExec = uint256(_startTime) > block.timestamp
-            ? _startTime
-            : uint128(block.timestamp);
-
-        timedTask[taskId] = Time({nextExec: nextExec, interval: _interval});
-        emit TimerSet(taskId, nextExec, _interval);
-    }
-
-    /// @notice Create a task that tells Gelato to monitor and execute transactions on specific contracts
-    /// @dev Requires funds to be added in Task Treasury, assumes treasury sends fee to Gelato via Ops
-    /// @param _execAddress On which contract should Gelato execute the transactions
-    /// @param _execSelector Which function Gelato should eecute on the _execAddress
-    /// @param _resolverAddress On which contract should Gelato check when to execute the tx
-    /// @param _resolverData Which data should be used to check on the Resolver when to execute the tx
-    function createTask(
-        address _execAddress,
-        bytes4 _execSelector,
-        address _resolverAddress,
-        bytes calldata _resolverData
-    ) public override returns (bytes32 taskId) {
-        taskId = _createTask(
-            msg.sender,
-            _execAddress,
-            _execSelector,
-            _resolverAddress,
-            _resolverData,
-            address(0)
-        );
-    }
-
-    /// @notice Create a task that tells Gelato to monitor and execute transactions on specific contracts
-    /// @dev Requires no funds to be added in Task Treasury, assumes tasks sends fee to Gelato directly
-    /// @param _execAddress On which contract should Gelato execute the transactions
-    /// @param _execSelector Which function Gelato should eecute on the _execAddress
-    /// @param _resolverAddress On which contract should Gelato check when to execute the tx
-    /// @param _resolverData Which data should be used to check on the Resolver when to execute the tx
-    /// @param _feeToken Which token to use as fee payment
-    function createTaskNoPrepayment(
-        address _execAddress,
-        bytes4 _execSelector,
-        address _resolverAddress,
-        bytes calldata _resolverData,
-        address _feeToken
-    ) public override returns (bytes32 taskId) {
-        taskId = _createTask(
-            msg.sender,
-            _execAddress,
-            _execSelector,
-            _resolverAddress,
-            _resolverData,
-            _feeToken
-        );
-    }
-
-    /// @notice Cancel a task so that Gelato can no longer execute it
-    /// @param _taskId The hash of the task, can be computed using getTaskId()
-    function cancelTask(bytes32 _taskId) public override {
-        address creator = taskCreator[_taskId];
-
-        require(
-            creator == msg.sender ||
-                (opsProxyFactory.isProxy(msg.sender) &&
-                    creator == opsProxyFactory.getOwnerOf(msg.sender)),
-            "Ops: cancelTask: Sender did not start task yet"
-        );
-
-        _createdTasks[creator].remove(_taskId);
-        delete taskCreator[_taskId];
-        delete execAddresses[_taskId];
-
-        Time memory time = timedTask[_taskId];
-        bool isTimedTask = time.nextExec != 0;
-        if (isTimedTask) delete timedTask[_taskId];
-
-        emit TaskCancelled(_taskId, creator);
-    }
-
     function _createTask(
         address _taskCreator,
         address _execAddress,
         bytes4 _execSelector,
         address _resolverAddress,
-        bytes calldata _resolverData,
-        address _feeToken
-    ) internal returns (bytes32 taskId) {
+        bytes memory _resolverData,
+        address _feeToken,
+        DataTypes.Modules[] memory _taskModules,
+        bytes[] memory _taskModuleArgs
+    ) private returns (bytes32 taskId) {
         _taskCreator = _checkForOpsProxyAndGetTaskCreator(
+            opsProxyFactory,
             _execAddress,
             _taskCreator
         );
@@ -269,11 +185,13 @@ contract Ops is Gelatofied, LibOps, IOps {
             "Ops: _createTask: Sender already started task"
         );
 
+        _handleTaskModuleOnCreate(taskId, _taskModules, _taskModuleArgs);
+
         _createdTasks[_taskCreator].add(taskId);
         taskCreator[taskId] = _taskCreator;
         execAddresses[taskId] = _execAddress;
 
-        emit TaskCreated(
+        emit Events.TaskCreated(
             _taskCreator,
             _execAddress,
             _execSelector,
@@ -286,69 +204,34 @@ contract Ops is Gelatofied, LibOps, IOps {
         );
     }
 
-    function _updateTime(bytes32 task) internal {
-        Time memory time = timedTask[task];
-        bool isTimedTask = time.nextExec != 0;
-
-        if (isTimedTask) {
-            require(
-                time.nextExec <= uint128(block.timestamp),
-                "Ops: _updateTime: Too early"
-            );
-            // If next execution would also be executed right now, skip forward to
-            // the next execution in the future
-            uint128 timeDiff = uint128(block.timestamp) - time.nextExec;
-            uint128 intervals = timeDiff / time.interval + 1;
-
-            timedTask[task].nextExec =
-                time.nextExec +
-                (intervals * time.interval);
-        }
-    }
-
-    function _checkForOpsProxyAndGetTaskCreator(
-        address _execAddress,
-        address _taskCreator
-    ) internal returns (address) {
-        bool taskCreatorIsProxy = opsProxyFactory.isProxy(_taskCreator);
-
-        // user creating task
-        if (!taskCreatorIsProxy) {
-            (address opsProxyAddress, bool deployed) = opsProxyFactory
-                .getProxyOf(_taskCreator);
-
-            bool execAddressIsProxy = opsProxyFactory.isProxy(_execAddress);
-            bool execAddressIsProxyOfCreator = _execAddress == opsProxyAddress;
-
-            if (!deployed && execAddressIsProxyOfCreator)
-                opsProxyFactory.deployFor(_taskCreator);
-
-            // user creating task for proxy
-            if (execAddressIsProxy)
-                _onlyOwnerOrProxy(_execAddress, _taskCreator);
-
-            return _taskCreator;
-        } else {
-            // proxy creating task
-            address opsProxyOwner = _onlyOwnerOrProxy(
-                _taskCreator,
-                _taskCreator
+    function _handleLegacyTaskCreations(
+        bytes4 _createTaskFuncSig,
+        bytes calldata _callData
+    ) private returns (bytes memory returnData) {
+        (
+            address execAddress,
+            bytes4 execSelector,
+            address resolverAddress,
+            bytes memory resolverData,
+            address feeToken,
+            DataTypes.Modules[] memory taskModules,
+            bytes[] memory taskModuleArgs
+        ) = LibLegacyTask.getLegacyCreateTaskArgs(
+                _createTaskFuncSig,
+                _callData
             );
 
-            return opsProxyOwner;
-        }
-    }
-
-    function _onlyOwnerOrProxy(address _opsProxyAddress, address _taskCreator)
-        internal
-        view
-        returns (address opsProxyOwner)
-    {
-        opsProxyOwner = opsProxyFactory.getOwnerOf(_opsProxyAddress);
-
-        require(
-            _taskCreator == _opsProxyAddress || _taskCreator == opsProxyOwner,
-            "Ops: _onlyOwnerOrProxy"
+        bytes32 taskId = _createTask(
+            msg.sender,
+            execAddress,
+            execSelector,
+            resolverAddress,
+            resolverData,
+            feeToken,
+            taskModules,
+            taskModuleArgs
         );
+
+        returnData = abi.encodePacked(taskId);
     }
 }
