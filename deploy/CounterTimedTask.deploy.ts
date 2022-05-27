@@ -1,6 +1,8 @@
-const { sleep } = require("@gelatonetwork/core");
+import { HardhatRuntimeEnvironment } from "hardhat/types";
+import { DeployFunction } from "hardhat-deploy/types";
+import { sleep } from "../hardhat/utils";
 
-module.exports = async (hre) => {
+const func: DeployFunction = async (hre: HardhatRuntimeEnvironment) => {
   if (hre.network.name !== "hardhat") {
     console.log(
       `Deploying CounterTimedTask to ${hre.network.name}. Hit ctrl + c to abort`
@@ -18,9 +20,11 @@ module.exports = async (hre) => {
   });
 };
 
-module.exports.skip = async (hre) => {
-  const skip = hre.network.name !== "hardhat";
-  return skip ? true : false;
+export default func;
+
+func.skip = async (hre: HardhatRuntimeEnvironment) => {
+  const shouldSkip = hre.network.name !== "hardhat";
+  return shouldSkip;
 };
 
-module.exports.tags = ["CounterTimedTask"];
+func.tags = ["CounterTimedTask"];
