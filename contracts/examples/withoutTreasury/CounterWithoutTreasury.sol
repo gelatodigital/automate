@@ -2,10 +2,7 @@
 pragma solidity ^0.8.0;
 
 import {OpsReady} from "../../vendor/gelato/OpsReady.sol";
-
-interface IOps {
-    function getFeeDetails() external view returns (uint256, address);
-}
+import {IOps} from "../../interfaces/IOps.sol";
 
 contract CounterWithoutTreasury is OpsReady {
     uint256 public count;
