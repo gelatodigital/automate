@@ -13,6 +13,7 @@ import {
 import {IOps} from "./interfaces/IOps.sol";
 import {LibTaskId} from "./libraries/LibTaskId.sol";
 import {LibDataTypes} from "./libraries/LibDataTypes.sol";
+import {LibEvents} from "./libraries/LibEvents.sol";
 
 // solhint-disable max-line-length
 // solhint-disable not-rely-on-time
@@ -88,7 +89,7 @@ contract Ops is LibTaskId, Gelatofied, OpsStorage, IOps {
             delete feeToken;
         }
 
-        emit ExecSuccess(
+        emit LibEvents.ExecSuccess(
             _txFee,
             _feeToken,
             _execAddress,
@@ -157,7 +158,7 @@ contract Ops is LibTaskId, Gelatofied, OpsStorage, IOps {
             nextExec: nextExec,
             interval: _interval
         });
-        emit TimerSet(taskId, nextExec, _interval);
+        emit LibEvents.TimerSet(taskId, nextExec, _interval);
     }
 
     /// @notice Create a task that tells Gelato to monitor and execute transactions on specific contracts
@@ -222,7 +223,7 @@ contract Ops is LibTaskId, Gelatofied, OpsStorage, IOps {
         bool isTimedTask = time.nextExec != 0;
         if (isTimedTask) delete timedTask[_taskId];
 
-        emit TaskCancelled(_taskId, msg.sender);
+        emit LibEvents.TaskCancelled(_taskId, msg.sender);
     }
 
     function _createTask(
@@ -254,7 +255,7 @@ contract Ops is LibTaskId, Gelatofied, OpsStorage, IOps {
         taskCreator[taskId] = _taskCreator;
         execAddresses[taskId] = _execAddress;
 
-        emit TaskCreated(
+        emit LibEvents.TaskCreated(
             _taskCreator,
             _execAddress,
             _execSelector,
