@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: UNLICENSED
 pragma solidity ^0.8.0;
 
-contract LibOps {
+contract LibTaskId {
     /// @notice Helper func to query the _selector of a function you want to automate
     /// @param _func String of the function you want the selector from
     /// @dev Example: "transferFrom(address,address,uint256)" => 0x23b872dd

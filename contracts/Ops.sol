@@ -6,33 +6,27 @@ import {GelatoBytes} from "./vendor/gelato/GelatoBytes.sol";
 import {
     EnumerableSet
 } from "@openzeppelin/contracts/utils/structs/EnumerableSet.sol";
+import {OpsStorage} from "./OpsStorage.sol";
 import {
     ITaskTreasuryUpgradable
 } from "./interfaces/ITaskTreasuryUpgradable.sol";
 import {IOps} from "./interfaces/IOps.sol";
-import {LibOps} from "./libraries/LibOps.sol";
+import {LibTaskId} from "./libraries/LibTaskId.sol";
+import {LibDataTypes} from "./libraries/LibDataTypes.sol";
 
 // solhint-disable max-line-length
-// solhint-disable max-states-count
 // solhint-disable not-rely-on-time
 /// @notice Ops enables everyone to communicate to Gelato Bots to monitor and execute certain transactions
 /// @notice ResolverAddresses determine when Gelato should execute and provides bots with
 /// the payload they should use to execute
 /// @notice ExecAddress determine the actual contracts to execute a function on
-contract Ops is Gelatofied, LibOps, IOps {
+contract Ops is LibTaskId, Gelatofied, OpsStorage, IOps {
     using GelatoBytes for bytes;
     using EnumerableSet for EnumerableSet.Bytes32Set;
 
     // solhint-disable const-name-snakecase
     string public constant version = "4";
-    mapping(bytes32 => address) public taskCreator;
-    mapping(bytes32 => address) public execAddresses;
-    mapping(address => EnumerableSet.Bytes32Set) internal _createdTasks;
-    ITaskTreasuryUpgradable public immutable taskTreasury;
-    uint256 public fee;
-    address public feeToken;
-    // Appended State
-    mapping(bytes32 => Time) public timedTask;
+    ITaskTreasuryUpgradable public immutable override taskTreasury;
 
     constructor(address payable _gelato, ITaskTreasuryUpgradable _taskTreasury)
         Gelatofied(_gelato)
@@ -159,7 +153,10 @@ contract Ops is Gelatofied, LibOps, IOps {
             ? _startTime
             : uint128(block.timestamp);
 
-        timedTask[taskId] = Time({nextExec: nextExec, interval: _interval});
+        timedTask[taskId] = LibDataTypes.Time({
+            nextExec: nextExec,
+            interval: _interval
+        });
         emit TimerSet(taskId, nextExec, _interval);
     }
 
@@ -221,7 +218,7 @@ contract Ops is Gelatofied, LibOps, IOps {
         delete taskCreator[_taskId];
         delete execAddresses[_taskId];
 
-        Time memory time = timedTask[_taskId];
+        LibDataTypes.Time memory time = timedTask[_taskId];
         bool isTimedTask = time.nextExec != 0;
         if (isTimedTask) delete timedTask[_taskId];
 
@@ -271,7 +268,7 @@ contract Ops is Gelatofied, LibOps, IOps {
     }
 
     function _updateTime(bytes32 task) internal {
-        Time memory time = timedTask[task];
+        LibDataTypes.Time memory time = timedTask[task];
         bool isTimedTask = time.nextExec != 0;
 
         if (isTimedTask) {

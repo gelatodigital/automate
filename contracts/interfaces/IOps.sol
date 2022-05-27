@@ -3,13 +3,6 @@ pragma solidity ^0.8.0;
 import {ITaskTreasuryUpgradable} from "./ITaskTreasuryUpgradable.sol";
 
 interface IOps {
-    /// @notice Structs ///
-
-    struct Time {
-        uint128 nextExec;
-        uint128 interval;
-    }
-
     /// @notice Events ///
 
     event ExecSuccess(
