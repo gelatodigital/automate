@@ -3,7 +3,7 @@
 import { BigNumber } from "ethers";
 import { ethers } from "hardhat";
 
-export const getMaxFee = (network: string): BigNumber | undefined => {
+export const getMaxFee = (network: string): BigNumber => {
   switch (network) {
     case "mainnet":
       return ethers.utils.parseEther("0");
