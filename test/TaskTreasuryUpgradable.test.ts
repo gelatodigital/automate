@@ -1,25 +1,31 @@
 import { expect } from "chai";
 import { Signer } from "@ethersproject/abstract-signer";
-import { abi as EIP173PROXY_ABI } from "hardhat-deploy/extendedArtifacts/EIP173Proxy.json";
 import { BigNumber } from "ethers";
-import { getTokenFromFaucet } from "./helpers";
+import {
+  encodeResolverArgs,
+  getTokenFromFaucet,
+  Module,
+  ModuleData,
+} from "./utils";
 import {
   IERC20,
   Counter,
   Ops,
-  TaskTreasury,
+  TaskTreasuryL2,
   TaskTreasuryUpgradable,
+  ResolverModule,
 } from "../typechain";
 
 import hre = require("hardhat");
 const { ethers, deployments } = hre;
 
+const execFuncSig =
+  "exec(address,address,bytes,(uint8[],bytes[]),uint256,address,bool,bool)";
 const GELATO = "0x3CACa7b48D0573D793d3b0279b5F0029180E83b6";
-const OPS_173PROXY = "0xB3f5503f93d5Ef84b06993a1975B9D21B962892F";
-const OLD_TASK_TREASURY = "0x66e2F69df68C8F56837142bE2E8C290EfE76DA9f";
 const ETH = "0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE";
 const DAI = "0x6B175474E89094C44Da98b954EedeAC495271d0F";
 const WBTC = "0x2260FAC5E5542a773Aa44fBCfeDf7C193bc2C599";
+const ZERO_ADD = ethers.constants.AddressZero;
 
 describe("TaskTreasuryUpgradable test", function () {
   this.timeout(0);
@@ -36,15 +42,16 @@ describe("TaskTreasuryUpgradable test", function () {
   let executor: Signer;
 
   let ops: Ops;
-  let oldTreasury: TaskTreasury;
+  let oldTreasury: TaskTreasuryL2;
   let treasury: TaskTreasuryUpgradable;
   let counter: Counter;
+  let resolverModule: ResolverModule;
   let dai: IERC20;
   let wbtc: IERC20;
 
   let execData: string;
   let execAddress: string;
-  let resolverHash: string;
+  let moduleData: ModuleData;
 
   beforeEach(async function () {
     await deployments.fixture();
@@ -53,41 +60,23 @@ describe("TaskTreasuryUpgradable test", function () {
     userAddress = await user.getAddress();
     user2Address = await user2.getAddress();
 
-    oldTreasury = await ethers.getContractAt("TaskTreasury", OLD_TASK_TREASURY);
+    ops = await ethers.getContract("Ops");
+    oldTreasury = await ethers.getContract("TaskTreasuryL2");
     treasury = await ethers.getContract("TaskTreasuryUpgradable");
     dai = await ethers.getContractAt("IERC20", DAI);
     wbtc = await ethers.getContractAt("IERC20", WBTC);
+    resolverModule = await ethers.getContract("ResolverModule");
 
     const counterFactory = await ethers.getContractFactory("Counter");
-    counter = <Counter>await counterFactory.deploy(OPS_173PROXY);
-
-    const opsFactory = await ethers.getContractFactory("Ops");
-    const opsImplementation = await opsFactory.deploy(GELATO, treasury.address);
-    const ops173Proxy = await ethers.getContractAt(
-      EIP173PROXY_ABI,
-      OPS_173PROXY
-    );
+    counter = <Counter>await counterFactory.deploy(ops.address);
 
     // get accounts
-    const treasuryOwnerAddress = await oldTreasury.owner();
-    const opsOwnerAddress = await ops173Proxy.owner();
-
-    await hre.network.provider.request({
-      method: "hardhat_impersonateAccount",
-      params: [treasuryOwnerAddress],
-    });
-    await hre.network.provider.request({
-      method: "hardhat_impersonateAccount",
-      params: [opsOwnerAddress],
-    });
     await hre.network.provider.request({
       method: "hardhat_impersonateAccount",
       params: [GELATO],
     });
 
     executor = await ethers.getSigner(GELATO);
-    const treasuryOwner = await ethers.getSigner(treasuryOwnerAddress);
-    const opsOwner = await ethers.getSigner(opsOwnerAddress);
 
     // account set-up
     const value = ethers.utils.parseEther("100");
@@ -97,17 +86,11 @@ describe("TaskTreasuryUpgradable test", function () {
     await getTokenFromFaucet(WBTC, userAddress, wbtcValue);
     await getTokenFromFaucet(WBTC, user2Address, wbtcValue);
 
-    await deployer.sendTransaction({
-      to: treasuryOwnerAddress,
-      value,
-    });
-
-    // upgrade opsProxy
-    await ops173Proxy.connect(opsOwner).upgradeTo(opsImplementation.address);
-    ops = await ethers.getContractAt("Ops", OPS_173PROXY);
+    // module set-up
+    await ops.setModule([Module.RESOLVER], [resolverModule.address]);
 
     // whitelist
-    oldTreasury.connect(treasuryOwner).addWhitelistedService(treasury.address);
+    oldTreasury.connect(deployer).addWhitelistedService(treasury.address);
     treasury.connect(deployer).updateWhitelistedService(ops.address, true);
 
     // create task
@@ -117,11 +100,14 @@ describe("TaskTreasuryUpgradable test", function () {
 
     const resolverAddress = ethers.constants.AddressZero;
     const resolverData = ethers.constants.HashZero;
-    resolverHash = await ops.getResolverHash(resolverAddress, resolverData);
-
+    const resolverArgs = encodeResolverArgs(resolverAddress, resolverData);
+    moduleData = {
+      modules: [Module.RESOLVER],
+      args: [resolverArgs],
+    };
     await ops
       .connect(user)
-      .createTask(execAddress, execSelector, resolverAddress, resolverData);
+      .createTask(execAddress, execSelector, moduleData, ZERO_ADD);
   });
 
   it("ops proxy should have correct treasury address", async () => {
@@ -367,15 +353,15 @@ describe("TaskTreasuryUpgradable test", function () {
 
     await ops
       .connect(executor)
-      .exec(
+      [execFuncSig](
+        userAddress,
+        execAddress,
+        execData,
+        moduleData,
         txFee,
         tokenAddress,
-        userAddress,
         true,
-        true,
-        resolverHash,
-        execAddress,
-        execData
+        true
       );
 
     const balanceAfter = await treasury.userTokenBalance(

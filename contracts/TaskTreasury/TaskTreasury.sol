@@ -13,7 +13,7 @@ import {
     ReentrancyGuard
 } from "@openzeppelin/contracts/security/ReentrancyGuard.sol";
 import {Math} from "@openzeppelin/contracts/utils/math/Math.sol";
-import {_transfer, ETH} from "../vendor/gelato/FGelato.sol";
+import {_transfer, ETH} from "../functions/FUtils.sol";
 
 contract TaskTreasury is Ownable, ReentrancyGuard {
     using EnumerableSet for EnumerableSet.AddressSet;

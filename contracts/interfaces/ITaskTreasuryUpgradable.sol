@@ -3,6 +3,7 @@ pragma solidity ^0.8.0;
 
 interface ITaskTreasuryUpgradable {
     /// @notice Events ///
+
     event FundsDeposited(
         address indexed sender,
         address indexed token,
