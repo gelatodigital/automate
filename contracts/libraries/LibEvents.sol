@@ -2,19 +2,11 @@
 
 pragma solidity ^0.8.12;
 
+import {LibDataTypes} from "./LibDataTypes.sol";
+
 library LibEvents {
-    event TaskCreated(
-        address taskCreator,
-        address execAddress,
-        bytes4 selector,
-        address resolverAddress,
-        bytes32 taskId,
-        bytes resolverData,
-        bool useTaskTreasuryFunds,
-        address feeToken,
-        bytes32 resolverHash
-    );
     event TaskCancelled(bytes32 taskId, address taskCreator);
+
     event ExecSuccess(
         uint256 indexed txFee,
         address indexed feeToken,
@@ -23,9 +15,27 @@ library LibEvents {
         bytes32 taskId,
         bool callSuccess
     );
+
+    event TaskCreated(
+        address indexed taskCreator,
+        address indexed execAddress,
+        bytes execData,
+        LibDataTypes.ModuleData moduleData,
+        address feeToken,
+        bytes32 indexed taskId
+    );
+
     event TimerSet(
         bytes32 indexed taskId,
         uint128 indexed nextExec,
         uint128 indexed interval
     );
+
+    event ResolverSet(
+        bytes32 indexed taskId,
+        address indexed resolverAddress,
+        bytes resolverData
+    );
+
+    event SingleExecSet(bytes32 indexed taskId);
 }

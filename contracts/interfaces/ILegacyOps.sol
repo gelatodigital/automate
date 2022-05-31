@@ -1,30 +1,37 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.0;
-import {LibDataTypes} from "../libraries/LibDataTypes.sol";
+
 import {ITaskTreasuryUpgradable} from "./ITaskTreasuryUpgradable.sol";
 
-interface IOps {
+interface ILegacyOps {
     /// @notice External functions ///
 
     function createTask(
-        address execAddress,
-        bytes calldata execData,
-        LibDataTypes.ModuleData calldata moduleData,
-        address feeToken
+        address _execAddress,
+        bytes4 _execSelector,
+        address _resolverAddress,
+        bytes calldata _resolverData
+    ) external returns (bytes32 taskId);
+
+    function createTaskNoPrepayment(
+        address _execAddress,
+        bytes4 _execSelector,
+        address _resolverAddress,
+        bytes calldata _resolverData,
+        address _feeToken
+    ) external returns (bytes32 taskId);
+
+    function createTimedTask(
+        uint128 _startTime,
+        uint128 _interval,
+        address _execAddress,
+        bytes4 _execSelector,
+        address _resolverAddress,
+        bytes calldata _resolverData,
+        address _feeToken
     ) external returns (bytes32 taskId);
 
     function cancelTask(bytes32 _taskId) external;
-
-    function exec(
-        address _taskCreator,
-        address _execAddress,
-        bytes memory _execData,
-        LibDataTypes.ModuleData calldata _moduleData,
-        uint256 _txFee,
-        address _feeToken,
-        bool _useTaskTreasuryFunds,
-        bool _revertOnFailure
-    ) external;
 
     function exec(
         uint256 _txFee,
@@ -34,7 +41,7 @@ interface IOps {
         bool _revertOnFailure,
         bytes32 _resolverHash,
         address _execAddress,
-        bytes memory _execData
+        bytes calldata _execData
     ) external;
 
     /// @notice External view functions ///

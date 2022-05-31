@@ -1,11 +1,32 @@
 // SPDX-License-Identifier: UNLICENSED
 pragma solidity ^0.8.0;
 
-contract LibTaskId {
+import {LibDataTypes} from "./LibDataTypes.sol";
+
+library LibTaskId {
+    function getTaskId(
+        address _taskCreator,
+        address _execAddress,
+        bytes4 _execSelector,
+        LibDataTypes.ModuleData memory _moduleData,
+        address _feeToken
+    ) internal pure returns (bytes32) {
+        return
+            keccak256(
+                abi.encode(
+                    _taskCreator,
+                    _execAddress,
+                    _execSelector,
+                    _moduleData,
+                    _feeToken
+                )
+            );
+    }
+
     /// @notice Helper func to query the _selector of a function you want to automate
     /// @param _func String of the function you want the selector from
     /// @dev Example: "transferFrom(address,address,uint256)" => 0x23b872dd
-    function getSelector(string calldata _func) external pure returns (bytes4) {
+    function getSelector(string calldata _func) internal pure returns (bytes4) {
         return bytes4(keccak256(bytes(_func)));
     }
 
@@ -15,7 +36,7 @@ contract LibTaskId {
     function getResolverHash(
         address _resolverAddress,
         bytes memory _resolverData
-    ) public pure returns (bytes32) {
+    ) internal pure returns (bytes32) {
         return keccak256(abi.encode(_resolverAddress, _resolverData));
     }
 
@@ -26,14 +47,14 @@ contract LibTaskId {
     /// @param _useTaskTreasuryFunds If msg.sender's balance on TaskTreasury should pay for the tx
     /// @param _feeToken FeeToken to use, address 0 if task treasury is used
     /// @param _resolverHash hash of resolver address and data
-    function getTaskId(
+    function getLegacyTaskId(
         address _taskCreator,
         address _execAddress,
         bytes4 _selector,
         bool _useTaskTreasuryFunds,
         address _feeToken,
         bytes32 _resolverHash
-    ) public pure returns (bytes32) {
+    ) internal pure returns (bytes32) {
         return
             keccak256(
                 abi.encode(
