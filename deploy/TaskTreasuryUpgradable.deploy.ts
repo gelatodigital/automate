@@ -46,3 +46,4 @@ func.skip = async (hre: HardhatRuntimeEnvironment) => {
 };
 
 func.tags = ["TaskTreasuryUpgradable"];
+func.dependencies = ["TaskTreasuryL2"];

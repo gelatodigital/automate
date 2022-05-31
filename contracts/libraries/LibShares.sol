@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: UNLICENSED
 pragma solidity ^0.8.12;
-import {ETH} from "../vendor/gelato/FGelato.sol";
+import {ETH} from "../functions/FUtils.sol";
 import {IERC20Extended} from "../interfaces/IERC20Extended.sol";
 
 library LibShares {

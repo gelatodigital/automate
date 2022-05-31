@@ -1,11 +1,12 @@
 import { HardhatRuntimeEnvironment } from "hardhat/types";
 import { DeployFunction } from "hardhat-deploy/types";
 import { sleep } from "../hardhat/utils";
-import { getGelatoAddress } from "../hardhat/config/addresses";
 
 const func: DeployFunction = async (hre: HardhatRuntimeEnvironment) => {
   if (hre.network.name !== "hardhat") {
-    console.log(`Deploying Ops to ${hre.network.name}. Hit ctrl + c to abort`);
+    console.log(
+      `Deploying ProxyModule to ${hre.network.name}. Hit ctrl + c to abort`
+    );
     await sleep(10000);
   }
 
@@ -13,17 +14,9 @@ const func: DeployFunction = async (hre: HardhatRuntimeEnvironment) => {
   const { deploy } = deployments;
   const { deployer } = await hre.getNamedAccounts();
 
-  const GELATO = getGelatoAddress(hre.network.name);
-  const UPGRADABLE_TREASURY = (
-    await hre.ethers.getContract("TaskTreasuryUpgradable")
-  ).address;
-
-  await deploy("Ops", {
+  await deploy("ProxyModule", {
     from: deployer,
-    proxy: {
-      owner: deployer,
-    },
-    args: [GELATO, UPGRADABLE_TREASURY],
+    args: [await (await hre.ethers.getContract("OpsUserProxyFactory")).address],
   });
 };
 
@@ -34,5 +27,5 @@ func.skip = async (hre: HardhatRuntimeEnvironment) => {
   return shouldSkip;
 };
 
-func.tags = ["Ops"];
-func.dependencies = ["TaskTreasuryUpgradable", "OpsProxyFactory"];
+func.tags = ["ProxyModule"];
+func.dependencies = ["OpsUserProxyFactory"];
