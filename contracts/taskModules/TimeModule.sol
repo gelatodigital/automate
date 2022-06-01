@@ -27,29 +27,12 @@ contract TimeModule is TaskModuleBase {
         emit LibEvents.TimerSet(_taskId, nextExec, interval);
     }
 
-    function onExecTask(
-        bool _lastModule,
+    function preExecTask(
         bytes32 _taskId,
         address,
         address _execAddress,
-        bytes calldata _execData,
-        bool _revertOnFailure
-    )
-        external
-        override
-        returns (
-            address,
-            bytes memory,
-            bool callSuccess
-        )
-    {
-        callSuccess = _onExecTaskHook(
-            _lastModule,
-            _execAddress,
-            _execData,
-            _revertOnFailure
-        );
-
+        bytes calldata _execData
+    ) external override returns (address, bytes memory) {
         LibDataTypes.Time memory time = timedTask[_taskId];
         bool isTimedTask = time.nextExec != 0;
 
@@ -67,7 +50,15 @@ contract TimeModule is TaskModuleBase {
                 (intervals * time.interval);
         }
 
-        return (_execAddress, _execData, callSuccess);
+        return (_execAddress, _execData);
+    }
+
+    function encodeModuleArg(address _startTime, bytes calldata _interval)
+        external
+        pure
+        returns (bytes memory)
+    {
+        return abi.encode(_startTime, _interval);
     }
 
     function _decodeModuleArg(bytes calldata _arg)

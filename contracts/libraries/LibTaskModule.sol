@@ -2,7 +2,7 @@
 
 pragma solidity ^0.8.12;
 
-import {_delegateCall} from "../functions/FExec.sol";
+import {_call, _delegateCall} from "../functions/FExec.sol";
 import {LibDataTypes} from "./LibDataTypes.sol";
 import {ITaskModule} from "../interfaces/ITaskModule.sol";
 
@@ -51,35 +51,97 @@ library LibTaskModule {
         bool _revertOnFailure,
         mapping(LibDataTypes.Module => address) storage taskModuleAddresses
     ) internal returns (bool callSuccess) {
-        uint256 length = _modules.length;
+        address[] memory moduleAddresses;
+        (moduleAddresses, _execAddress, _execData) = _preExecTask(
+            _taskId,
+            _taskCreator,
+            _execAddress,
+            _execData,
+            _modules,
+            taskModuleAddresses
+        );
 
-        bool lastModule;
+        (callSuccess, ) = _call(
+            _execAddress,
+            _execData,
+            _revertOnFailure,
+            "Ops.exec: "
+        );
+
+        _postExecTask(
+            _taskId,
+            _taskCreator,
+            _execAddress,
+            _execData,
+            moduleAddresses
+        );
+    }
+
+    function _preExecTask(
+        bytes32 _taskId,
+        address _taskCreator,
+        address _execAddress,
+        bytes memory _execData,
+        LibDataTypes.Module[] memory _modules,
+        mapping(LibDataTypes.Module => address) storage taskModuleAddresses
+    )
+        private
+        returns (
+            address[] memory,
+            address,
+            bytes memory
+        )
+    {
+        uint256 length = _modules.length;
+        address[] memory moduleAddresses = new address[](length);
 
         for (uint256 i; i < length; i++) {
-            address taskModuleAddress = taskModuleAddresses[_modules[i]];
-            _moduleInitialised(taskModuleAddress);
-
-            lastModule = i == length - 1;
+            moduleAddresses[i] = taskModuleAddresses[_modules[i]];
 
             bytes memory delegatecallData = abi.encodeWithSelector(
-                ITaskModule.onExecTask.selector,
-                lastModule,
+                ITaskModule.preExecTask.selector,
                 _taskId,
                 _taskCreator,
                 _execAddress,
-                _execData,
-                _revertOnFailure
+                _execData
             );
 
             (, bytes memory returnData) = _delegateCall(
-                taskModuleAddress,
+                moduleAddresses[i],
                 delegatecallData,
-                "Ops.onExecTask: "
+                "Ops.preExecTask: "
             );
 
-            (_execAddress, _execData, callSuccess) = abi.decode(
+            (_execAddress, _execData) = abi.decode(
                 returnData,
-                (address, bytes, bool)
+                (address, bytes)
+            );
+        }
+        return (moduleAddresses, _execAddress, _execData);
+    }
+
+    function _postExecTask(
+        bytes32 _taskId,
+        address _taskCreator,
+        address _execAddress,
+        bytes memory _execData,
+        address[] memory _moduleAddresses
+    ) private {
+        uint256 length = _moduleAddresses.length;
+
+        for (uint256 i; i < length; i++) {
+            bytes memory delegatecallData = abi.encodeWithSelector(
+                ITaskModule.postExecTask.selector,
+                _taskId,
+                _taskCreator,
+                _execAddress,
+                _execData
+            );
+
+            _delegateCall(
+                _moduleAddresses[i],
+                delegatecallData,
+                "Ops.postExecTask: "
             );
         }
     }

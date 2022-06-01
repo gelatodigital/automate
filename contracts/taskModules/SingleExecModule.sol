@@ -11,39 +11,12 @@ import {LibEvents} from "../libraries/LibEvents.sol";
 contract SingleExecModule is TaskModuleBase {
     using EnumerableSet for EnumerableSet.Bytes32Set;
 
-    function onCreateTask(
-        bytes32 _taskId,
-        address,
-        address,
-        bytes calldata,
-        bytes calldata
-    ) external override {
-        emit LibEvents.SingleExecSet(_taskId);
-    }
-
-    function onExecTask(
-        bool _lastModule,
+    function postExecTask(
         bytes32 _taskId,
         address _taskCreator,
         address _execAddress,
-        bytes calldata _execData,
-        bool _revertOnFailure
-    )
-        external
-        override
-        returns (
-            address,
-            bytes memory,
-            bool callSuccess
-        )
-    {
-        callSuccess = _onExecTaskHook(
-            _lastModule,
-            _execAddress,
-            _execData,
-            _revertOnFailure
-        );
-
+        bytes calldata _execData
+    ) external override returns (address, bytes memory) {
         _createdTasks[_taskCreator].remove(_taskId);
         delete taskCreator[_taskId];
         delete execAddresses[_taskId];
@@ -51,6 +24,6 @@ contract SingleExecModule is TaskModuleBase {
 
         emit LibEvents.TaskCancelled(_taskId, address(this));
 
-        return (_execAddress, _execData, callSuccess);
+        return (_execAddress, _execData);
     }
 }

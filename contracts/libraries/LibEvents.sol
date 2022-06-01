@@ -30,12 +30,4 @@ library LibEvents {
         uint128 indexed nextExec,
         uint128 indexed interval
     );
-
-    event ResolverSet(
-        bytes32 indexed taskId,
-        address indexed resolverAddress,
-        bytes resolverData
-    );
-
-    event SingleExecSet(bytes32 indexed taskId);
 }
