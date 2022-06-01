@@ -116,30 +116,20 @@ describe("Ops legacy task test", function () {
     expect(txn.events).to.not.be.null;
     if (!txn.events) return;
 
-    // ResolverSet
+    // TaskCreated
     const decoded = events.interface.decodeEventLog(
-      "ResolverSet",
+      "TaskCreated",
       txn.events[0].data,
       txn.events[0].topics
     );
+
+    expect(decoded.taskCreator).to.be.eql(userAddress);
+    expect(decoded.execAddress).to.be.eql(counter.address);
+    expect(decoded.execData).to.be.eql(execSelector);
+    expect(decoded.moduleData.modules).to.be.eql(moduleData.modules);
+    expect(decoded.moduleData.args).to.be.eql(moduleData.args);
+    expect(decoded.feeToken).to.be.eql(ZERO_ADD);
     expect(decoded.taskId).to.be.eql(taskId);
-    expect(decoded.resolverAddress).to.be.eql(counterResolver.address);
-    expect(decoded.resolverData).to.be.eql(resolverData);
-
-    // TaskCreated
-    const decoded2 = events.interface.decodeEventLog(
-      "TaskCreated",
-      txn.events[1].data,
-      txn.events[1].topics
-    );
-
-    expect(decoded2.taskCreator).to.be.eql(userAddress);
-    expect(decoded2.execAddress).to.be.eql(counter.address);
-    expect(decoded2.execData).to.be.eql(execSelector);
-    expect(decoded2.moduleData.modules).to.be.eql(moduleData.modules);
-    expect(decoded2.moduleData.args).to.be.eql(moduleData.args);
-    expect(decoded2.feeToken).to.be.eql(ZERO_ADD);
-    expect(decoded2.taskId).to.be.eql(taskId);
   });
 
   it("create task no prepayment", async () => {
@@ -170,30 +160,20 @@ describe("Ops legacy task test", function () {
 
     if (!txn.events) return;
 
-    // ResolverSet
+    // TaskCreated
     const decoded = events.interface.decodeEventLog(
-      "ResolverSet",
+      "TaskCreated",
       txn.events[0].data,
       txn.events[0].topics
     );
+
+    expect(decoded.taskCreator).to.be.eql(userAddress);
+    expect(decoded.execAddress).to.be.eql(counter.address);
+    expect(decoded.execData).to.be.eql(execSelector);
+    expect(decoded.moduleData.modules).to.be.eql(moduleData.modules);
+    expect(decoded.moduleData.args).to.be.eql(moduleData.args);
+    expect(decoded.feeToken).to.be.eql(ETH);
     expect(decoded.taskId).to.be.eql(taskId);
-    expect(decoded.resolverAddress).to.be.eql(counterResolver.address);
-    expect(decoded.resolverData).to.be.eql(resolverData);
-
-    // TaskCreated
-    const decoded2 = events.interface.decodeEventLog(
-      "TaskCreated",
-      txn.events[1].data,
-      txn.events[1].topics
-    );
-
-    expect(decoded2.taskCreator).to.be.eql(userAddress);
-    expect(decoded2.execAddress).to.be.eql(counter.address);
-    expect(decoded2.execData).to.be.eql(execSelector);
-    expect(decoded2.moduleData.modules).to.be.eql(moduleData.modules);
-    expect(decoded2.moduleData.args).to.be.eql(moduleData.args);
-    expect(decoded2.feeToken).to.be.eql(ETH);
-    expect(decoded2.taskId).to.be.eql(taskId);
   });
 
   it("create timed task", async () => {
@@ -232,40 +212,30 @@ describe("Ops legacy task test", function () {
 
     if (!txn.events) return;
 
-    // ResolverSet
+    // TimerSet
     const decoded = events.interface.decodeEventLog(
-      "ResolverSet",
+      "TimerSet",
       txn.events[0].data,
       txn.events[0].topics
     );
     expect(decoded.taskId).to.be.eql(taskId);
-    expect(decoded.resolverAddress).to.be.eql(counterResolver.address);
-    expect(decoded.resolverData).to.be.eql(resolverData);
+    expect(decoded.nextExec).to.be.eql(ethers.BigNumber.from(startTime));
+    expect(decoded.interval).to.be.eql(ethers.BigNumber.from(interval));
 
-    // TimerSet
+    // TaskCreated
     const decoded2 = events.interface.decodeEventLog(
-      "TimerSet",
+      "TaskCreated",
       txn.events[1].data,
       txn.events[1].topics
     );
+
+    expect(decoded2.taskCreator).to.be.eql(userAddress);
+    expect(decoded2.execAddress).to.be.eql(counter.address);
+    expect(decoded2.execData).to.be.eql(execSelector);
+    expect(decoded2.moduleData.modules).to.be.eql(moduleData.modules);
+    expect(decoded2.moduleData.args).to.be.eql(moduleData.args);
+    expect(decoded2.feeToken).to.be.eql(ETH);
     expect(decoded2.taskId).to.be.eql(taskId);
-    expect(decoded2.nextExec).to.be.eql(ethers.BigNumber.from(startTime));
-    expect(decoded2.interval).to.be.eql(ethers.BigNumber.from(interval));
-
-    // TaskCreated
-    const decoded3 = events.interface.decodeEventLog(
-      "TaskCreated",
-      txn.events[2].data,
-      txn.events[2].topics
-    );
-
-    expect(decoded3.taskCreator).to.be.eql(userAddress);
-    expect(decoded3.execAddress).to.be.eql(counter.address);
-    expect(decoded3.execData).to.be.eql(execSelector);
-    expect(decoded3.moduleData.modules).to.be.eql(moduleData.modules);
-    expect(decoded3.moduleData.args).to.be.eql(moduleData.args);
-    expect(decoded3.feeToken).to.be.eql(ETH);
-    expect(decoded3.taskId).to.be.eql(taskId);
   });
 
   it("fallback - data", async () => {

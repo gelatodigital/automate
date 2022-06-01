@@ -161,9 +161,22 @@ describe("Ops multi module test", function () {
     ).to.be.revertedWith("Ops._validModules: Asc only");
   });
 
+  it("duplicate modules", async () => {
+    moduleData = {
+      modules: [Module.RESOLVER, Module.RESOLVER],
+      args: [resolverArgs, resolverArgs],
+    };
+
+    await expect(
+      ops
+        .connect(user)
+        .createTask(counter.address, execSelector, moduleData, ZERO_ADD)
+    ).to.be.revertedWith("Ops._validModules: Asc only");
+  });
+
   it("exec - time should revert", async () => {
     await expect(execute(true)).to.be.revertedWith(
-      "Ops.onExecTask: TimeModule: Too early"
+      "Ops.preExecTask: TimeModule: Too early"
     );
   });
 

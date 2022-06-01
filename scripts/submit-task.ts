@@ -1,4 +1,5 @@
 import { ethers } from "hardhat";
+import { encodeResolverArgs, Module, ModuleData } from "../test/utils";
 import { Counter, CounterResolver, Ops } from "../typechain";
 
 async function main() {
@@ -15,14 +16,21 @@ async function main() {
   console.log("Counter address: ", counter.address);
   console.log("Counter resolver address: ", resolver.address);
 
-  const selector = await ops.getSelector("increaseCount(uint256)");
-  const resolverData = await ops.getSelector("checker()");
+  const execSelector = counter.interface.getSighash("increaseCount");
+  const resolverData = resolver.interface.encodeFunctionData("checker");
+  const resolverModuleArg = encodeResolverArgs(resolver.address, resolverData);
+  const feeToken = ethers.constants.AddressZero;
+
+  const moduleData: ModuleData = {
+    modules: [Module.RESOLVER],
+    args: [resolverModuleArg],
+  };
 
   const txn = await ops.createTask(
     counter.address,
-    selector,
-    resolver.address,
-    resolverData
+    execSelector,
+    moduleData,
+    feeToken
   );
 
   const res = await txn.wait();
