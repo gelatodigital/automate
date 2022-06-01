@@ -127,7 +127,7 @@ describe("Ops Resolver module test", function () {
 
     // will fail in off-chain simulation
     await expect(execute(true)).to.be.revertedWith(
-      "Ops.onExecTask: Ops.exec: Counter: increaseCount: Time not elapsed"
+      "Ops.exec: Counter: increaseCount: Time not elapsed"
     );
     // will not fail on-chain
     const balanceBefore = await treasury.userTokenBalance(userAddress, ETH);

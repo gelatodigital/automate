@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: UNLICENSED
-pragma solidity 0.8.14;
+pragma solidity ^0.8.14;
 
 import {
     EnumerableSet
@@ -23,7 +23,7 @@ contract Ops is Gelatofied, Proxied, OpsStorage, IOps {
     using EnumerableSet for EnumerableSet.Bytes32Set;
 
     // solhint-disable const-name-snakecase
-    string public constant version = "4";
+    string public constant version = "5";
     ITaskTreasuryUpgradable public immutable override taskTreasury;
 
     constructor(address payable _gelato, ITaskTreasuryUpgradable _taskTreasury)

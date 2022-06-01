@@ -40,22 +40,12 @@ contract ProxyModule is TaskModuleBase {
      * _execAddress is not a proxy. If _execAddress is proxy, _execData
      * should have function signatures of `executeCall` or `batchExecuteCall`
      */
-    function onExecTask(
-        bool _lastModule,
+    function preExecTask(
         bytes32,
         address _taskCreator,
         address _execAddress,
-        bytes calldata _execData,
-        bool _revertOnFailure
-    )
-        external
-        override
-        returns (
-            address,
-            bytes memory execData,
-            bool callSuccess
-        )
-    {
+        bytes calldata _execData
+    ) external override returns (address, bytes memory execData) {
         address proxy = _deployIfNoProxy(_taskCreator);
 
         execData = _execAddress == proxy
@@ -64,14 +54,7 @@ contract ProxyModule is TaskModuleBase {
 
         _execAddress = proxy;
 
-        callSuccess = _onExecTaskHook(
-            _lastModule,
-            _execAddress,
-            execData,
-            _revertOnFailure
-        );
-
-        return (_execAddress, execData, callSuccess);
+        return (_execAddress, execData);
     }
 
     function _deployIfNoProxy(address _taskCreator)

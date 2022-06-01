@@ -11,18 +11,17 @@ interface ITaskModule {
         bytes calldata initModuleArg
     ) external;
 
-    function onExecTask(
-        bool lastModule,
+    function preExecTask(
         bytes32 taskId,
         address taskCreator,
         address execAddress,
-        bytes calldata execData,
-        bool revertOnFailure
-    )
-        external
-        returns (
-            address execAddress_,
-            bytes memory execData_,
-            bool callSuccess
-        );
+        bytes calldata execData
+    ) external returns (address execAddress_, bytes memory execData_);
+
+    function postExecTask(
+        bytes32 taskId,
+        address taskCreator,
+        address execAddress,
+        bytes calldata execData
+    ) external returns (address execAddress_, bytes memory execData_);
 }
