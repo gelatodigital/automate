@@ -13,6 +13,7 @@ import {IBeacon} from "@openzeppelin/contracts/proxy/beacon/IBeacon.sol";
 import {IOpsUserProxy} from "../interfaces/IOpsUserProxy.sol";
 import {IOpsUserProxyFactory} from "../interfaces/IOpsUserProxyFactory.sol";
 
+// solhint-disable max-states-count
 contract OpsUserProxyFactory is
     IOpsUserProxyFactory,
     IBeacon,
@@ -24,13 +25,13 @@ contract OpsUserProxyFactory is
     address public immutable ops;
     address public override implementation;
 
-    /// @dev track the next seed to be used by an EOA.
+    ///@dev track the next seed to be used by an EOA.
     mapping(address => bytes32) internal _nextSeeds;
 
-    /// @dev track deployed proxies
+    ///@dev track deployed proxies
     mapping(address => bool) internal _proxies;
 
-    /// @dev track proxy of user
+    ///@dev track proxy of user
     mapping(address => address) internal _proxyOf;
 
     modifier onlyOneProxy(address _account) {
@@ -51,6 +52,7 @@ contract OpsUserProxyFactory is
         implementation = _implementation;
     }
 
+    ///@inheritdoc IOpsUserProxyFactory
     function updateBeaconImplementation(address _implementation)
         external
         override
@@ -62,10 +64,12 @@ contract OpsUserProxyFactory is
         emit BeaconUpdated(oldImplementation, _implementation);
     }
 
+    ///@inheritdoc IOpsUserProxyFactory
     function deploy() external override returns (address payable proxy) {
         proxy = deployFor(msg.sender);
     }
 
+    ///@inheritdoc IOpsUserProxyFactory
     function getNextSeed(address _account)
         external
         view
@@ -75,6 +79,7 @@ contract OpsUserProxyFactory is
         return _nextSeeds[_account];
     }
 
+    ///@inheritdoc IOpsUserProxyFactory
     function getProxyOf(address _account)
         external
         view
@@ -89,6 +94,7 @@ contract OpsUserProxyFactory is
         return (proxyAddress, false);
     }
 
+    ///@inheritdoc IOpsUserProxyFactory
     function getOwnerOf(address _proxy)
         external
         view
@@ -100,6 +106,7 @@ contract OpsUserProxyFactory is
         return IOpsUserProxy(_proxy).owner();
     }
 
+    ///@inheritdoc IOpsUserProxyFactory
     function deployFor(address owner)
         public
         override
@@ -123,6 +130,7 @@ contract OpsUserProxyFactory is
         emit DeployProxy(msg.sender, owner, seed, salt, address(proxy));
     }
 
+    ///@inheritdoc IOpsUserProxyFactory
     function determineProxyAddress(address _account)
         public
         view
@@ -148,6 +156,7 @@ contract OpsUserProxyFactory is
         return address(uint160(uint256(codeHash)));
     }
 
+    ///@inheritdoc IOpsUserProxyFactory
     function isProxy(address proxy) public view override returns (bool) {
         return _proxies[proxy];
     }

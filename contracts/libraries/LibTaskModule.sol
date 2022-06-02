@@ -6,7 +6,20 @@ import {_call, _delegateCall} from "../functions/FExec.sol";
 import {LibDataTypes} from "./LibDataTypes.sol";
 import {ITaskModule} from "../interfaces/ITaskModule.sol";
 
+/**
+ * @notice Library to call task modules on task creation and execution.
+ */
 library LibTaskModule {
+    /**
+     * @notice Delegate calls task modules on create task to initialise them.
+     *
+     * @param _taskId Unique hash of the task. {See LibTaskId-getTaskId}
+     * @param _taskCreator The address which created the task.
+     * @param _execAddress Address of contract that will be called by Gelato.
+     * @param _execData Execution data to be called with / function selector.
+     * @param _moduleData Modules that will be used for the task. {See LibDataTypes-ModuleData}
+     * @param taskModuleAddresses The storage reference to the mapping of modules to their address.
+     */
     function onCreateTask(
         bytes32 _taskId,
         address _taskCreator,
@@ -42,6 +55,17 @@ library LibTaskModule {
         }
     }
 
+    /**
+     * @notice Delegate calls task modules on exec.
+     *
+     * @param _taskId Unique hash of the task. {See LibTaskId-getTaskId}
+     * @param _taskCreator The address which created the task.
+     * @param _execAddress Address of contract that will be called by Gelato.
+     * @param _execData Execution data to be called with / function selector.
+     * @param _modules Modules that is used for the task. {See LibDataTypes-Module}
+     * @param _revertOnFailure To revert or not if call to execAddress fails.
+     * @param taskModuleAddresses The storage reference to the mapping of modules to their address.
+     */
     function onExecTask(
         bytes32 _taskId,
         address _taskCreator,

@@ -9,6 +9,7 @@ import {LibEvents} from "../libraries/LibEvents.sol";
 
 // solhint-disable not-rely-on-time
 contract TimeModule is TaskModuleBase {
+    ///@inheritdoc TaskModuleBase
     function onCreateTask(
         bytes32 _taskId,
         address,
@@ -27,6 +28,11 @@ contract TimeModule is TaskModuleBase {
         emit LibEvents.TimerSet(_taskId, nextExec, interval);
     }
 
+    /**
+     * @inheritdoc TaskModuleBase
+     * @dev Time is updated at preExec because if
+     * SingleExec is used concurrently, it will delete timedTask.
+     */
     function preExecTask(
         bytes32 _taskId,
         address,
@@ -53,6 +59,12 @@ contract TimeModule is TaskModuleBase {
         return (_execAddress, _execData);
     }
 
+    /**
+     * @notice Helper function to encode arguments for TimeModule.
+     *
+     * @param _startTime Time when the first execution should occur.
+     * @param _interval Time interval between each execution.
+     */
     function encodeModuleArg(address _startTime, bytes calldata _interval)
         external
         pure

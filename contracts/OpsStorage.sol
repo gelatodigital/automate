@@ -5,6 +5,9 @@ import {
 } from "@openzeppelin/contracts/utils/structs/EnumerableSet.sol";
 import {LibDataTypes} from "./libraries/LibDataTypes.sol";
 
+/**
+ * @notice Storage layout of Ops smart contract.
+ */
 // solhint-disable max-states-count
 abstract contract OpsStorage {
     mapping(bytes32 => address) public taskCreator;

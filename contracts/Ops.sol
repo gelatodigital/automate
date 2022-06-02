@@ -18,6 +18,11 @@ import {
 } from "./interfaces/ITaskTreasuryUpgradable.sol";
 import {IOps} from "./interfaces/IOps.sol";
 
+/**
+ * @notice Ops enables everyone to have Gelato monitor and execute transactions.
+ * @notice ExecAddress refers to the contract that has the function which Gelato will call.
+ * @notice Modules allow users to customise conditions and specifications when creating a task.
+ */
 contract Ops is Gelatofied, Proxied, OpsStorage, IOps {
     using GelatoBytes for bytes;
     using EnumerableSet for EnumerableSet.Bytes32Set;
@@ -37,6 +42,7 @@ contract Ops is Gelatofied, Proxied, OpsStorage, IOps {
         returnData = _handleLegacyTaskCreation(_callData);
     }
 
+    ///@inheritdoc IOps
     function createTask(
         address _execAddress,
         bytes calldata _execData,
@@ -52,10 +58,12 @@ contract Ops is Gelatofied, Proxied, OpsStorage, IOps {
         );
     }
 
+    ///@inheritdoc IOps
     function cancelTask(bytes32 _taskId) external {
         _cancelTask(msg.sender, _taskId);
     }
 
+    ///@inheritdoc IOps
     function exec(
         address _taskCreator,
         address _execAddress,
@@ -87,6 +95,7 @@ contract Ops is Gelatofied, Proxied, OpsStorage, IOps {
         );
     }
 
+    ///@inheritdoc IOps
     function exec(
         uint256 _txFee,
         address _feeToken,
@@ -122,6 +131,7 @@ contract Ops is Gelatofied, Proxied, OpsStorage, IOps {
         );
     }
 
+    ///@inheritdoc IOps
     function setModule(
         LibDataTypes.Module[] calldata _modules,
         address[] calldata _moduleAddresses
@@ -132,10 +142,12 @@ contract Ops is Gelatofied, Proxied, OpsStorage, IOps {
         }
     }
 
+    ///@inheritdoc IOps
     function getFeeDetails() external view returns (uint256, address) {
         return (fee, feeToken);
     }
 
+    ///@inheritdoc IOps
     function getTaskIdsByUser(address _taskCreator)
         external
         view
