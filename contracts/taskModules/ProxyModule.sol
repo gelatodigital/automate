@@ -18,6 +18,7 @@ contract ProxyModule is TaskModuleBase {
     }
 
     /**
+     * @inheritdoc TaskModuleBase
      * @dev _taskCreator cannot create task to other user's proxy
      */
     function onCreateTask(
@@ -36,6 +37,7 @@ contract ProxyModule is TaskModuleBase {
     }
 
     /**
+     * @inheritdoc TaskModuleBase
      * @dev _execData is encoded with proxy's `executeCall` function if
      * _execAddress is not a proxy. If _execAddress is proxy, _execData
      * should have function signatures of `executeCall` or `batchExecuteCall`

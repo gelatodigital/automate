@@ -32,6 +32,7 @@ contract OpsUserProxy is IOpsUserProxy, Initializable {
         owner = _owner;
     }
 
+    ///@inheritdoc IOpsUserProxy
     function batchExecuteCall(
         address[] calldata _targets,
         bytes[] calldata _datas,
@@ -47,6 +48,7 @@ contract OpsUserProxy is IOpsUserProxy, Initializable {
             executeCall(_targets[i], _datas[i], _values[i]);
     }
 
+    ///@inheritdoc IOpsUserProxy
     function executeCall(
         address _target,
         bytes calldata _data,

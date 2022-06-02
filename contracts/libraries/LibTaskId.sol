@@ -3,68 +3,83 @@ pragma solidity ^0.8.0;
 
 import {LibDataTypes} from "./LibDataTypes.sol";
 
+/**
+ * @notice Library to compute taskId of legacy and current tasks.
+ */
+// solhint-disable max-line-length
 library LibTaskId {
+    /**
+     * @notice Returns taskId of taskCreator.
+     * @notice Current way of computing taskId.
+     *
+     * @param taskCreator The address which created the task.
+     * @param execAddress Address of contract that will be called by Gelato.
+     * @param execSelector Signature of the function which will be called by Gelato.
+     * @param moduleData  Conditional modules that will be used. {See LibDataTypes-ModuleData}
+     * @param feeToken Address of token to be used as payment. Use address(0) if TaskTreasury is being used, 0xeeeeee... for ETH or native tokens.
+     */
     function getTaskId(
-        address _taskCreator,
-        address _execAddress,
-        bytes4 _execSelector,
-        LibDataTypes.ModuleData memory _moduleData,
-        address _feeToken
+        address taskCreator,
+        address execAddress,
+        bytes4 execSelector,
+        LibDataTypes.ModuleData memory moduleData,
+        address feeToken
     ) internal pure returns (bytes32) {
         return
             keccak256(
                 abi.encode(
-                    _taskCreator,
-                    _execAddress,
-                    _execSelector,
-                    _moduleData,
-                    _feeToken
+                    taskCreator,
+                    execAddress,
+                    execSelector,
+                    moduleData,
+                    feeToken
                 )
             );
     }
 
-    /// @notice Helper func to query the _selector of a function you want to automate
-    /// @param _func String of the function you want the selector from
-    /// @dev Example: "transferFrom(address,address,uint256)" => 0x23b872dd
-    function getSelector(string calldata _func) internal pure returns (bytes4) {
-        return bytes4(keccak256(bytes(_func)));
-    }
-
-    /// @notice Helper func to query the resolverHash
-    /// @param _resolverAddress Address of resolver
-    /// @param _resolverData Data passed to resolver
-    function getResolverHash(
-        address _resolverAddress,
-        bytes memory _resolverData
-    ) internal pure returns (bytes32) {
-        return keccak256(abi.encode(_resolverAddress, _resolverData));
-    }
-
-    /// @notice Returns TaskId of a task Creator
-    /// @param _taskCreator Address of the task creator
-    /// @param _execAddress Address of the contract to be executed by Gelato
-    /// @param _selector Function on the _execAddress which should be executed
-    /// @param _useTaskTreasuryFunds If msg.sender's balance on TaskTreasury should pay for the tx
-    /// @param _feeToken FeeToken to use, address 0 if task treasury is used
-    /// @param _resolverHash hash of resolver address and data
+    /**
+     * @notice Returns taskId of taskCreator.
+     * @notice Legacy way of computing taskId.
+     *
+     * @param taskCreator The address which created the task.
+     * @param execAddress Address of contract that will be called by Gelato.
+     * @param execSelector Signature of the function which will be called by Gelato.
+     * @param useTaskTreasuryFunds Wether fee should be deducted from TaskTreasury.
+     * @param feeToken Address of token to be used as payment. Use address(0) if TaskTreasury is being used, 0xeeeeee... for ETH or native tokens.
+     * @param resolverHash Hash of resolverAddress and resolverData {See getResolverHash}
+     */
     function getLegacyTaskId(
-        address _taskCreator,
-        address _execAddress,
-        bytes4 _selector,
-        bool _useTaskTreasuryFunds,
-        address _feeToken,
-        bytes32 _resolverHash
+        address taskCreator,
+        address execAddress,
+        bytes4 execSelector,
+        bool useTaskTreasuryFunds,
+        address feeToken,
+        bytes32 resolverHash
     ) internal pure returns (bytes32) {
         return
             keccak256(
                 abi.encode(
-                    _taskCreator,
-                    _execAddress,
-                    _selector,
-                    _useTaskTreasuryFunds,
-                    _feeToken,
-                    _resolverHash
+                    taskCreator,
+                    execAddress,
+                    execSelector,
+                    useTaskTreasuryFunds,
+                    feeToken,
+                    resolverHash
                 )
             );
+    }
+
+    /**
+     * @notice Helper func to query the resolverHash
+     *
+     * @param resolverAddress Address of resolver
+     * @param resolverData Data passed to resolver
+     */
+    function getResolverHash(address resolverAddress, bytes memory resolverData)
+        internal
+        pure
+        returns (bytes32)
+    {
+        return keccak256(abi.encode(resolverAddress, resolverData));
     }
 }

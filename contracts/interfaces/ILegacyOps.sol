@@ -3,9 +3,11 @@ pragma solidity ^0.8.0;
 
 import {ITaskTreasuryUpgradable} from "./ITaskTreasuryUpgradable.sol";
 
+/**
+ * @notice Legacy Ops interface with individual create task function for each task type.
+ * @notice These function signatures are still supported via fallback. {See Ops.sol-fallback}
+ */
 interface ILegacyOps {
-    /// @notice External functions ///
-
     function createTask(
         address _execAddress,
         bytes4 _execSelector,
@@ -43,8 +45,6 @@ interface ILegacyOps {
         address _execAddress,
         bytes calldata _execData
     ) external;
-
-    /// @notice External view functions ///
 
     function getFeeDetails() external view returns (uint256, address);
 
