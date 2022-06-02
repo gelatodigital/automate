@@ -7,7 +7,18 @@ import {LibDataTypes} from "./LibDataTypes.sol";
 import {ILegacyOps} from "../interfaces/ILegacyOps.sol";
 import {ITaskModule} from "../interfaces/ITaskModule.sol";
 
+/**
+ * @notice Library to keep task creation methods backwards compatible.
+ * @notice Legacy create task methods can be found in ILegacyOps.sol
+ */
 library LibLegacyTask {
+    /**
+     * @notice Use legacy ops create task calldata to construct
+     * arguments that conforms to current create task format.
+     *
+     * @param _funcSig Function signature of calldata.
+     * @param _callData Calldata that was passed from fallback function.
+     */
     function getCreateTaskArg(bytes4 _funcSig, bytes calldata _callData)
         internal
         pure

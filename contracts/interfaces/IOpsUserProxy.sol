@@ -2,8 +2,14 @@
 pragma solidity ^0.8.12;
 
 interface IOpsUserProxy {
-    /// @notice Events ///
-
+    /**
+     * @notice Emitted when proxy calls a contract successfully in `executeCall`
+     *
+     * @param target Address of contract that is called
+     * @param data Data used in the call.
+     * @param value Native token value used in the call.
+     * @param returnData Data returned by the call.
+     */
     event ExecuteCall(
         address indexed target,
         bytes data,
@@ -11,29 +17,47 @@ interface IOpsUserProxy {
         bytes returnData
     );
 
-    event SetAdmin(address indexed account, bool isAdmin);
+    /**
+     * @notice Initializes the OpsUserProxy contract. Called by OpsUserProxyFactory upon deployment.
+     *
+     * @param ops Address of ops contract.
+     * @param owner Address of owner of the proxy.
+     */
+    function initialize(address ops, address owner) external;
 
-    /// @notice Constructor ///
-
-    function initialize(address _ops, address _owner) external;
-
-    /// @notice External functions ///
-
+    /**
+     * @notice Multicall to different contracts with different datas.
+     *
+     * @param targets Addresses of contracts to be called.
+     * @param datas Datas for each contract call.
+     * @param values Native token value for each contract call.
+     */
     function batchExecuteCall(
-        address[] calldata _targets,
-        bytes[] calldata _datas,
-        uint256[] calldata _values
+        address[] calldata targets,
+        bytes[] calldata datas,
+        uint256[] calldata values
     ) external payable;
 
+    /**
+     * @notice Call to a single contract.
+     *
+     * @param target Address of contracts to be called.
+     * @param data Data for contract call.
+     * @param value Native token value for contract call.
+     */
     function executeCall(
         address target,
         bytes calldata data,
         uint256 value
     ) external payable;
 
-    /// @notice External view functions ///
-
+    /**
+     * @return address Ops smart contract address
+     */
     function ops() external view returns (address);
 
+    /**
+     * @return address Owner of the proxy
+     */
     function owner() external view returns (address);
 }

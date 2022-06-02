@@ -6,6 +6,12 @@ import {TaskModuleBase} from "./TaskModuleBase.sol";
 import {LibEvents} from "../libraries/LibEvents.sol";
 
 contract ResolverModule is TaskModuleBase {
+    /**
+     * @notice Helper function to encode arguments for ResolverModule.
+     *
+     * @param _resolverAddress Address of resolver.
+     * @param _resolverData Data passed to resolver.
+     */
     function encodeModuleArg(
         address _resolverAddress,
         bytes calldata _resolverData
