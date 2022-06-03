@@ -19,8 +19,6 @@ import {
 import hre = require("hardhat");
 const { ethers, deployments } = hre;
 
-const execFuncSig =
-  "exec(address,address,bytes,(uint8[],bytes[]),uint256,address,bool,bool)";
 const GELATO = "0x3CACa7b48D0573D793d3b0279b5F0029180E83b6";
 const ETH = "0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE";
 const DAI = "0x6B175474E89094C44Da98b954EedeAC495271d0F";
@@ -353,7 +351,7 @@ describe("TaskTreasuryUpgradable test", function () {
 
     await ops
       .connect(executor)
-      [execFuncSig](
+      .exec(
         userAddress,
         execAddress,
         execData,

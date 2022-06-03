@@ -16,8 +16,6 @@ import {
 const GELATO = "0x3caca7b48d0573d793d3b0279b5f0029180e83b6";
 const ETH = "0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE";
 const ZERO_ADD = ethers.constants.AddressZero;
-const execFuncSig =
-  "exec(address,address,bytes,(uint8[],bytes[]),uint256,address,bool,bool)";
 
 const INTERVAL = 7 * 60;
 const FEE = ethers.utils.parseEther("0.1");
@@ -144,7 +142,7 @@ describe("Ops Time module test", function () {
   const execute = async () => {
     await ops
       .connect(executor)
-      [execFuncSig](
+      .exec(
         userAddress,
         counter.address,
         execData,

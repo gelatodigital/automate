@@ -7,7 +7,7 @@ library LibDataTypes {
     /**
      * @notice Whitelisted modules that are available for users to customise conditions and specifications of their tasks.
      *
-     * @param RESOLVER Pass dynamic execData to be used for execution. {See ResolverModule.sol}
+     * @param RESOLVER Use dynamic condition & input data for execution. {See ResolverModule.sol}
      * @param TIME Repeated execution of task at a specified timing and interval. {See TimeModule.sol}
      * @param PROXY Creates a dedicated caller (msg.sender) to be used when executing the task. {See ProxyModule.sol}
      * @param SINGLE_EXEC Task is cancelled after one execution. {See SingleExecModule.sol}
