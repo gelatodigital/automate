@@ -10,7 +10,9 @@ import {LibDataTypes} from "./LibDataTypes.sol";
 library LibTaskId {
     /**
      * @notice Returns taskId of taskCreator.
-     * @notice Current way of computing taskId.
+     * @notice To maintain the taskId of legacy tasks, if
+     * resolver module or resolver and time module is used,
+     * we will compute task id the legacy way.
      *
      * @param taskCreator The address which created the task.
      * @param execAddress Address of contract that will be called by Gelato.
@@ -24,9 +26,20 @@ library LibTaskId {
         bytes4 execSelector,
         LibDataTypes.ModuleData memory moduleData,
         address feeToken
-    ) internal pure returns (bytes32) {
-        return
-            keccak256(
+    ) internal pure returns (bytes32 taskId) {
+        if (_shouldGetLegacyTaskId(moduleData.modules)) {
+            bytes32 resolverHash = _getResolverHash(moduleData.args[0]);
+
+            taskId = getLegacyTaskId(
+                taskCreator,
+                execAddress,
+                execSelector,
+                feeToken == address(0),
+                feeToken,
+                resolverHash
+            );
+        } else {
+            taskId = keccak256(
                 abi.encode(
                     taskCreator,
                     execAddress,
@@ -35,6 +48,7 @@ library LibTaskId {
                     feeToken
                 )
             );
+        }
     }
 
     /**
@@ -70,16 +84,36 @@ library LibTaskId {
     }
 
     /**
-     * @notice Helper func to query the resolverHash
-     *
-     * @param resolverAddress Address of resolver
-     * @param resolverData Data passed to resolver
+     * @dev For legacy tasks, resolvers are compulsory. Time tasks were also introduced.
+     * The sequence of Module is enforced in {LibTaskModule-_validModules}
      */
-    function getResolverHash(address resolverAddress, bytes memory resolverData)
-        internal
+    function _shouldGetLegacyTaskId(LibDataTypes.Module[] memory _modules)
+        private
+        pure
+        returns (bool)
+    {
+        uint256 length = _modules.length;
+
+        if (
+            (length == 1 && _modules[0] == LibDataTypes.Module.RESOLVER) ||
+            (length == 2 &&
+                _modules[0] == LibDataTypes.Module.RESOLVER &&
+                _modules[1] == LibDataTypes.Module.TIME)
+        ) return true;
+
+        return false;
+    }
+
+    function _getResolverHash(bytes memory _resolverModuleArg)
+        private
         pure
         returns (bytes32)
     {
+        (address resolverAddress, bytes memory resolverData) = abi.decode(
+            _resolverModuleArg,
+            (address, bytes)
+        );
+
         return keccak256(abi.encode(resolverAddress, resolverData));
     }
 }
