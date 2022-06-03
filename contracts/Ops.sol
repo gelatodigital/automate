@@ -96,7 +96,7 @@ contract Ops is Gelatofied, Proxied, OpsStorage, IOps {
     }
 
     ///@inheritdoc IOps
-    function exec(
+    function legacyExec(
         uint256 _txFee,
         address _feeToken,
         address _taskCreator,
@@ -115,8 +115,9 @@ contract Ops is Gelatofied, Proxied, OpsStorage, IOps {
             _resolverHash
         );
 
-        LibDataTypes.Module[] memory modules = new LibDataTypes.Module[](1);
-        modules[0] = LibDataTypes.Module.TIME;
+        LibDataTypes.Module[] memory modules = new LibDataTypes.Module[](2);
+        modules[0] = LibDataTypes.Module.RESOLVER;
+        modules[1] = LibDataTypes.Module.TIME;
 
         _exec(
             taskId,
