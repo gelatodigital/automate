@@ -26,7 +26,7 @@ async function main() {
   const feeToken = ethers.constants.AddressZero;
 
   const moduleData: ModuleData = {
-    modules: [Module.RESOLVER],
+    modules: [Module.TIME],
     args: [timeModuleArg],
   };
 
