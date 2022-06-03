@@ -3,7 +3,8 @@ import { expect } from "chai";
 import {
   encodeResolverArgs,
   encodeTimeArgs,
-  getTaskId,
+  getLegacyTaskId,
+  getResolverHash,
   getTimeStampNow,
   Module,
   ModuleData,
@@ -96,12 +97,14 @@ describe("Ops legacy task test", function () {
       args: [encodeResolverArgs(counterResolver.address, resolverData)],
     };
 
-    const taskId = getTaskId(
+    const resolverHash = getResolverHash(counterResolver.address, resolverData);
+    const taskId = getLegacyTaskId(
       userAddress,
       counter.address,
       execSelector,
-      moduleData,
-      ZERO_ADD
+      true,
+      ZERO_ADD,
+      resolverHash
     );
 
     const res = await legacyOps
@@ -138,12 +141,14 @@ describe("Ops legacy task test", function () {
       args: [encodeResolverArgs(counterResolver.address, resolverData)],
     };
 
-    const taskId = getTaskId(
+    const resolverHash = getResolverHash(counterResolver.address, resolverData);
+    const taskId = getLegacyTaskId(
       userAddress,
       counter.address,
       execSelector,
-      moduleData,
-      ETH
+      false,
+      ETH,
+      resolverHash
     );
 
     const res = await legacyOps
@@ -188,14 +193,15 @@ describe("Ops legacy task test", function () {
       ],
     };
 
-    const taskId = getTaskId(
+    const resolverHash = getResolverHash(counterResolver.address, resolverData);
+    const taskId = getLegacyTaskId(
       userAddress,
       counter.address,
       execSelector,
-      moduleData,
-      ETH
+      false,
+      ETH,
+      resolverHash
     );
-
     const res = await legacyOps
       .connect(user)
       .createTimedTask(
