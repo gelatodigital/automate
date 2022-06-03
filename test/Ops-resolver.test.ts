@@ -1,6 +1,12 @@
 import { Signer } from "@ethersproject/abstract-signer";
 import { expect } from "chai";
-import { encodeResolverArgs, getTaskId, Module, ModuleData } from "./utils";
+import {
+  encodeResolverArgs,
+  getLegacyTaskId,
+  getResolverHash,
+  Module,
+  ModuleData,
+} from "./utils";
 import hre = require("hardhat");
 const { ethers, deployments } = hre;
 import {
@@ -71,12 +77,14 @@ describe("Ops Resolver module test", function () {
       modules: [Module.RESOLVER],
       args: [resolverArgs],
     };
-    taskId = getTaskId(
+    const resolverHash = getResolverHash(counterResolver.address, resolverData);
+    taskId = getLegacyTaskId(
       userAddress,
       counter.address,
       execSelector,
-      moduleData,
-      ZERO_ADD
+      true,
+      ZERO_ADD,
+      resolverHash
     );
 
     await ops

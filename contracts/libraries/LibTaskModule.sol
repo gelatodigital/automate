@@ -177,6 +177,7 @@ library LibTaskModule {
         );
     }
 
+    ///@dev Check for duplicate modules.
     function _validModules(
         uint256 _length,
         LibDataTypes.Module[] memory _modules
