@@ -3,6 +3,7 @@ import { expect } from "chai";
 import {
   encodeResolverArgs,
   encodeTimeArgs,
+  fastForwardTime,
   getLegacyTaskId,
   getResolverHash,
   getTimeStampNow,
@@ -13,7 +14,7 @@ import hre = require("hardhat");
 const { ethers, deployments } = hre;
 import {
   Ops,
-  CounterWithWhitelist,
+  Counter,
   CounterResolver,
   TaskTreasuryUpgradable,
   ResolverModule,
@@ -24,14 +25,17 @@ import {
   LibEvents__factory,
   LibEvents,
 } from "../typechain";
+import assert = require("assert");
 
+const GELATO = "0x3caca7b48d0573d793d3b0279b5f0029180e83b6";
 const ETH = "0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE";
 const ZERO_ADD = ethers.constants.AddressZero;
+const FEE = ethers.utils.parseEther("0.1");
 
 describe("Ops legacy task test", function () {
   let ops: Ops;
   let legacyOps: ILegacyOps;
-  let counter: CounterWithWhitelist;
+  let counter: Counter;
   let counterResolver: CounterResolver;
   let taskTreasury: TaskTreasuryUpgradable;
   let events: LibEvents;
@@ -41,6 +45,7 @@ describe("Ops legacy task test", function () {
   let proxyModule: ProxyModule;
   let singleExecModule: SingleExecModule;
 
+  let executor: Signer;
   let user: Signer;
   let userAddress: string;
 
@@ -53,13 +58,9 @@ describe("Ops legacy task test", function () {
     [, user] = await hre.ethers.getSigners();
     userAddress = await user.getAddress();
 
-    const counterFactory = await ethers.getContractFactory(
-      "CounterWithWhitelist"
-    );
-
     ops = await ethers.getContract("Ops");
     taskTreasury = await ethers.getContract("TaskTreasuryUpgradable");
-    counter = <CounterWithWhitelist>await counterFactory.deploy();
+    counter = await ethers.getContract("Counter");
     counterResolver = await ethers.getContract("CounterResolver");
     legacyOps = await ethers.getContractAt("ILegacyOps", ops.address);
     events = LibEvents__factory.connect(ops.address, user);
@@ -80,6 +81,12 @@ describe("Ops legacy task test", function () {
         singleExecModule.address,
       ]
     );
+
+    await hre.network.provider.request({
+      method: "hardhat_impersonateAccount",
+      params: [GELATO],
+    });
+    executor = ethers.provider.getSigner(GELATO);
 
     // deposit funds
     const depositAmount = ethers.utils.parseEther("1");
@@ -116,8 +123,7 @@ describe("Ops legacy task test", function () {
         resolverData
       );
     const txn = await res.wait();
-    expect(txn.events).to.not.be.null;
-    if (!txn.events) return;
+    assert(txn.events);
 
     // TaskCreated
     const decoded = events.interface.decodeEventLog(
@@ -133,6 +139,13 @@ describe("Ops legacy task test", function () {
     expect(decoded.moduleData.args).to.be.eql(moduleData.args);
     expect(decoded.feeToken).to.be.eql(ZERO_ADD);
     expect(decoded.taskId).to.be.eql(taskId);
+
+    const countBefore = await counter.count();
+
+    await execute(true);
+
+    const countAfter = await counter.count();
+    expect(countAfter).to.be.gt(countBefore);
   });
 
   it("create task no prepayment", async () => {
@@ -161,9 +174,7 @@ describe("Ops legacy task test", function () {
         ETH
       );
     const txn = await res.wait();
-    expect(txn.events).to.not.be.null;
-
-    if (!txn.events) return;
+    assert(txn.events);
 
     // TaskCreated
     const decoded = events.interface.decodeEventLog(
@@ -179,6 +190,13 @@ describe("Ops legacy task test", function () {
     expect(decoded.moduleData.args).to.be.eql(moduleData.args);
     expect(decoded.feeToken).to.be.eql(ETH);
     expect(decoded.taskId).to.be.eql(taskId);
+
+    const countBefore = await counter.count();
+
+    await execute(false);
+
+    const countAfter = await counter.count();
+    expect(countAfter).to.be.gt(countBefore);
   });
 
   it("create timed task", async () => {
@@ -214,9 +232,7 @@ describe("Ops legacy task test", function () {
         ETH
       );
     const txn = await res.wait();
-    expect(txn.events).to.not.be.null;
-
-    if (!txn.events) return;
+    assert(txn.events);
 
     // TimerSet
     const decoded = events.interface.decodeEventLog(
@@ -242,6 +258,14 @@ describe("Ops legacy task test", function () {
     expect(decoded2.moduleData.args).to.be.eql(moduleData.args);
     expect(decoded2.feeToken).to.be.eql(ETH);
     expect(decoded2.taskId).to.be.eql(taskId);
+
+    const countBefore = await counter.count();
+    await fastForwardTime(interval);
+
+    await execute(false);
+
+    const countAfter = await counter.count();
+    expect(countAfter).to.be.gt(countBefore);
   });
 
   it("fallback - data", async () => {
@@ -263,4 +287,22 @@ describe("Ops legacy task test", function () {
     await expect(user.sendTransaction({ to: ops.address, value, data })).to.be
       .reverted;
   });
+
+  const execute = async (useTaskTreasury: boolean) => {
+    const [, execData] = await counterResolver.checker();
+
+    const resolverHash = getResolverHash(counterResolver.address, resolverData);
+    await ops
+      .connect(executor)
+      .legacyExec(
+        FEE,
+        ETH,
+        userAddress,
+        useTaskTreasury,
+        true,
+        resolverHash,
+        counter.address,
+        execData
+      );
+  };
 });
