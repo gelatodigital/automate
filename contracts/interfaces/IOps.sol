@@ -64,7 +64,7 @@ interface IOps {
      * @param execAddress Address of contract that should be called by Gelato.
      * @param execData Execution data to be called with.
      */
-    function exec(
+    function legacyExec(
         uint256 txFee,
         address feeToken,
         address taskCreator,

@@ -11,9 +11,6 @@ import {
   ResolverModule,
 } from "../typechain";
 
-const execFuncSig =
-  "exec(address,address,bytes,(uint8[],bytes[]),uint256,address,bool,bool)";
-
 const GELATO = "0x3caca7b48d0573d793d3b0279b5f0029180e83b6";
 const ETH = "0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE";
 const ZERO_ADD = ethers.constants.AddressZero;
@@ -156,7 +153,7 @@ describe("Ops Resolver module test", function () {
 
     await ops
       .connect(executor)
-      [execFuncSig](
+      .exec(
         userAddress,
         counter.address,
         execData,

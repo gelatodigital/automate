@@ -12,9 +12,6 @@ import {
 } from "../typechain";
 import { getTaskId, Module, ModuleData } from "./utils";
 
-const execFuncSig =
-  "exec(address,address,bytes,(uint8[],bytes[]),uint256,address,bool,bool)";
-
 const GELATO = "0x3CACa7b48D0573D793d3b0279b5F0029180E83b6";
 const ETH = "0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee";
 const ZERO_ADD = ethers.constants.AddressZero;
@@ -183,7 +180,7 @@ describe("Ops Proxy module test", function () {
   const execute = async (execAddress: string) => {
     await ops
       .connect(executor)
-      [execFuncSig](
+      .exec(
         userAddress,
         execAddress,
         execData,
