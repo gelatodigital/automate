@@ -171,6 +171,26 @@ describe("Ops multi module test", function () {
     ).to.be.revertedWith("Ops._validModules: Asc only");
   });
 
+  it("no modules", async () => {
+    await counter.setWhitelist(ops.address, true);
+    expect(await counter.whitelisted(ops.address)).to.be.true;
+    moduleData = { modules: [], args: [] };
+    const execData = counter.interface.encodeFunctionData("increaseCount", [
+      10,
+    ]);
+
+    await ops
+      .connect(user)
+      .createTask(counter.address, execData, moduleData, ZERO_ADD);
+
+    const countBefore = await counter.count();
+
+    await execute(true);
+
+    const countAfter = await counter.count();
+    expect(countAfter).to.be.gt(countBefore);
+  });
+
   it("exec - time should revert", async () => {
     await expect(execute(true)).to.be.revertedWith(
       "Ops.preExecTask: TimeModule: Too early"
