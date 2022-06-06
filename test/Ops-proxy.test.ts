@@ -6,8 +6,8 @@ import {
   CounterWithWhitelist,
   Ops,
   TaskTreasuryUpgradable,
-  OpsUserProxy,
-  OpsUserProxyFactory,
+  OpsProxy,
+  OpsProxyFactory,
   ProxyModule,
 } from "../typechain";
 import { getTaskId, Module, ModuleData } from "./utils";
@@ -27,9 +27,9 @@ describe("Ops Proxy module test", function () {
   let userAddress: string;
 
   let ops: Ops;
-  let opsUserProxy: OpsUserProxy;
-  let opsUserProxyImplementation: OpsUserProxy;
-  let opsUserProxyFactory: OpsUserProxyFactory;
+  let opsProxy: OpsProxy;
+  let opsProxyImplementation: OpsProxy;
+  let opsProxyFactory: OpsProxyFactory;
   let treasury: TaskTreasuryUpgradable;
   let counter: CounterWithWhitelist;
   let proxyModule: ProxyModule;
@@ -52,8 +52,8 @@ describe("Ops Proxy module test", function () {
     ops = await ethers.getContract("Ops");
     proxyModule = await ethers.getContract("ProxyModule");
     counter = <CounterWithWhitelist>await counterFactory.deploy();
-    opsUserProxyFactory = await ethers.getContract("OpsUserProxyFactory");
-    opsUserProxyImplementation = await ethers.getContract("OpsUserProxy");
+    opsProxyFactory = await ethers.getContract("OpsProxyFactory");
+    opsProxyImplementation = await ethers.getContract("OpsProxy");
 
     // get accounts
     const depositAmount = ethers.utils.parseEther("10");
@@ -97,29 +97,30 @@ describe("Ops Proxy module test", function () {
   });
 
   it("proxy deployed", async () => {
-    const determinedProxyAddress =
-      await opsUserProxyFactory.determineProxyAddress(userAddress);
-
-    const [proxyAddress, isDeployed] = await opsUserProxyFactory.getProxyOf(
+    const determinedProxyAddress = await opsProxyFactory.determineProxyAddress(
       userAddress
     );
-    opsUserProxy = await ethers.getContractAt("OpsUserProxy", proxyAddress);
+
+    const [proxyAddress, isDeployed] = await opsProxyFactory.getProxyOf(
+      userAddress
+    );
+    opsProxy = await ethers.getContractAt("OpsProxy", proxyAddress);
 
     expect(isDeployed).to.be.true;
     expect(proxyAddress).to.be.eql(determinedProxyAddress);
 
-    expect(await opsUserProxy.ops()).to.be.eql(ops.address);
-    expect(await opsUserProxy.owner()).to.be.eql(userAddress);
-    expect(await opsUserProxyFactory.isProxy(proxyAddress)).to.be.true;
+    expect(await opsProxy.ops()).to.be.eql(ops.address);
+    expect(await opsProxy.owner()).to.be.eql(userAddress);
+    expect(await opsProxyFactory.isProxy(proxyAddress)).to.be.true;
   });
 
   it("proxy properly initialized", async () => {
-    expect(await opsUserProxyFactory.implementation()).to.be.eql(
-      opsUserProxyImplementation.address
+    expect(await opsProxyFactory.implementation()).to.be.eql(
+      opsProxyImplementation.address
     );
 
-    expect(await opsUserProxy.ops()).to.be.eql(ops.address);
-    expect(await opsUserProxy.owner()).to.be.eql(userAddress);
+    expect(await opsProxy.ops()).to.be.eql(ops.address);
+    expect(await opsProxy.owner()).to.be.eql(userAddress);
   });
 
   it("exec - whitelist", async () => {
@@ -130,8 +131,8 @@ describe("Ops Proxy module test", function () {
 
   it("exec - no whitelist", async () => {
     // // whitelist proxy on counter
-    await counter.connect(deployer).setWhitelist(opsUserProxy.address, true);
-    expect(await counter.whitelisted(opsUserProxy.address)).to.be.true;
+    await counter.connect(deployer).setWhitelist(opsProxy.address, true);
+    expect(await counter.whitelisted(opsProxy.address)).to.be.true;
 
     const countBefore = await counter.count();
     await execute(counter.address);
@@ -146,16 +147,16 @@ describe("Ops Proxy module test", function () {
     const counter2 = await counter2Factory.deploy();
 
     // // whitelist proxy on counter
-    await counter.connect(deployer).setWhitelist(opsUserProxy.address, true);
-    expect(await counter.whitelisted(opsUserProxy.address)).to.be.true;
-    await counter2.connect(deployer).setWhitelist(opsUserProxy.address, true);
-    expect(await counter2.whitelisted(opsUserProxy.address)).to.be.true;
+    await counter.connect(deployer).setWhitelist(opsProxy.address, true);
+    expect(await counter.whitelisted(opsProxy.address)).to.be.true;
+    await counter2.connect(deployer).setWhitelist(opsProxy.address, true);
+    expect(await counter2.whitelisted(opsProxy.address)).to.be.true;
 
     const targets = [counter.address, counter2.address];
     const datas = [execData, execData];
     const values = [0, 0];
 
-    const batchExecuteCallData = opsUserProxy.interface.encodeFunctionData(
+    const batchExecuteCallData = opsProxy.interface.encodeFunctionData(
       "batchExecuteCall",
       [targets, datas, values]
     );
@@ -164,12 +165,12 @@ describe("Ops Proxy module test", function () {
 
     await ops
       .connect(user)
-      .createTask(opsUserProxy.address, execData, moduleData, ZERO_ADD);
+      .createTask(opsProxy.address, execData, moduleData, ZERO_ADD);
 
     const countBefore = await counter.count();
     const count2Before = await counter2.count();
 
-    await execute(opsUserProxy.address);
+    await execute(opsProxy.address);
 
     const countAfter = await counter.count();
     const count2After = await counter2.count();

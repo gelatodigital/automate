@@ -8,18 +8,13 @@ import {
     Initializable
 } from "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol";
 import {Proxied} from "../vendor/proxy/EIP173/Proxied.sol";
-import {OpsUserProxy} from "./OpsUserProxy.sol";
+import {OpsProxy} from "./OpsProxy.sol";
 import {IBeacon} from "@openzeppelin/contracts/proxy/beacon/IBeacon.sol";
-import {IOpsUserProxy} from "../interfaces/IOpsUserProxy.sol";
-import {IOpsUserProxyFactory} from "../interfaces/IOpsUserProxyFactory.sol";
+import {IOpsProxy} from "../interfaces/IOpsProxy.sol";
+import {IOpsProxyFactory} from "../interfaces/IOpsProxyFactory.sol";
 
 // solhint-disable max-states-count
-contract OpsUserProxyFactory is
-    IOpsUserProxyFactory,
-    IBeacon,
-    Proxied,
-    Initializable
-{
+contract OpsProxyFactory is IOpsProxyFactory, IBeacon, Proxied, Initializable {
     // solhint-disable const-name-snakecase
     uint256 public constant override version = 1;
     address public immutable ops;
@@ -52,7 +47,7 @@ contract OpsUserProxyFactory is
         implementation = _implementation;
     }
 
-    ///@inheritdoc IOpsUserProxyFactory
+    ///@inheritdoc IOpsProxyFactory
     function updateBeaconImplementation(address _implementation)
         external
         override
@@ -64,12 +59,12 @@ contract OpsUserProxyFactory is
         emit BeaconUpdated(oldImplementation, _implementation);
     }
 
-    ///@inheritdoc IOpsUserProxyFactory
+    ///@inheritdoc IOpsProxyFactory
     function deploy() external override returns (address payable proxy) {
         proxy = deployFor(msg.sender);
     }
 
-    ///@inheritdoc IOpsUserProxyFactory
+    ///@inheritdoc IOpsProxyFactory
     function getNextSeed(address _account)
         external
         view
@@ -79,7 +74,7 @@ contract OpsUserProxyFactory is
         return _nextSeeds[_account];
     }
 
-    ///@inheritdoc IOpsUserProxyFactory
+    ///@inheritdoc IOpsProxyFactory
     function getProxyOf(address _account)
         external
         view
@@ -94,7 +89,7 @@ contract OpsUserProxyFactory is
         return (proxyAddress, false);
     }
 
-    ///@inheritdoc IOpsUserProxyFactory
+    ///@inheritdoc IOpsProxyFactory
     function getOwnerOf(address _proxy)
         external
         view
@@ -103,10 +98,10 @@ contract OpsUserProxyFactory is
     {
         require(isProxy(_proxy), "OpsProxyFactory: Not proxy");
 
-        return IOpsUserProxy(_proxy).owner();
+        return IOpsProxy(_proxy).owner();
     }
 
-    ///@inheritdoc IOpsUserProxyFactory
+    ///@inheritdoc IOpsProxyFactory
     function deployFor(address owner)
         public
         override
@@ -130,7 +125,7 @@ contract OpsUserProxyFactory is
         emit DeployProxy(msg.sender, owner, seed, salt, address(proxy));
     }
 
-    ///@inheritdoc IOpsUserProxyFactory
+    ///@inheritdoc IOpsProxyFactory
     function determineProxyAddress(address _account)
         public
         view
@@ -156,7 +151,7 @@ contract OpsUserProxyFactory is
         return address(uint160(uint256(codeHash)));
     }
 
-    ///@inheritdoc IOpsUserProxyFactory
+    ///@inheritdoc IOpsProxyFactory
     function isProxy(address proxy) public view override returns (bool) {
         return _proxies[proxy];
     }
@@ -185,7 +180,7 @@ contract OpsUserProxyFactory is
 
     function _getBytecode(address _owner) internal view returns (bytes memory) {
         bytes memory opsProxyInitializeData = abi.encodeWithSelector(
-            IOpsUserProxy.initialize.selector,
+            IOpsProxy.initialize.selector,
             ops,
             _owner
         );

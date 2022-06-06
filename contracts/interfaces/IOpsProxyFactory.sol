@@ -1,9 +1,9 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.12;
 
-interface IOpsUserProxyFactory {
+interface IOpsProxyFactory {
     /**
-     * @notice Emitted when an OpsUserProxy is deployed.
+     * @notice Emitted when an OpsProxy is deployed.
      *
      * @param deployer Address which initiated the deployment
      * @param owner The address which the proxy is for.
@@ -20,22 +20,22 @@ interface IOpsUserProxyFactory {
     );
 
     /**
-     * @notice Emitted when OpsUserProxy implementation is updated
+     * @notice Emitted when OpsProxy implementation is updated
      *
-     * @param oldImplementation Previous implementation of OpsUserProxy
-     * @param newImplementation Current implementation of OpsUserProxy
+     * @param oldImplementation Previous implementation of OpsProxy
+     * @param newImplementation Current implementation of OpsProxy
      */
     event BeaconUpdated(address oldImplementation, address newImplementation);
 
     /**
-     * @notice Deploys OpsUserProxy for the msg.sender.
+     * @notice Deploys OpsProxy for the msg.sender.
      *
      * @return proxy Address of deployed proxy.
      */
     function deploy() external returns (address payable proxy);
 
     /**
-     * @notice Deploys OpsUserProxy for another address.
+     * @notice Deploys OpsProxy for another address.
      *
      * @param owner Address to deploy the proxy for.
      *
@@ -44,14 +44,14 @@ interface IOpsUserProxyFactory {
     function deployFor(address owner) external returns (address payable proxy);
 
     /**
-     * @notice Update OpsUserProxy implementation
+     * @notice Update OpsProxy implementation
      *
-     * @param implementation New OpsUserProxy implementation to be updated to.
+     * @param implementation New OpsProxy implementation to be updated to.
      */
     function updateBeaconImplementation(address implementation) external;
 
     /**
-     * @notice Determines the OpsUserProxy address when it is not deployed.
+     * @notice Determines the OpsProxy address when it is not deployed.
      *
      * @param account Address to determine the proxy address for.
      */
@@ -77,12 +77,12 @@ interface IOpsUserProxyFactory {
     function getOwnerOf(address proxy) external view returns (address);
 
     /**
-     * @return bool Whether if a contract is an OpsUserProxy.
+     * @return bool Whether if a contract is an OpsProxy.
      */
     function isProxy(address proxy) external view returns (bool);
 
     /**
-     * @return uint256 version of OpsUserProxyFactory.
+     * @return uint256 version of OpsProxyFactory.
      */
     function version() external view returns (uint256);
 }

@@ -20,8 +20,8 @@ import {
   TimeModule,
   ProxyModule,
   SingleExecModule,
-  OpsUserProxyFactory,
-  OpsUserProxy,
+  OpsProxyFactory,
+  OpsProxy,
 } from "../typechain";
 
 const GELATO = "0x3caca7b48d0573d793d3b0279b5f0029180e83b6";
@@ -35,8 +35,8 @@ describe("Ops multi module test", function () {
   let counter: CounterWithWhitelist;
   let counterResolver: CounterResolver;
   let taskTreasury: TaskTreasuryUpgradable;
-  let opsUserProxyFactory: OpsUserProxyFactory;
-  let opsUserProxy: OpsUserProxy;
+  let opsProxyFactory: OpsProxyFactory;
+  let opsProxy: OpsProxy;
 
   let resolverModule: ResolverModule;
   let timeModule: TimeModule;
@@ -69,7 +69,7 @@ describe("Ops multi module test", function () {
     taskTreasury = await ethers.getContract("TaskTreasuryUpgradable");
     counter = <CounterWithWhitelist>await counterFactory.deploy();
     counterResolver = await ethers.getContract("CounterResolver");
-    opsUserProxyFactory = await ethers.getContract("OpsUserProxyFactory");
+    opsProxyFactory = await ethers.getContract("OpsProxyFactory");
 
     resolverModule = await ethers.getContract("ResolverModule");
     timeModule = await ethers.getContract("TimeModule");
@@ -125,12 +125,12 @@ describe("Ops multi module test", function () {
       .connect(user)
       .createTask(counter.address, execSelector, moduleData, ZERO_ADD);
 
-    const [proxyAddress] = await opsUserProxyFactory.getProxyOf(userAddress);
-    opsUserProxy = await ethers.getContractAt("OpsUserProxy", proxyAddress);
+    const [proxyAddress] = await opsProxyFactory.getProxyOf(userAddress);
+    opsProxy = await ethers.getContractAt("OpsProxy", proxyAddress);
 
     // whitelist proxy on counter
-    await counter.setWhitelist(opsUserProxy.address, true);
-    expect(await counter.whitelisted(opsUserProxy.address)).to.be.true;
+    await counter.setWhitelist(opsProxy.address, true);
+    expect(await counter.whitelisted(opsProxy.address)).to.be.true;
   });
 
   it("task created", async () => {
