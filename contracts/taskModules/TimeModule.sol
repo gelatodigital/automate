@@ -40,21 +40,18 @@ contract TimeModule is TaskModuleBase {
         bytes calldata _execData
     ) external override returns (address, bytes memory) {
         LibDataTypes.Time memory time = timedTask[_taskId];
-        bool isTimedTask = time.nextExec != 0;
 
-        if (isTimedTask) {
-            require(
-                time.nextExec <= uint128(block.timestamp),
-                "TimeModule: Too early"
-            );
+        require(
+            time.nextExec <= uint128(block.timestamp),
+            "TimeModule: Too early"
+        );
 
-            uint128 timeDiff = uint128(block.timestamp) - time.nextExec;
-            uint128 intervals = (timeDiff / time.interval) + 1;
+        uint128 timeDiff = uint128(block.timestamp) - time.nextExec;
+        uint128 intervals = (timeDiff / time.interval) + 1;
 
-            timedTask[_taskId].nextExec =
-                time.nextExec +
-                (intervals * time.interval);
-        }
+        timedTask[_taskId].nextExec =
+            time.nextExec +
+            (intervals * time.interval);
 
         return (_execAddress, _execData);
     }
