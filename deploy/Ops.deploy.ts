@@ -35,4 +35,4 @@ func.skip = async (hre: HardhatRuntimeEnvironment) => {
 };
 
 func.tags = ["Ops"];
-func.dependencies = ["TaskTreasuryUpgradable", "OpsProxyFactory"];
+func.dependencies = ["TaskTreasuryUpgradable"];
