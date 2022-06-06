@@ -16,7 +16,7 @@ const func: DeployFunction = async (hre: HardhatRuntimeEnvironment) => {
 
   await deploy("ProxyModule", {
     from: deployer,
-    args: [await (await hre.ethers.getContract("OpsUserProxyFactory")).address],
+    args: [await (await hre.ethers.getContract("OpsProxyFactory")).address],
   });
 };
 
@@ -28,4 +28,4 @@ func.skip = async (hre: HardhatRuntimeEnvironment) => {
 };
 
 func.tags = ["ProxyModule"];
-func.dependencies = ["OpsUserProxyFactory"];
+func.dependencies = ["OpsProxyFactory"];

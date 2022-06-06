@@ -6,9 +6,9 @@ import {
 } from "@openzeppelin/contracts/proxy/utils/Initializable.sol";
 import {GelatoBytes} from "../vendor/gelato/GelatoBytes.sol";
 import {_call} from "../functions/FExec.sol";
-import {IOpsUserProxy} from "../interfaces/IOpsUserProxy.sol";
+import {IOpsProxy} from "../interfaces/IOpsProxy.sol";
 
-contract OpsUserProxy is IOpsUserProxy, Initializable {
+contract OpsProxy is IOpsProxy, Initializable {
     using GelatoBytes for bytes;
 
     address public override ops;
@@ -32,7 +32,7 @@ contract OpsUserProxy is IOpsUserProxy, Initializable {
         owner = _owner;
     }
 
-    ///@inheritdoc IOpsUserProxy
+    ///@inheritdoc IOpsProxy
     function batchExecuteCall(
         address[] calldata _targets,
         bytes[] calldata _datas,
@@ -48,7 +48,7 @@ contract OpsUserProxy is IOpsUserProxy, Initializable {
             executeCall(_targets[i], _datas[i], _values[i]);
     }
 
-    ///@inheritdoc IOpsUserProxy
+    ///@inheritdoc IOpsProxy
     function executeCall(
         address _target,
         bytes calldata _data,
@@ -58,7 +58,7 @@ contract OpsUserProxy is IOpsUserProxy, Initializable {
             _target,
             _data,
             true,
-            "OpsUserProxy.executeCall: "
+            "OpsProxy.executeCall: "
         );
 
         emit ExecuteCall(_target, _data, _value, returnData);

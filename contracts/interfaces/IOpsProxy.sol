@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.12;
 
-interface IOpsUserProxy {
+interface IOpsProxy {
     /**
      * @notice Emitted when proxy calls a contract successfully in `executeCall`
      *
@@ -18,7 +18,7 @@ interface IOpsUserProxy {
     );
 
     /**
-     * @notice Initializes the OpsUserProxy contract. Called by OpsUserProxyFactory upon deployment.
+     * @notice Initializes the OpsProxy contract. Called by OpsProxyFactory upon deployment.
      *
      * @param ops Address of ops contract.
      * @param owner Address of owner of the proxy.

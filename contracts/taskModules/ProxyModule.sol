@@ -5,16 +5,16 @@ pragma solidity ^0.8.12;
 import {GelatoBytes} from "../vendor/gelato/GelatoBytes.sol";
 import {TaskModuleBase} from "./TaskModuleBase.sol";
 import {LibDataTypes} from "../libraries/LibDataTypes.sol";
-import {IOpsUserProxy} from "../interfaces/IOpsUserProxy.sol";
-import {IOpsUserProxyFactory} from "../interfaces/IOpsUserProxyFactory.sol";
+import {IOpsProxy} from "../interfaces/IOpsProxy.sol";
+import {IOpsProxyFactory} from "../interfaces/IOpsProxyFactory.sol";
 
 contract ProxyModule is TaskModuleBase {
     using GelatoBytes for bytes;
 
-    IOpsUserProxyFactory public immutable opsUserProxyFactory;
+    IOpsProxyFactory public immutable opsProxyFactory;
 
-    constructor(IOpsUserProxyFactory _opsUserProxyFactory) {
-        opsUserProxyFactory = _opsUserProxyFactory;
+    constructor(IOpsProxyFactory _opsProxyFactory) {
+        opsProxyFactory = _opsProxyFactory;
     }
 
     /**
@@ -30,7 +30,7 @@ contract ProxyModule is TaskModuleBase {
     ) external override {
         address proxy = _deployIfNoProxy(_taskCreator);
 
-        bool execToProxy = opsUserProxyFactory.isProxy(_execAddress);
+        bool execToProxy = opsProxyFactory.isProxy(_execAddress);
 
         if (execToProxy)
             require(_execAddress == proxy, "ProxyModule: Only proxy owner");
@@ -52,7 +52,7 @@ contract ProxyModule is TaskModuleBase {
 
         execData = _execAddress == proxy
             ? _execData
-            : _encodeWithOpsUserProxy(_execAddress, _execData);
+            : _encodeWithOpsProxy(_execAddress, _execData);
 
         _execAddress = proxy;
 
@@ -64,18 +64,19 @@ contract ProxyModule is TaskModuleBase {
         returns (address proxy)
     {
         bool deployed;
-        (proxy, deployed) = opsUserProxyFactory.getProxyOf(_taskCreator);
+        (proxy, deployed) = opsProxyFactory.getProxyOf(_taskCreator);
 
-        if (!deployed) opsUserProxyFactory.deployFor(_taskCreator);
+        if (!deployed) opsProxyFactory.deployFor(_taskCreator);
     }
 
-    function _encodeWithOpsUserProxy(
-        address _execAddress,
-        bytes calldata _execData
-    ) private pure returns (bytes memory) {
+    function _encodeWithOpsProxy(address _execAddress, bytes calldata _execData)
+        private
+        pure
+        returns (bytes memory)
+    {
         return
             abi.encodeWithSelector(
-                IOpsUserProxy.executeCall.selector,
+                IOpsProxy.executeCall.selector,
                 _execAddress,
                 _execData,
                 0
