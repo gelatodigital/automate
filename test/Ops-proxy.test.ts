@@ -23,8 +23,10 @@ describe("Ops Proxy module test", function () {
   let deployer: Signer;
   let executor: Signer;
   let user: Signer;
+  let user2: Signer;
 
   let userAddress: string;
+  let user2Address: string;
 
   let ops: Ops;
   let opsProxy: OpsProxy;
@@ -34,14 +36,18 @@ describe("Ops Proxy module test", function () {
   let counter: CounterWithWhitelist;
   let proxyModule: ProxyModule;
 
+  let taskCreator: string;
+  let execAddress: string;
   let execData: string;
+  let execSelector: string;
   let taskId: string;
   let moduleData: ModuleData;
 
   beforeEach(async function () {
     await deployments.fixture();
-    [deployer, user] = await ethers.getSigners();
+    [deployer, user, user2] = await ethers.getSigners();
     userAddress = await user.getAddress();
+    user2Address = await user2.getAddress();
 
     treasury = await ethers.getContract("TaskTreasuryUpgradable");
 
@@ -74,21 +80,15 @@ describe("Ops Proxy module test", function () {
       .depositFunds(userAddress, ETH, depositAmount, { value: depositAmount });
 
     // create task
-    const execSelector = counter.interface.getSighash("increaseCount");
+    taskCreator = userAddress;
+    execAddress = counter.address;
+    execSelector = counter.interface.getSighash("increaseCount");
     execData = counter.interface.encodeFunctionData("increaseCount", [10]);
     moduleData = { modules: [Module.PROXY], args: ["0x"] };
 
-    taskId = getTaskId(
-      userAddress,
-      counter.address,
-      execSelector,
-      moduleData,
-      ZERO_ADD
-    );
+    computeTaskId();
 
-    await ops
-      .connect(user)
-      .createTask(counter.address, execData, moduleData, ZERO_ADD);
+    await createTask(user);
   });
 
   it("create task", async () => {
@@ -123,24 +123,22 @@ describe("Ops Proxy module test", function () {
     expect(await opsProxy.owner()).to.be.eql(userAddress);
   });
 
-  it("exec - whitelist", async () => {
-    await expect(execute(counter.address)).to.be.revertedWith(
-      "Counter: Not whitelisted"
-    );
+  it("exec - no whitelist", async () => {
+    await expect(execute()).to.be.revertedWith("Counter: Not whitelisted");
   });
 
-  it("exec - no whitelist", async () => {
+  it("exec - whitelist", async () => {
     // // whitelist proxy on counter
     await counter.connect(deployer).setWhitelist(opsProxy.address, true);
     expect(await counter.whitelisted(opsProxy.address)).to.be.true;
 
     const countBefore = await counter.count();
-    await execute(counter.address);
+    await execute();
     const countAfter = await counter.count();
     expect(countAfter).to.be.gt(countBefore);
   });
 
-  it("batchExecuteCall", async () => {
+  it("exec - batchExecuteCall", async () => {
     const counter2Factory = await ethers.getContractFactory(
       "CounterWithWhitelist"
     );
@@ -162,15 +160,16 @@ describe("Ops Proxy module test", function () {
     );
 
     execData = batchExecuteCallData;
+    execAddress = opsProxy.address;
+    // proxy module not included as module encodes with `executeCall`
+    moduleData = { modules: [], args: [] };
 
-    await ops
-      .connect(user)
-      .createTask(opsProxy.address, execData, moduleData, ZERO_ADD);
+    await createTask(user);
 
     const countBefore = await counter.count();
     const count2Before = await counter2.count();
 
-    await execute(opsProxy.address);
+    await execute();
 
     const countAfter = await counter.count();
     const count2After = await counter2.count();
@@ -178,11 +177,69 @@ describe("Ops Proxy module test", function () {
     expect(count2After).to.be.gt(count2Before);
   });
 
-  const execute = async (execAddress: string) => {
+  it("exec - without module initialised", async () => {
+    // // whitelist proxy on counter
+    await counter.connect(deployer).setWhitelist(opsProxy.address, true);
+    expect(await counter.whitelisted(opsProxy.address)).to.be.true;
+
+    const [proxyAddress] = await opsProxyFactory.getProxyOf(userAddress);
+    opsProxy = await ethers.getContractAt("OpsProxy", proxyAddress);
+
+    execAddress = proxyAddress;
+    execSelector = opsProxy.interface.getSighash("executeCall");
+    const proxyExecData = opsProxy.interface.encodeFunctionData("executeCall", [
+      counter.address,
+      execData,
+      0,
+    ]);
+    execData = proxyExecData;
+    moduleData = { modules: [], args: [] };
+
+    await createTask(user);
+
+    computeTaskId();
+
+    const taskIds = await ops.getTaskIdsByUser(userAddress);
+    expect(taskIds).to.include(taskId);
+
+    const countBefore = await counter.count();
+    await execute();
+    const countAfter = await counter.count();
+    expect(countAfter).to.be.gt(countBefore);
+  });
+
+  it("exec - without module initialised, created by non proxy owner", async () => {
+    const [proxyAddress] = await opsProxyFactory.getProxyOf(userAddress);
+    opsProxy = await ethers.getContractAt("OpsProxy", proxyAddress);
+
+    execAddress = proxyAddress;
+    execSelector = opsProxy.interface.getSighash("executeCall");
+    const proxyExecData = opsProxy.interface.encodeFunctionData("executeCall", [
+      counter.address,
+      execData,
+      0,
+    ]);
+    execData = proxyExecData;
+    moduleData = { modules: [], args: [] };
+    taskCreator = user2Address;
+
+    await createTask(user2);
+
+    computeTaskId();
+
+    const taskIds = await ops.getTaskIdsByUser(user2Address);
+    expect(taskIds).to.include(taskId);
+
+    await expect(execute()).to.be.revertedWith(
+      "Ops.exec: OpsProxy: Only tasks created by owner"
+    );
+  });
+
+  const execute = async () => {
     await ops
       .connect(executor)
       .exec(
-        userAddress,
+        taskCreator,
         execAddress,
         execData,
         moduleData,
@@ -191,5 +248,21 @@ describe("Ops Proxy module test", function () {
         true,
         true
       );
+  };
+
+  const createTask = async (signer: Signer) => {
+    await ops
+      .connect(signer)
+      .createTask(execAddress, execData, moduleData, ZERO_ADD);
+  };
+
+  const computeTaskId = () => {
+    taskId = getTaskId(
+      taskCreator,
+      execAddress,
+      execSelector,
+      moduleData,
+      ZERO_ADD
+    );
   };
 });

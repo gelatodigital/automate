@@ -16,11 +16,18 @@ contract OpsProxy is IOpsProxy, Initializable {
 
     modifier onlyAuth() {
         require(
-            msg.sender == ops ||
-                msg.sender == owner ||
-                msg.sender == address(this),
+            msg.sender == ops || msg.sender == owner,
             "OpsProxy: Not authorised"
         );
+
+        if (msg.sender == ops) {
+            address taskCreator = _getTaskCreator();
+
+            require(
+                taskCreator == owner,
+                "OpsProxy: Only tasks created by owner"
+            );
+        }
         _;
     }
 
@@ -37,7 +44,7 @@ contract OpsProxy is IOpsProxy, Initializable {
         address[] calldata _targets,
         bytes[] calldata _datas,
         uint256[] calldata _values
-    ) public payable override onlyAuth {
+    ) external payable override onlyAuth {
         uint256 length = _targets.length;
         require(
             length == _datas.length && length == _values.length,
@@ -57,10 +64,17 @@ contract OpsProxy is IOpsProxy, Initializable {
         (, bytes memory returnData) = _call(
             _target,
             _data,
+            0,
             true,
             "OpsProxy.executeCall: "
         );
 
         emit ExecuteCall(_target, _data, _value, returnData);
+    }
+
+    function _getTaskCreator() private pure returns (address taskCreator) {
+        assembly {
+            taskCreator := shr(96, calldataload(sub(calldatasize(), 20)))
+        }
     }
 }
