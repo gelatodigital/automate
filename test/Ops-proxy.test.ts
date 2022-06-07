@@ -119,7 +119,9 @@ describe("Ops Proxy module test", function () {
       opsProxyImplementation.address
     );
 
+    expect(await opsProxyImplementation.ops()).to.be.eql(ops.address);
     expect(await opsProxy.ops()).to.be.eql(ops.address);
+    expect(await opsProxyImplementation.owner()).to.be.eql(ZERO_ADD);
     expect(await opsProxy.owner()).to.be.eql(userAddress);
   });
 
@@ -182,10 +184,7 @@ describe("Ops Proxy module test", function () {
     await counter.connect(deployer).setWhitelist(opsProxy.address, true);
     expect(await counter.whitelisted(opsProxy.address)).to.be.true;
 
-    const [proxyAddress] = await opsProxyFactory.getProxyOf(userAddress);
-    opsProxy = await ethers.getContractAt("OpsProxy", proxyAddress);
-
-    execAddress = proxyAddress;
+    execAddress = opsProxy.address;
     execSelector = opsProxy.interface.getSighash("executeCall");
     const proxyExecData = opsProxy.interface.encodeFunctionData("executeCall", [
       counter.address,
@@ -209,10 +208,7 @@ describe("Ops Proxy module test", function () {
   });
 
   it("exec - without module initialised, created by non proxy owner", async () => {
-    const [proxyAddress] = await opsProxyFactory.getProxyOf(userAddress);
-    opsProxy = await ethers.getContractAt("OpsProxy", proxyAddress);
-
-    execAddress = proxyAddress;
+    execAddress = opsProxy.address;
     execSelector = opsProxy.interface.getSighash("executeCall");
     const proxyExecData = opsProxy.interface.encodeFunctionData("executeCall", [
       counter.address,

@@ -11,7 +11,7 @@ import {IOpsProxy} from "../interfaces/IOpsProxy.sol";
 contract OpsProxy is IOpsProxy, Initializable {
     using GelatoBytes for bytes;
 
-    address public override ops;
+    address public immutable override ops;
     address public override owner;
 
     modifier onlyAuth() {
@@ -32,10 +32,13 @@ contract OpsProxy is IOpsProxy, Initializable {
     }
 
     // solhint-disable no-empty-blocks
+    constructor(address _ops) {
+        ops = _ops;
+    }
+
     receive() external payable {}
 
-    function initialize(address _ops, address _owner) external initializer {
-        ops = _ops;
+    function initialize(address _owner) external initializer {
         owner = _owner;
     }
 
