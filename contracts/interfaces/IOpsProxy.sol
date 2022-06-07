@@ -20,10 +20,9 @@ interface IOpsProxy {
     /**
      * @notice Initializes the OpsProxy contract. Called by OpsProxyFactory upon deployment.
      *
-     * @param ops Address of ops contract.
      * @param owner Address of owner of the proxy.
      */
-    function initialize(address ops, address owner) external;
+    function initialize(address owner) external;
 
     /**
      * @notice Multicall to different contracts with different datas.

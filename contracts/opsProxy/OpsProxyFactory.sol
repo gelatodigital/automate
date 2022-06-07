@@ -181,7 +181,6 @@ contract OpsProxyFactory is IOpsProxyFactory, IBeacon, Proxied, Initializable {
     function _getBytecode(address _owner) internal view returns (bytes memory) {
         bytes memory opsProxyInitializeData = abi.encodeWithSelector(
             IOpsProxy.initialize.selector,
-            ops,
             _owner
         );
 
