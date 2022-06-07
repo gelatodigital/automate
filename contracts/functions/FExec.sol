@@ -9,10 +9,11 @@ import {GelatoBytes} from "../vendor/gelato/GelatoBytes.sol";
 function _call(
     address _add,
     bytes memory _data,
+    uint256 _value,
     bool _revertOnFailure,
     string memory _tracingInfo
 ) returns (bool success, bytes memory returnData) {
-    (success, returnData) = _add.call(_data);
+    (success, returnData) = _add.call{value: _value}(_data);
 
     if (!success && _revertOnFailure)
         GelatoBytes.revertWithError(returnData, _tracingInfo);

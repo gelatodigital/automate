@@ -24,23 +24,16 @@ contract ProxyModule is TaskModuleBase {
     function onCreateTask(
         bytes32,
         address _taskCreator,
-        address _execAddress,
+        address,
         bytes calldata,
         bytes calldata
     ) external override {
-        address proxy = _deployIfNoProxy(_taskCreator);
-
-        bool execToProxy = opsProxyFactory.isProxy(_execAddress);
-
-        if (execToProxy)
-            require(_execAddress == proxy, "ProxyModule: Only proxy owner");
+        _deployIfNoProxy(_taskCreator);
     }
 
     /**
      * @inheritdoc TaskModuleBase
-     * @dev _execData is encoded with proxy's `executeCall` function if
-     * _execAddress is not a proxy. If _execAddress is proxy, _execData
-     * should have function signatures of `executeCall` or `batchExecuteCall`
+     * @dev _execData is encoded with proxy's `executeCall` function.
      */
     function preExecTask(
         bytes32,
@@ -50,9 +43,7 @@ contract ProxyModule is TaskModuleBase {
     ) external override returns (address, bytes memory execData) {
         address proxy = _deployIfNoProxy(_taskCreator);
 
-        execData = _execAddress == proxy
-            ? _execData
-            : _encodeWithOpsProxy(_execAddress, _execData);
+        execData = _encodeWithOpsProxy(_execAddress, _execData);
 
         _execAddress = proxy;
 
