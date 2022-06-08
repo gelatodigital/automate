@@ -291,18 +291,25 @@ describe("Ops legacy task test", function () {
   const execute = async (useTaskTreasury: boolean) => {
     const [, execData] = await counterResolver.checker();
 
-    const resolverHash = getResolverHash(counterResolver.address, resolverData);
+    const resolverArg = encodeResolverArgs(
+      counterResolver.address,
+      resolverData
+    );
+    const moduleData: ModuleData = {
+      modules: [Module.RESOLVER, Module.TIME],
+      args: [resolverArg, "0x"],
+    };
     await ops
       .connect(executor)
-      .legacyExec(
+      .exec(
+        userAddress,
+        counter.address,
+        execData,
+        moduleData,
         FEE,
         ETH,
-        userAddress,
         useTaskTreasury,
-        true,
-        resolverHash,
-        counter.address,
-        execData
+        true
       );
   };
 });
