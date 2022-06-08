@@ -53,29 +53,6 @@ interface IOps {
     ) external;
 
     /**
-     * @notice Legacy Execution API called by Gelato.
-     *
-     * @param txFee Fee paid to Gelato for execution, deducted on the TaskTreasury or transfered to Gelato.
-     * @param feeToken Token used to pay for the execution. ETH = 0xeeeeee...
-     * @param taskCreator The address which created the task.
-     * @param useTaskTreasuryFunds If taskCreator's balance on TaskTreasury should pay for the tx.
-     * @param revertOnFailure To revert or not if call to execAddress fails. (Used for off-chain simulations)
-     * @param resolverHash Hash of resolverAddress and resolverData. {See LibTaskId-getResolverHash}
-     * @param execAddress Address of contract that should be called by Gelato.
-     * @param execData Execution data to be called with.
-     */
-    function legacyExec(
-        uint256 txFee,
-        address feeToken,
-        address taskCreator,
-        bool useTaskTreasuryFunds,
-        bool revertOnFailure,
-        bytes32 resolverHash,
-        address execAddress,
-        bytes memory execData
-    ) external;
-
-    /**
      * @notice Sets the address of task modules. Only callable by proxy admin.
      *
      * @param modules List of modules to be set

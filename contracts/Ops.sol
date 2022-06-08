@@ -96,45 +96,6 @@ contract Ops is Gelatofied, Proxied, OpsStorage, IOps {
     }
 
     ///@inheritdoc IOps
-    function legacyExec(
-        uint256 _txFee,
-        address _feeToken,
-        address _taskCreator,
-        bool _useTaskTreasuryFunds,
-        bool _revertOnFailure,
-        bytes32 _resolverHash,
-        address _execAddress,
-        bytes memory _execData
-    ) external onlyGelato {
-        bytes32 taskId = LibTaskId.getLegacyTaskId(
-            _taskCreator,
-            _execAddress,
-            _execData.memorySliceSelector(),
-            _useTaskTreasuryFunds,
-            _useTaskTreasuryFunds ? address(0) : _feeToken,
-            _resolverHash
-        );
-
-        LibDataTypes.Module[] memory modules;
-        if (timedTask[taskId].nextExec != 0) {
-            modules = new LibDataTypes.Module[](1);
-            modules[0] = LibDataTypes.Module.TIME;
-        }
-
-        _exec(
-            taskId,
-            _taskCreator,
-            _execAddress,
-            _execData,
-            modules,
-            _txFee,
-            _feeToken,
-            _useTaskTreasuryFunds,
-            _revertOnFailure
-        );
-    }
-
-    ///@inheritdoc IOps
     function setModule(
         LibDataTypes.Module[] calldata _modules,
         address[] calldata _moduleAddresses
@@ -177,7 +138,7 @@ contract Ops is Gelatofied, Proxied, OpsStorage, IOps {
         );
 
         require(
-            taskCreator[taskId] == address(0),
+            !_createdTasks[_taskCreator].contains(taskId),
             "Ops.createTask: Duplicate task"
         );
 
@@ -191,8 +152,6 @@ contract Ops is Gelatofied, Proxied, OpsStorage, IOps {
         );
 
         _createdTasks[_taskCreator].add(taskId);
-        taskCreator[taskId] = _taskCreator;
-        execAddresses[taskId] = _execAddress;
 
         emit LibEvents.TaskCreated(
             _taskCreator,
@@ -206,13 +165,11 @@ contract Ops is Gelatofied, Proxied, OpsStorage, IOps {
 
     function _cancelTask(address _taskCreator, bytes32 _taskId) private {
         require(
-            taskCreator[_taskId] == _taskCreator,
+            _createdTasks[_taskCreator].contains(_taskId),
             "Ops.cancelTask: Task not found"
         );
 
         _createdTasks[_taskCreator].remove(_taskId);
-        delete taskCreator[_taskId];
-        delete execAddresses[_taskId];
         delete timedTask[_taskId];
 
         emit LibEvents.TaskCancelled(_taskId, _taskCreator);
@@ -231,7 +188,7 @@ contract Ops is Gelatofied, Proxied, OpsStorage, IOps {
         bool _revertOnFailure
     ) private {
         require(
-            _taskCreator != address(0) && taskCreator[_taskId] == _taskCreator,
+            _createdTasks[_taskCreator].contains(_taskId),
             "Ops.exec: Task not found"
         );
 

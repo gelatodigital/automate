@@ -104,16 +104,16 @@ library LibTaskId {
         return false;
     }
 
+    /**
+     * @dev Acquire resolverHash which is required to compute legacyTaskId.
+     *
+     * @param _resolverModuleArg Encoded value of resolverAddress and resolverData
+     */
     function _getResolverHash(bytes memory _resolverModuleArg)
         private
         pure
         returns (bytes32)
     {
-        (address resolverAddress, bytes memory resolverData) = abi.decode(
-            _resolverModuleArg,
-            (address, bytes)
-        );
-
-        return keccak256(abi.encode(resolverAddress, resolverData));
+        return keccak256(_resolverModuleArg);
     }
 }
