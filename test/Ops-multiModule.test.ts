@@ -100,6 +100,9 @@ describe("Ops multi module test", function () {
       .connect(user)
       .depositFunds(userAddress, ETH, depositAmount, { value: depositAmount });
 
+    // deploy proxy
+    await opsProxyFactory.connect(user).deploy();
+
     // create task
     const resolverData =
       counterResolver.interface.encodeFunctionData("checker");
