@@ -43,7 +43,9 @@ contract ProxyModule is TaskModuleBase {
     ) external override returns (address, bytes memory execData) {
         address proxy = _deployIfNoProxy(_taskCreator);
 
-        execData = _encodeWithOpsProxy(_execAddress, _execData);
+        execData = _execAddress == proxy
+            ? _execData
+            : _encodeWithOpsProxy(_execAddress, _execData);
 
         _execAddress = proxy;
 

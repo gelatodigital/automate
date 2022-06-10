@@ -79,6 +79,9 @@ describe("Ops Proxy module test", function () {
       .connect(user)
       .depositFunds(userAddress, ETH, depositAmount, { value: depositAmount });
 
+    // deploy proxy
+    await opsProxyFactory.connect(user).deploy();
+
     // create task
     taskCreator = userAddress;
     execAddress = counter.address;
@@ -179,7 +182,53 @@ describe("Ops Proxy module test", function () {
     expect(count2After).to.be.gt(count2Before);
   });
 
-  it("exec - without module initialised", async () => {
+  it("exec - execAddress is proxy", async () => {
+    // // whitelist proxy on counter
+    await counter.connect(deployer).setWhitelist(opsProxy.address, true);
+    expect(await counter.whitelisted(opsProxy.address)).to.be.true;
+
+    execAddress = opsProxy.address;
+    execSelector = opsProxy.interface.getSighash("executeCall");
+    const proxyExecData = opsProxy.interface.encodeFunctionData("executeCall", [
+      counter.address,
+      execData,
+      0,
+    ]);
+    execData = proxyExecData;
+    moduleData = { modules: [Module.PROXY], args: ["0x"] };
+
+    await createTask(user);
+
+    computeTaskId();
+
+    const taskIds = await ops.getTaskIdsByUser(userAddress);
+    expect(taskIds).to.include(taskId);
+
+    const countBefore = await counter.count();
+    await execute();
+    const countAfter = await counter.count();
+    expect(countAfter).to.be.gt(countBefore);
+  });
+
+  it("exec - execAddress is proxy, execData not encoded with `executeCall`", async () => {
+    // // whitelist proxy on counter
+    await counter.connect(deployer).setWhitelist(opsProxy.address, true);
+    expect(await counter.whitelisted(opsProxy.address)).to.be.true;
+
+    execAddress = opsProxy.address;
+    moduleData = { modules: [Module.PROXY], args: ["0x"] };
+
+    await createTask(user);
+
+    computeTaskId();
+
+    const taskIds = await ops.getTaskIdsByUser(userAddress);
+    expect(taskIds).to.include(taskId);
+
+    await expect(execute()).to.be.reverted;
+  });
+
+  it("exec - without proxy module initialised", async () => {
     // // whitelist proxy on counter
     await counter.connect(deployer).setWhitelist(opsProxy.address, true);
     expect(await counter.whitelisted(opsProxy.address)).to.be.true;
@@ -207,7 +256,7 @@ describe("Ops Proxy module test", function () {
     expect(countAfter).to.be.gt(countBefore);
   });
 
-  it("exec - without module initialised, created by non proxy owner", async () => {
+  it("exec - without proxy module initialised, created by non proxy owner", async () => {
     execAddress = opsProxy.address;
     execSelector = opsProxy.interface.getSighash("executeCall");
     const proxyExecData = opsProxy.interface.encodeFunctionData("executeCall", [

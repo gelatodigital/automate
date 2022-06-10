@@ -34,6 +34,7 @@ library LibTaskModule {
 
         for (uint256 i; i < length; i++) {
             LibDataTypes.Module module = _moduleData.modules[i];
+            if (!_requireOnCreate(module)) continue;
 
             address taskModuleAddress = taskModuleAddresses[module];
             _moduleInitialised(taskModuleAddress);
@@ -75,14 +76,18 @@ library LibTaskModule {
         bool _revertOnFailure,
         mapping(LibDataTypes.Module => address) storage taskModuleAddresses
     ) internal returns (bool callSuccess) {
-        address[] memory moduleAddresses;
-        (moduleAddresses, _execAddress, _execData) = _preExecTask(
+        address[] memory moduleAddresses = _getModuleAddresses(
+            _modules,
+            taskModuleAddresses
+        );
+
+        (_execAddress, _execData) = _preExecTask(
             _taskId,
             _taskCreator,
             _execAddress,
             _execData,
             _modules,
-            taskModuleAddresses
+            moduleAddresses
         );
 
         (callSuccess, ) = _call(
@@ -98,6 +103,7 @@ library LibTaskModule {
             _taskCreator,
             _execAddress,
             _execData,
+            _modules,
             moduleAddresses
         );
     }
@@ -108,20 +114,12 @@ library LibTaskModule {
         address _execAddress,
         bytes memory _execData,
         LibDataTypes.Module[] memory _modules,
-        mapping(LibDataTypes.Module => address) storage taskModuleAddresses
-    )
-        private
-        returns (
-            address[] memory,
-            address,
-            bytes memory
-        )
-    {
+        address[] memory _moduleAddresses
+    ) private returns (address, bytes memory) {
         uint256 length = _modules.length;
-        address[] memory moduleAddresses = new address[](length);
 
         for (uint256 i; i < length; i++) {
-            moduleAddresses[i] = taskModuleAddresses[_modules[i]];
+            if (!_requirePreExec(_modules[i])) continue;
 
             bytes memory delegatecallData = abi.encodeWithSelector(
                 ITaskModule.preExecTask.selector,
@@ -132,7 +130,7 @@ library LibTaskModule {
             );
 
             (, bytes memory returnData) = _delegateCall(
-                moduleAddresses[i],
+                _moduleAddresses[i],
                 delegatecallData,
                 "Ops.preExecTask: "
             );
@@ -142,7 +140,7 @@ library LibTaskModule {
                 (address, bytes)
             );
         }
-        return (moduleAddresses, _execAddress, _execData);
+        return (_execAddress, _execData);
     }
 
     function _postExecTask(
@@ -150,11 +148,14 @@ library LibTaskModule {
         address _taskCreator,
         address _execAddress,
         bytes memory _execData,
+        LibDataTypes.Module[] memory _modules,
         address[] memory _moduleAddresses
     ) private {
         uint256 length = _moduleAddresses.length;
 
         for (uint256 i; i < length; i++) {
+            if (!_requirePostExec(_modules[i])) continue;
+
             bytes memory delegatecallData = abi.encodeWithSelector(
                 ITaskModule.postExecTask.selector,
                 _taskId,
@@ -169,6 +170,56 @@ library LibTaskModule {
                 "Ops.postExecTask: "
             );
         }
+    }
+
+    function _getModuleAddresses(
+        LibDataTypes.Module[] memory _modules,
+        mapping(LibDataTypes.Module => address) storage taskModuleAddresses
+    ) private view returns (address[] memory) {
+        uint256 length = _modules.length;
+        address[] memory moduleAddresses = new address[](length);
+
+        for (uint256 i; i < length; i++) {
+            moduleAddresses[i] = taskModuleAddresses[_modules[i]];
+        }
+
+        return moduleAddresses;
+    }
+
+    function _requireOnCreate(LibDataTypes.Module _module)
+        private
+        pure
+        returns (bool)
+    {
+        if (
+            _module == LibDataTypes.Module.TIME ||
+            _module == LibDataTypes.Module.PROXY
+        ) return true;
+
+        return false;
+    }
+
+    function _requirePreExec(LibDataTypes.Module _module)
+        private
+        pure
+        returns (bool)
+    {
+        if (
+            _module == LibDataTypes.Module.TIME ||
+            _module == LibDataTypes.Module.PROXY
+        ) return true;
+
+        return false;
+    }
+
+    function _requirePostExec(LibDataTypes.Module _module)
+        private
+        pure
+        returns (bool)
+    {
+        if (_module == LibDataTypes.Module.SINGLE_EXEC) return true;
+
+        return false;
     }
 
     function _moduleInitialised(address _taskModuleAddress) private pure {
