@@ -134,7 +134,7 @@ describe("Ops legacy task test", function () {
 
     expect(decoded.taskCreator).to.be.eql(userAddress);
     expect(decoded.execAddress).to.be.eql(counter.address);
-    expect(decoded.execData).to.be.eql(execSelector);
+    expect(decoded.execDataOrSelector).to.be.eql(execSelector);
     expect(decoded.moduleData.modules).to.be.eql(moduleData.modules);
     expect(decoded.moduleData.args).to.be.eql(moduleData.args);
     expect(decoded.feeToken).to.be.eql(ZERO_ADD);
@@ -185,7 +185,7 @@ describe("Ops legacy task test", function () {
 
     expect(decoded.taskCreator).to.be.eql(userAddress);
     expect(decoded.execAddress).to.be.eql(counter.address);
-    expect(decoded.execData).to.be.eql(execSelector);
+    expect(decoded.execDataOrSelector).to.be.eql(execSelector);
     expect(decoded.moduleData.modules).to.be.eql(moduleData.modules);
     expect(decoded.moduleData.args).to.be.eql(moduleData.args);
     expect(decoded.feeToken).to.be.eql(ETH);
@@ -253,7 +253,7 @@ describe("Ops legacy task test", function () {
 
     expect(decoded2.taskCreator).to.be.eql(userAddress);
     expect(decoded2.execAddress).to.be.eql(counter.address);
-    expect(decoded2.execData).to.be.eql(execSelector);
+    expect(decoded2.execDataOrSelector).to.be.eql(execSelector);
     expect(decoded2.moduleData.modules).to.be.eql(moduleData.modules);
     expect(decoded2.moduleData.args).to.be.eql(moduleData.args);
     expect(decoded2.feeToken).to.be.eql(ETH);

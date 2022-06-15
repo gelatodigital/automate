@@ -10,7 +10,7 @@ library LibEvents {
      *
      * @param taskCreator The address which created the task.
      * @param execAddress Address of contract that is called by Gelato.
-     * @param execData Execution data / function selector.
+     * @param execDataOrSelector Execution data / function selector.
      * @param moduleData Conditional modules used. {See LibDataTypes-ModuleData}
      * @param feeToken Token used to pay for the execution. ETH = 0xeeeeee...
      * @param taskId Unique hash of the task. {See LibTaskId-getTaskId}
@@ -18,7 +18,7 @@ library LibEvents {
     event TaskCreated(
         address indexed taskCreator,
         address indexed execAddress,
-        bytes execData,
+        bytes execDataOrSelector,
         LibDataTypes.ModuleData moduleData,
         address feeToken,
         bytes32 indexed taskId

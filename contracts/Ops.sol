@@ -45,14 +45,14 @@ contract Ops is Gelatofied, Proxied, OpsStorage, IOps {
     ///@inheritdoc IOps
     function createTask(
         address _execAddress,
-        bytes calldata _execData,
+        bytes calldata _execDataOrSelector,
         LibDataTypes.ModuleData calldata _moduleData,
         address _feeToken
     ) external override returns (bytes32 taskId) {
         taskId = _createTask(
             msg.sender,
             _execAddress,
-            _execData,
+            _execDataOrSelector,
             _moduleData,
             _feeToken
         );
@@ -125,14 +125,14 @@ contract Ops is Gelatofied, Proxied, OpsStorage, IOps {
     function _createTask(
         address _taskCreator,
         address _execAddress,
-        bytes memory _execData,
+        bytes memory _execDataOrSelector,
         LibDataTypes.ModuleData memory _moduleData,
         address _feeToken
     ) private returns (bytes32 taskId) {
         taskId = LibTaskId.getTaskId(
             _taskCreator,
             _execAddress,
-            _execData.memorySliceSelector(),
+            _execDataOrSelector.memorySliceSelector(),
             _moduleData,
             _feeToken
         );
@@ -146,7 +146,7 @@ contract Ops is Gelatofied, Proxied, OpsStorage, IOps {
             taskId,
             _taskCreator,
             _execAddress,
-            _execData,
+            _execDataOrSelector,
             _moduleData,
             taskModuleAddresses
         );
@@ -156,7 +156,7 @@ contract Ops is Gelatofied, Proxied, OpsStorage, IOps {
         emit LibEvents.TaskCreated(
             _taskCreator,
             _execAddress,
-            _execData,
+            _execDataOrSelector,
             _moduleData,
             _feeToken,
             taskId
