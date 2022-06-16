@@ -127,35 +127,66 @@ library LibLegacyTask {
             address feeToken
         )
     {
-        bytes4 execSelector;
-        address resolverAddress;
-        bytes memory resolverData;
-
-        uint128 startTime;
-        uint128 interval;
+        bytes memory resolverModuleArgs;
+        bytes memory timeModuleArgs;
         (
-            startTime,
-            interval,
             execAddress,
-            execSelector,
-            resolverAddress,
-            resolverData,
-            feeToken
-        ) = abi.decode(
-            _callDataSliced,
-            (uint128, uint128, address, bytes4, address, bytes, address)
-        );
-
+            execData,
+            feeToken,
+            resolverModuleArgs,
+            timeModuleArgs
+        ) = _decodeTimedTaskCallData(_callDataSliced);
         LibDataTypes.Module[] memory modules = new LibDataTypes.Module[](2);
         modules[0] = LibDataTypes.Module.RESOLVER;
         modules[1] = LibDataTypes.Module.TIME;
 
         bytes[] memory args = new bytes[](2);
-        args[0] = abi.encode(resolverAddress, resolverData);
-        args[1] = abi.encode(startTime, interval);
+        args[0] = resolverModuleArgs;
+        args[1] = timeModuleArgs;
 
         moduleData = LibDataTypes.ModuleData(modules, args);
+    }
 
-        execData = abi.encodePacked(execSelector);
+    function _decodeTimedTaskCallData(bytes calldata _callDataSliced)
+        private
+        pure
+        returns (
+            address,
+            bytes memory,
+            address,
+            bytes memory,
+            bytes memory
+        )
+    {
+        (
+            uint128 startTime,
+            uint128 interval,
+            address execAddress,
+            bytes4 execSelector,
+            address resolverAddress,
+            bytes memory resolverData,
+            address feeToken,
+            bool useTreasury
+        ) = abi.decode(
+                _callDataSliced,
+                (
+                    uint128,
+                    uint128,
+                    address,
+                    bytes4,
+                    address,
+                    bytes,
+                    address,
+                    bool
+                )
+            );
+
+        return (
+            execAddress,
+            abi.encodePacked(execSelector),
+            feeToken = useTreasury ? address(0) : feeToken,
+            abi.encode(resolverAddress, resolverData),
+            abi.encode(startTime, interval)
+        );
     }
 }
