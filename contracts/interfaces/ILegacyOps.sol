@@ -30,7 +30,8 @@ interface ILegacyOps {
         bytes4 _execSelector,
         address _resolverAddress,
         bytes calldata _resolverData,
-        address _feeToken
+        address _feeToken,
+        bool _useTreasury
     ) external returns (bytes32 taskId);
 
     function cancelTask(bytes32 _taskId) external;

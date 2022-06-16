@@ -216,8 +216,8 @@ describe("Ops legacy task test", function () {
       userAddress,
       counter.address,
       execSelector,
-      false,
-      ETH,
+      true,
+      ZERO_ADD,
       resolverHash
     );
     const res = await legacyOps
@@ -229,7 +229,8 @@ describe("Ops legacy task test", function () {
         execSelector,
         counterResolver.address,
         resolverData,
-        ETH
+        ZERO_ADD,
+        true
       );
     const txn = await res.wait();
     assert(txn.events);
@@ -256,13 +257,13 @@ describe("Ops legacy task test", function () {
     expect(decoded2.execDataOrSelector).to.be.eql(execSelector);
     expect(decoded2.moduleData.modules).to.be.eql(moduleData.modules);
     expect(decoded2.moduleData.args).to.be.eql(moduleData.args);
-    expect(decoded2.feeToken).to.be.eql(ETH);
+    expect(decoded2.feeToken).to.be.eql(ZERO_ADD);
     expect(decoded2.taskId).to.be.eql(taskId);
 
     const countBefore = await counter.count();
     await fastForwardTime(interval);
 
-    await execute(false);
+    await execute(true);
 
     const countAfter = await counter.count();
     expect(countAfter).to.be.gt(countBefore);
