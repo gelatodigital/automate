@@ -33,7 +33,9 @@ contract ProxyModule is TaskModuleBase {
 
     /**
      * @inheritdoc TaskModuleBase
-     * @dev _execData is encoded with proxy's `executeCall` function.
+     * @dev _execData is encoded with proxy's `executeCall` function
+     * unless _execAddress is OpsProxy which assumes that _execData is encoded
+     * with `executeCall` or `batchExecuteCall`.
      */
     function preExecTask(
         bytes32,
