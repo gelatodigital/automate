@@ -14,6 +14,7 @@ export const getGelatoAddress = (network: string): string => {
   const GELATO_GNOSIS = "0x29b6603D17B9D8f021EcB8845B6FD06E1Adf89DE";
   const GELATO_OPTIMISM = "0x01051113D81D7d6DA508462F2ad6d7fD96cF42Ef";
   const GELATO_MOONBEAM = "0x91f2A140cA47DdF438B9c583b7E71987525019bB";
+  const GELATO_MOONRIVER = "0x91f2A140cA47DdF438B9c583b7E71987525019bB";
 
   const GELATO_ROPSTEN = "0xCc4CcD69D31F9FfDBD3BFfDe49c6aA886DaB98d9";
   const GELATO_RINKEBY = "0x0630d1b8C2df3F0a68Df578D02075027a6397173";
@@ -50,6 +51,8 @@ export const getGelatoAddress = (network: string): string => {
       return GELATO_OPTIMISM;
     case "moonbeam":
       return GELATO_MOONBEAM;
+    case "moonriver":
+      return GELATO_MOONRIVER;
     case "hardhat":
       return GELATO_MAINNET;
     default:

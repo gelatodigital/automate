@@ -22,13 +22,6 @@ assert.ok(ALCHEMY_ID, "no Alchemy ID in process.env");
 // @dev fill this out
 const DEPLOYER_PK_MAINNET = process.env.DEPLOYER_PK_MAINNET;
 const ETHERSCAN_API = process.env.ETHERSCAN_API;
-// ETHERSCAN_MATIC_API;
-// ETHERSCAN_FANTOM_API;
-// ETHERSCAN_ARBITRUM_API;
-// ETHERSCAN_BSC_API;
-// ETHERSCAN_AVALANCHE_API;
-// ETHERSCAN_OPTIMISM_API
-// ETHERSCAN_MOONBEAM_API
 
 // ================================= CONFIG =========================================
 const config: HardhatUserConfig = {
@@ -96,6 +89,11 @@ const config: HardhatUserConfig = {
     moonbeam: {
       url: `https://rpc.api.moonbeam.network`,
       chainId: 1284,
+      accounts: DEPLOYER_PK_MAINNET ? [DEPLOYER_PK_MAINNET] : [],
+    },
+    moonriver: {
+      url: `https://rpc.api.moonriver.moonbeam.network`,
+      chainId: 1285,
       accounts: DEPLOYER_PK_MAINNET ? [DEPLOYER_PK_MAINNET] : [],
     },
     mumbai: {
