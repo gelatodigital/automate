@@ -67,7 +67,7 @@ contract OpsProxy is IOpsProxy, Initializable {
         (, bytes memory returnData) = _call(
             _target,
             _data,
-            0,
+            _value,
             true,
             "OpsProxy.executeCall: "
         );
