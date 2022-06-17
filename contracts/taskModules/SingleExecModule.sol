@@ -1,5 +1,4 @@
 // SPDX-License-Identifier: UNLICENSED
-
 pragma solidity ^0.8.12;
 
 import {
@@ -21,6 +20,6 @@ contract SingleExecModule is TaskModuleBase {
         _createdTasks[_taskCreator].remove(_taskId);
         delete timedTask[_taskId];
 
-        emit LibEvents.TaskCancelled(_taskId, address(this));
+        emit LibEvents.TaskCancelled(_taskId, _taskCreator);
     }
 }
