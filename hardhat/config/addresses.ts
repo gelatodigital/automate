@@ -45,6 +45,8 @@ export const getGelatoAddress = (network: string): string => {
       return GELATO_GNOSIS;
     case "mumbai":
       return GELATO_MUMBAI;
+    case "mumbaiTest":
+      return GELATO_MUMBAI;
     case "optimism":
       return GELATO_OPTIMISM;
     case "moonbeam":

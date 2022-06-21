@@ -102,6 +102,11 @@ const config: HardhatUserConfig = {
       chainId: 80001,
       accounts: DEPLOYER_PK_MAINNET ? [DEPLOYER_PK_MAINNET] : [],
     },
+    mumbaiTest: {
+      url: `https://polygon-mumbai.g.alchemy.com/v2/${ALCHEMY_ID}`,
+      chainId: 80001,
+      accounts: DEPLOYER_PK_MAINNET ? [DEPLOYER_PK_MAINNET] : [],
+    },
     optimism: {
       url: `https://opt-mainnet.g.alchemy.com/v2/${ALCHEMY_ID}`,
       chainId: 10,

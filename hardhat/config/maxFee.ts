@@ -29,6 +29,8 @@ export const getMaxFee = (network: string): BigNumber => {
       return ethers.utils.parseEther("2");
     case "mumbai":
       return ethers.utils.parseEther("0");
+    case "mumbaiTest":
+      return ethers.utils.parseEther("0");
     case "optimism":
       return ethers.utils.parseEther("0.1");
     case "moonbeam":
