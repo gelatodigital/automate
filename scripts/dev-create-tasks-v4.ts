@@ -16,15 +16,45 @@ const main = async () => {
 
   const execAddress = opsTest.address;
   const execData = opsTest.interface.encodeFunctionData("increaseCount", [1]);
+  const execData2 = opsTest.interface.encodeFunctionData("increaseCount", [2]);
+  const execDataNoPrepayment = opsTest.interface.encodeFunctionData(
+    "increaseCountNoPrepayment",
+    [1]
+  );
+  const execDataNoPrepayment2 = opsTest.interface.encodeFunctionData(
+    "increaseCountNoPrepayment",
+    [2]
+  );
+
   const execSelector = opsTest.interface.getSighash("increaseCount");
+  const execSelectorNoPrepayment = opsTest.interface.getSighash(
+    "increaseCountNoPrepayment"
+  );
 
   const forwarderResolverData = forwarder.interface.encodeFunctionData(
     "checker",
     [execData]
   );
-  const resolverData = opsTest.interface.encodeFunctionData("checker", [1]);
+  const forwarderResolverData2 = forwarder.interface.encodeFunctionData(
+    "checker",
+    [execData2]
+  );
+  const forwarderResolverDataNoPrepayment =
+    forwarder.interface.encodeFunctionData("checker", [execDataNoPrepayment]);
+  const forwarderResolverDataNoPrepayment2 =
+    forwarder.interface.encodeFunctionData("checker", [execDataNoPrepayment2]);
 
-  //----------------------------------------------------------------------
+  const resolverData = opsTest.interface.encodeFunctionData("checker", [1]);
+  const resolverData2 = opsTest.interface.encodeFunctionData("checker", [2]);
+  const resolverDataNoPrepayment = opsTest.interface.encodeFunctionData(
+    "checkerNoPrepayment",
+    [1]
+  );
+  const resolverDataNoPrepayment2 = opsTest.interface.encodeFunctionData(
+    "checkerNoPrepayment",
+    [2]
+  );
+  // ----------------------------------------------------------------------
   (
     await ops.createTask(
       execAddress,
@@ -39,9 +69,9 @@ const main = async () => {
   (
     await ops.createTaskNoPrepayment(
       execAddress,
-      execSelector,
+      execSelectorNoPrepayment,
       forwarder.address,
-      forwarderResolverData,
+      forwarderResolverDataNoPrepayment,
       ETH
     )
   ).wait();
@@ -63,16 +93,16 @@ const main = async () => {
   (
     await ops.createTaskNoPrepayment(
       execAddress,
-      execSelector,
+      execSelectorNoPrepayment,
       opsTest.address,
-      resolverData,
+      resolverDataNoPrepayment,
       ETH
     )
   ).wait();
   console.log(`created: "resolver" "useTreasury: false"`);
   await sleep(5000);
 
-  //----------------------------------------------------------------------
+  // ----------------------------------------------------------------------
   const startTime = 0;
   const interval = 5 * 60;
   (
@@ -82,7 +112,7 @@ const main = async () => {
       execAddress,
       execSelector,
       forwarder.address,
-      forwarderResolverData,
+      forwarderResolverData2,
       ZERO,
       true
     )
@@ -95,9 +125,9 @@ const main = async () => {
       startTime,
       interval,
       execAddress,
-      execSelector,
+      execSelectorNoPrepayment,
       forwarder.address,
-      forwarderResolverData,
+      forwarderResolverDataNoPrepayment2,
       ETH,
       false
     )
@@ -112,7 +142,7 @@ const main = async () => {
       execAddress,
       execSelector,
       opsTest.address,
-      resolverData,
+      resolverData2,
       ZERO,
       true
     )
@@ -125,9 +155,9 @@ const main = async () => {
       startTime,
       interval,
       execAddress,
-      execSelector,
+      execSelectorNoPrepayment,
       opsTest.address,
-      resolverData,
+      resolverDataNoPrepayment2,
       ETH,
       false
     )

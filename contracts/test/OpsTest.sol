@@ -38,4 +38,16 @@ contract OpsTest is OpsReady {
         canExec = true;
         payload = abi.encodeWithSelector(this.increaseCount.selector, _count);
     }
+
+    function checkerNoPrepayment(uint256 _count)
+        external
+        pure
+        returns (bool canExec, bytes memory payload)
+    {
+        canExec = true;
+        payload = abi.encodeWithSelector(
+            this.increaseCountNoPrepayment.selector,
+            _count
+        );
+    }
 }
