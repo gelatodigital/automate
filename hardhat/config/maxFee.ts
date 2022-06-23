@@ -33,6 +33,8 @@ export const getMaxFee = (network: string): BigNumber | undefined => {
       return ethers.utils.parseEther("0.1");
     case "moonbeam":
       return ethers.utils.parseEther("5");
+    case "optimisticKovan":
+      return ethers.utils.parseEther("0");
     case "hardhat":
       return ethers.utils.parseEther("100");
     default:
