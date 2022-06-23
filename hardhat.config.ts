@@ -108,7 +108,7 @@ const config: HardhatUserConfig = {
       chainId: 10,
       accounts: DEPLOYER_PK_MAINNET ? [DEPLOYER_PK_MAINNET] : [],
     },
-    optimisticKovan: {
+    okovan: {
       url: `https://opt-kovan.g.alchemy.com/v2/${ALCHEMY_ID}`,
       chainId: 69,
       accounts: DEPLOYER_PK_MAINNET ? [DEPLOYER_PK_MAINNET] : [],
