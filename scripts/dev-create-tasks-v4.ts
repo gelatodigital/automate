@@ -1,6 +1,6 @@
 import { ethers } from "hardhat";
 import { sleep } from "../hardhat/utils";
-import { OpsTest, IForwarder, ILegacyOps } from "../typechain";
+import { OpsTest, IForwarder, ILegacyOps, Ops } from "../typechain";
 
 const ETH = "0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE";
 const ZERO = ethers.constants.AddressZero;
@@ -10,7 +10,10 @@ const main = async () => {
   const ownerAddress = await owner.getAddress();
   console.log("Owner: ", ownerAddress);
 
-  const ops = <ILegacyOps>await ethers.getContract("Ops");
+  const opsContract = <Ops>await ethers.getContract("Ops");
+  const ops = <ILegacyOps>(
+    await ethers.getContractAt("ILegacyOps", opsContract.address)
+  );
   const opsTest = <OpsTest>await ethers.getContract("OpsTest");
   const forwarder = <IForwarder>await ethers.getContract("Forwarder");
 
