@@ -1,0 +1,919 @@
+{
+  "address": "0x8aB6aDbC1fec4F18617C9B889F5cE7F28401B8dB",
+  "abi": [
+    {
+      "inputs": [
+        {
+          "internalType": "address payable",
+          "name": "_gelato",
+          "type": "address"
+        },
+        {
+          "internalType": "contract ITaskTreasuryUpgradable",
+          "name": "_taskTreasury",
+          "type": "address"
+        }
+      ],
+      "stateMutability": "nonpayable",
+      "type": "constructor"
+    },
+    {
+      "anonymous": false,
+      "inputs": [
+        {
+          "indexed": true,
+          "internalType": "uint256",
+          "name": "txFee",
+          "type": "uint256"
+        },
+        {
+          "indexed": true,
+          "internalType": "address",
+          "name": "feeToken",
+          "type": "address"
+        },
+        {
+          "indexed": true,
+          "internalType": "address",
+          "name": "execAddress",
+          "type": "address"
+        },
+        {
+          "indexed": false,
+          "internalType": "bytes",
+          "name": "execData",
+          "type": "bytes"
+        },
+        {
+          "indexed": false,
+          "internalType": "bytes32",
+          "name": "taskId",
+          "type": "bytes32"
+        },
+        {
+          "indexed": false,
+          "internalType": "bool",
+          "name": "callSuccess",
+          "type": "bool"
+        }
+      ],
+      "name": "ExecSuccess",
+      "type": "event"
+    },
+    {
+      "anonymous": false,
+      "inputs": [
+        {
+          "indexed": false,
+          "internalType": "bytes32",
+          "name": "taskId",
+          "type": "bytes32"
+        },
+        {
+          "indexed": false,
+          "internalType": "address",
+          "name": "taskCreator",
+          "type": "address"
+        }
+      ],
+      "name": "TaskCancelled",
+      "type": "event"
+    },
+    {
+      "anonymous": false,
+      "inputs": [
+        {
+          "indexed": false,
+          "internalType": "address",
+          "name": "taskCreator",
+          "type": "address"
+        },
+        {
+          "indexed": false,
+          "internalType": "address",
+          "name": "execAddress",
+          "type": "address"
+        },
+        {
+          "indexed": false,
+          "internalType": "bytes4",
+          "name": "selector",
+          "type": "bytes4"
+        },
+        {
+          "indexed": false,
+          "internalType": "address",
+          "name": "resolverAddress",
+          "type": "address"
+        },
+        {
+          "indexed": false,
+          "internalType": "bytes32",
+          "name": "taskId",
+          "type": "bytes32"
+        },
+        {
+          "indexed": false,
+          "internalType": "bytes",
+          "name": "resolverData",
+          "type": "bytes"
+        },
+        {
+          "indexed": false,
+          "internalType": "bool",
+          "name": "useTaskTreasuryFunds",
+          "type": "bool"
+        },
+        {
+          "indexed": false,
+          "internalType": "address",
+          "name": "feeToken",
+          "type": "address"
+        },
+        {
+          "indexed": false,
+          "internalType": "bytes32",
+          "name": "resolverHash",
+          "type": "bytes32"
+        }
+      ],
+      "name": "TaskCreated",
+      "type": "event"
+    },
+    {
+      "anonymous": false,
+      "inputs": [
+        {
+          "indexed": true,
+          "internalType": "bytes32",
+          "name": "taskId",
+          "type": "bytes32"
+        },
+        {
+          "indexed": true,
+          "internalType": "uint128",
+          "name": "nextExec",
+          "type": "uint128"
+        },
+        {
+          "indexed": true,
+          "internalType": "uint128",
+          "name": "interval",
+          "type": "uint128"
+        }
+      ],
+      "name": "TimerSet",
+      "type": "event"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "bytes32",
+          "name": "_taskId",
+          "type": "bytes32"
+        }
+      ],
+      "name": "cancelTask",
+      "outputs": [],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "address",
+          "name": "_execAddress",
+          "type": "address"
+        },
+        {
+          "internalType": "bytes4",
+          "name": "_execSelector",
+          "type": "bytes4"
+        },
+        {
+          "internalType": "address",
+          "name": "_resolverAddress",
+          "type": "address"
+        },
+        {
+          "internalType": "bytes",
+          "name": "_resolverData",
+          "type": "bytes"
+        }
+      ],
+      "name": "createTask",
+      "outputs": [
+        {
+          "internalType": "bytes32",
+          "name": "task",
+          "type": "bytes32"
+        }
+      ],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "address",
+          "name": "_execAddress",
+          "type": "address"
+        },
+        {
+          "internalType": "bytes4",
+          "name": "_execSelector",
+          "type": "bytes4"
+        },
+        {
+          "internalType": "address",
+          "name": "_resolverAddress",
+          "type": "address"
+        },
+        {
+          "internalType": "bytes",
+          "name": "_resolverData",
+          "type": "bytes"
+        },
+        {
+          "internalType": "address",
+          "name": "_feeToken",
+          "type": "address"
+        }
+      ],
+      "name": "createTaskNoPrepayment",
+      "outputs": [
+        {
+          "internalType": "bytes32",
+          "name": "task",
+          "type": "bytes32"
+        }
+      ],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "uint128",
+          "name": "_startTime",
+          "type": "uint128"
+        },
+        {
+          "internalType": "uint128",
+          "name": "_interval",
+          "type": "uint128"
+        },
+        {
+          "internalType": "address",
+          "name": "_execAddress",
+          "type": "address"
+        },
+        {
+          "internalType": "bytes4",
+          "name": "_execSelector",
+          "type": "bytes4"
+        },
+        {
+          "internalType": "address",
+          "name": "_resolverAddress",
+          "type": "address"
+        },
+        {
+          "internalType": "bytes",
+          "name": "_resolverData",
+          "type": "bytes"
+        },
+        {
+          "internalType": "address",
+          "name": "_feeToken",
+          "type": "address"
+        },
+        {
+          "internalType": "bool",
+          "name": "_useTreasury",
+          "type": "bool"
+        }
+      ],
+      "name": "createTimedTask",
+      "outputs": [
+        {
+          "internalType": "bytes32",
+          "name": "task",
+          "type": "bytes32"
+        }
+      ],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "uint256",
+          "name": "_txFee",
+          "type": "uint256"
+        },
+        {
+          "internalType": "address",
+          "name": "_feeToken",
+          "type": "address"
+        },
+        {
+          "internalType": "address",
+          "name": "_taskCreator",
+          "type": "address"
+        },
+        {
+          "internalType": "bool",
+          "name": "_useTaskTreasuryFunds",
+          "type": "bool"
+        },
+        {
+          "internalType": "bool",
+          "name": "_revertOnFailure",
+          "type": "bool"
+        },
+        {
+          "internalType": "bytes32",
+          "name": "_resolverHash",
+          "type": "bytes32"
+        },
+        {
+          "internalType": "address",
+          "name": "_execAddress",
+          "type": "address"
+        },
+        {
+          "internalType": "bytes",
+          "name": "_execData",
+          "type": "bytes"
+        }
+      ],
+      "name": "exec",
+      "outputs": [],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "bytes32",
+          "name": "",
+          "type": "bytes32"
+        }
+      ],
+      "name": "execAddresses",
+      "outputs": [
+        {
+          "internalType": "address",
+          "name": "",
+          "type": "address"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [],
+      "name": "fee",
+      "outputs": [
+        {
+          "internalType": "uint256",
+          "name": "",
+          "type": "uint256"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [],
+      "name": "feeToken",
+      "outputs": [
+        {
+          "internalType": "address",
+          "name": "",
+          "type": "address"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [],
+      "name": "gelato",
+      "outputs": [
+        {
+          "internalType": "address payable",
+          "name": "",
+          "type": "address"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [],
+      "name": "getFeeDetails",
+      "outputs": [
+        {
+          "internalType": "uint256",
+          "name": "",
+          "type": "uint256"
+        },
+        {
+          "internalType": "address",
+          "name": "",
+          "type": "address"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "address",
+          "name": "_resolverAddress",
+          "type": "address"
+        },
+        {
+          "internalType": "bytes",
+          "name": "_resolverData",
+          "type": "bytes"
+        }
+      ],
+      "name": "getResolverHash",
+      "outputs": [
+        {
+          "internalType": "bytes32",
+          "name": "",
+          "type": "bytes32"
+        }
+      ],
+      "stateMutability": "pure",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "string",
+          "name": "_func",
+          "type": "string"
+        }
+      ],
+      "name": "getSelector",
+      "outputs": [
+        {
+          "internalType": "bytes4",
+          "name": "",
+          "type": "bytes4"
+        }
+      ],
+      "stateMutability": "pure",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "address",
+          "name": "_taskCreator",
+          "type": "address"
+        },
+        {
+          "internalType": "address",
+          "name": "_execAddress",
+          "type": "address"
+        },
+        {
+          "internalType": "bytes4",
+          "name": "_selector",
+          "type": "bytes4"
+        },
+        {
+          "internalType": "bool",
+          "name": "_useTaskTreasuryFunds",
+          "type": "bool"
+        },
+        {
+          "internalType": "address",
+          "name": "_feeToken",
+          "type": "address"
+        },
+        {
+          "internalType": "bytes32",
+          "name": "_resolverHash",
+          "type": "bytes32"
+        }
+      ],
+      "name": "getTaskId",
+      "outputs": [
+        {
+          "internalType": "bytes32",
+          "name": "",
+          "type": "bytes32"
+        }
+      ],
+      "stateMutability": "pure",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "address",
+          "name": "_taskCreator",
+          "type": "address"
+        }
+      ],
+      "name": "getTaskIdsByUser",
+      "outputs": [
+        {
+          "internalType": "bytes32[]",
+          "name": "",
+          "type": "bytes32[]"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "bytes32",
+          "name": "",
+          "type": "bytes32"
+        }
+      ],
+      "name": "taskCreator",
+      "outputs": [
+        {
+          "internalType": "address",
+          "name": "",
+          "type": "address"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [],
+      "name": "taskTreasury",
+      "outputs": [
+        {
+          "internalType": "contract ITaskTreasuryUpgradable",
+          "name": "",
+          "type": "address"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "bytes32",
+          "name": "",
+          "type": "bytes32"
+        }
+      ],
+      "name": "timedTask",
+      "outputs": [
+        {
+          "internalType": "uint128",
+          "name": "nextExec",
+          "type": "uint128"
+        },
+        {
+          "internalType": "uint128",
+          "name": "interval",
+          "type": "uint128"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [],
+      "name": "version",
+      "outputs": [
+        {
+          "internalType": "string",
+          "name": "",
+          "type": "string"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    }
+  ],
+  "transactionHash": "0xd96027cf2ad75e3bca3117a0196ef4cadbe7bddc4ea1814479e07475ba79f768",
+  "receipt": {
+    "to": null,
+    "from": "0xCDf41a135C65d0013393B3793F92b4FAF31032d0",
+    "contractAddress": "0x8aB6aDbC1fec4F18617C9B889F5cE7F28401B8dB",
+    "transactionIndex": 0,
+    "gasUsed": "2673374",
+    "logsBloom": "0x00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000",
+    "blockHash": "0xc23d7ad844d12858e77b06660f83f75f8dd821ffb5055e6ac3de66743eee418e",
+    "transactionHash": "0xd96027cf2ad75e3bca3117a0196ef4cadbe7bddc4ea1814479e07475ba79f768",
+    "logs": [],
+    "blockNumber": 4241992,
+    "cumulativeGasUsed": "2673374",
+    "status": 1,
+    "byzantium": true
+  },
+  "args": [
+    "0x91f2A140cA47DdF438B9c583b7E71987525019bB",
+    "0x527a819db1eb0e34426297b03bae11F2f8B3A19E"
+  ],
+  "numDeployments": 1,
+  "solcInputHash": "07324167f4bf468b271334a7271a4559",
+  "metadata": "{\"compiler\":{\"version\":\"0.8.12+commit.f00d7308\"},\"language\":\"Solidity\",\"output\":{\"abi\":[{\"inputs\":[{\"internalType\":\"address payable\",\"name\":\"_gelato\",\"type\":\"address\"},{\"internalType\":\"contract ITaskTreasuryUpgradable\",\"name\":\"_taskTreasury\",\"type\":\"address\"}],\"stateMutability\":\"nonpayable\",\"type\":\"constructor\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":true,\"internalType\":\"uint256\",\"name\":\"txFee\",\"type\":\"uint256\"},{\"indexed\":true,\"internalType\":\"address\",\"name\":\"feeToken\",\"type\":\"address\"},{\"indexed\":true,\"internalType\":\"address\",\"name\":\"execAddress\",\"type\":\"address\"},{\"indexed\":false,\"internalType\":\"bytes\",\"name\":\"execData\",\"type\":\"bytes\"},{\"indexed\":false,\"internalType\":\"bytes32\",\"name\":\"taskId\",\"type\":\"bytes32\"},{\"indexed\":false,\"internalType\":\"bool\",\"name\":\"callSuccess\",\"type\":\"bool\"}],\"name\":\"ExecSuccess\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":false,\"internalType\":\"bytes32\",\"name\":\"taskId\",\"type\":\"bytes32\"},{\"indexed\":false,\"internalType\":\"address\",\"name\":\"taskCreator\",\"type\":\"address\"}],\"name\":\"TaskCancelled\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":false,\"internalType\":\"address\",\"name\":\"taskCreator\",\"type\":\"address\"},{\"indexed\":false,\"internalType\":\"address\",\"name\":\"execAddress\",\"type\":\"address\"},{\"indexed\":false,\"internalType\":\"bytes4\",\"name\":\"selector\",\"type\":\"bytes4\"},{\"indexed\":false,\"internalType\":\"address\",\"name\":\"resolverAddress\",\"type\":\"address\"},{\"indexed\":false,\"internalType\":\"bytes32\",\"name\":\"taskId\",\"type\":\"bytes32\"},{\"indexed\":false,\"internalType\":\"bytes\",\"name\":\"resolverData\",\"type\":\"bytes\"},{\"indexed\":false,\"internalType\":\"bool\",\"name\":\"useTaskTreasuryFunds\",\"type\":\"bool\"},{\"indexed\":false,\"internalType\":\"address\",\"name\":\"feeToken\",\"type\":\"address\"},{\"indexed\":false,\"internalType\":\"bytes32\",\"name\":\"resolverHash\",\"type\":\"bytes32\"}],\"name\":\"TaskCreated\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":true,\"internalType\":\"bytes32\",\"name\":\"taskId\",\"type\":\"bytes32\"},{\"indexed\":true,\"internalType\":\"uint128\",\"name\":\"nextExec\",\"type\":\"uint128\"},{\"indexed\":true,\"internalType\":\"uint128\",\"name\":\"interval\",\"type\":\"uint128\"}],\"name\":\"TimerSet\",\"type\":\"event\"},{\"inputs\":[{\"internalType\":\"bytes32\",\"name\":\"_taskId\",\"type\":\"bytes32\"}],\"name\":\"cancelTask\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"_execAddress\",\"type\":\"address\"},{\"internalType\":\"bytes4\",\"name\":\"_execSelector\",\"type\":\"bytes4\"},{\"internalType\":\"address\",\"name\":\"_resolverAddress\",\"type\":\"address\"},{\"internalType\":\"bytes\",\"name\":\"_resolverData\",\"type\":\"bytes\"}],\"name\":\"createTask\",\"outputs\":[{\"internalType\":\"bytes32\",\"name\":\"task\",\"type\":\"bytes32\"}],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"_execAddress\",\"type\":\"address\"},{\"internalType\":\"bytes4\",\"name\":\"_execSelector\",\"type\":\"bytes4\"},{\"internalType\":\"address\",\"name\":\"_resolverAddress\",\"type\":\"address\"},{\"internalType\":\"bytes\",\"name\":\"_resolverData\",\"type\":\"bytes\"},{\"internalType\":\"address\",\"name\":\"_feeToken\",\"type\":\"address\"}],\"name\":\"createTaskNoPrepayment\",\"outputs\":[{\"internalType\":\"bytes32\",\"name\":\"task\",\"type\":\"bytes32\"}],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"uint128\",\"name\":\"_startTime\",\"type\":\"uint128\"},{\"internalType\":\"uint128\",\"name\":\"_interval\",\"type\":\"uint128\"},{\"internalType\":\"address\",\"name\":\"_execAddress\",\"type\":\"address\"},{\"internalType\":\"bytes4\",\"name\":\"_execSelector\",\"type\":\"bytes4\"},{\"internalType\":\"address\",\"name\":\"_resolverAddress\",\"type\":\"address\"},{\"internalType\":\"bytes\",\"name\":\"_resolverData\",\"type\":\"bytes\"},{\"internalType\":\"address\",\"name\":\"_feeToken\",\"type\":\"address\"},{\"internalType\":\"bool\",\"name\":\"_useTreasury\",\"type\":\"bool\"}],\"name\":\"createTimedTask\",\"outputs\":[{\"internalType\":\"bytes32\",\"name\":\"task\",\"type\":\"bytes32\"}],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"uint256\",\"name\":\"_txFee\",\"type\":\"uint256\"},{\"internalType\":\"address\",\"name\":\"_feeToken\",\"type\":\"address\"},{\"internalType\":\"address\",\"name\":\"_taskCreator\",\"type\":\"address\"},{\"internalType\":\"bool\",\"name\":\"_useTaskTreasuryFunds\",\"type\":\"bool\"},{\"internalType\":\"bool\",\"name\":\"_revertOnFailure\",\"type\":\"bool\"},{\"internalType\":\"bytes32\",\"name\":\"_resolverHash\",\"type\":\"bytes32\"},{\"internalType\":\"address\",\"name\":\"_execAddress\",\"type\":\"address\"},{\"internalType\":\"bytes\",\"name\":\"_execData\",\"type\":\"bytes\"}],\"name\":\"exec\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"bytes32\",\"name\":\"\",\"type\":\"bytes32\"}],\"name\":\"execAddresses\",\"outputs\":[{\"internalType\":\"address\",\"name\":\"\",\"type\":\"address\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"fee\",\"outputs\":[{\"internalType\":\"uint256\",\"name\":\"\",\"type\":\"uint256\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"feeToken\",\"outputs\":[{\"internalType\":\"address\",\"name\":\"\",\"type\":\"address\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"gelato\",\"outputs\":[{\"internalType\":\"address payable\",\"name\":\"\",\"type\":\"address\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"getFeeDetails\",\"outputs\":[{\"internalType\":\"uint256\",\"name\":\"\",\"type\":\"uint256\"},{\"internalType\":\"address\",\"name\":\"\",\"type\":\"address\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"_resolverAddress\",\"type\":\"address\"},{\"internalType\":\"bytes\",\"name\":\"_resolverData\",\"type\":\"bytes\"}],\"name\":\"getResolverHash\",\"outputs\":[{\"internalType\":\"bytes32\",\"name\":\"\",\"type\":\"bytes32\"}],\"stateMutability\":\"pure\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"string\",\"name\":\"_func\",\"type\":\"string\"}],\"name\":\"getSelector\",\"outputs\":[{\"internalType\":\"bytes4\",\"name\":\"\",\"type\":\"bytes4\"}],\"stateMutability\":\"pure\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"_taskCreator\",\"type\":\"address\"},{\"internalType\":\"address\",\"name\":\"_execAddress\",\"type\":\"address\"},{\"internalType\":\"bytes4\",\"name\":\"_selector\",\"type\":\"bytes4\"},{\"internalType\":\"bool\",\"name\":\"_useTaskTreasuryFunds\",\"type\":\"bool\"},{\"internalType\":\"address\",\"name\":\"_feeToken\",\"type\":\"address\"},{\"internalType\":\"bytes32\",\"name\":\"_resolverHash\",\"type\":\"bytes32\"}],\"name\":\"getTaskId\",\"outputs\":[{\"internalType\":\"bytes32\",\"name\":\"\",\"type\":\"bytes32\"}],\"stateMutability\":\"pure\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"_taskCreator\",\"type\":\"address\"}],\"name\":\"getTaskIdsByUser\",\"outputs\":[{\"internalType\":\"bytes32[]\",\"name\":\"\",\"type\":\"bytes32[]\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"bytes32\",\"name\":\"\",\"type\":\"bytes32\"}],\"name\":\"taskCreator\",\"outputs\":[{\"internalType\":\"address\",\"name\":\"\",\"type\":\"address\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"taskTreasury\",\"outputs\":[{\"internalType\":\"contract ITaskTreasuryUpgradable\",\"name\":\"\",\"type\":\"address\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"bytes32\",\"name\":\"\",\"type\":\"bytes32\"}],\"name\":\"timedTask\",\"outputs\":[{\"internalType\":\"uint128\",\"name\":\"nextExec\",\"type\":\"uint128\"},{\"internalType\":\"uint128\",\"name\":\"interval\",\"type\":\"uint128\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"version\",\"outputs\":[{\"internalType\":\"string\",\"name\":\"\",\"type\":\"string\"}],\"stateMutability\":\"view\",\"type\":\"function\"}],\"devdoc\":{\"kind\":\"dev\",\"methods\":{\"cancelTask(bytes32)\":{\"params\":{\"_taskId\":\"The hash of the task, can be computed using getTaskId()\"}},\"createTask(address,bytes4,address,bytes)\":{\"details\":\"Requires funds to be added in Task Treasury, assumes treasury sends fee to Gelato via Ops\",\"params\":{\"_execAddress\":\"On which contract should Gelato execute the transactions\",\"_execSelector\":\"Which function Gelato should eecute on the _execAddress\",\"_resolverAddress\":\"On which contract should Gelato check when to execute the tx\",\"_resolverData\":\"Which data should be used to check on the Resolver when to execute the tx\"}},\"createTaskNoPrepayment(address,bytes4,address,bytes,address)\":{\"details\":\"Requires no funds to be added in Task Treasury, assumes tasks sends fee to Gelato directly\",\"params\":{\"_execAddress\":\"On which contract should Gelato execute the transactions\",\"_execSelector\":\"Which function Gelato should eecute on the _execAddress\",\"_feeToken\":\"Which token to use as fee payment\",\"_resolverAddress\":\"On which contract should Gelato check when to execute the tx\",\"_resolverData\":\"Which data should be used to check on the Resolver when to execute the tx\"}},\"createTimedTask(uint128,uint128,address,bytes4,address,bytes,address,bool)\":{\"params\":{\"_execAddress\":\"On which contract should Gelato execute the transactions\",\"_execSelector\":\"Which function Gelato should eecute on the _execAddress\",\"_feeToken\":\"Which token to use as fee payment\",\"_interval\":\"After how many seconds should each task be executed\",\"_resolverAddress\":\"On which contract should Gelato check when to execute the tx\",\"_resolverData\":\"Which data should be used to check on the Resolver when to execute the tx\",\"_startTime\":\"Timestamp when the first task should become executable. 0 for right now\",\"_useTreasury\":\"True if Gelato should charge fees from TaskTreasury, false if not\"}},\"exec(uint256,address,address,bool,bool,bytes32,address,bytes)\":{\"params\":{\"_execAddress\":\"On which contract should Gelato execute the tx\",\"_execData\":\"Data used to execute the tx, queried from the Resolver by Gelato\",\"_feeToken\":\"Token used to pay for the execution. ETH = 0xeeeeee...\",\"_revertOnFailure\":\"To revert or not if call to execAddress fails\",\"_taskCreator\":\"On which contract should Gelato check when to execute the tx\",\"_txFee\":\"Fee paid to Gelato for execution, deducted on the TaskTreasury\",\"_useTaskTreasuryFunds\":\"If msg.sender's balance on TaskTreasury should pay for the tx\"}},\"getResolverHash(address,bytes)\":{\"params\":{\"_resolverAddress\":\"Address of resolver\",\"_resolverData\":\"Data passed to resolver\"}},\"getSelector(string)\":{\"details\":\"Example: \\\"transferFrom(address,address,uint256)\\\" => 0x23b872dd\",\"params\":{\"_func\":\"String of the function you want the selector from\"}},\"getTaskId(address,address,bytes4,bool,address,bytes32)\":{\"params\":{\"_execAddress\":\"Address of the contract to be executed by Gelato\",\"_feeToken\":\"FeeToken to use, address 0 if task treasury is used\",\"_resolverHash\":\"hash of resolver address and data\",\"_selector\":\"Function on the _execAddress which should be executed\",\"_taskCreator\":\"Address of the task creator\",\"_useTaskTreasuryFunds\":\"If msg.sender's balance on TaskTreasury should pay for the tx\"}},\"getTaskIdsByUser(address)\":{\"params\":{\"_taskCreator\":\"Address who created the task\"}}},\"version\":1},\"userdoc\":{\"kind\":\"user\",\"methods\":{\"cancelTask(bytes32)\":{\"notice\":\"Cancel a task so that Gelato can no longer execute it\"},\"createTask(address,bytes4,address,bytes)\":{\"notice\":\"Create a task that tells Gelato to monitor and execute transactions on specific contracts\"},\"createTaskNoPrepayment(address,bytes4,address,bytes,address)\":{\"notice\":\"Create a task that tells Gelato to monitor and execute transactions on specific contracts\"},\"createTimedTask(uint128,uint128,address,bytes4,address,bytes,address,bool)\":{\"notice\":\"Create a timed task that executes every so often based on the inputted interval\"},\"exec(uint256,address,address,bool,bool,bytes32,address,bytes)\":{\"notice\":\"Execution API called by Gelato\"},\"getFeeDetails()\":{\"notice\":\"Helper func to query fee and feeToken\"},\"getResolverHash(address,bytes)\":{\"notice\":\"Helper func to query the resolverHash\"},\"getSelector(string)\":{\"notice\":\"Helper func to query the _selector of a function you want to automate\"},\"getTaskId(address,address,bytes4,bool,address,bytes32)\":{\"notice\":\"Returns TaskId of a task Creator\"},\"getTaskIdsByUser(address)\":{\"notice\":\"Helper func to query all open tasks by a task creator\"}},\"notice\":\"Ops enables everyone to communicate to Gelato Bots to monitor and execute certain transactionsResolverAddresses determine when Gelato should execute and provides bots with the payload they should use to executeExecAddress determine the actual contracts to execute a function on\",\"version\":1}},\"settings\":{\"compilationTarget\":{\"contracts/Ops.sol\":\"Ops\"},\"evmVersion\":\"london\",\"libraries\":{},\"metadata\":{\"bytecodeHash\":\"ipfs\",\"useLiteralContent\":true},\"optimizer\":{\"enabled\":false,\"runs\":200},\"remappings\":[]},\"sources\":{\"@openzeppelin/contracts/token/ERC20/IERC20.sol\":{\"content\":\"// SPDX-License-Identifier: MIT\\n// OpenZeppelin Contracts (last updated v4.5.0) (token/ERC20/IERC20.sol)\\n\\npragma solidity ^0.8.0;\\n\\n/**\\n * @dev Interface of the ERC20 standard as defined in the EIP.\\n */\\ninterface IERC20 {\\n    /**\\n     * @dev Returns the amount of tokens in existence.\\n     */\\n    function totalSupply() external view returns (uint256);\\n\\n    /**\\n     * @dev Returns the amount of tokens owned by `account`.\\n     */\\n    function balanceOf(address account) external view returns (uint256);\\n\\n    /**\\n     * @dev Moves `amount` tokens from the caller's account to `to`.\\n     *\\n     * Returns a boolean value indicating whether the operation succeeded.\\n     *\\n     * Emits a {Transfer} event.\\n     */\\n    function transfer(address to, uint256 amount) external returns (bool);\\n\\n    /**\\n     * @dev Returns the remaining number of tokens that `spender` will be\\n     * allowed to spend on behalf of `owner` through {transferFrom}. This is\\n     * zero by default.\\n     *\\n     * This value changes when {approve} or {transferFrom} are called.\\n     */\\n    function allowance(address owner, address spender) external view returns (uint256);\\n\\n    /**\\n     * @dev Sets `amount` as the allowance of `spender` over the caller's tokens.\\n     *\\n     * Returns a boolean value indicating whether the operation succeeded.\\n     *\\n     * IMPORTANT: Beware that changing an allowance with this method brings the risk\\n     * that someone may use both the old and the new allowance by unfortunate\\n     * transaction ordering. One possible solution to mitigate this race\\n     * condition is to first reduce the spender's allowance to 0 and set the\\n     * desired value afterwards:\\n     * https://github.com/ethereum/EIPs/issues/20#issuecomment-263524729\\n     *\\n     * Emits an {Approval} event.\\n     */\\n    function approve(address spender, uint256 amount) external returns (bool);\\n\\n    /**\\n     * @dev Moves `amount` tokens from `from` to `to` using the\\n     * allowance mechanism. `amount` is then deducted from the caller's\\n     * allowance.\\n     *\\n     * Returns a boolean value indicating whether the operation succeeded.\\n     *\\n     * Emits a {Transfer} event.\\n     */\\n    function transferFrom(\\n        address from,\\n        address to,\\n        uint256 amount\\n    ) external returns (bool);\\n\\n    /**\\n     * @dev Emitted when `value` tokens are moved from one account (`from`) to\\n     * another (`to`).\\n     *\\n     * Note that `value` may be zero.\\n     */\\n    event Transfer(address indexed from, address indexed to, uint256 value);\\n\\n    /**\\n     * @dev Emitted when the allowance of a `spender` for an `owner` is set by\\n     * a call to {approve}. `value` is the new allowance.\\n     */\\n    event Approval(address indexed owner, address indexed spender, uint256 value);\\n}\\n\",\"keccak256\":\"0xbbc8ac883ac3c0078ce5ad3e288fbb3ffcc8a30c3a98c0fda0114d64fc44fca2\",\"license\":\"MIT\"},\"@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol\":{\"content\":\"// SPDX-License-Identifier: MIT\\n// OpenZeppelin Contracts v4.4.1 (token/ERC20/utils/SafeERC20.sol)\\n\\npragma solidity ^0.8.0;\\n\\nimport \\\"../IERC20.sol\\\";\\nimport \\\"../../../utils/Address.sol\\\";\\n\\n/**\\n * @title SafeERC20\\n * @dev Wrappers around ERC20 operations that throw on failure (when the token\\n * contract returns false). Tokens that return no value (and instead revert or\\n * throw on failure) are also supported, non-reverting calls are assumed to be\\n * successful.\\n * To use this library you can add a `using SafeERC20 for IERC20;` statement to your contract,\\n * which allows you to call the safe operations as `token.safeTransfer(...)`, etc.\\n */\\nlibrary SafeERC20 {\\n    using Address for address;\\n\\n    function safeTransfer(\\n        IERC20 token,\\n        address to,\\n        uint256 value\\n    ) internal {\\n        _callOptionalReturn(token, abi.encodeWithSelector(token.transfer.selector, to, value));\\n    }\\n\\n    function safeTransferFrom(\\n        IERC20 token,\\n        address from,\\n        address to,\\n        uint256 value\\n    ) internal {\\n        _callOptionalReturn(token, abi.encodeWithSelector(token.transferFrom.selector, from, to, value));\\n    }\\n\\n    /**\\n     * @dev Deprecated. This function has issues similar to the ones found in\\n     * {IERC20-approve}, and its usage is discouraged.\\n     *\\n     * Whenever possible, use {safeIncreaseAllowance} and\\n     * {safeDecreaseAllowance} instead.\\n     */\\n    function safeApprove(\\n        IERC20 token,\\n        address spender,\\n        uint256 value\\n    ) internal {\\n        // safeApprove should only be called when setting an initial allowance,\\n        // or when resetting it to zero. To increase and decrease it, use\\n        // 'safeIncreaseAllowance' and 'safeDecreaseAllowance'\\n        require(\\n            (value == 0) || (token.allowance(address(this), spender) == 0),\\n            \\\"SafeERC20: approve from non-zero to non-zero allowance\\\"\\n        );\\n        _callOptionalReturn(token, abi.encodeWithSelector(token.approve.selector, spender, value));\\n    }\\n\\n    function safeIncreaseAllowance(\\n        IERC20 token,\\n        address spender,\\n        uint256 value\\n    ) internal {\\n        uint256 newAllowance = token.allowance(address(this), spender) + value;\\n        _callOptionalReturn(token, abi.encodeWithSelector(token.approve.selector, spender, newAllowance));\\n    }\\n\\n    function safeDecreaseAllowance(\\n        IERC20 token,\\n        address spender,\\n        uint256 value\\n    ) internal {\\n        unchecked {\\n            uint256 oldAllowance = token.allowance(address(this), spender);\\n            require(oldAllowance >= value, \\\"SafeERC20: decreased allowance below zero\\\");\\n            uint256 newAllowance = oldAllowance - value;\\n            _callOptionalReturn(token, abi.encodeWithSelector(token.approve.selector, spender, newAllowance));\\n        }\\n    }\\n\\n    /**\\n     * @dev Imitates a Solidity high-level call (i.e. a regular function call to a contract), relaxing the requirement\\n     * on the return value: the return value is optional (but if data is returned, it must not be false).\\n     * @param token The token targeted by the call.\\n     * @param data The call data (encoded using abi.encode or one of its variants).\\n     */\\n    function _callOptionalReturn(IERC20 token, bytes memory data) private {\\n        // We need to perform a low level call here, to bypass Solidity's return data size checking mechanism, since\\n        // we're implementing it ourselves. We use {Address.functionCall} to perform this call, which verifies that\\n        // the target address contains contract code and also asserts for success in the low-level call.\\n\\n        bytes memory returndata = address(token).functionCall(data, \\\"SafeERC20: low-level call failed\\\");\\n        if (returndata.length > 0) {\\n            // Return data is optional\\n            require(abi.decode(returndata, (bool)), \\\"SafeERC20: ERC20 operation did not succeed\\\");\\n        }\\n    }\\n}\\n\",\"keccak256\":\"0xc3d946432c0ddbb1f846a0d3985be71299df331b91d06732152117f62f0be2b5\",\"license\":\"MIT\"},\"@openzeppelin/contracts/utils/Address.sol\":{\"content\":\"// SPDX-License-Identifier: MIT\\n// OpenZeppelin Contracts (last updated v4.5.0) (utils/Address.sol)\\n\\npragma solidity ^0.8.1;\\n\\n/**\\n * @dev Collection of functions related to the address type\\n */\\nlibrary Address {\\n    /**\\n     * @dev Returns true if `account` is a contract.\\n     *\\n     * [IMPORTANT]\\n     * ====\\n     * It is unsafe to assume that an address for which this function returns\\n     * false is an externally-owned account (EOA) and not a contract.\\n     *\\n     * Among others, `isContract` will return false for the following\\n     * types of addresses:\\n     *\\n     *  - an externally-owned account\\n     *  - a contract in construction\\n     *  - an address where a contract will be created\\n     *  - an address where a contract lived, but was destroyed\\n     * ====\\n     *\\n     * [IMPORTANT]\\n     * ====\\n     * You shouldn't rely on `isContract` to protect against flash loan attacks!\\n     *\\n     * Preventing calls from contracts is highly discouraged. It breaks composability, breaks support for smart wallets\\n     * like Gnosis Safe, and does not provide security since it can be circumvented by calling from a contract\\n     * constructor.\\n     * ====\\n     */\\n    function isContract(address account) internal view returns (bool) {\\n        // This method relies on extcodesize/address.code.length, which returns 0\\n        // for contracts in construction, since the code is only stored at the end\\n        // of the constructor execution.\\n\\n        return account.code.length > 0;\\n    }\\n\\n    /**\\n     * @dev Replacement for Solidity's `transfer`: sends `amount` wei to\\n     * `recipient`, forwarding all available gas and reverting on errors.\\n     *\\n     * https://eips.ethereum.org/EIPS/eip-1884[EIP1884] increases the gas cost\\n     * of certain opcodes, possibly making contracts go over the 2300 gas limit\\n     * imposed by `transfer`, making them unable to receive funds via\\n     * `transfer`. {sendValue} removes this limitation.\\n     *\\n     * https://diligence.consensys.net/posts/2019/09/stop-using-soliditys-transfer-now/[Learn more].\\n     *\\n     * IMPORTANT: because control is transferred to `recipient`, care must be\\n     * taken to not create reentrancy vulnerabilities. Consider using\\n     * {ReentrancyGuard} or the\\n     * https://solidity.readthedocs.io/en/v0.5.11/security-considerations.html#use-the-checks-effects-interactions-pattern[checks-effects-interactions pattern].\\n     */\\n    function sendValue(address payable recipient, uint256 amount) internal {\\n        require(address(this).balance >= amount, \\\"Address: insufficient balance\\\");\\n\\n        (bool success, ) = recipient.call{value: amount}(\\\"\\\");\\n        require(success, \\\"Address: unable to send value, recipient may have reverted\\\");\\n    }\\n\\n    /**\\n     * @dev Performs a Solidity function call using a low level `call`. A\\n     * plain `call` is an unsafe replacement for a function call: use this\\n     * function instead.\\n     *\\n     * If `target` reverts with a revert reason, it is bubbled up by this\\n     * function (like regular Solidity function calls).\\n     *\\n     * Returns the raw returned data. To convert to the expected return value,\\n     * use https://solidity.readthedocs.io/en/latest/units-and-global-variables.html?highlight=abi.decode#abi-encoding-and-decoding-functions[`abi.decode`].\\n     *\\n     * Requirements:\\n     *\\n     * - `target` must be a contract.\\n     * - calling `target` with `data` must not revert.\\n     *\\n     * _Available since v3.1._\\n     */\\n    function functionCall(address target, bytes memory data) internal returns (bytes memory) {\\n        return functionCall(target, data, \\\"Address: low-level call failed\\\");\\n    }\\n\\n    /**\\n     * @dev Same as {xref-Address-functionCall-address-bytes-}[`functionCall`], but with\\n     * `errorMessage` as a fallback revert reason when `target` reverts.\\n     *\\n     * _Available since v3.1._\\n     */\\n    function functionCall(\\n        address target,\\n        bytes memory data,\\n        string memory errorMessage\\n    ) internal returns (bytes memory) {\\n        return functionCallWithValue(target, data, 0, errorMessage);\\n    }\\n\\n    /**\\n     * @dev Same as {xref-Address-functionCall-address-bytes-}[`functionCall`],\\n     * but also transferring `value` wei to `target`.\\n     *\\n     * Requirements:\\n     *\\n     * - the calling contract must have an ETH balance of at least `value`.\\n     * - the called Solidity function must be `payable`.\\n     *\\n     * _Available since v3.1._\\n     */\\n    function functionCallWithValue(\\n        address target,\\n        bytes memory data,\\n        uint256 value\\n    ) internal returns (bytes memory) {\\n        return functionCallWithValue(target, data, value, \\\"Address: low-level call with value failed\\\");\\n    }\\n\\n    /**\\n     * @dev Same as {xref-Address-functionCallWithValue-address-bytes-uint256-}[`functionCallWithValue`], but\\n     * with `errorMessage` as a fallback revert reason when `target` reverts.\\n     *\\n     * _Available since v3.1._\\n     */\\n    function functionCallWithValue(\\n        address target,\\n        bytes memory data,\\n        uint256 value,\\n        string memory errorMessage\\n    ) internal returns (bytes memory) {\\n        require(address(this).balance >= value, \\\"Address: insufficient balance for call\\\");\\n        require(isContract(target), \\\"Address: call to non-contract\\\");\\n\\n        (bool success, bytes memory returndata) = target.call{value: value}(data);\\n        return verifyCallResult(success, returndata, errorMessage);\\n    }\\n\\n    /**\\n     * @dev Same as {xref-Address-functionCall-address-bytes-}[`functionCall`],\\n     * but performing a static call.\\n     *\\n     * _Available since v3.3._\\n     */\\n    function functionStaticCall(address target, bytes memory data) internal view returns (bytes memory) {\\n        return functionStaticCall(target, data, \\\"Address: low-level static call failed\\\");\\n    }\\n\\n    /**\\n     * @dev Same as {xref-Address-functionCall-address-bytes-string-}[`functionCall`],\\n     * but performing a static call.\\n     *\\n     * _Available since v3.3._\\n     */\\n    function functionStaticCall(\\n        address target,\\n        bytes memory data,\\n        string memory errorMessage\\n    ) internal view returns (bytes memory) {\\n        require(isContract(target), \\\"Address: static call to non-contract\\\");\\n\\n        (bool success, bytes memory returndata) = target.staticcall(data);\\n        return verifyCallResult(success, returndata, errorMessage);\\n    }\\n\\n    /**\\n     * @dev Same as {xref-Address-functionCall-address-bytes-}[`functionCall`],\\n     * but performing a delegate call.\\n     *\\n     * _Available since v3.4._\\n     */\\n    function functionDelegateCall(address target, bytes memory data) internal returns (bytes memory) {\\n        return functionDelegateCall(target, data, \\\"Address: low-level delegate call failed\\\");\\n    }\\n\\n    /**\\n     * @dev Same as {xref-Address-functionCall-address-bytes-string-}[`functionCall`],\\n     * but performing a delegate call.\\n     *\\n     * _Available since v3.4._\\n     */\\n    function functionDelegateCall(\\n        address target,\\n        bytes memory data,\\n        string memory errorMessage\\n    ) internal returns (bytes memory) {\\n        require(isContract(target), \\\"Address: delegate call to non-contract\\\");\\n\\n        (bool success, bytes memory returndata) = target.delegatecall(data);\\n        return verifyCallResult(success, returndata, errorMessage);\\n    }\\n\\n    /**\\n     * @dev Tool to verifies that a low level call was successful, and revert if it wasn't, either by bubbling the\\n     * revert reason using the provided one.\\n     *\\n     * _Available since v4.3._\\n     */\\n    function verifyCallResult(\\n        bool success,\\n        bytes memory returndata,\\n        string memory errorMessage\\n    ) internal pure returns (bytes memory) {\\n        if (success) {\\n            return returndata;\\n        } else {\\n            // Look for revert reason and bubble it up if present\\n            if (returndata.length > 0) {\\n                // The easiest way to bubble the revert reason is using memory via assembly\\n\\n                assembly {\\n                    let returndata_size := mload(returndata)\\n                    revert(add(32, returndata), returndata_size)\\n                }\\n            } else {\\n                revert(errorMessage);\\n            }\\n        }\\n    }\\n}\\n\",\"keccak256\":\"0x2ccf9d2313a313d41a791505f2b5abfdc62191b5d4334f7f7a82691c088a1c87\",\"license\":\"MIT\"},\"@openzeppelin/contracts/utils/structs/EnumerableSet.sol\":{\"content\":\"// SPDX-License-Identifier: MIT\\n// OpenZeppelin Contracts v4.4.1 (utils/structs/EnumerableSet.sol)\\n\\npragma solidity ^0.8.0;\\n\\n/**\\n * @dev Library for managing\\n * https://en.wikipedia.org/wiki/Set_(abstract_data_type)[sets] of primitive\\n * types.\\n *\\n * Sets have the following properties:\\n *\\n * - Elements are added, removed, and checked for existence in constant time\\n * (O(1)).\\n * - Elements are enumerated in O(n). No guarantees are made on the ordering.\\n *\\n * ```\\n * contract Example {\\n *     // Add the library methods\\n *     using EnumerableSet for EnumerableSet.AddressSet;\\n *\\n *     // Declare a set state variable\\n *     EnumerableSet.AddressSet private mySet;\\n * }\\n * ```\\n *\\n * As of v3.3.0, sets of type `bytes32` (`Bytes32Set`), `address` (`AddressSet`)\\n * and `uint256` (`UintSet`) are supported.\\n */\\nlibrary EnumerableSet {\\n    // To implement this library for multiple types with as little code\\n    // repetition as possible, we write it in terms of a generic Set type with\\n    // bytes32 values.\\n    // The Set implementation uses private functions, and user-facing\\n    // implementations (such as AddressSet) are just wrappers around the\\n    // underlying Set.\\n    // This means that we can only create new EnumerableSets for types that fit\\n    // in bytes32.\\n\\n    struct Set {\\n        // Storage of set values\\n        bytes32[] _values;\\n        // Position of the value in the `values` array, plus 1 because index 0\\n        // means a value is not in the set.\\n        mapping(bytes32 => uint256) _indexes;\\n    }\\n\\n    /**\\n     * @dev Add a value to a set. O(1).\\n     *\\n     * Returns true if the value was added to the set, that is if it was not\\n     * already present.\\n     */\\n    function _add(Set storage set, bytes32 value) private returns (bool) {\\n        if (!_contains(set, value)) {\\n            set._values.push(value);\\n            // The value is stored at length-1, but we add 1 to all indexes\\n            // and use 0 as a sentinel value\\n            set._indexes[value] = set._values.length;\\n            return true;\\n        } else {\\n            return false;\\n        }\\n    }\\n\\n    /**\\n     * @dev Removes a value from a set. O(1).\\n     *\\n     * Returns true if the value was removed from the set, that is if it was\\n     * present.\\n     */\\n    function _remove(Set storage set, bytes32 value) private returns (bool) {\\n        // We read and store the value's index to prevent multiple reads from the same storage slot\\n        uint256 valueIndex = set._indexes[value];\\n\\n        if (valueIndex != 0) {\\n            // Equivalent to contains(set, value)\\n            // To delete an element from the _values array in O(1), we swap the element to delete with the last one in\\n            // the array, and then remove the last element (sometimes called as 'swap and pop').\\n            // This modifies the order of the array, as noted in {at}.\\n\\n            uint256 toDeleteIndex = valueIndex - 1;\\n            uint256 lastIndex = set._values.length - 1;\\n\\n            if (lastIndex != toDeleteIndex) {\\n                bytes32 lastvalue = set._values[lastIndex];\\n\\n                // Move the last value to the index where the value to delete is\\n                set._values[toDeleteIndex] = lastvalue;\\n                // Update the index for the moved value\\n                set._indexes[lastvalue] = valueIndex; // Replace lastvalue's index to valueIndex\\n            }\\n\\n            // Delete the slot where the moved value was stored\\n            set._values.pop();\\n\\n            // Delete the index for the deleted slot\\n            delete set._indexes[value];\\n\\n            return true;\\n        } else {\\n            return false;\\n        }\\n    }\\n\\n    /**\\n     * @dev Returns true if the value is in the set. O(1).\\n     */\\n    function _contains(Set storage set, bytes32 value) private view returns (bool) {\\n        return set._indexes[value] != 0;\\n    }\\n\\n    /**\\n     * @dev Returns the number of values on the set. O(1).\\n     */\\n    function _length(Set storage set) private view returns (uint256) {\\n        return set._values.length;\\n    }\\n\\n    /**\\n     * @dev Returns the value stored at position `index` in the set. O(1).\\n     *\\n     * Note that there are no guarantees on the ordering of values inside the\\n     * array, and it may change when more values are added or removed.\\n     *\\n     * Requirements:\\n     *\\n     * - `index` must be strictly less than {length}.\\n     */\\n    function _at(Set storage set, uint256 index) private view returns (bytes32) {\\n        return set._values[index];\\n    }\\n\\n    /**\\n     * @dev Return the entire set in an array\\n     *\\n     * WARNING: This operation will copy the entire storage to memory, which can be quite expensive. This is designed\\n     * to mostly be used by view accessors that are queried without any gas fees. Developers should keep in mind that\\n     * this function has an unbounded cost, and using it as part of a state-changing function may render the function\\n     * uncallable if the set grows to a point where copying to memory consumes too much gas to fit in a block.\\n     */\\n    function _values(Set storage set) private view returns (bytes32[] memory) {\\n        return set._values;\\n    }\\n\\n    // Bytes32Set\\n\\n    struct Bytes32Set {\\n        Set _inner;\\n    }\\n\\n    /**\\n     * @dev Add a value to a set. O(1).\\n     *\\n     * Returns true if the value was added to the set, that is if it was not\\n     * already present.\\n     */\\n    function add(Bytes32Set storage set, bytes32 value) internal returns (bool) {\\n        return _add(set._inner, value);\\n    }\\n\\n    /**\\n     * @dev Removes a value from a set. O(1).\\n     *\\n     * Returns true if the value was removed from the set, that is if it was\\n     * present.\\n     */\\n    function remove(Bytes32Set storage set, bytes32 value) internal returns (bool) {\\n        return _remove(set._inner, value);\\n    }\\n\\n    /**\\n     * @dev Returns true if the value is in the set. O(1).\\n     */\\n    function contains(Bytes32Set storage set, bytes32 value) internal view returns (bool) {\\n        return _contains(set._inner, value);\\n    }\\n\\n    /**\\n     * @dev Returns the number of values in the set. O(1).\\n     */\\n    function length(Bytes32Set storage set) internal view returns (uint256) {\\n        return _length(set._inner);\\n    }\\n\\n    /**\\n     * @dev Returns the value stored at position `index` in the set. O(1).\\n     *\\n     * Note that there are no guarantees on the ordering of values inside the\\n     * array, and it may change when more values are added or removed.\\n     *\\n     * Requirements:\\n     *\\n     * - `index` must be strictly less than {length}.\\n     */\\n    function at(Bytes32Set storage set, uint256 index) internal view returns (bytes32) {\\n        return _at(set._inner, index);\\n    }\\n\\n    /**\\n     * @dev Return the entire set in an array\\n     *\\n     * WARNING: This operation will copy the entire storage to memory, which can be quite expensive. This is designed\\n     * to mostly be used by view accessors that are queried without any gas fees. Developers should keep in mind that\\n     * this function has an unbounded cost, and using it as part of a state-changing function may render the function\\n     * uncallable if the set grows to a point where copying to memory consumes too much gas to fit in a block.\\n     */\\n    function values(Bytes32Set storage set) internal view returns (bytes32[] memory) {\\n        return _values(set._inner);\\n    }\\n\\n    // AddressSet\\n\\n    struct AddressSet {\\n        Set _inner;\\n    }\\n\\n    /**\\n     * @dev Add a value to a set. O(1).\\n     *\\n     * Returns true if the value was added to the set, that is if it was not\\n     * already present.\\n     */\\n    function add(AddressSet storage set, address value) internal returns (bool) {\\n        return _add(set._inner, bytes32(uint256(uint160(value))));\\n    }\\n\\n    /**\\n     * @dev Removes a value from a set. O(1).\\n     *\\n     * Returns true if the value was removed from the set, that is if it was\\n     * present.\\n     */\\n    function remove(AddressSet storage set, address value) internal returns (bool) {\\n        return _remove(set._inner, bytes32(uint256(uint160(value))));\\n    }\\n\\n    /**\\n     * @dev Returns true if the value is in the set. O(1).\\n     */\\n    function contains(AddressSet storage set, address value) internal view returns (bool) {\\n        return _contains(set._inner, bytes32(uint256(uint160(value))));\\n    }\\n\\n    /**\\n     * @dev Returns the number of values in the set. O(1).\\n     */\\n    function length(AddressSet storage set) internal view returns (uint256) {\\n        return _length(set._inner);\\n    }\\n\\n    /**\\n     * @dev Returns the value stored at position `index` in the set. O(1).\\n     *\\n     * Note that there are no guarantees on the ordering of values inside the\\n     * array, and it may change when more values are added or removed.\\n     *\\n     * Requirements:\\n     *\\n     * - `index` must be strictly less than {length}.\\n     */\\n    function at(AddressSet storage set, uint256 index) internal view returns (address) {\\n        return address(uint160(uint256(_at(set._inner, index))));\\n    }\\n\\n    /**\\n     * @dev Return the entire set in an array\\n     *\\n     * WARNING: This operation will copy the entire storage to memory, which can be quite expensive. This is designed\\n     * to mostly be used by view accessors that are queried without any gas fees. Developers should keep in mind that\\n     * this function has an unbounded cost, and using it as part of a state-changing function may render the function\\n     * uncallable if the set grows to a point where copying to memory consumes too much gas to fit in a block.\\n     */\\n    function values(AddressSet storage set) internal view returns (address[] memory) {\\n        bytes32[] memory store = _values(set._inner);\\n        address[] memory result;\\n\\n        assembly {\\n            result := store\\n        }\\n\\n        return result;\\n    }\\n\\n    // UintSet\\n\\n    struct UintSet {\\n        Set _inner;\\n    }\\n\\n    /**\\n     * @dev Add a value to a set. O(1).\\n     *\\n     * Returns true if the value was added to the set, that is if it was not\\n     * already present.\\n     */\\n    function add(UintSet storage set, uint256 value) internal returns (bool) {\\n        return _add(set._inner, bytes32(value));\\n    }\\n\\n    /**\\n     * @dev Removes a value from a set. O(1).\\n     *\\n     * Returns true if the value was removed from the set, that is if it was\\n     * present.\\n     */\\n    function remove(UintSet storage set, uint256 value) internal returns (bool) {\\n        return _remove(set._inner, bytes32(value));\\n    }\\n\\n    /**\\n     * @dev Returns true if the value is in the set. O(1).\\n     */\\n    function contains(UintSet storage set, uint256 value) internal view returns (bool) {\\n        return _contains(set._inner, bytes32(value));\\n    }\\n\\n    /**\\n     * @dev Returns the number of values on the set. O(1).\\n     */\\n    function length(UintSet storage set) internal view returns (uint256) {\\n        return _length(set._inner);\\n    }\\n\\n    /**\\n     * @dev Returns the value stored at position `index` in the set. O(1).\\n     *\\n     * Note that there are no guarantees on the ordering of values inside the\\n     * array, and it may change when more values are added or removed.\\n     *\\n     * Requirements:\\n     *\\n     * - `index` must be strictly less than {length}.\\n     */\\n    function at(UintSet storage set, uint256 index) internal view returns (uint256) {\\n        return uint256(_at(set._inner, index));\\n    }\\n\\n    /**\\n     * @dev Return the entire set in an array\\n     *\\n     * WARNING: This operation will copy the entire storage to memory, which can be quite expensive. This is designed\\n     * to mostly be used by view accessors that are queried without any gas fees. Developers should keep in mind that\\n     * this function has an unbounded cost, and using it as part of a state-changing function may render the function\\n     * uncallable if the set grows to a point where copying to memory consumes too much gas to fit in a block.\\n     */\\n    function values(UintSet storage set) internal view returns (uint256[] memory) {\\n        bytes32[] memory store = _values(set._inner);\\n        uint256[] memory result;\\n\\n        assembly {\\n            result := store\\n        }\\n\\n        return result;\\n    }\\n}\\n\",\"keccak256\":\"0x9772845c886f87a3aab315f8d6b68aa599027c20f441b131cd4afaf65b588900\",\"license\":\"MIT\"},\"contracts/Ops.sol\":{\"content\":\"// SPDX-License-Identifier: UNLICENSED\\npragma solidity 0.8.12;\\n\\nimport {Gelatofied} from \\\"./vendor/gelato/Gelatofied.sol\\\";\\nimport {GelatoBytes} from \\\"./vendor/gelato/GelatoBytes.sol\\\";\\nimport {\\n    EnumerableSet\\n} from \\\"@openzeppelin/contracts/utils/structs/EnumerableSet.sol\\\";\\nimport {\\n    SafeERC20,\\n    IERC20\\n} from \\\"@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol\\\";\\nimport {\\n    ITaskTreasuryUpgradable\\n} from \\\"./interfaces/ITaskTreasuryUpgradable.sol\\\";\\n\\n// solhint-disable max-line-length\\n// solhint-disable max-states-count\\n// solhint-disable not-rely-on-time\\n/// @notice Ops enables everyone to communicate to Gelato Bots to monitor and execute certain transactions\\n/// @notice ResolverAddresses determine when Gelato should execute and provides bots with\\n/// the payload they should use to execute\\n/// @notice ExecAddress determine the actual contracts to execute a function on\\ncontract Ops is Gelatofied {\\n    using SafeERC20 for IERC20;\\n    using GelatoBytes for bytes;\\n    using EnumerableSet for EnumerableSet.Bytes32Set;\\n\\n    struct Time {\\n        uint128 nextExec;\\n        uint128 interval;\\n    }\\n\\n    // solhint-disable const-name-snakecase\\n    string public constant version = \\\"4\\\";\\n    mapping(bytes32 => address) public taskCreator;\\n    mapping(bytes32 => address) public execAddresses;\\n    mapping(address => EnumerableSet.Bytes32Set) internal _createdTasks;\\n    ITaskTreasuryUpgradable public immutable taskTreasury;\\n    uint256 public fee;\\n    address public feeToken;\\n    // Appended State\\n    mapping(bytes32 => Time) public timedTask;\\n\\n    event ExecSuccess(\\n        uint256 indexed txFee,\\n        address indexed feeToken,\\n        address indexed execAddress,\\n        bytes execData,\\n        bytes32 taskId,\\n        bool callSuccess\\n    );\\n    event TaskCreated(\\n        address taskCreator,\\n        address execAddress,\\n        bytes4 selector,\\n        address resolverAddress,\\n        bytes32 taskId,\\n        bytes resolverData,\\n        bool useTaskTreasuryFunds,\\n        address feeToken,\\n        bytes32 resolverHash\\n    );\\n    event TaskCancelled(bytes32 taskId, address taskCreator);\\n    event TimerSet(\\n        bytes32 indexed taskId,\\n        uint128 indexed nextExec,\\n        uint128 indexed interval\\n    );\\n\\n    constructor(address payable _gelato, ITaskTreasuryUpgradable _taskTreasury)\\n        Gelatofied(_gelato)\\n    {\\n        taskTreasury = _taskTreasury;\\n    }\\n\\n    /// @notice Execution API called by Gelato\\n    /// @param _txFee Fee paid to Gelato for execution, deducted on the TaskTreasury\\n    /// @param _feeToken Token used to pay for the execution. ETH = 0xeeeeee...\\n    /// @param _taskCreator On which contract should Gelato check when to execute the tx\\n    /// @param _useTaskTreasuryFunds If msg.sender's balance on TaskTreasury should pay for the tx\\n    /// @param _revertOnFailure To revert or not if call to execAddress fails\\n    /// @param _execAddress On which contract should Gelato execute the tx\\n    /// @param _execData Data used to execute the tx, queried from the Resolver by Gelato\\n    // solhint-disable function-max-lines\\n    // solhint-disable code-complexity\\n    function exec(\\n        uint256 _txFee,\\n        address _feeToken,\\n        address _taskCreator,\\n        bool _useTaskTreasuryFunds,\\n        bool _revertOnFailure,\\n        bytes32 _resolverHash,\\n        address _execAddress,\\n        bytes calldata _execData\\n    ) external onlyGelato {\\n        bytes32 task = getTaskId(\\n            _taskCreator,\\n            _execAddress,\\n            _execData.calldataSliceSelector(),\\n            _useTaskTreasuryFunds,\\n            _useTaskTreasuryFunds ? address(0) : _feeToken,\\n            _resolverHash\\n        );\\n\\n        require(taskCreator[task] == _taskCreator, \\\"Ops: exec: No task found\\\");\\n\\n        if (!_useTaskTreasuryFunds) {\\n            fee = _txFee;\\n            feeToken = _feeToken;\\n        }\\n\\n        _updateTime(task);\\n\\n        (bool success, bytes memory returnData) = _execAddress.call(_execData);\\n\\n        // For off-chain simultaion\\n        if (!success && _revertOnFailure)\\n            returnData.revertWithError(\\\"Ops.exec:\\\");\\n\\n        if (_useTaskTreasuryFunds) {\\n            taskTreasury.useFunds(_taskCreator, _feeToken, _txFee);\\n        } else {\\n            delete fee;\\n            delete feeToken;\\n        }\\n\\n        emit ExecSuccess(\\n            _txFee,\\n            _feeToken,\\n            _execAddress,\\n            _execData,\\n            task,\\n            success\\n        );\\n    }\\n\\n    /// @notice Helper func to query fee and feeToken\\n    function getFeeDetails() external view returns (uint256, address) {\\n        return (fee, feeToken);\\n    }\\n\\n    /// @notice Helper func to query all open tasks by a task creator\\n    /// @param _taskCreator Address who created the task\\n    function getTaskIdsByUser(address _taskCreator)\\n        external\\n        view\\n        returns (bytes32[] memory)\\n    {\\n        uint256 length = _createdTasks[_taskCreator].length();\\n        bytes32[] memory taskIds = new bytes32[](length);\\n\\n        for (uint256 i; i < length; i++) {\\n            taskIds[i] = _createdTasks[_taskCreator].at(i);\\n        }\\n\\n        return taskIds;\\n    }\\n\\n    /// @notice Helper func to query the _selector of a function you want to automate\\n    /// @param _func String of the function you want the selector from\\n    /// @dev Example: \\\"transferFrom(address,address,uint256)\\\" => 0x23b872dd\\n    function getSelector(string calldata _func) external pure returns (bytes4) {\\n        return bytes4(keccak256(bytes(_func)));\\n    }\\n\\n    /// @notice Create a timed task that executes every so often based on the inputted interval\\n    /// @param _startTime Timestamp when the first task should become executable. 0 for right now\\n    /// @param _interval After how many seconds should each task be executed\\n    /// @param _execAddress On which contract should Gelato execute the transactions\\n    /// @param _execSelector Which function Gelato should eecute on the _execAddress\\n    /// @param _resolverAddress On which contract should Gelato check when to execute the tx\\n    /// @param _resolverData Which data should be used to check on the Resolver when to execute the tx\\n    /// @param _feeToken Which token to use as fee payment\\n    /// @param _useTreasury True if Gelato should charge fees from TaskTreasury, false if not\\n    function createTimedTask(\\n        uint128 _startTime,\\n        uint128 _interval,\\n        address _execAddress,\\n        bytes4 _execSelector,\\n        address _resolverAddress,\\n        bytes calldata _resolverData,\\n        address _feeToken,\\n        bool _useTreasury\\n    ) public returns (bytes32 task) {\\n        require(_interval > 0, \\\"Ops: createTimedTask: interval cannot be 0\\\");\\n\\n        if (_useTreasury) {\\n            task = createTask(\\n                _execAddress,\\n                _execSelector,\\n                _resolverAddress,\\n                _resolverData\\n            );\\n        } else {\\n            task = createTaskNoPrepayment(\\n                _execAddress,\\n                _execSelector,\\n                _resolverAddress,\\n                _resolverData,\\n                _feeToken\\n            );\\n        }\\n\\n        uint128 nextExec = uint256(_startTime) > block.timestamp\\n            ? _startTime\\n            : uint128(block.timestamp);\\n\\n        timedTask[task] = Time({nextExec: nextExec, interval: _interval});\\n        emit TimerSet(task, nextExec, _interval);\\n    }\\n\\n    /// @notice Create a task that tells Gelato to monitor and execute transactions on specific contracts\\n    /// @dev Requires funds to be added in Task Treasury, assumes treasury sends fee to Gelato via Ops\\n    /// @param _execAddress On which contract should Gelato execute the transactions\\n    /// @param _execSelector Which function Gelato should eecute on the _execAddress\\n    /// @param _resolverAddress On which contract should Gelato check when to execute the tx\\n    /// @param _resolverData Which data should be used to check on the Resolver when to execute the tx\\n    function createTask(\\n        address _execAddress,\\n        bytes4 _execSelector,\\n        address _resolverAddress,\\n        bytes calldata _resolverData\\n    ) public returns (bytes32 task) {\\n        bytes32 resolverHash = getResolverHash(_resolverAddress, _resolverData);\\n        task = getTaskId(\\n            msg.sender,\\n            _execAddress,\\n            _execSelector,\\n            true,\\n            address(0),\\n            resolverHash\\n        );\\n\\n        require(\\n            taskCreator[task] == address(0),\\n            \\\"Ops: createTask: Sender already started task\\\"\\n        );\\n\\n        _createdTasks[msg.sender].add(task);\\n        taskCreator[task] = msg.sender;\\n        execAddresses[task] = _execAddress;\\n\\n        emit TaskCreated(\\n            msg.sender,\\n            _execAddress,\\n            _execSelector,\\n            _resolverAddress,\\n            task,\\n            _resolverData,\\n            true,\\n            address(0),\\n            resolverHash\\n        );\\n    }\\n\\n    /// @notice Create a task that tells Gelato to monitor and execute transactions on specific contracts\\n    /// @dev Requires no funds to be added in Task Treasury, assumes tasks sends fee to Gelato directly\\n    /// @param _execAddress On which contract should Gelato execute the transactions\\n    /// @param _execSelector Which function Gelato should eecute on the _execAddress\\n    /// @param _resolverAddress On which contract should Gelato check when to execute the tx\\n    /// @param _resolverData Which data should be used to check on the Resolver when to execute the tx\\n    /// @param _feeToken Which token to use as fee payment\\n    function createTaskNoPrepayment(\\n        address _execAddress,\\n        bytes4 _execSelector,\\n        address _resolverAddress,\\n        bytes calldata _resolverData,\\n        address _feeToken\\n    ) public returns (bytes32 task) {\\n        bytes32 resolverHash = getResolverHash(_resolverAddress, _resolverData);\\n        task = getTaskId(\\n            msg.sender,\\n            _execAddress,\\n            _execSelector,\\n            false,\\n            _feeToken,\\n            resolverHash\\n        );\\n\\n        require(\\n            taskCreator[task] == address(0),\\n            \\\"Ops: createTask: Sender already started task\\\"\\n        );\\n\\n        _createdTasks[msg.sender].add(task);\\n        taskCreator[task] = msg.sender;\\n        execAddresses[task] = _execAddress;\\n\\n        emit TaskCreated(\\n            msg.sender,\\n            _execAddress,\\n            _execSelector,\\n            _resolverAddress,\\n            task,\\n            _resolverData,\\n            false,\\n            _feeToken,\\n            resolverHash\\n        );\\n    }\\n\\n    /// @notice Cancel a task so that Gelato can no longer execute it\\n    /// @param _taskId The hash of the task, can be computed using getTaskId()\\n    function cancelTask(bytes32 _taskId) public {\\n        require(\\n            taskCreator[_taskId] == msg.sender,\\n            \\\"Ops: cancelTask: Sender did not start task yet\\\"\\n        );\\n\\n        _createdTasks[msg.sender].remove(_taskId);\\n        delete taskCreator[_taskId];\\n        delete execAddresses[_taskId];\\n\\n        Time memory time = timedTask[_taskId];\\n        bool isTimedTask = time.nextExec != 0 ? true : false;\\n        if (isTimedTask) delete timedTask[_taskId];\\n\\n        emit TaskCancelled(_taskId, msg.sender);\\n    }\\n\\n    /// @notice Helper func to query the resolverHash\\n    /// @param _resolverAddress Address of resolver\\n    /// @param _resolverData Data passed to resolver\\n    function getResolverHash(\\n        address _resolverAddress,\\n        bytes memory _resolverData\\n    ) public pure returns (bytes32) {\\n        return keccak256(abi.encode(_resolverAddress, _resolverData));\\n    }\\n\\n    /// @notice Returns TaskId of a task Creator\\n    /// @param _taskCreator Address of the task creator\\n    /// @param _execAddress Address of the contract to be executed by Gelato\\n    /// @param _selector Function on the _execAddress which should be executed\\n    /// @param _useTaskTreasuryFunds If msg.sender's balance on TaskTreasury should pay for the tx\\n    /// @param _feeToken FeeToken to use, address 0 if task treasury is used\\n    /// @param _resolverHash hash of resolver address and data\\n    function getTaskId(\\n        address _taskCreator,\\n        address _execAddress,\\n        bytes4 _selector,\\n        bool _useTaskTreasuryFunds,\\n        address _feeToken,\\n        bytes32 _resolverHash\\n    ) public pure returns (bytes32) {\\n        return\\n            keccak256(\\n                abi.encode(\\n                    _taskCreator,\\n                    _execAddress,\\n                    _selector,\\n                    _useTaskTreasuryFunds,\\n                    _feeToken,\\n                    _resolverHash\\n                )\\n            );\\n    }\\n\\n    function _updateTime(bytes32 task) internal {\\n        Time storage time = timedTask[task];\\n        bool isTimedTask = time.nextExec != 0 ? true : false;\\n\\n        if (isTimedTask) {\\n            require(\\n                time.nextExec <= uint128(block.timestamp),\\n                \\\"Ops: exec: Too early\\\"\\n            );\\n            // If next execution would also be executed right now, skip forward to\\n            // the next execution in the future\\n            uint128 nextExec = time.nextExec + time.interval;\\n            uint128 timestamp = uint128(block.timestamp);\\n            while (timestamp >= nextExec) {\\n                nextExec = nextExec + time.interval;\\n            }\\n            time.nextExec = nextExec;\\n        }\\n    }\\n}\\n\",\"keccak256\":\"0xbca048225a92d4891b20885e33e41868d3a9a1bb5cfc978e0f3885e6c55a719b\",\"license\":\"UNLICENSED\"},\"contracts/interfaces/ITaskTreasuryUpgradable.sol\":{\"content\":\"// SPDX-License-Identifier: MIT\\npragma solidity ^0.8.0;\\n\\ninterface ITaskTreasuryUpgradable {\\n    /// @notice Events ///\\n    event FundsDeposited(\\n        address indexed sender,\\n        address indexed token,\\n        uint256 indexed amount\\n    );\\n\\n    event FundsWithdrawn(\\n        address indexed receiver,\\n        address indexed initiator,\\n        address indexed token,\\n        uint256 amount\\n    );\\n\\n    event LogDeductFees(\\n        address indexed user,\\n        address indexed executor,\\n        address indexed token,\\n        uint256 fees,\\n        address service\\n    );\\n\\n    event UpdatedService(address indexed service, bool add);\\n\\n    event UpdatedMaxFee(uint256 indexed maxFee);\\n\\n    /// @notice External functions ///\\n\\n    function depositFunds(\\n        address receiver,\\n        address token,\\n        uint256 amount\\n    ) external payable;\\n\\n    function withdrawFunds(\\n        address payable receiver,\\n        address token,\\n        uint256 amount\\n    ) external;\\n\\n    function useFunds(\\n        address user,\\n        address token,\\n        uint256 amount\\n    ) external;\\n\\n    function updateMaxFee(uint256 _newMaxFee) external;\\n\\n    function updateWhitelistedService(address service, bool isWhitelist)\\n        external;\\n\\n    /// @notice External view functions ///\\n\\n    function getCreditTokensByUser(address user)\\n        external\\n        view\\n        returns (address[] memory);\\n\\n    function getTotalCreditTokensByUser(address user)\\n        external\\n        view\\n        returns (address[] memory);\\n\\n    function getWhitelistedServices() external view returns (address[] memory);\\n\\n    function totalUserTokenBalance(address user, address token)\\n        external\\n        view\\n        returns (uint256);\\n\\n    function userTokenBalance(address user, address token)\\n        external\\n        view\\n        returns (uint256);\\n}\\n\",\"keccak256\":\"0xa1452289581534124391c5f5c2a76048013e3a5c700824531c61476527562ba4\",\"license\":\"MIT\"},\"contracts/vendor/gelato/FGelato.sol\":{\"content\":\"// SPDX-License-Identifier: UNLICENSED\\npragma solidity ^0.8.12;\\n\\nimport {\\n    SafeERC20,\\n    IERC20\\n} from \\\"@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol\\\";\\n\\naddress constant ETH = 0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE;\\n\\n// solhint-disable private-vars-leading-underscore\\n// solhint-disable func-visibility\\nfunction _transfer(\\n    address payable _to,\\n    address _paymentToken,\\n    uint256 _amount\\n) {\\n    if (_paymentToken == ETH) {\\n        (bool success, ) = _to.call{value: _amount}(\\\"\\\");\\n        require(success, \\\"_transfer: ETH transfer failed\\\");\\n    } else {\\n        SafeERC20.safeTransfer(IERC20(_paymentToken), _to, _amount);\\n    }\\n}\\n\",\"keccak256\":\"0xecf150c4e9030703ac85cd5192fb98eca2e68a8df00ca50efd99fc8813cfb4a2\",\"license\":\"UNLICENSED\"},\"contracts/vendor/gelato/GelatoBytes.sol\":{\"content\":\"// SPDX-License-Identifier: UNLICENSED\\npragma solidity ^0.8.12;\\n\\nlibrary GelatoBytes {\\n    function calldataSliceSelector(bytes calldata _bytes)\\n        internal\\n        pure\\n        returns (bytes4 selector)\\n    {\\n        selector =\\n            _bytes[0] |\\n            (bytes4(_bytes[1]) >> 8) |\\n            (bytes4(_bytes[2]) >> 16) |\\n            (bytes4(_bytes[3]) >> 24);\\n    }\\n\\n    function memorySliceSelector(bytes memory _bytes)\\n        internal\\n        pure\\n        returns (bytes4 selector)\\n    {\\n        selector =\\n            _bytes[0] |\\n            (bytes4(_bytes[1]) >> 8) |\\n            (bytes4(_bytes[2]) >> 16) |\\n            (bytes4(_bytes[3]) >> 24);\\n    }\\n\\n    function revertWithError(bytes memory _bytes, string memory _tracingInfo)\\n        internal\\n        pure\\n    {\\n        // 68: 32-location, 32-length, 4-ErrorSelector, UTF-8 err\\n        if (_bytes.length % 32 == 4) {\\n            bytes4 selector;\\n            assembly {\\n                selector := mload(add(0x20, _bytes))\\n            }\\n            if (selector == 0x08c379a0) {\\n                // Function selector for Error(string)\\n                assembly {\\n                    _bytes := add(_bytes, 68)\\n                }\\n                revert(string(abi.encodePacked(_tracingInfo, string(_bytes))));\\n            } else {\\n                revert(\\n                    string(abi.encodePacked(_tracingInfo, \\\"NoErrorSelector\\\"))\\n                );\\n            }\\n        } else {\\n            revert(\\n                string(abi.encodePacked(_tracingInfo, \\\"UnexpectedReturndata\\\"))\\n            );\\n        }\\n    }\\n\\n    function returnError(bytes memory _bytes, string memory _tracingInfo)\\n        internal\\n        pure\\n        returns (string memory)\\n    {\\n        // 68: 32-location, 32-length, 4-ErrorSelector, UTF-8 err\\n        if (_bytes.length % 32 == 4) {\\n            bytes4 selector;\\n            assembly {\\n                selector := mload(add(0x20, _bytes))\\n            }\\n            if (selector == 0x08c379a0) {\\n                // Function selector for Error(string)\\n                assembly {\\n                    _bytes := add(_bytes, 68)\\n                }\\n                return string(abi.encodePacked(_tracingInfo, string(_bytes)));\\n            } else {\\n                return\\n                    string(abi.encodePacked(_tracingInfo, \\\"NoErrorSelector\\\"));\\n            }\\n        } else {\\n            return\\n                string(abi.encodePacked(_tracingInfo, \\\"UnexpectedReturndata\\\"));\\n        }\\n    }\\n}\\n\",\"keccak256\":\"0x6ec59b2c6f678f3bbe186677e5970e59e46a40d22881dc813c49ffb18e417951\",\"license\":\"UNLICENSED\"},\"contracts/vendor/gelato/Gelatofied.sol\":{\"content\":\"// SPDX-License-Identifier: UNLICENSED\\npragma solidity ^0.8.12;\\n\\nimport {\\n    SafeERC20,\\n    IERC20\\n} from \\\"@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol\\\";\\nimport {_transfer, ETH} from \\\"./FGelato.sol\\\";\\n\\nabstract contract Gelatofied {\\n    address payable public immutable gelato;\\n\\n    modifier gelatofy(uint256 _amount, address _paymentToken) {\\n        require(msg.sender == gelato, \\\"Gelatofied: Only gelato\\\");\\n        _;\\n        _transfer(gelato, _paymentToken, _amount);\\n    }\\n\\n    modifier onlyGelato() {\\n        require(msg.sender == gelato, \\\"Gelatofied: Only gelato\\\");\\n        _;\\n    }\\n\\n    constructor(address payable _gelato) {\\n        gelato = _gelato;\\n    }\\n}\\n\",\"keccak256\":\"0x23215873b7034ee81d6eeb7df1a93db752eddf2096ea574f7f636fdf8523d1c3\",\"license\":\"UNLICENSED\"}},\"version\":1}",
+  "bytecode": "0x60c06040523480156200001157600080fd5b50604051620031563803806200315683398181016040528101906200003791906200016c565b818073ffffffffffffffffffffffffffffffffffffffff1660808173ffffffffffffffffffffffffffffffffffffffff1681525050508073ffffffffffffffffffffffffffffffffffffffff1660a08173ffffffffffffffffffffffffffffffffffffffff16815250505050620001b3565b600080fd5b600073ffffffffffffffffffffffffffffffffffffffff82169050919050565b6000620000db82620000ae565b9050919050565b620000ed81620000ce565b8114620000f957600080fd5b50565b6000815190506200010d81620000e2565b92915050565b60006200012082620000ae565b9050919050565b6000620001348262000113565b9050919050565b620001468162000127565b81146200015257600080fd5b50565b60008151905062000166816200013b565b92915050565b60008060408385031215620001865762000185620000a9565b5b60006200019685828601620000fc565b9250506020620001a98582860162000155565b9150509250929050565b60805160a051612f6f620001e76000396000818161079b015261115801526000818161051e01526109410152612f6f6000f3fe608060405234801561001057600080fd5b50600436106101165760003560e01c80638b92696a116100a2578063b9f45adb11610071578063b9f45adb14610331578063cabcb34914610361578063ddca3f4314610391578063e60a3213146103af578063ee8ca3b5146103cd57610116565b80638b92696a14610281578063a8738825146102b1578063b810c636146102e1578063b81cd8661461030057610116565b8063573ea575116100e9578063573ea575146101b5578063647846a5146101d35780636d2dd29f146101f15780637b4e45e91461022157806380a003ff1461025157610116565b80630407145c1461011b5780630ea65a631461014b5780632e6e0bd01461016757806354fd4d5014610197575b600080fd5b61013560048036038101906101309190611bcb565b6103e9565b6040516101429190611cc0565b60405180910390f35b61016560048036038101906101609190611de1565b61051c565b005b610181600480360381019061017c9190611eb7565b6108d3565b60405161018e9190611ef3565b60405180910390f35b61019f610906565b6040516101ac9190611fa7565b60405180910390f35b6101bd61093f565b6040516101ca9190611fea565b60405180910390f35b6101db610963565b6040516101e89190611ef3565b60405180910390f35b61020b60048036038101906102069190611eb7565b610989565b6040516102189190611ef3565b60405180910390f35b61023b6004803603810190610236919061205d565b6109bc565b60405161024891906120f9565b60405180910390f35b61026b6004803603810190610266919061216a565b6109fb565b60405161027891906121c6565b60405180910390f35b61029b600480360381019061029691906121e1565b610a1d565b6040516102a891906120f9565b60405180910390f35b6102cb60048036038101906102c691906122b1565b610c6d565b6040516102d891906120f9565b60405180910390f35b6102e9610e41565b6040516102f7929190612396565b60405180910390f35b61031a60048036038101906103159190611eb7565b610e72565b6040516103289291906123ce565b60405180910390f35b61034b600480360381019061034691906123f7565b610ece565b60405161035891906120f9565b60405180910390f35b61037b600480360381019061037691906125c1565b61111d565b60405161038891906120f9565b60405180910390f35b610399611150565b6040516103a6919061261d565b60405180910390f35b6103b7611156565b6040516103c49190612697565b60405180910390f35b6103e760048036038101906103e29190611eb7565b61117a565b005b60606000610434600260008573ffffffffffffffffffffffffffffffffffffffff1673ffffffffffffffffffffffffffffffffffffffff16815260200190815260200160002061145a565b905060008167ffffffffffffffff81111561045257610451612496565b5b6040519080825280602002602001820160405280156104805781602001602082028036833780820191505090505b50905060005b82811015610511576104df81600260008873ffffffffffffffffffffffffffffffffffffffff1673ffffffffffffffffffffffffffffffffffffffff16815260200190815260200160002061146f90919063ffffffff16565b8282815181106104f2576104f16126b2565b5b602002602001018181525050808061050990612710565b915050610486565b508092505050919050565b7f000000000000000000000000000000000000000000000000000000000000000073ffffffffffffffffffffffffffffffffffffffff163373ffffffffffffffffffffffffffffffffffffffff16146105aa576040517f08c379a00000000000000000000000000000000000000000000000000000000081526004016105a1906127a5565b60405180910390fd5b60006105d088856105bb8686611486565b8a8b6105c7578d6105ca565b60005b8a6109bc565b90508773ffffffffffffffffffffffffffffffffffffffff1660008083815260200190815260200160002060009054906101000a900473ffffffffffffffffffffffffffffffffffffffff1673ffffffffffffffffffffffffffffffffffffffff1614610672576040517f08c379a000000000000000000000000000000000000000000000000000000000815260040161066990612811565b60405180910390fd5b866106c0578960038190555088600460006101000a81548173ffffffffffffffffffffffffffffffffffffffff021916908373ffffffffffffffffffffffffffffffffffffffff1602179055505b6106c9816115fc565b6000808573ffffffffffffffffffffffffffffffffffffffff1685856040516106f3929190612861565b6000604051808303816000865af19150503d8060008114610730576040519150601f19603f3d011682016040523d82523d6000602084013e610735565b606091505b5091509150811580156107455750875b15610793576107926040518060400160405280600981526020017f4f70732e657865633a0000000000000000000000000000000000000000000000815250826117df90919063ffffffff16565b5b881561082d577f000000000000000000000000000000000000000000000000000000000000000073ffffffffffffffffffffffffffffffffffffffff1663a3f1233e8b8d8f6040518463ffffffff1660e01b81526004016107f69392919061287a565b600060405180830381600087803b15801561081057600080fd5b505af1158015610824573d6000803e3d6000fd5b50505050610859565b600360009055600460006101000a81549073ffffffffffffffffffffffffffffffffffffffff02191690555b8573ffffffffffffffffffffffffffffffffffffffff168b73ffffffffffffffffffffffffffffffffffffffff168d7fa458375b1282695a972870cbfbc4891a9d856b79d563d17667d171d87e0c527a888888886040516108bd94939291906128fe565b60405180910390a4505050505050505050505050565b60006020528060005260406000206000915054906101000a900473ffffffffffffffffffffffffffffffffffffffff1681565b6040518060400160405280600181526020017f340000000000000000000000000000000000000000000000000000000000000081525081565b7f000000000000000000000000000000000000000000000000000000000000000081565b600460009054906101000a900473ffffffffffffffffffffffffffffffffffffffff1681565b60016020528060005260406000206000915054906101000a900473ffffffffffffffffffffffffffffffffffffffff1681565b60008686868686866040516020016109d99695949392919061293e565b6040516020818303038152906040528051906020012090509695505050505050565b60008282604051610a0d929190612861565b6040518091039020905092915050565b600080610a6e8585858080601f016020809104026020016040519081016040528093929190818152602001838380828437600081840152601f19601f8201169050808301925050505050505061111d565b9050610a8033888860016000866109bc565b9150600073ffffffffffffffffffffffffffffffffffffffff1660008084815260200190815260200160002060009054906101000a900473ffffffffffffffffffffffffffffffffffffffff1673ffffffffffffffffffffffffffffffffffffffff1614610b23576040517f08c379a0000000000000000000000000000000000000000000000000000000008152600401610b1a90612a11565b60405180910390fd5b610b7482600260003373ffffffffffffffffffffffffffffffffffffffff1673ffffffffffffffffffffffffffffffffffffffff16815260200190815260200160002061194890919063ffffffff16565b503360008084815260200190815260200160002060006101000a81548173ffffffffffffffffffffffffffffffffffffffff021916908373ffffffffffffffffffffffffffffffffffffffff160217905550866001600084815260200190815260200160002060006101000a81548173ffffffffffffffffffffffffffffffffffffffff021916908373ffffffffffffffffffffffffffffffffffffffff1602179055507fcfd64545826fbe236e660141349bd1ed0b30c9bec7e213894afd7745a1f76f3333888888868989600160008a604051610c5b9a99989796959493929190612a31565b60405180910390a15095945050505050565b600080896fffffffffffffffffffffffffffffffff1611610cc3576040517f08c379a0000000000000000000000000000000000000000000000000000000008152600401610cba90612b39565b60405180910390fd5b8115610cdd57610cd68888888888610a1d565b9050610cee565b610ceb888888888888610ece565b90505b6000428b6fffffffffffffffffffffffffffffffff1611610d0f5742610d11565b8a5b90506040518060400160405280826fffffffffffffffffffffffffffffffff1681526020018b6fffffffffffffffffffffffffffffffff168152506005600084815260200190815260200160002060008201518160000160006101000a8154816fffffffffffffffffffffffffffffffff02191690836fffffffffffffffffffffffffffffffff16021790555060208201518160000160106101000a8154816fffffffffffffffffffffffffffffffff02191690836fffffffffffffffffffffffffffffffff160217905550905050896fffffffffffffffffffffffffffffffff16816fffffffffffffffffffffffffffffffff16837f857791ec95701b6fff966bff1b5ce9a86107aeabaf6d2fdfd89993aa0f084e3760405160405180910390a4509998505050505050505050565b600080600354600460009054906101000a900473ffffffffffffffffffffffffffffffffffffffff16915091509091565b60056020528060005260406000206000915090508060000160009054906101000a90046fffffffffffffffffffffffffffffffff16908060000160109054906101000a90046fffffffffffffffffffffffffffffffff16905082565b600080610f1f8686868080601f016020809104026020016040519081016040528093929190818152602001838380828437600081840152601f19601f8201169050808301925050505050505061111d565b9050610f30338989600087866109bc565b9150600073ffffffffffffffffffffffffffffffffffffffff1660008084815260200190815260200160002060009054906101000a900473ffffffffffffffffffffffffffffffffffffffff1673ffffffffffffffffffffffffffffffffffffffff1614610fd3576040517f08c379a0000000000000000000000000000000000000000000000000000000008152600401610fca90612a11565b60405180910390fd5b61102482600260003373ffffffffffffffffffffffffffffffffffffffff1673ffffffffffffffffffffffffffffffffffffffff16815260200190815260200160002061194890919063ffffffff16565b503360008084815260200190815260200160002060006101000a81548173ffffffffffffffffffffffffffffffffffffffff021916908373ffffffffffffffffffffffffffffffffffffffff160217905550876001600084815260200190815260200160002060006101000a81548173ffffffffffffffffffffffffffffffffffffffff021916908373ffffffffffffffffffffffffffffffffffffffff1602179055507fcfd64545826fbe236e660141349bd1ed0b30c9bec7e213894afd7745a1f76f3333898989868a8a60008b8a60405161110a9a99989796959493929190612a31565b60405180910390a1509695505050505050565b60008282604051602001611132929190612b9d565b60405160208183030381529060405280519060200120905092915050565b60035481565b7f000000000000000000000000000000000000000000000000000000000000000081565b3373ffffffffffffffffffffffffffffffffffffffff1660008083815260200190815260200160002060009054906101000a900473ffffffffffffffffffffffffffffffffffffffff1673ffffffffffffffffffffffffffffffffffffffff161461121a576040517f08c379a000000000000000000000000000000000000000000000000000000000815260040161121190612c3f565b60405180910390fd5b61126b81600260003373ffffffffffffffffffffffffffffffffffffffff1673ffffffffffffffffffffffffffffffffffffffff16815260200190815260200160002061195f90919063ffffffff16565b5060008082815260200190815260200160002060006101000a81549073ffffffffffffffffffffffffffffffffffffffff02191690556001600082815260200190815260200160002060006101000a81549073ffffffffffffffffffffffffffffffffffffffff02191690556000600560008381526020019081526020016000206040518060400160405290816000820160009054906101000a90046fffffffffffffffffffffffffffffffff166fffffffffffffffffffffffffffffffff166fffffffffffffffffffffffffffffffff1681526020016000820160109054906101000a90046fffffffffffffffffffffffffffffffff166fffffffffffffffffffffffffffffffff166fffffffffffffffffffffffffffffffff1681525050905060008082600001516fffffffffffffffffffffffffffffffff1614156113b45760006113b7565b60015b9050801561141c5760056000848152602001908152602001600020600080820160006101000a8154906fffffffffffffffffffffffffffffffff02191690556000820160106101000a8154906fffffffffffffffffffffffffffffffff021916905550505b7f44d83729a43f9c6046446df014d073dd242e0ad672071e9b292f31b669c25b09833360405161144d929190612c5f565b60405180910390a1505050565b600061146882600001611976565b9050919050565b600061147e8360000183611987565b905092915050565b600060188383600381811061149e5761149d6126b2565b5b9050013560f81c60f81b7effffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff19167bffffffffffffffffffffffffffffffffffffffffffffffffffffffff1916901c601084846002818110611501576115006126b2565b5b9050013560f81c60f81b7effffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff19167bffffffffffffffffffffffffffffffffffffffffffffffffffffffff1916901c600885856001818110611564576115636126b2565b5b9050013560f81c60f81b7effffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff19167bffffffffffffffffffffffffffffffffffffffffffffffffffffffff1916901c858560008181106115c5576115c46126b2565b5b9050013560f81c60f81b7effffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff1916171717905092915050565b60006005600083815260200190815260200160002090506000808260000160009054906101000a90046fffffffffffffffffffffffffffffffff166fffffffffffffffffffffffffffffffff161415611656576000611659565b60015b905080156117da57426fffffffffffffffffffffffffffffffff168260000160009054906101000a90046fffffffffffffffffffffffffffffffff166fffffffffffffffffffffffffffffffff1611156116e8576040517f08c379a00000000000000000000000000000000000000000000000000000000081526004016116df90612cd4565b60405180910390fd5b60008260000160109054906101000a90046fffffffffffffffffffffffffffffffff168360000160009054906101000a90046fffffffffffffffffffffffffffffffff166117369190612cf4565b905060004290505b816fffffffffffffffffffffffffffffffff16816fffffffffffffffffffffffffffffffff161061179c578360000160109054906101000a90046fffffffffffffffffffffffffffffffff16826117959190612cf4565b915061173e565b818460000160006101000a8154816fffffffffffffffffffffffffffffffff02191690836fffffffffffffffffffffffffffffffff16021790555050505b505050565b6004602083516117ef9190612d69565b14156118ec576000826020015190506308c379a060e01b817bffffffffffffffffffffffffffffffffffffffffffffffffffffffff19161415611890576044830192508183604051602001611845929190612dd6565b6040516020818303038152906040526040517f08c379a00000000000000000000000000000000000000000000000000000000081526004016118879190611fa7565b60405180910390fd5b816040516020016118a19190612e46565b6040516020818303038152906040526040517f08c379a00000000000000000000000000000000000000000000000000000000081526004016118e39190611fa7565b60405180910390fd5b806040516020016118fd9190612eb4565b6040516020818303038152906040526040517f08c379a000000000000000000000000000000000000000000000000000000000815260040161193f9190611fa7565b60405180910390fd5b600061195783600001836119b2565b905092915050565b600061196e8360000183611a22565b905092915050565b600081600001805490509050919050565b600082600001828154811061199f5761199e6126b2565b5b9060005260206000200154905092915050565b60006119be8383611b36565b611a17578260000182908060018154018082558091505060019003906000526020600020016000909190919091505582600001805490508360010160008481526020019081526020016000208190555060019050611a1c565b600090505b92915050565b60008083600101600084815260200190815260200160002054905060008114611b2a576000600182611a549190612ed6565b9050600060018660000180549050611a6c9190612ed6565b9050818114611adb576000866000018281548110611a8d57611a8c6126b2565b5b9060005260206000200154905080876000018481548110611ab157611ab06126b2565b5b90600052602060002001819055508387600101600083815260200190815260200160002081905550505b85600001805480611aef57611aee612f0a565b5b600190038181906000526020600020016000905590558560010160008681526020019081526020016000206000905560019350505050611b30565b60009150505b92915050565b600080836001016000848152602001908152602001600020541415905092915050565b6000604051905090565b600080fd5b600080fd5b600073ffffffffffffffffffffffffffffffffffffffff82169050919050565b6000611b9882611b6d565b9050919050565b611ba881611b8d565b8114611bb357600080fd5b50565b600081359050611bc581611b9f565b92915050565b600060208284031215611be157611be0611b63565b5b6000611bef84828501611bb6565b91505092915050565b600081519050919050565b600082825260208201905092915050565b6000819050602082019050919050565b6000819050919050565b611c3781611c24565b82525050565b6000611c498383611c2e565b60208301905092915050565b6000602082019050919050565b6000611c6d82611bf8565b611c778185611c03565b9350611c8283611c14565b8060005b83811015611cb3578151611c9a8882611c3d565b9750611ca583611c55565b925050600181019050611c86565b5085935050505092915050565b60006020820190508181036000830152611cda8184611c62565b905092915050565b6000819050919050565b611cf581611ce2565b8114611d0057600080fd5b50565b600081359050611d1281611cec565b92915050565b60008115159050919050565b611d2d81611d18565b8114611d3857600080fd5b50565b600081359050611d4a81611d24565b92915050565b611d5981611c24565b8114611d6457600080fd5b50565b600081359050611d7681611d50565b92915050565b600080fd5b600080fd5b600080fd5b60008083601f840112611da157611da0611d7c565b5b8235905067ffffffffffffffff811115611dbe57611dbd611d81565b5b602083019150836001820283011115611dda57611dd9611d86565b5b9250929050565b60008060008060008060008060006101008a8c031215611e0457611e03611b63565b5b6000611e128c828d01611d03565b9950506020611e238c828d01611bb6565b9850506040611e348c828d01611bb6565b9750506060611e458c828d01611d3b565b9650506080611e568c828d01611d3b565b95505060a0611e678c828d01611d67565b94505060c0611e788c828d01611bb6565b93505060e08a013567ffffffffffffffff811115611e9957611e98611b68565b5b611ea58c828d01611d8b565b92509250509295985092959850929598565b600060208284031215611ecd57611ecc611b63565b5b6000611edb84828501611d67565b91505092915050565b611eed81611b8d565b82525050565b6000602082019050611f086000830184611ee4565b92915050565b600081519050919050565b600082825260208201905092915050565b60005b83811015611f48578082015181840152602081019050611f2d565b83811115611f57576000848401525b50505050565b6000601f19601f8301169050919050565b6000611f7982611f0e565b611f838185611f19565b9350611f93818560208601611f2a565b611f9c81611f5d565b840191505092915050565b60006020820190508181036000830152611fc18184611f6e565b905092915050565b6000611fd482611b6d565b9050919050565b611fe481611fc9565b82525050565b6000602082019050611fff6000830184611fdb565b92915050565b60007fffffffff0000000000000000000000000000000000000000000000000000000082169050919050565b61203a81612005565b811461204557600080fd5b50565b60008135905061205781612031565b92915050565b60008060008060008060c0878903121561207a57612079611b63565b5b600061208889828a01611bb6565b965050602061209989828a01611bb6565b95505060406120aa89828a01612048565b94505060606120bb89828a01611d3b565b93505060806120cc89828a01611bb6565b92505060a06120dd89828a01611d67565b9150509295509295509295565b6120f381611c24565b82525050565b600060208201905061210e60008301846120ea565b92915050565b60008083601f84011261212a57612129611d7c565b5b8235905067ffffffffffffffff81111561214757612146611d81565b5b60208301915083600182028301111561216357612162611d86565b5b9250929050565b6000806020838503121561218157612180611b63565b5b600083013567ffffffffffffffff81111561219f5761219e611b68565b5b6121ab85828601612114565b92509250509250929050565b6121c081612005565b82525050565b60006020820190506121db60008301846121b7565b92915050565b6000806000806000608086880312156121fd576121fc611b63565b5b600061220b88828901611bb6565b955050602061221c88828901612048565b945050604061222d88828901611bb6565b935050606086013567ffffffffffffffff81111561224e5761224d611b68565b5b61225a88828901611d8b565b92509250509295509295909350565b60006fffffffffffffffffffffffffffffffff82169050919050565b61228e81612269565b811461229957600080fd5b50565b6000813590506122ab81612285565b92915050565b60008060008060008060008060006101008a8c0312156122d4576122d3611b63565b5b60006122e28c828d0161229c565b99505060206122f38c828d0161229c565b98505060406123048c828d01611bb6565b97505060606123158c828d01612048565b96505060806123268c828d01611bb6565b95505060a08a013567ffffffffffffffff81111561234757612346611b68565b5b6123538c828d01611d8b565b945094505060c06123668c828d01611bb6565b92505060e06123778c828d01611d3b565b9150509295985092959850929598565b61239081611ce2565b82525050565b60006040820190506123ab6000830185612387565b6123b86020830184611ee4565b9392505050565b6123c881612269565b82525050565b60006040820190506123e360008301856123bf565b6123f060208301846123bf565b9392505050565b60008060008060008060a0878903121561241457612413611b63565b5b600061242289828a01611bb6565b965050602061243389828a01612048565b955050604061244489828a01611bb6565b945050606087013567ffffffffffffffff81111561246557612464611b68565b5b61247189828a01611d8b565b9350935050608061248489828a01611bb6565b9150509295509295509295565b600080fd5b7f4e487b7100000000000000000000000000000000000000000000000000000000600052604160045260246000fd5b6124ce82611f5d565b810181811067ffffffffffffffff821117156124ed576124ec612496565b5b80604052505050565b6000612500611b59565b905061250c82826124c5565b919050565b600067ffffffffffffffff82111561252c5761252b612496565b5b61253582611f5d565b9050602081019050919050565b82818337600083830152505050565b600061256461255f84612511565b6124f6565b9050828152602081018484840111156125805761257f612491565b5b61258b848285612542565b509392505050565b600082601f8301126125a8576125a7611d7c565b5b81356125b8848260208601612551565b91505092915050565b600080604083850312156125d8576125d7611b63565b5b60006125e685828601611bb6565b925050602083013567ffffffffffffffff81111561260757612606611b68565b5b61261385828601612593565b9150509250929050565b60006020820190506126326000830184612387565b92915050565b6000819050919050565b600061265d61265861265384611b6d565b612638565b611b6d565b9050919050565b600061266f82612642565b9050919050565b600061268182612664565b9050919050565b61269181612676565b82525050565b60006020820190506126ac6000830184612688565b92915050565b7f4e487b7100000000000000000000000000000000000000000000000000000000600052603260045260246000fd5b7f4e487b7100000000000000000000000000000000000000000000000000000000600052601160045260246000fd5b600061271b82611ce2565b91507fffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff82141561274e5761274d6126e1565b5b600182019050919050565b7f47656c61746f666965643a204f6e6c792067656c61746f000000000000000000600082015250565b600061278f601783611f19565b915061279a82612759565b602082019050919050565b600060208201905081810360008301526127be81612782565b9050919050565b7f4f70733a20657865633a204e6f207461736b20666f756e640000000000000000600082015250565b60006127fb601883611f19565b9150612806826127c5565b602082019050919050565b6000602082019050818103600083015261282a816127ee565b9050919050565b600081905092915050565b60006128488385612831565b9350612855838584612542565b82840190509392505050565b600061286e82848661283c565b91508190509392505050565b600060608201905061288f6000830186611ee4565b61289c6020830185611ee4565b6128a96040830184612387565b949350505050565b600082825260208201905092915050565b60006128ce83856128b1565b93506128db838584612542565b6128e483611f5d565b840190509392505050565b6128f881611d18565b82525050565b600060608201905081810360008301526129198186886128c2565b905061292860208301856120ea565b61293560408301846128ef565b95945050505050565b600060c0820190506129536000830189611ee4565b6129606020830188611ee4565b61296d60408301876121b7565b61297a60608301866128ef565b6129876080830185611ee4565b61299460a08301846120ea565b979650505050505050565b7f4f70733a206372656174655461736b3a2053656e64657220616c72656164792060008201527f73746172746564207461736b0000000000000000000000000000000000000000602082015250565b60006129fb602c83611f19565b9150612a068261299f565b604082019050919050565b60006020820190508181036000830152612a2a816129ee565b9050919050565b600061012082019050612a47600083018d611ee4565b612a54602083018c611ee4565b612a61604083018b6121b7565b612a6e606083018a611ee4565b612a7b60808301896120ea565b81810360a0830152612a8e8187896128c2565b9050612a9d60c08301866128ef565b612aaa60e0830185611ee4565b612ab86101008301846120ea565b9b9a5050505050505050505050565b7f4f70733a2063726561746554696d65645461736b3a20696e74657276616c206360008201527f616e6e6f74206265203000000000000000000000000000000000000000000000602082015250565b6000612b23602a83611f19565b9150612b2e82612ac7565b604082019050919050565b60006020820190508181036000830152612b5281612b16565b9050919050565b600081519050919050565b6000612b6f82612b59565b612b7981856128b1565b9350612b89818560208601611f2a565b612b9281611f5d565b840191505092915050565b6000604082019050612bb26000830185611ee4565b8181036020830152612bc48184612b64565b90509392505050565b7f4f70733a2063616e63656c5461736b3a2053656e64657220646964206e6f742060008201527f7374617274207461736b20796574000000000000000000000000000000000000602082015250565b6000612c29602e83611f19565b9150612c3482612bcd565b604082019050919050565b60006020820190508181036000830152612c5881612c1c565b9050919050565b6000604082019050612c7460008301856120ea565b612c816020830184611ee4565b9392505050565b7f4f70733a20657865633a20546f6f206561726c79000000000000000000000000600082015250565b6000612cbe601483611f19565b9150612cc982612c88565b602082019050919050565b60006020820190508181036000830152612ced81612cb1565b9050919050565b6000612cff82612269565b9150612d0a83612269565b9250826fffffffffffffffffffffffffffffffff03821115612d2f57612d2e6126e1565b5b828201905092915050565b7f4e487b7100000000000000000000000000000000000000000000000000000000600052601260045260246000fd5b6000612d7482611ce2565b9150612d7f83611ce2565b925082612d8f57612d8e612d3a565b5b828206905092915050565b600081905092915050565b6000612db082611f0e565b612dba8185612d9a565b9350612dca818560208601611f2a565b80840191505092915050565b6000612de28285612da5565b9150612dee8284612da5565b91508190509392505050565b7f4e6f4572726f7253656c6563746f720000000000000000000000000000000000600082015250565b6000612e30600f83612d9a565b9150612e3b82612dfa565b600f82019050919050565b6000612e528284612da5565b9150612e5d82612e23565b915081905092915050565b7f556e657870656374656452657475726e64617461000000000000000000000000600082015250565b6000612e9e601483612d9a565b9150612ea982612e68565b601482019050919050565b6000612ec08284612da5565b9150612ecb82612e91565b915081905092915050565b6000612ee182611ce2565b9150612eec83611ce2565b925082821015612eff57612efe6126e1565b5b828203905092915050565b7f4e487b7100000000000000000000000000000000000000000000000000000000600052603160045260246000fdfea26469706673582212203ecf88645d63a5e4d09d50d759f0b555fe719d0b2b2ca0e2b5c0ab1a605c666d64736f6c634300080c0033",
+  "deployedBytecode": "0x608060405234801561001057600080fd5b50600436106101165760003560e01c80638b92696a116100a2578063b9f45adb11610071578063b9f45adb14610331578063cabcb34914610361578063ddca3f4314610391578063e60a3213146103af578063ee8ca3b5146103cd57610116565b80638b92696a14610281578063a8738825146102b1578063b810c636146102e1578063b81cd8661461030057610116565b8063573ea575116100e9578063573ea575146101b5578063647846a5146101d35780636d2dd29f146101f15780637b4e45e91461022157806380a003ff1461025157610116565b80630407145c1461011b5780630ea65a631461014b5780632e6e0bd01461016757806354fd4d5014610197575b600080fd5b61013560048036038101906101309190611bcb565b6103e9565b6040516101429190611cc0565b60405180910390f35b61016560048036038101906101609190611de1565b61051c565b005b610181600480360381019061017c9190611eb7565b6108d3565b60405161018e9190611ef3565b60405180910390f35b61019f610906565b6040516101ac9190611fa7565b60405180910390f35b6101bd61093f565b6040516101ca9190611fea565b60405180910390f35b6101db610963565b6040516101e89190611ef3565b60405180910390f35b61020b60048036038101906102069190611eb7565b610989565b6040516102189190611ef3565b60405180910390f35b61023b6004803603810190610236919061205d565b6109bc565b60405161024891906120f9565b60405180910390f35b61026b6004803603810190610266919061216a565b6109fb565b60405161027891906121c6565b60405180910390f35b61029b600480360381019061029691906121e1565b610a1d565b6040516102a891906120f9565b60405180910390f35b6102cb60048036038101906102c691906122b1565b610c6d565b6040516102d891906120f9565b60405180910390f35b6102e9610e41565b6040516102f7929190612396565b60405180910390f35b61031a60048036038101906103159190611eb7565b610e72565b6040516103289291906123ce565b60405180910390f35b61034b600480360381019061034691906123f7565b610ece565b60405161035891906120f9565b60405180910390f35b61037b600480360381019061037691906125c1565b61111d565b60405161038891906120f9565b60405180910390f35b610399611150565b6040516103a6919061261d565b60405180910390f35b6103b7611156565b6040516103c49190612697565b60405180910390f35b6103e760048036038101906103e29190611eb7565b61117a565b005b60606000610434600260008573ffffffffffffffffffffffffffffffffffffffff1673ffffffffffffffffffffffffffffffffffffffff16815260200190815260200160002061145a565b905060008167ffffffffffffffff81111561045257610451612496565b5b6040519080825280602002602001820160405280156104805781602001602082028036833780820191505090505b50905060005b82811015610511576104df81600260008873ffffffffffffffffffffffffffffffffffffffff1673ffffffffffffffffffffffffffffffffffffffff16815260200190815260200160002061146f90919063ffffffff16565b8282815181106104f2576104f16126b2565b5b602002602001018181525050808061050990612710565b915050610486565b508092505050919050565b7f000000000000000000000000000000000000000000000000000000000000000073ffffffffffffffffffffffffffffffffffffffff163373ffffffffffffffffffffffffffffffffffffffff16146105aa576040517f08c379a00000000000000000000000000000000000000000000000000000000081526004016105a1906127a5565b60405180910390fd5b60006105d088856105bb8686611486565b8a8b6105c7578d6105ca565b60005b8a6109bc565b90508773ffffffffffffffffffffffffffffffffffffffff1660008083815260200190815260200160002060009054906101000a900473ffffffffffffffffffffffffffffffffffffffff1673ffffffffffffffffffffffffffffffffffffffff1614610672576040517f08c379a000000000000000000000000000000000000000000000000000000000815260040161066990612811565b60405180910390fd5b866106c0578960038190555088600460006101000a81548173ffffffffffffffffffffffffffffffffffffffff021916908373ffffffffffffffffffffffffffffffffffffffff1602179055505b6106c9816115fc565b6000808573ffffffffffffffffffffffffffffffffffffffff1685856040516106f3929190612861565b6000604051808303816000865af19150503d8060008114610730576040519150601f19603f3d011682016040523d82523d6000602084013e610735565b606091505b5091509150811580156107455750875b15610793576107926040518060400160405280600981526020017f4f70732e657865633a0000000000000000000000000000000000000000000000815250826117df90919063ffffffff16565b5b881561082d577f000000000000000000000000000000000000000000000000000000000000000073ffffffffffffffffffffffffffffffffffffffff1663a3f1233e8b8d8f6040518463ffffffff1660e01b81526004016107f69392919061287a565b600060405180830381600087803b15801561081057600080fd5b505af1158015610824573d6000803e3d6000fd5b50505050610859565b600360009055600460006101000a81549073ffffffffffffffffffffffffffffffffffffffff02191690555b8573ffffffffffffffffffffffffffffffffffffffff168b73ffffffffffffffffffffffffffffffffffffffff168d7fa458375b1282695a972870cbfbc4891a9d856b79d563d17667d171d87e0c527a888888886040516108bd94939291906128fe565b60405180910390a4505050505050505050505050565b60006020528060005260406000206000915054906101000a900473ffffffffffffffffffffffffffffffffffffffff1681565b6040518060400160405280600181526020017f340000000000000000000000000000000000000000000000000000000000000081525081565b7f000000000000000000000000000000000000000000000000000000000000000081565b600460009054906101000a900473ffffffffffffffffffffffffffffffffffffffff1681565b60016020528060005260406000206000915054906101000a900473ffffffffffffffffffffffffffffffffffffffff1681565b60008686868686866040516020016109d99695949392919061293e565b6040516020818303038152906040528051906020012090509695505050505050565b60008282604051610a0d929190612861565b6040518091039020905092915050565b600080610a6e8585858080601f016020809104026020016040519081016040528093929190818152602001838380828437600081840152601f19601f8201169050808301925050505050505061111d565b9050610a8033888860016000866109bc565b9150600073ffffffffffffffffffffffffffffffffffffffff1660008084815260200190815260200160002060009054906101000a900473ffffffffffffffffffffffffffffffffffffffff1673ffffffffffffffffffffffffffffffffffffffff1614610b23576040517f08c379a0000000000000000000000000000000000000000000000000000000008152600401610b1a90612a11565b60405180910390fd5b610b7482600260003373ffffffffffffffffffffffffffffffffffffffff1673ffffffffffffffffffffffffffffffffffffffff16815260200190815260200160002061194890919063ffffffff16565b503360008084815260200190815260200160002060006101000a81548173ffffffffffffffffffffffffffffffffffffffff021916908373ffffffffffffffffffffffffffffffffffffffff160217905550866001600084815260200190815260200160002060006101000a81548173ffffffffffffffffffffffffffffffffffffffff021916908373ffffffffffffffffffffffffffffffffffffffff1602179055507fcfd64545826fbe236e660141349bd1ed0b30c9bec7e213894afd7745a1f76f3333888888868989600160008a604051610c5b9a99989796959493929190612a31565b60405180910390a15095945050505050565b600080896fffffffffffffffffffffffffffffffff1611610cc3576040517f08c379a0000000000000000000000000000000000000000000000000000000008152600401610cba90612b39565b60405180910390fd5b8115610cdd57610cd68888888888610a1d565b9050610cee565b610ceb888888888888610ece565b90505b6000428b6fffffffffffffffffffffffffffffffff1611610d0f5742610d11565b8a5b90506040518060400160405280826fffffffffffffffffffffffffffffffff1681526020018b6fffffffffffffffffffffffffffffffff168152506005600084815260200190815260200160002060008201518160000160006101000a8154816fffffffffffffffffffffffffffffffff02191690836fffffffffffffffffffffffffffffffff16021790555060208201518160000160106101000a8154816fffffffffffffffffffffffffffffffff02191690836fffffffffffffffffffffffffffffffff160217905550905050896fffffffffffffffffffffffffffffffff16816fffffffffffffffffffffffffffffffff16837f857791ec95701b6fff966bff1b5ce9a86107aeabaf6d2fdfd89993aa0f084e3760405160405180910390a4509998505050505050505050565b600080600354600460009054906101000a900473ffffffffffffffffffffffffffffffffffffffff16915091509091565b60056020528060005260406000206000915090508060000160009054906101000a90046fffffffffffffffffffffffffffffffff16908060000160109054906101000a90046fffffffffffffffffffffffffffffffff16905082565b600080610f1f8686868080601f016020809104026020016040519081016040528093929190818152602001838380828437600081840152601f19601f8201169050808301925050505050505061111d565b9050610f30338989600087866109bc565b9150600073ffffffffffffffffffffffffffffffffffffffff1660008084815260200190815260200160002060009054906101000a900473ffffffffffffffffffffffffffffffffffffffff1673ffffffffffffffffffffffffffffffffffffffff1614610fd3576040517f08c379a0000000000000000000000000000000000000000000000000000000008152600401610fca90612a11565b60405180910390fd5b61102482600260003373ffffffffffffffffffffffffffffffffffffffff1673ffffffffffffffffffffffffffffffffffffffff16815260200190815260200160002061194890919063ffffffff16565b503360008084815260200190815260200160002060006101000a81548173ffffffffffffffffffffffffffffffffffffffff021916908373ffffffffffffffffffffffffffffffffffffffff160217905550876001600084815260200190815260200160002060006101000a81548173ffffffffffffffffffffffffffffffffffffffff021916908373ffffffffffffffffffffffffffffffffffffffff1602179055507fcfd64545826fbe236e660141349bd1ed0b30c9bec7e213894afd7745a1f76f3333898989868a8a60008b8a60405161110a9a99989796959493929190612a31565b60405180910390a1509695505050505050565b60008282604051602001611132929190612b9d565b60405160208183030381529060405280519060200120905092915050565b60035481565b7f000000000000000000000000000000000000000000000000000000000000000081565b3373ffffffffffffffffffffffffffffffffffffffff1660008083815260200190815260200160002060009054906101000a900473ffffffffffffffffffffffffffffffffffffffff1673ffffffffffffffffffffffffffffffffffffffff161461121a576040517f08c379a000000000000000000000000000000000000000000000000000000000815260040161121190612c3f565b60405180910390fd5b61126b81600260003373ffffffffffffffffffffffffffffffffffffffff1673ffffffffffffffffffffffffffffffffffffffff16815260200190815260200160002061195f90919063ffffffff16565b5060008082815260200190815260200160002060006101000a81549073ffffffffffffffffffffffffffffffffffffffff02191690556001600082815260200190815260200160002060006101000a81549073ffffffffffffffffffffffffffffffffffffffff02191690556000600560008381526020019081526020016000206040518060400160405290816000820160009054906101000a90046fffffffffffffffffffffffffffffffff166fffffffffffffffffffffffffffffffff166fffffffffffffffffffffffffffffffff1681526020016000820160109054906101000a90046fffffffffffffffffffffffffffffffff166fffffffffffffffffffffffffffffffff166fffffffffffffffffffffffffffffffff1681525050905060008082600001516fffffffffffffffffffffffffffffffff1614156113b45760006113b7565b60015b9050801561141c5760056000848152602001908152602001600020600080820160006101000a8154906fffffffffffffffffffffffffffffffff02191690556000820160106101000a8154906fffffffffffffffffffffffffffffffff021916905550505b7f44d83729a43f9c6046446df014d073dd242e0ad672071e9b292f31b669c25b09833360405161144d929190612c5f565b60405180910390a1505050565b600061146882600001611976565b9050919050565b600061147e8360000183611987565b905092915050565b600060188383600381811061149e5761149d6126b2565b5b9050013560f81c60f81b7effffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff19167bffffffffffffffffffffffffffffffffffffffffffffffffffffffff1916901c601084846002818110611501576115006126b2565b5b9050013560f81c60f81b7effffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff19167bffffffffffffffffffffffffffffffffffffffffffffffffffffffff1916901c600885856001818110611564576115636126b2565b5b9050013560f81c60f81b7effffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff19167bffffffffffffffffffffffffffffffffffffffffffffffffffffffff1916901c858560008181106115c5576115c46126b2565b5b9050013560f81c60f81b7effffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff1916171717905092915050565b60006005600083815260200190815260200160002090506000808260000160009054906101000a90046fffffffffffffffffffffffffffffffff166fffffffffffffffffffffffffffffffff161415611656576000611659565b60015b905080156117da57426fffffffffffffffffffffffffffffffff168260000160009054906101000a90046fffffffffffffffffffffffffffffffff166fffffffffffffffffffffffffffffffff1611156116e8576040517f08c379a00000000000000000000000000000000000000000000000000000000081526004016116df90612cd4565b60405180910390fd5b60008260000160109054906101000a90046fffffffffffffffffffffffffffffffff168360000160009054906101000a90046fffffffffffffffffffffffffffffffff166117369190612cf4565b905060004290505b816fffffffffffffffffffffffffffffffff16816fffffffffffffffffffffffffffffffff161061179c578360000160109054906101000a90046fffffffffffffffffffffffffffffffff16826117959190612cf4565b915061173e565b818460000160006101000a8154816fffffffffffffffffffffffffffffffff02191690836fffffffffffffffffffffffffffffffff16021790555050505b505050565b6004602083516117ef9190612d69565b14156118ec576000826020015190506308c379a060e01b817bffffffffffffffffffffffffffffffffffffffffffffffffffffffff19161415611890576044830192508183604051602001611845929190612dd6565b6040516020818303038152906040526040517f08c379a00000000000000000000000000000000000000000000000000000000081526004016118879190611fa7565b60405180910390fd5b816040516020016118a19190612e46565b6040516020818303038152906040526040517f08c379a00000000000000000000000000000000000000000000000000000000081526004016118e39190611fa7565b60405180910390fd5b806040516020016118fd9190612eb4565b6040516020818303038152906040526040517f08c379a000000000000000000000000000000000000000000000000000000000815260040161193f9190611fa7565b60405180910390fd5b600061195783600001836119b2565b905092915050565b600061196e8360000183611a22565b905092915050565b600081600001805490509050919050565b600082600001828154811061199f5761199e6126b2565b5b9060005260206000200154905092915050565b60006119be8383611b36565b611a17578260000182908060018154018082558091505060019003906000526020600020016000909190919091505582600001805490508360010160008481526020019081526020016000208190555060019050611a1c565b600090505b92915050565b60008083600101600084815260200190815260200160002054905060008114611b2a576000600182611a549190612ed6565b9050600060018660000180549050611a6c9190612ed6565b9050818114611adb576000866000018281548110611a8d57611a8c6126b2565b5b9060005260206000200154905080876000018481548110611ab157611ab06126b2565b5b90600052602060002001819055508387600101600083815260200190815260200160002081905550505b85600001805480611aef57611aee612f0a565b5b600190038181906000526020600020016000905590558560010160008681526020019081526020016000206000905560019350505050611b30565b60009150505b92915050565b600080836001016000848152602001908152602001600020541415905092915050565b6000604051905090565b600080fd5b600080fd5b600073ffffffffffffffffffffffffffffffffffffffff82169050919050565b6000611b9882611b6d565b9050919050565b611ba881611b8d565b8114611bb357600080fd5b50565b600081359050611bc581611b9f565b92915050565b600060208284031215611be157611be0611b63565b5b6000611bef84828501611bb6565b91505092915050565b600081519050919050565b600082825260208201905092915050565b6000819050602082019050919050565b6000819050919050565b611c3781611c24565b82525050565b6000611c498383611c2e565b60208301905092915050565b6000602082019050919050565b6000611c6d82611bf8565b611c778185611c03565b9350611c8283611c14565b8060005b83811015611cb3578151611c9a8882611c3d565b9750611ca583611c55565b925050600181019050611c86565b5085935050505092915050565b60006020820190508181036000830152611cda8184611c62565b905092915050565b6000819050919050565b611cf581611ce2565b8114611d0057600080fd5b50565b600081359050611d1281611cec565b92915050565b60008115159050919050565b611d2d81611d18565b8114611d3857600080fd5b50565b600081359050611d4a81611d24565b92915050565b611d5981611c24565b8114611d6457600080fd5b50565b600081359050611d7681611d50565b92915050565b600080fd5b600080fd5b600080fd5b60008083601f840112611da157611da0611d7c565b5b8235905067ffffffffffffffff811115611dbe57611dbd611d81565b5b602083019150836001820283011115611dda57611dd9611d86565b5b9250929050565b60008060008060008060008060006101008a8c031215611e0457611e03611b63565b5b6000611e128c828d01611d03565b9950506020611e238c828d01611bb6565b9850506040611e348c828d01611bb6565b9750506060611e458c828d01611d3b565b9650506080611e568c828d01611d3b565b95505060a0611e678c828d01611d67565b94505060c0611e788c828d01611bb6565b93505060e08a013567ffffffffffffffff811115611e9957611e98611b68565b5b611ea58c828d01611d8b565b92509250509295985092959850929598565b600060208284031215611ecd57611ecc611b63565b5b6000611edb84828501611d67565b91505092915050565b611eed81611b8d565b82525050565b6000602082019050611f086000830184611ee4565b92915050565b600081519050919050565b600082825260208201905092915050565b60005b83811015611f48578082015181840152602081019050611f2d565b83811115611f57576000848401525b50505050565b6000601f19601f8301169050919050565b6000611f7982611f0e565b611f838185611f19565b9350611f93818560208601611f2a565b611f9c81611f5d565b840191505092915050565b60006020820190508181036000830152611fc18184611f6e565b905092915050565b6000611fd482611b6d565b9050919050565b611fe481611fc9565b82525050565b6000602082019050611fff6000830184611fdb565b92915050565b60007fffffffff0000000000000000000000000000000000000000000000000000000082169050919050565b61203a81612005565b811461204557600080fd5b50565b60008135905061205781612031565b92915050565b60008060008060008060c0878903121561207a57612079611b63565b5b600061208889828a01611bb6565b965050602061209989828a01611bb6565b95505060406120aa89828a01612048565b94505060606120bb89828a01611d3b565b93505060806120cc89828a01611bb6565b92505060a06120dd89828a01611d67565b9150509295509295509295565b6120f381611c24565b82525050565b600060208201905061210e60008301846120ea565b92915050565b60008083601f84011261212a57612129611d7c565b5b8235905067ffffffffffffffff81111561214757612146611d81565b5b60208301915083600182028301111561216357612162611d86565b5b9250929050565b6000806020838503121561218157612180611b63565b5b600083013567ffffffffffffffff81111561219f5761219e611b68565b5b6121ab85828601612114565b92509250509250929050565b6121c081612005565b82525050565b60006020820190506121db60008301846121b7565b92915050565b6000806000806000608086880312156121fd576121fc611b63565b5b600061220b88828901611bb6565b955050602061221c88828901612048565b945050604061222d88828901611bb6565b935050606086013567ffffffffffffffff81111561224e5761224d611b68565b5b61225a88828901611d8b565b92509250509295509295909350565b60006fffffffffffffffffffffffffffffffff82169050919050565b61228e81612269565b811461229957600080fd5b50565b6000813590506122ab81612285565b92915050565b60008060008060008060008060006101008a8c0312156122d4576122d3611b63565b5b60006122e28c828d0161229c565b99505060206122f38c828d0161229c565b98505060406123048c828d01611bb6565b97505060606123158c828d01612048565b96505060806123268c828d01611bb6565b95505060a08a013567ffffffffffffffff81111561234757612346611b68565b5b6123538c828d01611d8b565b945094505060c06123668c828d01611bb6565b92505060e06123778c828d01611d3b565b9150509295985092959850929598565b61239081611ce2565b82525050565b60006040820190506123ab6000830185612387565b6123b86020830184611ee4565b9392505050565b6123c881612269565b82525050565b60006040820190506123e360008301856123bf565b6123f060208301846123bf565b9392505050565b60008060008060008060a0878903121561241457612413611b63565b5b600061242289828a01611bb6565b965050602061243389828a01612048565b955050604061244489828a01611bb6565b945050606087013567ffffffffffffffff81111561246557612464611b68565b5b61247189828a01611d8b565b9350935050608061248489828a01611bb6565b9150509295509295509295565b600080fd5b7f4e487b7100000000000000000000000000000000000000000000000000000000600052604160045260246000fd5b6124ce82611f5d565b810181811067ffffffffffffffff821117156124ed576124ec612496565b5b80604052505050565b6000612500611b59565b905061250c82826124c5565b919050565b600067ffffffffffffffff82111561252c5761252b612496565b5b61253582611f5d565b9050602081019050919050565b82818337600083830152505050565b600061256461255f84612511565b6124f6565b9050828152602081018484840111156125805761257f612491565b5b61258b848285612542565b509392505050565b600082601f8301126125a8576125a7611d7c565b5b81356125b8848260208601612551565b91505092915050565b600080604083850312156125d8576125d7611b63565b5b60006125e685828601611bb6565b925050602083013567ffffffffffffffff81111561260757612606611b68565b5b61261385828601612593565b9150509250929050565b60006020820190506126326000830184612387565b92915050565b6000819050919050565b600061265d61265861265384611b6d565b612638565b611b6d565b9050919050565b600061266f82612642565b9050919050565b600061268182612664565b9050919050565b61269181612676565b82525050565b60006020820190506126ac6000830184612688565b92915050565b7f4e487b7100000000000000000000000000000000000000000000000000000000600052603260045260246000fd5b7f4e487b7100000000000000000000000000000000000000000000000000000000600052601160045260246000fd5b600061271b82611ce2565b91507fffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff82141561274e5761274d6126e1565b5b600182019050919050565b7f47656c61746f666965643a204f6e6c792067656c61746f000000000000000000600082015250565b600061278f601783611f19565b915061279a82612759565b602082019050919050565b600060208201905081810360008301526127be81612782565b9050919050565b7f4f70733a20657865633a204e6f207461736b20666f756e640000000000000000600082015250565b60006127fb601883611f19565b9150612806826127c5565b602082019050919050565b6000602082019050818103600083015261282a816127ee565b9050919050565b600081905092915050565b60006128488385612831565b9350612855838584612542565b82840190509392505050565b600061286e82848661283c565b91508190509392505050565b600060608201905061288f6000830186611ee4565b61289c6020830185611ee4565b6128a96040830184612387565b949350505050565b600082825260208201905092915050565b60006128ce83856128b1565b93506128db838584612542565b6128e483611f5d565b840190509392505050565b6128f881611d18565b82525050565b600060608201905081810360008301526129198186886128c2565b905061292860208301856120ea565b61293560408301846128ef565b95945050505050565b600060c0820190506129536000830189611ee4565b6129606020830188611ee4565b61296d60408301876121b7565b61297a60608301866128ef565b6129876080830185611ee4565b61299460a08301846120ea565b979650505050505050565b7f4f70733a206372656174655461736b3a2053656e64657220616c72656164792060008201527f73746172746564207461736b0000000000000000000000000000000000000000602082015250565b60006129fb602c83611f19565b9150612a068261299f565b604082019050919050565b60006020820190508181036000830152612a2a816129ee565b9050919050565b600061012082019050612a47600083018d611ee4565b612a54602083018c611ee4565b612a61604083018b6121b7565b612a6e606083018a611ee4565b612a7b60808301896120ea565b81810360a0830152612a8e8187896128c2565b9050612a9d60c08301866128ef565b612aaa60e0830185611ee4565b612ab86101008301846120ea565b9b9a5050505050505050505050565b7f4f70733a2063726561746554696d65645461736b3a20696e74657276616c206360008201527f616e6e6f74206265203000000000000000000000000000000000000000000000602082015250565b6000612b23602a83611f19565b9150612b2e82612ac7565b604082019050919050565b60006020820190508181036000830152612b5281612b16565b9050919050565b600081519050919050565b6000612b6f82612b59565b612b7981856128b1565b9350612b89818560208601611f2a565b612b9281611f5d565b840191505092915050565b6000604082019050612bb26000830185611ee4565b8181036020830152612bc48184612b64565b90509392505050565b7f4f70733a2063616e63656c5461736b3a2053656e64657220646964206e6f742060008201527f7374617274207461736b20796574000000000000000000000000000000000000602082015250565b6000612c29602e83611f19565b9150612c3482612bcd565b604082019050919050565b60006020820190508181036000830152612c5881612c1c565b9050919050565b6000604082019050612c7460008301856120ea565b612c816020830184611ee4565b9392505050565b7f4f70733a20657865633a20546f6f206561726c79000000000000000000000000600082015250565b6000612cbe601483611f19565b9150612cc982612c88565b602082019050919050565b60006020820190508181036000830152612ced81612cb1565b9050919050565b6000612cff82612269565b9150612d0a83612269565b9250826fffffffffffffffffffffffffffffffff03821115612d2f57612d2e6126e1565b5b828201905092915050565b7f4e487b7100000000000000000000000000000000000000000000000000000000600052601260045260246000fd5b6000612d7482611ce2565b9150612d7f83611ce2565b925082612d8f57612d8e612d3a565b5b828206905092915050565b600081905092915050565b6000612db082611f0e565b612dba8185612d9a565b9350612dca818560208601611f2a565b80840191505092915050565b6000612de28285612da5565b9150612dee8284612da5565b91508190509392505050565b7f4e6f4572726f7253656c6563746f720000000000000000000000000000000000600082015250565b6000612e30600f83612d9a565b9150612e3b82612dfa565b600f82019050919050565b6000612e528284612da5565b9150612e5d82612e23565b915081905092915050565b7f556e657870656374656452657475726e64617461000000000000000000000000600082015250565b6000612e9e601483612d9a565b9150612ea982612e68565b601482019050919050565b6000612ec08284612da5565b9150612ecb82612e91565b915081905092915050565b6000612ee182611ce2565b9150612eec83611ce2565b925082821015612eff57612efe6126e1565b5b828203905092915050565b7f4e487b7100000000000000000000000000000000000000000000000000000000600052603160045260246000fdfea26469706673582212203ecf88645d63a5e4d09d50d759f0b555fe719d0b2b2ca0e2b5c0ab1a605c666d64736f6c634300080c0033",
+  "devdoc": {
+    "kind": "dev",
+    "methods": {
+      "cancelTask(bytes32)": {
+        "params": {
+          "_taskId": "The hash of the task, can be computed using getTaskId()"
+        }
+      },
+      "createTask(address,bytes4,address,bytes)": {
+        "details": "Requires funds to be added in Task Treasury, assumes treasury sends fee to Gelato via Ops",
+        "params": {
+          "_execAddress": "On which contract should Gelato execute the transactions",
+          "_execSelector": "Which function Gelato should eecute on the _execAddress",
+          "_resolverAddress": "On which contract should Gelato check when to execute the tx",
+          "_resolverData": "Which data should be used to check on the Resolver when to execute the tx"
+        }
+      },
+      "createTaskNoPrepayment(address,bytes4,address,bytes,address)": {
+        "details": "Requires no funds to be added in Task Treasury, assumes tasks sends fee to Gelato directly",
+        "params": {
+          "_execAddress": "On which contract should Gelato execute the transactions",
+          "_execSelector": "Which function Gelato should eecute on the _execAddress",
+          "_feeToken": "Which token to use as fee payment",
+          "_resolverAddress": "On which contract should Gelato check when to execute the tx",
+          "_resolverData": "Which data should be used to check on the Resolver when to execute the tx"
+        }
+      },
+      "createTimedTask(uint128,uint128,address,bytes4,address,bytes,address,bool)": {
+        "params": {
+          "_execAddress": "On which contract should Gelato execute the transactions",
+          "_execSelector": "Which function Gelato should eecute on the _execAddress",
+          "_feeToken": "Which token to use as fee payment",
+          "_interval": "After how many seconds should each task be executed",
+          "_resolverAddress": "On which contract should Gelato check when to execute the tx",
+          "_resolverData": "Which data should be used to check on the Resolver when to execute the tx",
+          "_startTime": "Timestamp when the first task should become executable. 0 for right now",
+          "_useTreasury": "True if Gelato should charge fees from TaskTreasury, false if not"
+        }
+      },
+      "exec(uint256,address,address,bool,bool,bytes32,address,bytes)": {
+        "params": {
+          "_execAddress": "On which contract should Gelato execute the tx",
+          "_execData": "Data used to execute the tx, queried from the Resolver by Gelato",
+          "_feeToken": "Token used to pay for the execution. ETH = 0xeeeeee...",
+          "_revertOnFailure": "To revert or not if call to execAddress fails",
+          "_taskCreator": "On which contract should Gelato check when to execute the tx",
+          "_txFee": "Fee paid to Gelato for execution, deducted on the TaskTreasury",
+          "_useTaskTreasuryFunds": "If msg.sender's balance on TaskTreasury should pay for the tx"
+        }
+      },
+      "getResolverHash(address,bytes)": {
+        "params": {
+          "_resolverAddress": "Address of resolver",
+          "_resolverData": "Data passed to resolver"
+        }
+      },
+      "getSelector(string)": {
+        "details": "Example: \"transferFrom(address,address,uint256)\" => 0x23b872dd",
+        "params": {
+          "_func": "String of the function you want the selector from"
+        }
+      },
+      "getTaskId(address,address,bytes4,bool,address,bytes32)": {
+        "params": {
+          "_execAddress": "Address of the contract to be executed by Gelato",
+          "_feeToken": "FeeToken to use, address 0 if task treasury is used",
+          "_resolverHash": "hash of resolver address and data",
+          "_selector": "Function on the _execAddress which should be executed",
+          "_taskCreator": "Address of the task creator",
+          "_useTaskTreasuryFunds": "If msg.sender's balance on TaskTreasury should pay for the tx"
+        }
+      },
+      "getTaskIdsByUser(address)": {
+        "params": {
+          "_taskCreator": "Address who created the task"
+        }
+      }
+    },
+    "version": 1
+  },
+  "userdoc": {
+    "kind": "user",
+    "methods": {
+      "cancelTask(bytes32)": {
+        "notice": "Cancel a task so that Gelato can no longer execute it"
+      },
+      "createTask(address,bytes4,address,bytes)": {
+        "notice": "Create a task that tells Gelato to monitor and execute transactions on specific contracts"
+      },
+      "createTaskNoPrepayment(address,bytes4,address,bytes,address)": {
+        "notice": "Create a task that tells Gelato to monitor and execute transactions on specific contracts"
+      },
+      "createTimedTask(uint128,uint128,address,bytes4,address,bytes,address,bool)": {
+        "notice": "Create a timed task that executes every so often based on the inputted interval"
+      },
+      "exec(uint256,address,address,bool,bool,bytes32,address,bytes)": {
+        "notice": "Execution API called by Gelato"
+      },
+      "getFeeDetails()": {
+        "notice": "Helper func to query fee and feeToken"
+      },
+      "getResolverHash(address,bytes)": {
+        "notice": "Helper func to query the resolverHash"
+      },
+      "getSelector(string)": {
+        "notice": "Helper func to query the _selector of a function you want to automate"
+      },
+      "getTaskId(address,address,bytes4,bool,address,bytes32)": {
+        "notice": "Returns TaskId of a task Creator"
+      },
+      "getTaskIdsByUser(address)": {
+        "notice": "Helper func to query all open tasks by a task creator"
+      }
+    },
+    "notice": "Ops enables everyone to communicate to Gelato Bots to monitor and execute certain transactionsResolverAddresses determine when Gelato should execute and provides bots with the payload they should use to executeExecAddress determine the actual contracts to execute a function on",
+    "version": 1
+  },
+  "storageLayout": {
+    "storage": [
+      {
+        "astId": 1883,
+        "contract": "contracts/Ops.sol:Ops",
+        "label": "taskCreator",
+        "offset": 0,
+        "slot": "0",
+        "type": "t_mapping(t_bytes32,t_address)"
+      },
+      {
+        "astId": 1887,
+        "contract": "contracts/Ops.sol:Ops",
+        "label": "execAddresses",
+        "offset": 0,
+        "slot": "1",
+        "type": "t_mapping(t_bytes32,t_address)"
+      },
+      {
+        "astId": 1892,
+        "contract": "contracts/Ops.sol:Ops",
+        "label": "_createdTasks",
+        "offset": 0,
+        "slot": "2",
+        "type": "t_mapping(t_address,t_struct(Bytes32Set)1433_storage)"
+      },
+      {
+        "astId": 1897,
+        "contract": "contracts/Ops.sol:Ops",
+        "label": "fee",
+        "offset": 0,
+        "slot": "3",
+        "type": "t_uint256"
+      },
+      {
+        "astId": 1899,
+        "contract": "contracts/Ops.sol:Ops",
+        "label": "feeToken",
+        "offset": 0,
+        "slot": "4",
+        "type": "t_address"
+      },
+      {
+        "astId": 1904,
+        "contract": "contracts/Ops.sol:Ops",
+        "label": "timedTask",
+        "offset": 0,
+        "slot": "5",
+        "type": "t_mapping(t_bytes32,t_struct(Time)1876_storage)"
+      }
+    ],
+    "types": {
+      "t_address": {
+        "encoding": "inplace",
+        "label": "address",
+        "numberOfBytes": "20"
+      },
+      "t_array(t_bytes32)dyn_storage": {
+        "base": "t_bytes32",
+        "encoding": "dynamic_array",
+        "label": "bytes32[]",
+        "numberOfBytes": "32"
+      },
+      "t_bytes32": {
+        "encoding": "inplace",
+        "label": "bytes32",
+        "numberOfBytes": "32"
+      },
+      "t_mapping(t_address,t_struct(Bytes32Set)1433_storage)": {
+        "encoding": "mapping",
+        "key": "t_address",
+        "label": "mapping(address => struct EnumerableSet.Bytes32Set)",
+        "numberOfBytes": "32",
+        "value": "t_struct(Bytes32Set)1433_storage"
+      },
+      "t_mapping(t_bytes32,t_address)": {
+        "encoding": "mapping",
+        "key": "t_bytes32",
+        "label": "mapping(bytes32 => address)",
+        "numberOfBytes": "32",
+        "value": "t_address"
+      },
+      "t_mapping(t_bytes32,t_struct(Time)1876_storage)": {
+        "encoding": "mapping",
+        "key": "t_bytes32",
+        "label": "mapping(bytes32 => struct Ops.Time)",
+        "numberOfBytes": "32",
+        "value": "t_struct(Time)1876_storage"
+      },
+      "t_mapping(t_bytes32,t_uint256)": {
+        "encoding": "mapping",
+        "key": "t_bytes32",
+        "label": "mapping(bytes32 => uint256)",
+        "numberOfBytes": "32",
+        "value": "t_uint256"
+      },
+      "t_struct(Bytes32Set)1433_storage": {
+        "encoding": "inplace",
+        "label": "struct EnumerableSet.Bytes32Set",
+        "members": [
+          {
+            "astId": 1432,
+            "contract": "contracts/Ops.sol:Ops",
+            "label": "_inner",
+            "offset": 0,
+            "slot": "0",
+            "type": "t_struct(Set)1239_storage"
+          }
+        ],
+        "numberOfBytes": "64"
+      },
+      "t_struct(Set)1239_storage": {
+        "encoding": "inplace",
+        "label": "struct EnumerableSet.Set",
+        "members": [
+          {
+            "astId": 1234,
+            "contract": "contracts/Ops.sol:Ops",
+            "label": "_values",
+            "offset": 0,
+            "slot": "0",
+            "type": "t_array(t_bytes32)dyn_storage"
+          },
+          {
+            "astId": 1238,
+            "contract": "contracts/Ops.sol:Ops",
+            "label": "_indexes",
+            "offset": 0,
+            "slot": "1",
+            "type": "t_mapping(t_bytes32,t_uint256)"
+          }
+        ],
+        "numberOfBytes": "64"
+      },
+      "t_struct(Time)1876_storage": {
+        "encoding": "inplace",
+        "label": "struct Ops.Time",
+        "members": [
+          {
+            "astId": 1873,
+            "contract": "contracts/Ops.sol:Ops",
+            "label": "nextExec",
+            "offset": 0,
+            "slot": "0",
+            "type": "t_uint128"
+          },
+          {
+            "astId": 1875,
+            "contract": "contracts/Ops.sol:Ops",
+            "label": "interval",
+            "offset": 16,
+            "slot": "0",
+            "type": "t_uint128"
+          }
+        ],
+        "numberOfBytes": "32"
+      },
+      "t_uint128": {
+        "encoding": "inplace",
+        "label": "uint128",
+        "numberOfBytes": "16"
+      },
+      "t_uint256": {
+        "encoding": "inplace",
+        "label": "uint256",
+        "numberOfBytes": "32"
+      }
+    }
+  }
+}
