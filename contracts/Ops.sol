@@ -68,7 +68,13 @@ contract Ops is Gelatofied, Proxied, OpsStorage, IOps {
 
     ///@inheritdoc IOps
     function cancelTask(bytes32 _taskId) external {
-        _cancelTask(msg.sender, _taskId);
+        address _taskCreator = LibTaskModule.preCancelTask(
+            _taskId,
+            msg.sender,
+            taskModuleAddresses
+        );
+
+        _cancelTask(_taskCreator, _taskId);
     }
 
     ///@inheritdoc IOps
@@ -178,7 +184,6 @@ contract Ops is Gelatofied, Proxied, OpsStorage, IOps {
         );
 
         _createdTasks[_taskCreator].remove(_taskId);
-        delete timedTask[_taskId];
 
         emit LibEvents.TaskCancelled(_taskId, _taskCreator);
     }

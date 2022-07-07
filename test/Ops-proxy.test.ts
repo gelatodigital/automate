@@ -9,6 +9,7 @@ import {
   OpsProxy,
   OpsProxyFactory,
   ProxyModule,
+  TimeModule,
   EIP173ProxyWithCustomReceive,
 } from "../typechain";
 import { getTaskId, Module, ModuleData } from "./utils";
@@ -36,6 +37,7 @@ describe("Ops Proxy module test", function () {
   let treasury: TaskTreasuryUpgradable;
   let counter: CounterWithWhitelist;
   let proxyModule: ProxyModule;
+  let timeModule: TimeModule;
 
   let taskCreator: string;
   let execAddress: string;
@@ -58,6 +60,7 @@ describe("Ops Proxy module test", function () {
 
     ops = await ethers.getContract("Ops");
     proxyModule = await ethers.getContract("ProxyModule");
+    timeModule = await ethers.getContract("TimeModule");
     counter = <CounterWithWhitelist>await counterFactory.deploy();
     opsProxyFactory = await ethers.getContract("OpsProxyFactory");
     opsProxyImplementation = await ethers.getContract("OpsProxy");
@@ -74,7 +77,10 @@ describe("Ops Proxy module test", function () {
 
     // set-up
     await treasury.updateWhitelistedService(ops.address, true);
-    await ops.setModule([Module.PROXY], [proxyModule.address]);
+    await ops.setModule(
+      [Module.TIME, Module.PROXY],
+      [timeModule.address, proxyModule.address]
+    );
 
     await treasury
       .connect(user)
@@ -190,6 +196,27 @@ describe("Ops Proxy module test", function () {
     });
 
     expect(await ethers.provider.getBalance(proxyAddress)).to.be.eql(value);
+  });
+
+  it("cancelTask - with proxy, eoa is owner of task", async () => {
+    const [proxyAddress] = await opsProxyFactory.getProxyOf(userAddress);
+    opsProxy = await ethers.getContractAt("OpsProxy", proxyAddress);
+
+    const taskIds = await ops.getTaskIdsByUser(userAddress);
+
+    const cancelTaskData = ops.interface.encodeFunctionData("cancelTask", [
+      taskIds[0],
+    ]);
+
+    const executeCallData = opsProxy.interface.encodeFunctionData(
+      "executeCall",
+      [ops.address, cancelTaskData, 0]
+    );
+
+    await user.sendTransaction({ to: opsProxy.address, data: executeCallData });
+
+    const taskIdsAfter = await ops.getTaskIdsByUser(userAddress);
+    expect(taskIdsAfter).to.not.include(taskIds[0]);
   });
 
   it("exec - no whitelist", async () => {

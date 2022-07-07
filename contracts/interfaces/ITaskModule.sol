@@ -11,8 +11,8 @@ interface ITaskModule {
      * @param taskCreator The address which created the task.
      * @param execAddress Address of contract that should be called.
      *
-     * @return address Overriden or original taskCreator
-     * @return address Overriden or original execAddress
+     * @return address Overriden or original taskCreator.
+     * @return address Overriden or original execAddress.
      */
     function preCreateTask(address taskCreator, address execAddress)
         external
@@ -36,6 +36,19 @@ interface ITaskModule {
     ) external;
 
     /**
+     * @notice Called before taskId is removed from _createdTasks[].
+     * @dev Modules can override taskCreator.
+     *
+     * @param taskId Unique hash of the task created.
+     * @param taskCreator The address which created the task.
+     *
+     * @return address Overriden or original taskCreator.
+     */
+    function preCancelTask(bytes32 taskId, address taskCreator)
+        external
+        returns (address);
+
+    /**
      * @notice Called during `exec` and before execAddress is being called.
      *
      * @param taskId Unique hash of the task created.
@@ -43,8 +56,8 @@ interface ITaskModule {
      * @param execAddress Address of contract that should be called.
      * @param execData Execution data to be called with / function selector if execution data is yet to be determined.
      *
-     * @return address Overriden or original execution address
-     * @return bytes Overriden or original execution data
+     * @return address Overriden or original execution address.
+     * @return bytes Overriden or original execution data.
      */
     function preExecTask(
         bytes32 taskId,

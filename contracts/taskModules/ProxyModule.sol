@@ -90,6 +90,25 @@ contract ProxyModule is TaskModuleBase {
         }
     }
 
+    function preCancelTask(bytes32, address _taskCreator)
+        external
+        view
+        override
+        returns (address)
+    {
+        bool isTaskCreatorProxy = opsProxyFactory.isProxy(_taskCreator);
+
+        if (isTaskCreatorProxy) {
+            address ownerOfTaskCreator = opsProxyFactory.getOwnerOf(
+                _taskCreator
+            );
+
+            return ownerOfTaskCreator;
+        }
+
+        return _taskCreator;
+    }
+
     function _deployIfNoProxy(address _taskCreator) private {
         bool isTaskCreatorProxy = opsProxyFactory.isProxy(_taskCreator);
 

@@ -14,7 +14,7 @@ library LibTaskModule {
     using LibTaskModuleConfig for LibDataTypes.Module;
 
     /**
-     * @notice Call task modules before generating taskId.
+     * @notice Delegate calls task modules before generating taskId.
      *
      * @param _execAddress Address of contract that will be called by Gelato.
      * @param _taskCreator The address which created the task.
@@ -99,6 +99,46 @@ library LibTaskModule {
                 "Ops.onCreateTask: "
             );
         }
+    }
+
+    /**
+     * @notice Delegate calls task modules before removing task.
+     *
+     * @param _taskId Unique hash of the task. {See LibTaskId-getTaskId}
+     * @param _taskCreator The address which created the task.
+     * @param taskModuleAddresses The storage reference to the mapping of modules to their address.
+     */
+    function preCancelTask(
+        bytes32 _taskId,
+        address _taskCreator,
+        mapping(LibDataTypes.Module => address) storage taskModuleAddresses
+    ) internal returns (address) {
+        uint256 length = uint256(type(LibDataTypes.Module).max);
+
+        for (uint256 i; i <= length; i++) {
+            LibDataTypes.Module module = LibDataTypes.Module(i);
+
+            if (!module.requirePreCancel()) continue;
+
+            address moduleAddress = taskModuleAddresses[module];
+            _moduleInitialised(moduleAddress);
+
+            bytes memory delegatecallData = abi.encodeWithSelector(
+                ITaskModule.preCancelTask.selector,
+                _taskId,
+                _taskCreator
+            );
+
+            (, bytes memory returnData) = _delegateCall(
+                moduleAddress,
+                delegatecallData,
+                "Ops.preCreateTask: "
+            );
+
+            (_taskCreator) = abi.decode(returnData, (address));
+        }
+
+        return _taskCreator;
     }
 
     /**

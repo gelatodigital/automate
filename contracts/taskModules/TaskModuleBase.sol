@@ -26,6 +26,14 @@ abstract contract TaskModuleBase is OpsStorage, ITaskModule {
     ) external virtual override {}
 
     ///@inheritdoc ITaskModule
+    function preCancelTask(bytes32, address)
+        external
+        virtual
+        override
+        returns (address)
+    {}
+
+    ///@inheritdoc ITaskModule
     function preExecTask(
         bytes32,
         address,

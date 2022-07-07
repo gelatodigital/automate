@@ -18,6 +18,19 @@ library LibTaskModuleConfig {
         return false;
     }
 
+    function requirePreCancel(LibDataTypes.Module _module)
+        internal
+        pure
+        returns (bool)
+    {
+        if (
+            _module == LibDataTypes.Module.TIME ||
+            _module == LibDataTypes.Module.PROXY
+        ) return true;
+
+        return false;
+    }
+
     function requireOnCreate(LibDataTypes.Module _module)
         internal
         pure
