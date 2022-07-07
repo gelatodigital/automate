@@ -20,14 +20,6 @@ interface IOpsProxyFactory {
     );
 
     /**
-     * @notice Emitted when OpsProxy implementation is updated
-     *
-     * @param oldImplementation Previous implementation of OpsProxy
-     * @param newImplementation Current implementation of OpsProxy
-     */
-    event BeaconUpdated(address oldImplementation, address newImplementation);
-
-    /**
      * @notice Deploys OpsProxy for the msg.sender.
      *
      * @return proxy Address of deployed proxy.
@@ -42,13 +34,6 @@ interface IOpsProxyFactory {
      * @return proxy Address of deployed proxy.
      */
     function deployFor(address owner) external returns (address payable proxy);
-
-    /**
-     * @notice Update OpsProxy implementation
-     *
-     * @param implementation New OpsProxy implementation to be updated to.
-     */
-    function updateBeaconImplementation(address implementation) external;
 
     /**
      * @notice Determines the OpsProxy address when it is not deployed.

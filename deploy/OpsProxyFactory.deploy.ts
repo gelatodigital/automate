@@ -22,14 +22,8 @@ const func: DeployFunction = async (hre: HardhatRuntimeEnvironment) => {
     proxy: {
       proxyContract: "EIP173Proxy",
       owner: deployer,
-      execute: {
-        init: {
-          methodName: "initialize",
-          args: [OPSPROXY],
-        },
-      },
     },
-    args: [OPS],
+    args: [OPS, OPSPROXY],
   });
 };
 
