@@ -105,7 +105,7 @@ describe("Ops Time module test", function () {
 
   it("time not elapsed", async () => {
     await expect(execute()).to.be.revertedWith(
-      "Ops.preExecTask: TimeModule: Too early"
+      "Ops.preExecCall: TimeModule: Too early"
     );
   });
 
@@ -121,7 +121,7 @@ describe("Ops Time module test", function () {
     // executable in Counter but not in Time module
     await fastForwardTime(3 * 60);
     await expect(execute()).to.be.revertedWith(
-      "Ops.preExecTask: TimeModule: Too early"
+      "Ops.preExecCall: TimeModule: Too early"
     );
   });
 
@@ -137,7 +137,7 @@ describe("Ops Time module test", function () {
     // executable in Counter but not in Time module
     await fastForwardTime(3 * 60);
     await expect(execute()).to.be.revertedWith(
-      "Ops.preExecTask: TimeModule: Too early"
+      "Ops.preExecCall: TimeModule: Too early"
     );
 
     const time = await ops.timedTask(taskId);

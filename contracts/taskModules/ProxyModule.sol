@@ -32,29 +32,6 @@ contract ProxyModule is TaskModuleBase {
 
     /**
      * @inheritdoc TaskModuleBase
-     * @dev _execData is encoded with proxy's `executeCall` function
-     * unless _execAddress is OpsProxy which assumes that _execData is encoded
-     * with `executeCall` or `batchExecuteCall`.
-     */
-    function preExecTask(
-        bytes32,
-        address _taskCreator,
-        address _execAddress,
-        bytes calldata _execData
-    ) external view override returns (address, bytes memory execData) {
-        (address proxy, ) = opsProxyFactory.getProxyOf(_taskCreator);
-
-        execData = _execAddress == proxy
-            ? _execData
-            : _encodeWithOpsProxy(_execAddress, _execData);
-
-        _execAddress = proxy;
-
-        return (_execAddress, execData);
-    }
-
-    /**
-     * @inheritdoc TaskModuleBase
      * @dev _taskCreator cannot create task to other user's proxy
      */
     function preCreateTask(address _taskCreator, address _execAddress)
@@ -107,6 +84,29 @@ contract ProxyModule is TaskModuleBase {
         }
 
         return _taskCreator;
+    }
+
+    /**
+     * @inheritdoc TaskModuleBase
+     * @dev _execData is encoded with proxy's `executeCall` function
+     * unless _execAddress is OpsProxy which assumes that _execData is encoded
+     * with `executeCall` or `batchExecuteCall`.
+     */
+    function preExecCall(
+        bytes32,
+        address _taskCreator,
+        address _execAddress,
+        bytes calldata _execData
+    ) external view override returns (address, bytes memory execData) {
+        (address proxy, ) = opsProxyFactory.getProxyOf(_taskCreator);
+
+        execData = _execAddress == proxy
+            ? _execData
+            : _encodeWithOpsProxy(_execAddress, _execData);
+
+        _execAddress = proxy;
+
+        return (_execAddress, execData);
     }
 
     function _deployIfNoProxy(address _taskCreator) private {

@@ -49,7 +49,7 @@ interface ITaskModule {
         returns (address);
 
     /**
-     * @notice Called during `exec` and before execAddress is being called.
+     * @notice Called during `exec` and before execAddress is called.
      *
      * @param taskId Unique hash of the task created.
      * @param taskCreator The address which created the task.
@@ -59,7 +59,7 @@ interface ITaskModule {
      * @return address Overriden or original execution address.
      * @return bytes Overriden or original execution data.
      */
-    function preExecTask(
+    function preExecCall(
         bytes32 taskId,
         address taskCreator,
         address execAddress,
@@ -74,7 +74,7 @@ interface ITaskModule {
      * @param execAddress Address of contract that should be called.
      * @param execData Execution data to be called with / function selector if execution data is yet to be determined.
      */
-    function postExecTask(
+    function postExecCall(
         bytes32 taskId,
         address taskCreator,
         address execAddress,

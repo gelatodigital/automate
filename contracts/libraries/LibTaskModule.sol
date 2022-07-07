@@ -166,7 +166,7 @@ library LibTaskModule {
             taskModuleAddresses
         );
 
-        (_execAddress, _execData) = _preExecTask(
+        (_execAddress, _execData) = _preExecCall(
             _taskId,
             _taskCreator,
             _execAddress,
@@ -183,7 +183,7 @@ library LibTaskModule {
             "Ops.exec: "
         );
 
-        _postExecTask(
+        _postExecCall(
             _taskId,
             _taskCreator,
             _execAddress,
@@ -193,7 +193,7 @@ library LibTaskModule {
         );
     }
 
-    function _preExecTask(
+    function _preExecCall(
         bytes32 _taskId,
         address _taskCreator,
         address _execAddress,
@@ -207,7 +207,7 @@ library LibTaskModule {
             if (!_modules[i].requirePreExec()) continue;
 
             bytes memory delegatecallData = abi.encodeWithSelector(
-                ITaskModule.preExecTask.selector,
+                ITaskModule.preExecCall.selector,
                 _taskId,
                 _taskCreator,
                 _execAddress,
@@ -217,7 +217,7 @@ library LibTaskModule {
             (, bytes memory returnData) = _delegateCall(
                 _moduleAddresses[i],
                 delegatecallData,
-                "Ops.preExecTask: "
+                "Ops.preExecCall: "
             );
 
             (_execAddress, _execData) = abi.decode(
@@ -228,7 +228,7 @@ library LibTaskModule {
         return (_execAddress, _execData);
     }
 
-    function _postExecTask(
+    function _postExecCall(
         bytes32 _taskId,
         address _taskCreator,
         address _execAddress,
@@ -242,7 +242,7 @@ library LibTaskModule {
             if (!_modules[i].requirePostExec()) continue;
 
             bytes memory delegatecallData = abi.encodeWithSelector(
-                ITaskModule.postExecTask.selector,
+                ITaskModule.postExecCall.selector,
                 _taskId,
                 _taskCreator,
                 _execAddress,
@@ -252,7 +252,7 @@ library LibTaskModule {
             _delegateCall(
                 _moduleAddresses[i],
                 delegatecallData,
-                "Ops.postExecTask: "
+                "Ops.postExecCall: "
             );
         }
     }

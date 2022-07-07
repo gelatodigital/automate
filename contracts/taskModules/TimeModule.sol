@@ -43,7 +43,7 @@ contract TimeModule is TaskModuleBase {
      * @dev Time is updated at preExec because if
      * SingleExec is used concurrently, it will delete timedTask.
      */
-    function preExecTask(
+    function preExecCall(
         bytes32 _taskId,
         address,
         address _execAddress,

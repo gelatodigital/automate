@@ -34,7 +34,7 @@ abstract contract TaskModuleBase is OpsStorage, ITaskModule {
     {}
 
     ///@inheritdoc ITaskModule
-    function preExecTask(
+    function preExecCall(
         bytes32,
         address,
         address _execAddress,
@@ -44,7 +44,7 @@ abstract contract TaskModuleBase is OpsStorage, ITaskModule {
     }
 
     ///@inheritdoc ITaskModule
-    function postExecTask(
+    function postExecCall(
         bytes32 taskId,
         address taskCreator,
         address execAddress,
