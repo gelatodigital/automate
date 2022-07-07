@@ -19,6 +19,14 @@ contract OpsProxy is Proxied, IOpsProxy {
             "OpsProxy: Not authorised"
         );
 
+        if (msg.sender == ops) {
+            address taskCreator = _getTaskCreator();
+
+            require(
+                taskCreator == owner,
+                "OpsProxy: Only tasks created by owner"
+            );
+        }
         _;
     }
 
@@ -72,5 +80,11 @@ contract OpsProxy is Proxied, IOpsProxy {
         );
 
         emit ExecuteCall(_target, _data, _value, returnData);
+    }
+
+    function _getTaskCreator() private pure returns (address taskCreator) {
+        assembly {
+            taskCreator := shr(96, calldataload(sub(calldatasize(), 20)))
+        }
     }
 }
