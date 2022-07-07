@@ -3,7 +3,13 @@ import { Signer } from "@ethersproject/abstract-signer";
 import { expect } from "chai";
 import hre = require("hardhat");
 const { ethers, deployments } = hre;
-import { Ops, TaskTreasuryUpgradable, Counter, TimeModule } from "../typechain";
+import {
+  Ops,
+  TaskTreasuryUpgradable,
+  Counter,
+  ProxyModule,
+  TimeModule,
+} from "../typechain";
 import {
   encodeTimeArgs,
   fastForwardTime,
@@ -27,6 +33,7 @@ describe("Ops Time module test", function () {
   let taskTreasury: TaskTreasuryUpgradable;
   let counter: Counter;
   let timeModule: TimeModule;
+  let proxyModule: ProxyModule;
 
   let user: Signer;
   let userAddress: string;
@@ -48,10 +55,14 @@ describe("Ops Time module test", function () {
     taskTreasury = await ethers.getContract("TaskTreasuryUpgradable");
     counter = await ethers.getContract("Counter");
     timeModule = await ethers.getContract("TimeModule");
+    proxyModule = await ethers.getContract("ProxyModule");
 
     // set-up
     await taskTreasury.updateWhitelistedService(ops.address, true);
-    await ops.setModule([Module.TIME], [timeModule.address]);
+    await ops.setModule(
+      [Module.TIME, Module.PROXY],
+      [timeModule.address, proxyModule.address]
+    );
 
     const depositAmount = ethers.utils.parseEther("1");
     await taskTreasury

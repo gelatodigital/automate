@@ -49,8 +49,16 @@ contract Ops is Gelatofied, Proxied, OpsStorage, IOps {
         LibDataTypes.ModuleData calldata _moduleData,
         address _feeToken
     ) external override returns (bytes32 taskId) {
-        taskId = _createTask(
+        address taskCreator;
+
+        (taskCreator, _execAddress) = LibTaskModule.preCreateTask(
             msg.sender,
+            _execAddress,
+            taskModuleAddresses
+        );
+
+        taskId = _createTask(
+            taskCreator,
             _execAddress,
             _execDataOrSelector,
             _moduleData,

@@ -5,6 +5,20 @@ pragma solidity ^0.8.12;
 // solhint-disable max-line-length
 interface ITaskModule {
     /**
+     * @notice Called before generating taskId.
+     * @dev Modules can override execAddress or taskCreator. {See ProxyModule-preCreateTask}
+     *
+     * @param taskCreator The address which created the task.
+     * @param execAddress Address of contract that should be called.
+     *
+     * @return address Overriden or original taskCreator
+     * @return address Overriden or original execAddress
+     */
+    function preCreateTask(address taskCreator, address execAddress)
+        external
+        returns (address, address);
+
+    /**
      * @notice Initiates task module whenever `createTask` is being called.
      *
      * @param taskId Unique hash of the task created.

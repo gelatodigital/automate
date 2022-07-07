@@ -100,7 +100,36 @@ describe("Ops Proxy module test", function () {
     expect(taskIds).to.include(taskId);
   });
 
-  it("proxy - deployed", async () => {
+  it("create task - with proxy, eoa should own task", async () => {
+    const [proxyAddress] = await opsProxyFactory.getProxyOf(userAddress);
+    opsProxy = await ethers.getContractAt("OpsProxy", proxyAddress);
+    moduleData = { ...moduleData, args: ["0x01"] };
+
+    const createTaskData = ops.interface.encodeFunctionData("createTask", [
+      execAddress,
+      execData,
+      moduleData,
+      ZERO_ADD,
+    ]);
+
+    const executeCallData = opsProxy.interface.encodeFunctionData(
+      "executeCall",
+      [ops.address, createTaskData, 0]
+    );
+
+    await user.sendTransaction({
+      to: opsProxy.address,
+      data: executeCallData,
+    });
+
+    const taskIds = await ops.getTaskIdsByUser(userAddress);
+
+    computeTaskId();
+
+    expect(taskIds).to.include(taskId);
+  });
+
+  it("proxy deployed", async () => {
     const determinedProxyAddress = await opsProxyFactory.determineProxyAddress(
       userAddress
     );
@@ -303,15 +332,25 @@ describe("Ops Proxy module test", function () {
     moduleData = { modules: [], args: [] };
     taskCreator = user2Address;
 
-    await createTask(user2);
+    await expect(createTask(user2)).to.be.revertedWith(
+      "Ops.preCreateTask: ProxyModule: Only owner of proxy"
+    );
+  });
 
-    computeTaskId();
+  it("exec - with proxy module initialised, created by non proxy owner", async () => {
+    execAddress = opsProxy.address;
+    execSelector = opsProxy.interface.getSighash("executeCall");
+    const proxyExecData = opsProxy.interface.encodeFunctionData("executeCall", [
+      counter.address,
+      execData,
+      0,
+    ]);
+    execData = proxyExecData;
+    moduleData = { modules: [Module.PROXY], args: ["0x"] };
+    taskCreator = user2Address;
 
-    const taskIds = await ops.getTaskIdsByUser(user2Address);
-    expect(taskIds).to.include(taskId);
-
-    await expect(execute()).to.be.revertedWith(
-      "Ops.exec: OpsProxy: Only tasks created by owner"
+    await expect(createTask(user2)).to.be.revertedWith(
+      "Ops.preCreateTask: ProxyModule: Only owner of proxy"
     );
   });
 

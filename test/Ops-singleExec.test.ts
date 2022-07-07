@@ -7,6 +7,7 @@ import {
   Ops,
   Counter,
   TaskTreasuryUpgradable,
+  ProxyModule,
   SingleExecModule,
 } from "../typechain";
 
@@ -20,6 +21,7 @@ describe("Ops SingleExec module test", function () {
   let counter: Counter;
   let taskTreasury: TaskTreasuryUpgradable;
   let singleExecModule: SingleExecModule;
+  let proxyModule: ProxyModule;
 
   let user: Signer;
   let userAddress: string;
@@ -41,10 +43,14 @@ describe("Ops SingleExec module test", function () {
     taskTreasury = await ethers.getContract("TaskTreasuryUpgradable");
     counter = await ethers.getContract("Counter");
     singleExecModule = await ethers.getContract("SingleExecModule");
+    proxyModule = await ethers.getContract("ProxyModule");
 
     // set-up
     await taskTreasury.updateWhitelistedService(ops.address, true);
-    await ops.setModule([Module.SINGLE_EXEC], [singleExecModule.address]);
+    await ops.setModule(
+      [Module.SINGLE_EXEC, Module.PROXY],
+      [singleExecModule.address, proxyModule.address]
+    );
 
     await hre.network.provider.request({
       method: "hardhat_impersonateAccount",

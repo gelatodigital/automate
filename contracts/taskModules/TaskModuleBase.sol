@@ -9,6 +9,14 @@ import {ITaskModule} from "../interfaces/ITaskModule.sol";
 // solhint-disable no-empty-blocks
 abstract contract TaskModuleBase is OpsStorage, ITaskModule {
     ///@inheritdoc ITaskModule
+    function preCreateTask(address, address)
+        external
+        virtual
+        override
+        returns (address, address)
+    {}
+
+    ///@inheritdoc ITaskModule
     function onCreateTask(
         bytes32,
         address,

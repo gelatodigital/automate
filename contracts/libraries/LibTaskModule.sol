@@ -4,12 +4,57 @@ pragma solidity ^0.8.12;
 
 import {_call, _delegateCall} from "../functions/FExec.sol";
 import {LibDataTypes} from "./LibDataTypes.sol";
+import {LibTaskModuleConfig} from "./LibTaskModuleConfig.sol";
 import {ITaskModule} from "../interfaces/ITaskModule.sol";
 
 /**
  * @notice Library to call task modules on task creation and execution.
  */
 library LibTaskModule {
+    using LibTaskModuleConfig for LibDataTypes.Module;
+
+    /**
+     * @notice Call task modules before generating taskId.
+     *
+     * @param _execAddress Address of contract that will be called by Gelato.
+     * @param _taskCreator The address which created the task.
+     * @param taskModuleAddresses The storage reference to the mapping of modules to their address.
+     */
+    function preCreateTask(
+        address _taskCreator,
+        address _execAddress,
+        mapping(LibDataTypes.Module => address) storage taskModuleAddresses
+    ) internal returns (address, address) {
+        uint256 length = uint256(type(LibDataTypes.Module).max);
+
+        for (uint256 i; i <= length; i++) {
+            LibDataTypes.Module module = LibDataTypes.Module(i);
+            if (!module.requirePreCreate()) continue;
+
+            address moduleAddress = taskModuleAddresses[module];
+            _moduleInitialised(moduleAddress);
+
+            bytes memory delegatecallData = abi.encodeWithSelector(
+                ITaskModule.preCreateTask.selector,
+                _taskCreator,
+                _execAddress
+            );
+
+            (, bytes memory returnData) = _delegateCall(
+                moduleAddress,
+                delegatecallData,
+                "Ops.preCreateTask: "
+            );
+
+            (_taskCreator, _execAddress) = abi.decode(
+                returnData,
+                (address, address)
+            );
+        }
+
+        return (_taskCreator, _execAddress);
+    }
+
     /**
      * @notice Delegate calls task modules on create task to initialise them.
      *
@@ -34,10 +79,10 @@ library LibTaskModule {
 
         for (uint256 i; i < length; i++) {
             LibDataTypes.Module module = _moduleData.modules[i];
-            if (!_requireOnCreate(module)) continue;
+            if (!module.requireOnCreate()) continue;
 
-            address taskModuleAddress = taskModuleAddresses[module];
-            _moduleInitialised(taskModuleAddress);
+            address moduleAddress = taskModuleAddresses[module];
+            _moduleInitialised(moduleAddress);
 
             bytes memory delegatecallData = abi.encodeWithSelector(
                 ITaskModule.onCreateTask.selector,
@@ -49,7 +94,7 @@ library LibTaskModule {
             );
 
             _delegateCall(
-                taskModuleAddress,
+                moduleAddress,
                 delegatecallData,
                 "Ops.onCreateTask: "
             );
@@ -119,7 +164,7 @@ library LibTaskModule {
         uint256 length = _modules.length;
 
         for (uint256 i; i < length; i++) {
-            if (!_requirePreExec(_modules[i])) continue;
+            if (!_modules[i].requirePreExec()) continue;
 
             bytes memory delegatecallData = abi.encodeWithSelector(
                 ITaskModule.preExecTask.selector,
@@ -154,7 +199,7 @@ library LibTaskModule {
         uint256 length = _moduleAddresses.length;
 
         for (uint256 i; i < length; i++) {
-            if (!_requirePostExec(_modules[i])) continue;
+            if (!_modules[i].requirePostExec()) continue;
 
             bytes memory delegatecallData = abi.encodeWithSelector(
                 ITaskModule.postExecTask.selector,
@@ -186,45 +231,9 @@ library LibTaskModule {
         return moduleAddresses;
     }
 
-    function _requireOnCreate(LibDataTypes.Module _module)
-        private
-        pure
-        returns (bool)
-    {
-        if (
-            _module == LibDataTypes.Module.TIME ||
-            _module == LibDataTypes.Module.PROXY
-        ) return true;
-
-        return false;
-    }
-
-    function _requirePreExec(LibDataTypes.Module _module)
-        private
-        pure
-        returns (bool)
-    {
-        if (
-            _module == LibDataTypes.Module.TIME ||
-            _module == LibDataTypes.Module.PROXY
-        ) return true;
-
-        return false;
-    }
-
-    function _requirePostExec(LibDataTypes.Module _module)
-        private
-        pure
-        returns (bool)
-    {
-        if (_module == LibDataTypes.Module.SINGLE_EXEC) return true;
-
-        return false;
-    }
-
-    function _moduleInitialised(address _taskModuleAddress) private pure {
+    function _moduleInitialised(address _moduleAddress) private pure {
         require(
-            _taskModuleAddress != address(0),
+            _moduleAddress != address(0),
             "Ops._moduleInitialised: Not init"
         );
     }
