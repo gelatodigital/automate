@@ -47,7 +47,8 @@ contract ProxyModule is TaskModuleBase {
                 _execAddress
             );
             require(
-                _taskCreator == ownerOfExecAddress,
+                _taskCreator == ownerOfExecAddress ||
+                    _taskCreator == _execAddress,
                 "ProxyModule: Only owner of proxy"
             );
 
