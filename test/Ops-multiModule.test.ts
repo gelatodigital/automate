@@ -196,7 +196,7 @@ describe("Ops multi module test", function () {
 
   it("exec - time should revert", async () => {
     await expect(execute(true)).to.be.revertedWith(
-      "Ops.preExecTask: TimeModule: Too early"
+      "Ops.preExecCall: TimeModule: Too early"
     );
   });
 

@@ -15,7 +15,7 @@ contract OpsProxy is Proxied, IOpsProxy {
 
     modifier onlyAuth() {
         require(
-            msg.sender == ops || msg.sender == _proxyAdmin(),
+            msg.sender == ops || msg.sender == owner(),
             "OpsProxy: Not authorised"
         );
 
@@ -23,7 +23,7 @@ contract OpsProxy is Proxied, IOpsProxy {
             address taskCreator = _getTaskCreator();
 
             require(
-                taskCreator == _proxyAdmin(),
+                taskCreator == owner(),
                 "OpsProxy: Only tasks created by owner"
             );
         }
@@ -62,7 +62,7 @@ contract OpsProxy is Proxied, IOpsProxy {
         _executeCall(_target, _data, _value);
     }
 
-    function owner() external view returns (address) {
+    function owner() public view returns (address) {
         return _proxyAdmin();
     }
 

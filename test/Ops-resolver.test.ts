@@ -15,6 +15,8 @@ import {
   CounterResolver,
   TaskTreasuryUpgradable,
   ResolverModule,
+  ProxyModule,
+  TimeModule,
 } from "../typechain";
 
 const GELATO = "0x3caca7b48d0573d793d3b0279b5f0029180e83b6";
@@ -28,6 +30,8 @@ describe("Ops Resolver module test", function () {
   let counterResolver: CounterResolver;
   let treasury: TaskTreasuryUpgradable;
   let resolverModule: ResolverModule;
+  let proxyModule: ProxyModule;
+  let timeModule: TimeModule;
 
   let user: Signer;
   let userAddress: string;
@@ -49,10 +53,15 @@ describe("Ops Resolver module test", function () {
     counter = await ethers.getContract("Counter");
     counterResolver = await ethers.getContract("CounterResolver");
     resolverModule = await ethers.getContract("ResolverModule");
+    proxyModule = await ethers.getContract("ProxyModule");
+    timeModule = await ethers.getContract("TimeModule");
 
     // set-up
     await treasury.updateWhitelistedService(ops.address, true);
-    await ops.setModule([Module.RESOLVER], [resolverModule.address]);
+    await ops.setModule(
+      [Module.RESOLVER, Module.TIME, Module.PROXY],
+      [resolverModule.address, timeModule.address, proxyModule.address]
+    );
 
     await hre.network.provider.request({
       method: "hardhat_impersonateAccount",
