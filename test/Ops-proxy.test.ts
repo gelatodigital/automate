@@ -9,6 +9,7 @@ import {
   OpsProxy,
   OpsProxyFactory,
   ProxyModule,
+  EIP173ProxyWithCustomReceive,
 } from "../typechain";
 import { getTaskId, Module, ModuleData } from "./utils";
 
@@ -99,7 +100,7 @@ describe("Ops Proxy module test", function () {
     expect(taskIds).to.include(taskId);
   });
 
-  it("proxy deployed", async () => {
+  it("proxy - deployed", async () => {
     const determinedProxyAddress = await opsProxyFactory.determineProxyAddress(
       userAddress
     );
@@ -117,7 +118,7 @@ describe("Ops Proxy module test", function () {
     expect(await opsProxyFactory.isProxy(proxyAddress)).to.be.true;
   });
 
-  it("proxy properly initialized", async () => {
+  it("proxy - properly initialized", async () => {
     expect(await opsProxyFactory.implementation()).to.be.eql(
       opsProxyImplementation.address
     );
@@ -126,6 +127,40 @@ describe("Ops Proxy module test", function () {
     expect(await opsProxy.ops()).to.be.eql(ops.address);
     expect(await opsProxyImplementation.owner()).to.be.eql(ZERO_ADD);
     expect(await opsProxy.owner()).to.be.eql(userAddress);
+  });
+
+  it("proxy - only owner can update implementation", async () => {
+    const [proxyAddress] = await opsProxyFactory.getProxyOf(userAddress);
+    const opsProxy: EIP173ProxyWithCustomReceive = await ethers.getContractAt(
+      "EIP173ProxyWithCustomReceive",
+      proxyAddress
+    );
+
+    await opsProxy.connect(user).upgradeTo(ETH);
+    const implementationAddress = ethers.utils.hexStripZeros(
+      await ethers.provider.getStorageAt(
+        opsProxy.address,
+        "0x360894a13ba1a3210667c828492db98dca3e2076cc3735a920a3ca505d382bbc"
+      )
+    );
+
+    expect(implementationAddress).to.be.eql(ETH);
+
+    await expect(
+      opsProxy.connect(user2).upgradeTo(ZERO_ADD)
+    ).to.be.revertedWith("NOT_AUTHORIZED");
+  });
+
+  it("receive", async () => {
+    const [proxyAddress] = await opsProxyFactory.getProxyOf(userAddress);
+
+    const value = ethers.utils.parseEther("1");
+    await deployer.sendTransaction({
+      to: proxyAddress,
+      value,
+    });
+
+    expect(await ethers.provider.getBalance(proxyAddress)).to.be.eql(value);
   });
 
   it("exec - no whitelist", async () => {

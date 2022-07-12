@@ -1,22 +1,21 @@
 // SPDX-License-Identifier: UNLICENSED
 pragma solidity ^0.8.12;
 
-import {
-    Initializable
-} from "@openzeppelin/contracts/proxy/utils/Initializable.sol";
+import {Proxied} from "../vendor/proxy/EIP173/Proxied.sol";
 import {GelatoBytes} from "../vendor/gelato/GelatoBytes.sol";
 import {_call} from "../functions/FExec.sol";
 import {IOpsProxy} from "../interfaces/IOpsProxy.sol";
 
-contract OpsProxy is IOpsProxy, Initializable {
+contract OpsProxy is Proxied, IOpsProxy {
     using GelatoBytes for bytes;
 
+    // solhint-disable const-name-snakecase
+    uint256 public constant override version = 1;
     address public immutable override ops;
-    address public override owner;
 
     modifier onlyAuth() {
         require(
-            msg.sender == ops || msg.sender == owner,
+            msg.sender == ops || msg.sender == _proxyAdmin(),
             "OpsProxy: Not authorised"
         );
 
@@ -24,7 +23,7 @@ contract OpsProxy is IOpsProxy, Initializable {
             address taskCreator = _getTaskCreator();
 
             require(
-                taskCreator == owner,
+                taskCreator == _proxyAdmin(),
                 "OpsProxy: Only tasks created by owner"
             );
         }
@@ -37,10 +36,6 @@ contract OpsProxy is IOpsProxy, Initializable {
     }
 
     receive() external payable {}
-
-    function initialize(address _owner) external initializer {
-        owner = _owner;
-    }
 
     ///@inheritdoc IOpsProxy
     function batchExecuteCall(
@@ -55,7 +50,7 @@ contract OpsProxy is IOpsProxy, Initializable {
         );
 
         for (uint256 i; i < length; i++)
-            executeCall(_targets[i], _datas[i], _values[i]);
+            _executeCall(_targets[i], _datas[i], _values[i]);
     }
 
     ///@inheritdoc IOpsProxy
@@ -63,7 +58,19 @@ contract OpsProxy is IOpsProxy, Initializable {
         address _target,
         bytes calldata _data,
         uint256 _value
-    ) public payable override onlyAuth {
+    ) external payable override onlyAuth {
+        _executeCall(_target, _data, _value);
+    }
+
+    function owner() external view returns (address) {
+        return _proxyAdmin();
+    }
+
+    function _executeCall(
+        address _target,
+        bytes calldata _data,
+        uint256 _value
+    ) private {
         (, bytes memory returnData) = _call(
             _target,
             _data,
