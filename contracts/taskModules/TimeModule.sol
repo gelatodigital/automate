@@ -28,12 +28,22 @@ contract TimeModule is TaskModuleBase {
         emit LibEvents.TimerSet(_taskId, nextExec, interval);
     }
 
+    function preCancelTask(bytes32 _taskId, address _taskCreator)
+        external
+        override
+        returns (address)
+    {
+        delete timedTask[_taskId];
+
+        return _taskCreator;
+    }
+
     /**
      * @inheritdoc TaskModuleBase
      * @dev Time is updated at preExec because if
      * SingleExec is used concurrently, it will delete timedTask.
      */
-    function preExecTask(
+    function preExecCall(
         bytes32 _taskId,
         address,
         address _execAddress,

@@ -8,7 +8,7 @@ import {
   TimeModule,
 } from "../typechain";
 
-const main = async () => {
+export const setModules = async () => {
   const [owner] = await ethers.getSigners();
   const ownerAddress = await owner.getAddress();
   console.log("Owner: ", ownerAddress);
@@ -40,4 +40,4 @@ const main = async () => {
   await ops.setModule(modules, moduleAddresses);
 };
 
-main();
+setModules();

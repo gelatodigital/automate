@@ -7,7 +7,9 @@ import {
   Ops,
   Counter,
   TaskTreasuryUpgradable,
+  ProxyModule,
   SingleExecModule,
+  TimeModule,
 } from "../typechain";
 
 const GELATO = "0x3caca7b48d0573d793d3b0279b5f0029180e83b6";
@@ -20,6 +22,8 @@ describe("Ops SingleExec module test", function () {
   let counter: Counter;
   let taskTreasury: TaskTreasuryUpgradable;
   let singleExecModule: SingleExecModule;
+  let proxyModule: ProxyModule;
+  let timeModule: TimeModule;
 
   let user: Signer;
   let userAddress: string;
@@ -41,10 +45,15 @@ describe("Ops SingleExec module test", function () {
     taskTreasury = await ethers.getContract("TaskTreasuryUpgradable");
     counter = await ethers.getContract("Counter");
     singleExecModule = await ethers.getContract("SingleExecModule");
+    proxyModule = await ethers.getContract("ProxyModule");
+    timeModule = await ethers.getContract("TimeModule");
 
     // set-up
     await taskTreasury.updateWhitelistedService(ops.address, true);
-    await ops.setModule([Module.SINGLE_EXEC], [singleExecModule.address]);
+    await ops.setModule(
+      [Module.TIME, Module.SINGLE_EXEC, Module.PROXY],
+      [timeModule.address, singleExecModule.address, proxyModule.address]
+    );
 
     await hre.network.provider.request({
       method: "hardhat_impersonateAccount",

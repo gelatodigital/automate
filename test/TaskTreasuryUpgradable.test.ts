@@ -14,6 +14,7 @@ import {
   TaskTreasuryL2,
   TaskTreasuryUpgradable,
   ResolverModule,
+  ProxyModule,
 } from "../typechain";
 
 import hre = require("hardhat");
@@ -44,6 +45,7 @@ describe("TaskTreasuryUpgradable test", function () {
   let treasury: TaskTreasuryUpgradable;
   let counter: Counter;
   let resolverModule: ResolverModule;
+  let proxyModule: ProxyModule;
   let dai: IERC20;
   let wbtc: IERC20;
 
@@ -64,6 +66,7 @@ describe("TaskTreasuryUpgradable test", function () {
     dai = await ethers.getContractAt("IERC20", DAI);
     wbtc = await ethers.getContractAt("IERC20", WBTC);
     resolverModule = await ethers.getContract("ResolverModule");
+    proxyModule = await ethers.getContract("ProxyModule");
 
     const counterFactory = await ethers.getContractFactory("Counter");
     counter = <Counter>await counterFactory.deploy(ops.address);
@@ -85,7 +88,10 @@ describe("TaskTreasuryUpgradable test", function () {
     await getTokenFromFaucet(WBTC, user2Address, wbtcValue);
 
     // module set-up
-    await ops.setModule([Module.RESOLVER], [resolverModule.address]);
+    await ops.setModule(
+      [Module.RESOLVER, Module.PROXY],
+      [resolverModule.address, proxyModule.address]
+    );
 
     // whitelist
     oldTreasury.connect(deployer).addWhitelistedService(treasury.address);

@@ -11,7 +11,7 @@ contract SingleExecModule is TaskModuleBase {
     using EnumerableSet for EnumerableSet.Bytes32Set;
 
     /// @inheritdoc TaskModuleBase
-    function postExecTask(
+    function postExecCall(
         bytes32 _taskId,
         address _taskCreator,
         address,
