@@ -2,23 +2,18 @@
 pragma solidity ^0.8.12;
 
 import {
-    BeaconProxy
-} from "@openzeppelin/contracts/proxy/beacon/BeaconProxy.sol";
-import {
-    Initializable
-} from "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol";
-import {Proxied} from "../vendor/proxy/EIP173/Proxied.sol";
+    EIP173ProxyWithCustomReceive
+} from "../vendor/proxy/EIP173/EIP173ProxyWithCustomReceive.sol";
 import {OpsProxy} from "./OpsProxy.sol";
-import {IBeacon} from "@openzeppelin/contracts/proxy/beacon/IBeacon.sol";
 import {IOpsProxy} from "../interfaces/IOpsProxy.sol";
 import {IOpsProxyFactory} from "../interfaces/IOpsProxyFactory.sol";
 
 // solhint-disable max-states-count
-contract OpsProxyFactory is IOpsProxyFactory, IBeacon, Proxied, Initializable {
+contract OpsProxyFactory is IOpsProxyFactory {
     // solhint-disable const-name-snakecase
     uint256 public constant override version = 1;
     address public immutable ops;
-    address public override implementation;
+    address public immutable implementation;
 
     ///@dev track the next seed to be used by an EOA.
     mapping(address => bytes32) internal _nextSeeds;
@@ -39,24 +34,9 @@ contract OpsProxyFactory is IOpsProxyFactory, IBeacon, Proxied, Initializable {
         _;
     }
 
-    constructor(address _ops) {
+    constructor(address _ops, address _implementation) {
         ops = _ops;
-    }
-
-    function initialize(address _implementation) external initializer {
         implementation = _implementation;
-    }
-
-    ///@inheritdoc IOpsProxyFactory
-    function updateBeaconImplementation(address _implementation)
-        external
-        override
-        onlyProxyAdmin
-    {
-        address oldImplementation = implementation;
-        implementation = _implementation;
-
-        emit BeaconUpdated(oldImplementation, _implementation);
     }
 
     ///@inheritdoc IOpsProxyFactory
@@ -179,15 +159,10 @@ contract OpsProxyFactory is IOpsProxyFactory, IBeacon, Proxied, Initializable {
     }
 
     function _getBytecode(address _owner) internal view returns (bytes memory) {
-        bytes memory opsProxyInitializeData = abi.encodeWithSelector(
-            IOpsProxy.initialize.selector,
-            _owner
-        );
-
         return
             abi.encodePacked(
-                type(BeaconProxy).creationCode,
-                abi.encode(address(this), opsProxyInitializeData)
+                type(EIP173ProxyWithCustomReceive).creationCode,
+                abi.encode(implementation, _owner, bytes(""))
             );
     }
 }

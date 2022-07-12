@@ -18,13 +18,6 @@ interface IOpsProxy {
     );
 
     /**
-     * @notice Initializes the OpsProxy contract. Called by OpsProxyFactory upon deployment.
-     *
-     * @param owner Address of owner of the proxy.
-     */
-    function initialize(address owner) external;
-
-    /**
      * @notice Multicall to different contracts with different datas.
      *
      * @param targets Addresses of contracts to be called.
@@ -59,4 +52,9 @@ interface IOpsProxy {
      * @return address Owner of the proxy
      */
     function owner() external view returns (address);
+
+    /**
+     * @return uint256 version of OpsProxy.
+     */
+    function version() external view returns (uint256);
 }
