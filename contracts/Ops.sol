@@ -49,8 +49,16 @@ contract Ops is Gelatofied, Proxied, OpsStorage, IOps {
         LibDataTypes.ModuleData calldata _moduleData,
         address _feeToken
     ) external override returns (bytes32 taskId) {
-        taskId = _createTask(
+        address taskCreator;
+
+        (taskCreator, _execAddress) = LibTaskModule.preCreateTask(
             msg.sender,
+            _execAddress,
+            taskModuleAddresses
+        );
+
+        taskId = _createTask(
+            taskCreator,
             _execAddress,
             _execDataOrSelector,
             _moduleData,
@@ -60,7 +68,13 @@ contract Ops is Gelatofied, Proxied, OpsStorage, IOps {
 
     ///@inheritdoc IOps
     function cancelTask(bytes32 _taskId) external {
-        _cancelTask(msg.sender, _taskId);
+        address _taskCreator = LibTaskModule.preCancelTask(
+            _taskId,
+            msg.sender,
+            taskModuleAddresses
+        );
+
+        _cancelTask(_taskCreator, _taskId);
     }
 
     ///@inheritdoc IOps
@@ -170,7 +184,6 @@ contract Ops is Gelatofied, Proxied, OpsStorage, IOps {
         );
 
         _createdTasks[_taskCreator].remove(_taskId);
-        delete timedTask[_taskId];
 
         emit LibEvents.TaskCancelled(_taskId, _taskCreator);
     }
