@@ -2,8 +2,8 @@
 pragma solidity ^0.8.12;
 
 import {
-    EIP173ProxyWithCustomReceive
-} from "../vendor/proxy/EIP173/EIP173ProxyWithCustomReceive.sol";
+    EIP173NonTransferableWithCustomReceive
+} from "../vendor/proxy/EIP173/EIP173NonTransferableWithCustomReceive.sol";
 import {OpsProxy} from "./OpsProxy.sol";
 import {IOpsProxy} from "../interfaces/IOpsProxy.sol";
 import {IOpsProxyFactory} from "../interfaces/IOpsProxyFactory.sol";
@@ -23,6 +23,9 @@ contract OpsProxyFactory is IOpsProxyFactory {
 
     ///@dev track proxy of user
     mapping(address => address) internal _proxyOf;
+
+    ///@dev track owner of proxy
+    mapping(address => address) internal _ownerOf;
 
     modifier onlyOneProxy(address _account) {
         require(_proxyOf[_account] == address(0), "OpsProxyFactory: One proxy");
@@ -78,7 +81,7 @@ contract OpsProxyFactory is IOpsProxyFactory {
     {
         require(isProxy(_proxy), "OpsProxyFactory: Not proxy");
 
-        return IOpsProxy(_proxy).owner();
+        return _ownerOf[_proxy];
     }
 
     ///@inheritdoc IOpsProxyFactory
@@ -97,6 +100,7 @@ contract OpsProxyFactory is IOpsProxyFactory {
 
         _proxies[proxy] = true;
         _proxyOf[owner] = proxy;
+        _ownerOf[proxy] = owner;
 
         unchecked {
             _nextSeeds[owner] = bytes32(uint256(seed) + 1);
@@ -161,7 +165,7 @@ contract OpsProxyFactory is IOpsProxyFactory {
     function _getBytecode(address _owner) internal view returns (bytes memory) {
         return
             abi.encodePacked(
-                type(EIP173ProxyWithCustomReceive).creationCode,
+                type(EIP173NonTransferableWithCustomReceive).creationCode,
                 abi.encode(implementation, _owner, bytes(""))
             );
     }
