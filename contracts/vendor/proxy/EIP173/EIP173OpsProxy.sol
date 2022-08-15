@@ -2,16 +2,24 @@
 pragma solidity ^0.8.12;
 
 import "./Proxy.sol";
+import {IOpsProxyFactory} from "../../../interfaces/IOpsProxyFactory.sol";
 
 interface ERC165 {
     function supportsInterface(bytes4 id) external view returns (bool);
 }
 
 /**
- * @notice Proxy implementing EIP173 for ownership management
- * @dev transferProxyAdmin removed
+ * @notice Proxy implementing EIP173 for ownership management.
+ * @notice This is used for OpsProxy.
+ *
+ * @dev 1. custom receive can be set in implementation.
+ * @dev 2. transferProxyAdmin removed.
+ * @dev 3. implementation can only be set to those whitelisted on OpsProxyFactory.
  */
-contract EIP173NonTransferable is Proxy {
+contract EIP173OpsProxy is Proxy {
+    // ////////////////////////// STATES ///////////////////////////////////////////////////////////////////////
+    IOpsProxyFactory public immutable opsProxyFactory;
+
     // ////////////////////////// EVENTS ///////////////////////////////////////////////////////////////////////
 
     event ProxyAdminTransferred(
@@ -19,13 +27,29 @@ contract EIP173NonTransferable is Proxy {
         address indexed newAdmin
     );
 
+    // /////////////////////// MODIFIERS //////////////////////////////////////////////////////////////////////
+    modifier onlyWhitelistedImplementation(address _implementation) {
+        require(
+            opsProxyFactory.whitelistedImplementations(_implementation),
+            "Implementation not whitelisted"
+        );
+        _;
+    }
+
+    // /////////////////////// FALLBACKS //////////////////////////////////////////////////////////////////////
+    receive() external payable override {
+        _fallback();
+    }
+
     // /////////////////////// CONSTRUCTOR //////////////////////////////////////////////////////////////////////
 
     constructor(
+        address _opsProxyFactory,
         address implementationAddress,
         address adminAddress,
         bytes memory data
     ) payable {
+        opsProxyFactory = IOpsProxyFactory(_opsProxyFactory);
         _setImplementation(implementationAddress, data);
         _setProxyAdmin(adminAddress);
     }
@@ -62,7 +86,11 @@ contract EIP173NonTransferable is Proxy {
         }
     }
 
-    function upgradeTo(address newImplementation) external onlyProxyAdmin {
+    function upgradeTo(address newImplementation)
+        external
+        onlyProxyAdmin
+        onlyWhitelistedImplementation(newImplementation)
+    {
         _setImplementation(newImplementation, "");
     }
 
@@ -70,6 +98,7 @@ contract EIP173NonTransferable is Proxy {
         external
         payable
         onlyProxyAdmin
+        onlyWhitelistedImplementation(newImplementation)
     {
         _setImplementation(newImplementation, data);
     }

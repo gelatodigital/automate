@@ -164,12 +164,28 @@ describe("Ops Proxy module test", function () {
     expect(await opsProxy.owner()).to.be.eql(userAddress);
   });
 
+  it("proxy - cannot upgrade to not whitelisted implementation", async () => {
+    const [proxyAddress] = await opsProxyFactory.getProxyOf(userAddress);
+    const opsProxy: EIP173ProxyWithCustomReceive = await ethers.getContractAt(
+      "EIP173ProxyWithCustomReceive",
+      proxyAddress
+    );
+
+    await expect(opsProxy.connect(user).upgradeTo(ETH)).to.be.revertedWith(
+      "Implementation not whitelisted"
+    );
+  });
+
   it("proxy - only owner can update implementation", async () => {
     const [proxyAddress] = await opsProxyFactory.getProxyOf(userAddress);
     const opsProxy: EIP173ProxyWithCustomReceive = await ethers.getContractAt(
       "EIP173ProxyWithCustomReceive",
       proxyAddress
     );
+
+    await opsProxyFactory
+      .connect(deployer)
+      .updateWhitelistedImplementations(ETH, true);
 
     await opsProxy.connect(user).upgradeTo(ETH);
     const implementationAddress = ethers.utils.hexStripZeros(

@@ -42,8 +42,8 @@ contract ProxyModule is TaskModuleBase {
     {
         address ownerOfExecAddress = opsProxyFactory.ownerOf(_execAddress);
 
-        // creating a task to proxy
         if (ownerOfExecAddress != address(0)) {
+            // creating task to proxy
             require(
                 _taskCreator == ownerOfExecAddress ||
                     _taskCreator == _execAddress,
@@ -52,14 +52,15 @@ contract ProxyModule is TaskModuleBase {
 
             return (ownerOfExecAddress, _execAddress);
         } else {
-            // creating a task to non proxy
             address ownerOfTaskCreator = opsProxyFactory.ownerOf(_taskCreator);
 
             if (ownerOfTaskCreator != address(0)) {
+                // creating task to non proxy, with proxy
                 // give task ownership to proxy owner
                 return (ownerOfTaskCreator, _execAddress);
             }
 
+            // creating task to non proxy, without proxy
             return (_taskCreator, _execAddress);
         }
     }

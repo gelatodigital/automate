@@ -16,6 +16,28 @@ interface IOpsProxyFactory {
     );
 
     /**
+     * @notice Emitted when OpsProxy implementation to be deployed is changed.
+     *
+     * @param oldImplementation Previous OpsProxy implementation.
+     * @param newImplementation Current OpsProxy implementation.
+     */
+    event SetImplementation(
+        address indexed oldImplementation,
+        address indexed newImplementation
+    );
+
+    /**
+     * @notice Emitted when OpsProxy implementation is added or removed from whitelist.
+     *
+     * @param implementation OpsProxy implementation.
+     * @param whitelisted Added or removed from whitelist.
+     */
+    event UpdateWhitelistedImplementation(
+        address indexed implementation,
+        bool indexed whitelisted
+    );
+
+    /**
      * @notice Deploys OpsProxy for the msg.sender.
      *
      * @return proxy Address of deployed proxy.
@@ -30,6 +52,24 @@ interface IOpsProxyFactory {
      * @return proxy Address of deployed proxy.
      */
     function deployFor(address owner) external returns (address payable proxy);
+
+    /**
+     * @notice Sets the OpsProxy implementation that will be deployed by OpsProxyFactory.
+     *
+     * @param newImplementation New implementation to be set.
+     */
+    function setImplementation(address newImplementation) external;
+
+    /**
+     * @notice Add or remove OpsProxy implementation from the whitelist.
+     *
+     * @param implementation OpsProxy implementation.
+     * @param whitelist Added or removed from whitelist.
+     */
+    function updateWhitelistedImplementations(
+        address implementation,
+        bool whitelist
+    ) external;
 
     /**
      * @notice Determines the OpsProxy address when it is not deployed.
@@ -53,7 +93,10 @@ interface IOpsProxyFactory {
     function ownerOf(address proxy) external view returns (address);
 
     /**
-     * @return uint256 version of OpsProxyFactory.
+     * @return bool Whether if implementation is whitelisted.
      */
-    function version() external view returns (uint256);
+    function whitelistedImplementations(address implementation)
+        external
+        view
+        returns (bool);
 }
