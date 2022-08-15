@@ -15,12 +15,6 @@ contract OpsProxyFactory is IOpsProxyFactory {
     address public immutable ops;
     address public immutable implementation;
 
-    ///@dev track the next seed to be used by an EOA.
-    mapping(address => bytes32) internal _nextSeeds;
-
-    ///@dev track deployed proxies
-    mapping(address => bool) internal _proxies;
-
     ///@dev track proxy of user
     mapping(address => address) internal _proxyOf;
 
@@ -33,7 +27,7 @@ contract OpsProxyFactory is IOpsProxyFactory {
     }
 
     modifier notProxy(address _account) {
-        require(!isProxy(_account), "OpsProxyFactory: No proxy");
+        require(_ownerOf[_account] == address(0), "OpsProxyFactory: No proxy");
         _;
     }
 
@@ -45,16 +39,6 @@ contract OpsProxyFactory is IOpsProxyFactory {
     ///@inheritdoc IOpsProxyFactory
     function deploy() external override returns (address payable proxy) {
         proxy = deployFor(msg.sender);
-    }
-
-    ///@inheritdoc IOpsProxyFactory
-    function getNextSeed(address _account)
-        external
-        view
-        override
-        returns (bytes32)
-    {
-        return _nextSeeds[_account];
     }
 
     ///@inheritdoc IOpsProxyFactory
@@ -73,14 +57,7 @@ contract OpsProxyFactory is IOpsProxyFactory {
     }
 
     ///@inheritdoc IOpsProxyFactory
-    function getOwnerOf(address _proxy)
-        external
-        view
-        override
-        returns (address)
-    {
-        require(isProxy(_proxy), "OpsProxyFactory: Not proxy");
-
+    function ownerOf(address _proxy) external view override returns (address) {
         return _ownerOf[_proxy];
     }
 
@@ -92,21 +69,12 @@ contract OpsProxyFactory is IOpsProxyFactory {
         notProxy(owner)
         returns (address payable proxy)
     {
-        (bytes32 seed, bytes32 salt) = _getSeedAndSalt(owner);
+        proxy = _deploy(bytes32(0), _getBytecode(owner));
 
-        bytes memory bytecode = _getBytecode(owner);
-
-        proxy = _deploy(salt, bytecode);
-
-        _proxies[proxy] = true;
         _proxyOf[owner] = proxy;
         _ownerOf[proxy] = owner;
 
-        unchecked {
-            _nextSeeds[owner] = bytes32(uint256(seed) + 1);
-        }
-
-        emit DeployProxy(msg.sender, owner, seed, salt, address(proxy));
+        emit DeployProxy(msg.sender, owner, address(proxy));
     }
 
     ///@inheritdoc IOpsProxyFactory
@@ -119,25 +87,18 @@ contract OpsProxyFactory is IOpsProxyFactory {
         address proxyAddress = _proxyOf[_account];
         if (proxyAddress != address(0)) return proxyAddress;
 
-        (, bytes32 salt) = _getSeedAndSalt(_account);
-
         bytes memory bytecode = _getBytecode(_account);
 
         bytes32 codeHash = keccak256(
             abi.encodePacked(
                 bytes1(0xff),
                 address(this),
-                salt,
+                bytes32(0),
                 keccak256(bytecode)
             )
         );
 
         return address(uint160(uint256(codeHash)));
-    }
-
-    ///@inheritdoc IOpsProxyFactory
-    function isProxy(address proxy) public view override returns (bool) {
-        return _proxies[proxy];
     }
 
     function _deploy(bytes32 _salt, bytes memory _bytecode)
@@ -150,16 +111,6 @@ contract OpsProxyFactory is IOpsProxyFactory {
             let bytecodeLength := mload(_bytecode)
             proxy := create2(endowment, bytecodeStart, bytecodeLength, _salt)
         }
-    }
-
-    function _getSeedAndSalt(address _account)
-        internal
-        view
-        returns (bytes32 seed, bytes32 salt)
-    {
-        seed = _nextSeeds[_account];
-
-        salt = keccak256(abi.encode(_account, seed));
     }
 
     function _getBytecode(address _owner) internal view returns (bytes memory) {

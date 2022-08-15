@@ -40,12 +40,10 @@ contract ProxyModule is TaskModuleBase {
         override
         returns (address, address)
     {
-        bool isExecAddressProxy = opsProxyFactory.isProxy(_execAddress);
+        address ownerOfExecAddress = opsProxyFactory.ownerOf(_execAddress);
 
-        if (isExecAddressProxy) {
-            address ownerOfExecAddress = opsProxyFactory.getOwnerOf(
-                _execAddress
-            );
+        // creating a task to proxy
+        if (ownerOfExecAddress != address(0)) {
             require(
                 _taskCreator == ownerOfExecAddress ||
                     _taskCreator == _execAddress,
@@ -54,13 +52,11 @@ contract ProxyModule is TaskModuleBase {
 
             return (ownerOfExecAddress, _execAddress);
         } else {
-            bool isTaskCreatorProxy = opsProxyFactory.isProxy(_taskCreator);
+            // creating a task to non proxy
+            address ownerOfTaskCreator = opsProxyFactory.ownerOf(_taskCreator);
 
-            if (isTaskCreatorProxy) {
-                address ownerOfTaskCreator = opsProxyFactory.getOwnerOf(
-                    _taskCreator
-                );
-
+            if (ownerOfTaskCreator != address(0)) {
+                // give task ownership to proxy owner
                 return (ownerOfTaskCreator, _execAddress);
             }
 
@@ -74,13 +70,9 @@ contract ProxyModule is TaskModuleBase {
         override
         returns (address)
     {
-        bool isTaskCreatorProxy = opsProxyFactory.isProxy(_taskCreator);
+        address ownerOfTaskCreator = opsProxyFactory.ownerOf(_taskCreator);
 
-        if (isTaskCreatorProxy) {
-            address ownerOfTaskCreator = opsProxyFactory.getOwnerOf(
-                _taskCreator
-            );
-
+        if (ownerOfTaskCreator != address(0)) {
             return ownerOfTaskCreator;
         }
 
@@ -111,7 +103,8 @@ contract ProxyModule is TaskModuleBase {
     }
 
     function _deployIfNoProxy(address _taskCreator) private {
-        bool isTaskCreatorProxy = opsProxyFactory.isProxy(_taskCreator);
+        bool isTaskCreatorProxy = opsProxyFactory.ownerOf(_taskCreator) !=
+            address(0);
 
         if (!isTaskCreatorProxy) {
             (, bool deployed) = opsProxyFactory.getProxyOf(_taskCreator);
