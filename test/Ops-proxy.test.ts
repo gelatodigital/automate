@@ -150,7 +150,7 @@ describe("Ops Proxy module test", function () {
 
     expect(await opsProxy.ops()).to.be.eql(ops.address);
     expect(await opsProxy.owner()).to.be.eql(userAddress);
-    expect(await opsProxyFactory.isProxy(proxyAddress)).to.be.true;
+    expect(await opsProxyFactory.ownerOf(proxyAddress)).to.not.be.eql(ZERO_ADD);
   });
 
   it("proxy - properly initialized", async () => {

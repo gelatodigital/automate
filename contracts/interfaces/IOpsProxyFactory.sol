@@ -7,16 +7,12 @@ interface IOpsProxyFactory {
      *
      * @param deployer Address which initiated the deployment
      * @param owner The address which the proxy is for.
-     * @param seed Seed used for deployment.
-     * @param salt Salt used for deployment.
      * @param proxy Address of deployed proxy.
      */
     event DeployProxy(
         address indexed deployer,
         address indexed owner,
-        bytes32 seed,
-        bytes32 salt,
-        address proxy
+        address indexed proxy
     );
 
     /**
@@ -46,11 +42,6 @@ interface IOpsProxyFactory {
         returns (address);
 
     /**
-     * @return bytes32 Next seed which will be used for deployment for an address.
-     */
-    function getNextSeed(address account) external view returns (bytes32);
-
-    /**
      * @return address Proxy address owned by account.
      * @return bool Whether if proxy is deployed
      */
@@ -59,12 +50,7 @@ interface IOpsProxyFactory {
     /**
      * @return address Owner of deployed proxy.
      */
-    function getOwnerOf(address proxy) external view returns (address);
-
-    /**
-     * @return bool Whether if a contract is an OpsProxy.
-     */
-    function isProxy(address proxy) external view returns (bool);
+    function ownerOf(address proxy) external view returns (address);
 
     /**
      * @return uint256 version of OpsProxyFactory.
