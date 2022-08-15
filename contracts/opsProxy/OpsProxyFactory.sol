@@ -2,18 +2,19 @@
 pragma solidity ^0.8.12;
 
 import {
-    EIP173NonTransferableWithCustomReceive
-} from "../vendor/proxy/EIP173/EIP173NonTransferableWithCustomReceive.sol";
+    Initializable
+} from "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol";
+import {EIP173OpsProxy} from "../vendor/proxy/EIP173/EIP173OpsProxy.sol";
+import {Proxied} from "../vendor/proxy/EIP173/Proxied.sol";
 import {OpsProxy} from "./OpsProxy.sol";
 import {IOpsProxy} from "../interfaces/IOpsProxy.sol";
 import {IOpsProxyFactory} from "../interfaces/IOpsProxyFactory.sol";
 
 // solhint-disable max-states-count
-contract OpsProxyFactory is IOpsProxyFactory {
-    // solhint-disable const-name-snakecase
-    uint256 public constant override version = 1;
+contract OpsProxyFactory is Initializable, Proxied, IOpsProxyFactory {
     address public immutable ops;
-    address public immutable implementation;
+    address public implementation;
+    mapping(address => bool) public override whitelistedImplementations;
 
     ///@dev track proxy of user
     mapping(address => address) internal _proxyOf;
@@ -31,14 +32,43 @@ contract OpsProxyFactory is IOpsProxyFactory {
         _;
     }
 
-    constructor(address _ops, address _implementation) {
+    constructor(address _ops) {
         ops = _ops;
+    }
+
+    function initialize(address _implementation) external initializer {
         implementation = _implementation;
+        whitelistedImplementations[_implementation] = true;
     }
 
     ///@inheritdoc IOpsProxyFactory
     function deploy() external override returns (address payable proxy) {
         proxy = deployFor(msg.sender);
+    }
+
+    function setImplementation(address _newImplementation)
+        external
+        onlyProxyAdmin
+    {
+        address oldImplementation = implementation;
+        require(
+            oldImplementation != _newImplementation &&
+                whitelistedImplementations[_newImplementation],
+            "OpsProxyFactory: Invalid implementation"
+        );
+
+        implementation = _newImplementation;
+
+        emit SetImplementation(oldImplementation, _newImplementation);
+    }
+
+    function updateWhitelistedImplementations(
+        address _implementation,
+        bool _whitelist
+    ) external onlyProxyAdmin {
+        whitelistedImplementations[_implementation] = _whitelist;
+
+        emit UpdateWhitelistedImplementation(_implementation, _whitelist);
     }
 
     ///@inheritdoc IOpsProxyFactory
@@ -116,8 +146,8 @@ contract OpsProxyFactory is IOpsProxyFactory {
     function _getBytecode(address _owner) internal view returns (bytes memory) {
         return
             abi.encodePacked(
-                type(EIP173NonTransferableWithCustomReceive).creationCode,
-                abi.encode(implementation, _owner, bytes(""))
+                type(EIP173OpsProxy).creationCode,
+                abi.encode(address(this), implementation, _owner, bytes(""))
             );
     }
 }
