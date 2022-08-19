@@ -42,3 +42,4 @@ module.exports.skip = async (hre) => {
 };
 
 module.exports.tags = ["TaskTreasuryUpgradable"];
+module.exports.dependencies = ["TaskTreasuryL2"];
