@@ -1,8 +1,6 @@
 // SPDX-License-Identifier: UNLICENSED
-
 pragma solidity ^0.8.12;
 
-import {OpsStorage} from "../OpsStorage.sol";
 import {TaskModuleBase} from "./TaskModuleBase.sol";
 import {LibDataTypes} from "../libraries/LibDataTypes.sol";
 import {LibEvents} from "../libraries/LibEvents.sol";

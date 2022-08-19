@@ -6,8 +6,6 @@ import {
 } from "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol";
 import {EIP173OpsProxy} from "../vendor/proxy/EIP173/EIP173OpsProxy.sol";
 import {Proxied} from "../vendor/proxy/EIP173/Proxied.sol";
-import {OpsProxy} from "./OpsProxy.sol";
-import {IOpsProxy} from "../interfaces/IOpsProxy.sol";
 import {IOpsProxyFactory} from "../interfaces/IOpsProxyFactory.sol";
 
 // solhint-disable max-states-count

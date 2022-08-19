@@ -2,31 +2,23 @@
 pragma solidity ^0.8.12;
 
 import {Proxied} from "../vendor/proxy/EIP173/Proxied.sol";
-import {GelatoBytes} from "../vendor/gelato/GelatoBytes.sol";
 import {_call} from "../functions/FExec.sol";
 import {IOpsProxy} from "../interfaces/IOpsProxy.sol";
 
 contract OpsProxy is Proxied, IOpsProxy {
-    using GelatoBytes for bytes;
-
     // solhint-disable const-name-snakecase
     uint256 public constant override version = 1;
     address public immutable override ops;
 
     modifier onlyAuth() {
-        require(
-            msg.sender == ops || msg.sender == owner(),
-            "OpsProxy: Not authorised"
-        );
-
-        if (msg.sender == ops) {
-            address taskCreator = _getTaskCreator();
-
+        address proxyOwner = owner();
+        if (msg.sender != proxyOwner) {
+            require(msg.sender == ops, "OpsProxy: Not authorised");
             require(
-                taskCreator == owner(),
+                _getTaskCreator() == proxyOwner,
                 "OpsProxy: Only tasks created by owner"
             );
-        }
+        } // else msg.sender == proxyOwner
         _;
     }
 
