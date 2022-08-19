@@ -1,16 +1,11 @@
 // SPDX-License-Identifier: UNLICENSED
-
 pragma solidity ^0.8.12;
 
-import {GelatoBytes} from "../vendor/gelato/GelatoBytes.sol";
 import {TaskModuleBase} from "./TaskModuleBase.sol";
-import {LibDataTypes} from "../libraries/LibDataTypes.sol";
 import {IOpsProxy} from "../interfaces/IOpsProxy.sol";
 import {IOpsProxyFactory} from "../interfaces/IOpsProxyFactory.sol";
 
 contract ProxyModule is TaskModuleBase {
-    using GelatoBytes for bytes;
-
     IOpsProxyFactory public immutable opsProxyFactory;
 
     constructor(IOpsProxyFactory _opsProxyFactory) {
