@@ -19,7 +19,7 @@ assert.ok(ALCHEMY_ID, "no Alchemy ID in process.env");
 
 // @dev fill this out
 const DEPLOYER_PK_MAINNET = process.env.DEPLOYER_PK_MAINNET;
-const ETHERSCAN_API = process.env.ETHERSCAN_API;
+const ETHERSCAN_API = process.env.ETHERSCAN_MATIC_API;
 // ETHERSCAN_MATIC_API;
 // ETHERSCAN_FANTOM_API;
 // ETHERSCAN_ARBITRUM_API;

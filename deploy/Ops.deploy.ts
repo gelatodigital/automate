@@ -29,10 +29,10 @@ const func: DeployFunction = async (hre: HardhatRuntimeEnvironment) => {
 
 export default func;
 
-func.skip = async (hre: HardhatRuntimeEnvironment) => {
-  const shouldSkip = hre.network.name !== "hardhat";
-  return shouldSkip;
-};
+// func.skip = async (hre: HardhatRuntimeEnvironment) => {
+//   const shouldSkip = hre.network.name !== "hardhat";
+//   return shouldSkip;
+// };
 
 func.tags = ["Ops"];
 func.dependencies = ["TaskTreasuryUpgradable"];
