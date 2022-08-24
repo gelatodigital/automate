@@ -6,6 +6,7 @@ export enum Module {
   TIME,
   PROXY,
   SINGLE_EXEC,
+  ORESOLVER,
 }
 
 export type ModuleData = {
@@ -29,6 +30,18 @@ export const encodeTimeArgs = (startTime: number, interval: number): string => {
   const encoded = ethers.utils.defaultAbiCoder.encode(
     ["uint128", "uint128"],
     [startTime, interval]
+  );
+
+  return encoded;
+};
+
+export const encodeOResolverArgs = (
+  oResolverHash: string,
+  oResolverArgsHex: string
+): string => {
+  const encoded = ethers.utils.defaultAbiCoder.encode(
+    ["string", "bytes"],
+    [oResolverHash, oResolverArgsHex]
   );
 
   return encoded;
