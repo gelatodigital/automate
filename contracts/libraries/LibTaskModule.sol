@@ -287,9 +287,8 @@ library LibTaskModule {
         uint256 _length,
         LibDataTypes.Module[] memory _modules
     ) private pure {
-        bool hasResolver = _modules[0] == LibDataTypes.Module.RESOLVER;
-
         if (_length > 1) {
+            bool hasResolver = _modules[0] == LibDataTypes.Module.RESOLVER;
             for (uint256 i; i < _length - 1; i++) {
                 require(
                     _modules[i + 1] > _modules[i],
