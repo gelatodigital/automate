@@ -68,7 +68,8 @@ describe("Ops OResolver module test", function () {
     };
   });
 
-  it("createTask", async () => {
+  it("createTask - whitelisted", async () => {
+    await oResolverModule.setWhitelist([userAddress], true);
     const encoded = await oResolverModule.encodeModuleArg("ipfsHash", "0x");
 
     moduleData = {
@@ -76,7 +77,24 @@ describe("Ops OResolver module test", function () {
       args: [encoded],
     };
 
-    await ops.createTask(counter.address, execSelector, moduleData, ZERO_ADD);
+    await ops
+      .connect(user)
+      .createTask(counter.address, execSelector, moduleData, ZERO_ADD);
+  });
+
+  it("createTask - not whitelisted", async () => {
+    const encoded = await oResolverModule.encodeModuleArg("ipfsHash", "0x");
+
+    moduleData = {
+      modules: [Module.ORESOLVER],
+      args: [encoded],
+    };
+
+    await expect(
+      ops
+        .connect(user)
+        .createTask(counter.address, execSelector, moduleData, ZERO_ADD)
+    ).to.be.revertedWith("Ops.onCreateTask: OResolverModule: Not whitelisted");
   });
 
   it("createTask - only one resolver", async () => {

@@ -38,7 +38,8 @@ library LibTaskModuleConfig {
     {
         if (
             _module == LibDataTypes.Module.TIME ||
-            _module == LibDataTypes.Module.PROXY
+            _module == LibDataTypes.Module.PROXY ||
+            _module == LibDataTypes.Module.ORESOLVER
         ) return true;
 
         return false;
