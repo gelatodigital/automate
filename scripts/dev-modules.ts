@@ -2,6 +2,7 @@ import { ethers } from "hardhat";
 import { Module } from "../test/utils";
 import {
   Ops,
+  OResolverModule,
   ProxyModule,
   ResolverModule,
   SingleExecModule,
@@ -23,18 +24,23 @@ export const setModules = async () => {
   const singleExecModule = <SingleExecModule>(
     await ethers.getContract("SingleExecModule")
   );
+  const oResolverModule = <OResolverModule>(
+    await ethers.getContract("OResolverModule")
+  );
 
   const modules = [
     Module.RESOLVER,
     Module.TIME,
     Module.PROXY,
     Module.SINGLE_EXEC,
+    Module.ORESOLVER,
   ];
   const moduleAddresses = [
     resolverModule.address,
     timeModule.address,
     proxyModule.address,
     singleExecModule.address,
+    oResolverModule.address,
   ];
 
   await ops.setModule(modules, moduleAddresses);
