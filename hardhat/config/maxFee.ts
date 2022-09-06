@@ -17,6 +17,8 @@ export const getMaxFee = (network: string): BigNumber => {
       return ethers.utils.parseEther("0");
     case "matic":
       return ethers.utils.parseEther("5");
+    case "maticTest":
+      return ethers.utils.parseEther("0");
     case "fantom":
       return ethers.utils.parseEther("50");
     case "avalanche":
