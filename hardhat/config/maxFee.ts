@@ -6,6 +6,7 @@ import { ethers } from "hardhat";
 export const getMaxFee = (network: string): BigNumber => {
   switch (network) {
     case "mainnet":
+    case "mainnetTest":
       return ethers.utils.parseEther("0");
     case "ropsten":
       return ethers.utils.parseEther("0");

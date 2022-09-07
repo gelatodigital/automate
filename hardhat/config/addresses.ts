@@ -25,6 +25,7 @@ export const getGelatoAddress = (network: string): string => {
 
   switch (network) {
     case "mainnet":
+    case "mainnetTest":
       return GELATO_MAINNET;
     case "ropsten":
       return GELATO_ROPSTEN;
@@ -35,7 +36,6 @@ export const getGelatoAddress = (network: string): string => {
     case "kovan":
       return GELATO_KOVAN;
     case "matic":
-      return GELATO_MATIC;
     case "maticTest":
       return GELATO_MATIC;
     case "fantom":
