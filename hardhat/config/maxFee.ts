@@ -39,6 +39,8 @@ export const getMaxFee = (network: string): BigNumber => {
       return ethers.utils.parseEther("0");
     case "okovan":
       return ethers.utils.parseEther("0");
+    case "cronos":
+      return ethers.utils.parseEther("5");
     case "hardhat":
       return ethers.utils.parseEther("100");
     default:
