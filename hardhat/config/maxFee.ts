@@ -13,6 +13,7 @@ export const getMaxFee = (network: string): BigNumber => {
     case "rinkeby":
       return ethers.utils.parseEther("0");
     case "goerli":
+    case "goerliTest":
       return ethers.utils.parseEther("0");
     case "kovan":
       return ethers.utils.parseEther("0");

@@ -70,6 +70,11 @@ const config: HardhatUserConfig = {
       chainId: 5,
       url: `https://eth-goerli.alchemyapi.io/v2/${ALCHEMY_ID}`,
     },
+    goerliTest: {
+      accounts: DEPLOYER_PK_MAINNET ? [DEPLOYER_PK_MAINNET] : [],
+      chainId: 5,
+      url: `https://eth-goerli.alchemyapi.io/v2/${ALCHEMY_ID}`,
+    },
     kovan: {
       accounts: DEPLOYER_PK_MAINNET ? [DEPLOYER_PK_MAINNET] : [],
       chainId: 42,

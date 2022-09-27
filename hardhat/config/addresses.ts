@@ -32,6 +32,7 @@ export const getGelatoAddress = (network: string): string => {
     case "rinkeby":
       return GELATO_RINKEBY;
     case "goerli":
+    case "goerliTest":
       return GELATO_GOERLI;
     case "kovan":
       return GELATO_KOVAN;
