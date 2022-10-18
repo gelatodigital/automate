@@ -137,13 +137,13 @@ describe("Ops multi module test", function () {
   });
 
   it("getTaskId", async () => {
-    const taskId = await ops[
+    const thisTaskId = await ops[
       "getTaskId(address,address,bytes4,(uint8[],bytes[]),address)"
     ](userAddress, counter.address, execSelector, moduleData, ZERO_ADD);
 
     const expectedTaskId = taskId;
 
-    expect(taskId).to.be.eql(expectedTaskId);
+    expect(thisTaskId).to.be.eql(expectedTaskId);
   });
 
   it("task created", async () => {
