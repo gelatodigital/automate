@@ -88,7 +88,7 @@ contract Ops is Gelatofied, Proxied, OpsStorage, IOps {
         bool _useTaskTreasuryFunds,
         bool _revertOnFailure
     ) external onlyGelato {
-        bytes32 taskId = LibTaskId.getId(
+        bytes32 taskId = LibTaskId.getTaskId(
             _taskCreator,
             _execAddress,
             _execData.memorySliceSelector(),
@@ -136,6 +136,42 @@ contract Ops is Gelatofied, Proxied, OpsStorage, IOps {
         return taskIds;
     }
 
+    ///@inheritdoc IOps
+    function getTaskId(
+        address taskCreator,
+        address execAddress,
+        bytes4 execSelector,
+        LibDataTypes.ModuleData memory moduleData,
+        address feeToken
+    ) external pure returns (bytes32 taskId) {
+        taskId = LibTaskId.getTaskId(
+            taskCreator,
+            execAddress,
+            execSelector,
+            moduleData,
+            feeToken
+        );
+    }
+
+    ///@inheritdoc IOps
+    function getTaskId(
+        address taskCreator,
+        address execAddress,
+        bytes4 execSelector,
+        bool useTaskTreasuryFunds,
+        address feeToken,
+        bytes32 resolverHash
+    ) external pure returns (bytes32 taskId) {
+        taskId = LibTaskId.getLegacyTaskId(
+            taskCreator,
+            execAddress,
+            execSelector,
+            useTaskTreasuryFunds,
+            feeToken,
+            resolverHash
+        );
+    }
+
     function _createTask(
         address _taskCreator,
         address _execAddress,
@@ -143,7 +179,7 @@ contract Ops is Gelatofied, Proxied, OpsStorage, IOps {
         LibDataTypes.ModuleData memory _moduleData,
         address _feeToken
     ) private returns (bytes32 taskId) {
-        taskId = LibTaskId.getId(
+        taskId = LibTaskId.getTaskId(
             _taskCreator,
             _execAddress,
             _execDataOrSelector.memorySliceSelector(),
