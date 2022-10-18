@@ -9,6 +9,47 @@ import {LibDataTypes} from "./LibDataTypes.sol";
 // solhint-disable max-line-length
 library LibTaskId {
     /**
+     * @notice External pure function for getId
+     */
+    function getTaskId(
+        address taskCreator,
+        address execAddress,
+        bytes4 execSelector,
+        LibDataTypes.ModuleData memory moduleData,
+        address feeToken
+    ) external pure returns (bytes32 taskId) {
+        taskId = getId(
+            taskCreator,
+            execAddress,
+            execSelector,
+            moduleData,
+            feeToken
+        );
+    }
+
+    /**
+     * @notice External pure function for getLegacyId
+     * @dev Keep for backwards compatibility
+     */
+    function getTaskId(
+        address taskCreator,
+        address execAddress,
+        bytes4 execSelector,
+        bool useTaskTreasuryFunds,
+        address feeToken,
+        bytes32 resolverHash
+    ) external pure returns (bytes32 taskId) {
+        taskId = getLegacyId(
+            taskCreator,
+            execAddress,
+            execSelector,
+            useTaskTreasuryFunds,
+            feeToken,
+            resolverHash
+        );
+    }
+
+    /**
      * @notice Returns taskId of taskCreator.
      * @notice To maintain the taskId of legacy tasks, if
      * resolver module or resolver and time module is used,
@@ -20,17 +61,17 @@ library LibTaskId {
      * @param moduleData  Conditional modules that will be used. {See LibDataTypes-ModuleData}
      * @param feeToken Address of token to be used as payment. Use address(0) if TaskTreasury is being used, 0xeeeeee... for ETH or native tokens.
      */
-    function getTaskId(
+    function getId(
         address taskCreator,
         address execAddress,
         bytes4 execSelector,
         LibDataTypes.ModuleData memory moduleData,
         address feeToken
     ) internal pure returns (bytes32 taskId) {
-        if (_shouldGetLegacyTaskId(moduleData.modules)) {
+        if (_shouldGetLegacyId(moduleData.modules)) {
             bytes32 resolverHash = _getResolverHash(moduleData.args[0]);
 
-            taskId = getLegacyTaskId(
+            taskId = getLegacyId(
                 taskCreator,
                 execAddress,
                 execSelector,
@@ -62,7 +103,7 @@ library LibTaskId {
      * @param feeToken Address of token to be used as payment. Use address(0) if TaskTreasury is being used, 0xeeeeee... for ETH or native tokens.
      * @param resolverHash Hash of resolverAddress and resolverData {See getResolverHash}
      */
-    function getLegacyTaskId(
+    function getLegacyId(
         address taskCreator,
         address execAddress,
         bytes4 execSelector,
@@ -87,7 +128,7 @@ library LibTaskId {
      * @dev For legacy tasks, resolvers are compulsory. Time tasks were also introduced.
      * The sequence of Module is enforced in {LibTaskModule-_validModules}
      */
-    function _shouldGetLegacyTaskId(LibDataTypes.Module[] memory _modules)
+    function _shouldGetLegacyId(LibDataTypes.Module[] memory _modules)
         private
         pure
         returns (bool)

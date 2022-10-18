@@ -88,7 +88,7 @@ contract Ops is Gelatofied, Proxied, OpsStorage, IOps {
         bool _useTaskTreasuryFunds,
         bool _revertOnFailure
     ) external onlyGelato {
-        bytes32 taskId = LibTaskId.getTaskId(
+        bytes32 taskId = LibTaskId.getId(
             _taskCreator,
             _execAddress,
             _execData.memorySliceSelector(),
@@ -143,7 +143,7 @@ contract Ops is Gelatofied, Proxied, OpsStorage, IOps {
         LibDataTypes.ModuleData memory _moduleData,
         address _feeToken
     ) private returns (bytes32 taskId) {
-        taskId = LibTaskId.getTaskId(
+        taskId = LibTaskId.getId(
             _taskCreator,
             _execAddress,
             _execDataOrSelector.memorySliceSelector(),
