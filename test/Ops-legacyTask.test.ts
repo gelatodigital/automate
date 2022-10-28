@@ -98,6 +98,24 @@ describe("Ops legacy task test", function () {
     resolverData = counterResolver.interface.encodeFunctionData("checker");
   });
 
+  it("getTaskId", async () => {
+    const resolverHash = getResolverHash(counterResolver.address, resolverData);
+    const legacyTaskId = await ops[
+      "getTaskId(address,address,bytes4,bool,address,bytes32)"
+    ](userAddress, counter.address, execSelector, true, ZERO_ADD, resolverHash);
+
+    const expectedLegacyTaskId = getLegacyTaskId(
+      userAddress,
+      counter.address,
+      execSelector,
+      true,
+      ZERO_ADD,
+      resolverHash
+    );
+
+    expect(legacyTaskId).to.be.eql(expectedLegacyTaskId);
+  });
+
   it("create task", async () => {
     const moduleData: ModuleData = {
       modules: [Module.RESOLVER],

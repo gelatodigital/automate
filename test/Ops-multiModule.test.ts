@@ -136,6 +136,16 @@ describe("Ops multi module test", function () {
     expect(await counter.whitelisted(opsProxy.address)).to.be.true;
   });
 
+  it("getTaskId", async () => {
+    const thisTaskId = await ops[
+      "getTaskId(address,address,bytes4,(uint8[],bytes[]),address)"
+    ](userAddress, counter.address, execSelector, moduleData, ZERO_ADD);
+
+    const expectedTaskId = taskId;
+
+    expect(thisTaskId).to.be.eql(expectedTaskId);
+  });
+
   it("task created", async () => {
     const taskIds = await ops.getTaskIdsByUser(userAddress);
     expect(taskIds).include(taskId);
