@@ -16,7 +16,7 @@ const func: DeployFunction = async (hre: HardhatRuntimeEnvironment) => {
 
   await deploy("ProxyModule", {
     from: deployer,
-    args: [await (await hre.ethers.getContract("OpsProxyFactory")).address],
+    args: [(await hre.ethers.getContract("OpsProxyFactory")).address],
   });
 };
 

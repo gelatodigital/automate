@@ -55,6 +55,11 @@ const config: HardhatUserConfig = {
       chainId: 56,
       accounts: DEPLOYER_PK_MAINNET ? [DEPLOYER_PK_MAINNET] : [],
     },
+    cronos: {
+      accounts: DEPLOYER_PK_MAINNET ? [DEPLOYER_PK_MAINNET] : [],
+      chainId: 25,
+      url: `https://evm.cronos.org`,
+    },
     fantom: {
       accounts: DEPLOYER_PK_MAINNET ? [DEPLOYER_PK_MAINNET] : [],
       chainId: 250,

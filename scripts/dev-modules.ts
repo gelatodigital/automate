@@ -13,7 +13,8 @@ export const setModules = async () => {
   const ownerAddress = await owner.getAddress();
   console.log("Owner: ", ownerAddress);
 
-  const ops = <Ops>await ethers.getContract("Ops");
+  const opsAddress = (<Ops>await ethers.getContract("Ops")).address;
+  const ops = await ethers.getContractAt("Ops", opsAddress);
 
   const resolverModule = <ResolverModule>(
     await ethers.getContract("ResolverModule")
