@@ -10,7 +10,7 @@ import {
   IERC20,
   TaskTreasuryUpgradable,
 } from "../typechain";
-import { BigNumber } from "ethereum-waffle/node_modules/ethers";
+import { BigNumber } from "ethers";
 
 const diamondAddress = "0x3caca7b48d0573d793d3b0279b5f0029180e83b6";
 const ETH = "0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE";
@@ -116,7 +116,7 @@ describe("Ops test", function () {
           counterResolver.address,
           resolverData
         )
-    ).to.be.revertedWith("Ops: createTask: Sender already started task");
+    ).to.be.revertedWith("Ops: _createTask: Sender already started task");
   });
 
   it("sender did not start task", async () => {
