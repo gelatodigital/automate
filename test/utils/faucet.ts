@@ -72,7 +72,7 @@ const getFaucetByToken = (tokenAddress: string): string => {
       return "0x742d35Cc6634C0532925a3b844Bc454e4438f44e";
 
     case "0x6b175474e89094c44da98b954eedeac495271d0f":
-      return "0x47ac0fb4f2d84898e4d9e7b4dab3c24507a6d503";
+      return "0x8eb8a3b98659cce290402893d0123abb75e3ab28";
 
     case "0xdd974d5c2e2928dea5f71b9825b8b646686bd200":
       return "0x3EB01B3391EA15CE752d01Cf3D3F09deC596F650";
@@ -87,7 +87,7 @@ const getFaucetByToken = (tokenAddress: string): string => {
       return "0xc247722ac42b2f9ba752886502c3d3dd39bdb2da";
 
     case "0x2260fac5e5542a773aa44fbcfedf7c193bc2c599":
-      return "0xe78388b4ce79068e89bf8aa7f218ef6b9ab0e9d0";
+      return "0x8eb8a3b98659cce290402893d0123abb75e3ab28";
 
     default:
       throw Error("No faucet found");

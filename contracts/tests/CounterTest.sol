@@ -1,17 +1,19 @@
 // SPDX-License-Identifier: UNLICENSED
 pragma solidity ^0.8.0;
 
-import {OpsReady} from "../../vendor/gelato/OpsReady.sol";
-import {IOps} from "../../interfaces/IOps.sol";
-
-contract CounterWithoutTreasury is OpsReady {
+contract CounterTest {
+    address public ops;
     uint256 public count;
     uint256 public lastExecuted;
 
-    // solhint-disable no-empty-blocks
-    constructor(address _ops) OpsReady(_ops) {}
+    modifier onlyOps() {
+        require(msg.sender == ops, "Only ops");
+        _;
+    }
 
-    receive() external payable {}
+    constructor(address payable _ops) {
+        ops = _ops;
+    }
 
     // solhint-disable not-rely-on-time
     function increaseCount(uint256 amount) external onlyOps {
@@ -22,12 +24,5 @@ contract CounterWithoutTreasury is OpsReady {
 
         count += amount;
         lastExecuted = block.timestamp;
-
-        uint256 fee;
-        address feeToken;
-
-        (fee, feeToken) = IOps(ops).getFeeDetails();
-
-        _transfer(fee, feeToken);
     }
 }

@@ -6,7 +6,7 @@ const { ethers, deployments } = hre;
 import {
   Ops,
   TaskTreasuryUpgradable,
-  Counter,
+  CounterTest,
   ProxyModule,
   TimeModule,
 } from "../typechain";
@@ -31,7 +31,7 @@ describe("Ops Time module test", function () {
 
   let ops: Ops;
   let taskTreasury: TaskTreasuryUpgradable;
-  let counter: Counter;
+  let counter: CounterTest;
   let timeModule: TimeModule;
   let proxyModule: ProxyModule;
 
@@ -53,7 +53,7 @@ describe("Ops Time module test", function () {
 
     ops = await ethers.getContract("Ops");
     taskTreasury = await ethers.getContract("TaskTreasuryUpgradable");
-    counter = await ethers.getContract("Counter");
+    counter = await ethers.getContract("CounterTest");
     timeModule = await ethers.getContract("TimeModule");
     proxyModule = await ethers.getContract("ProxyModule");
 
