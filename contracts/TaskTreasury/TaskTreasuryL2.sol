@@ -13,7 +13,7 @@ import {
     ReentrancyGuard
 } from "@openzeppelin/contracts/security/ReentrancyGuard.sol";
 import {Math} from "@openzeppelin/contracts/utils/math/Math.sol";
-import {_transfer, ETH} from "../vendor/gelato/FGelato.sol";
+import {_transfer, ETH} from "../functions/FUtils.sol";
 
 // solhint-disable max-states-count
 // solhint-disable max-line-length

@@ -1,5 +1,11 @@
 import { ethers } from "hardhat";
-import { Counter, Forwarder, Ops } from "../typechain";
+import {
+  encodeTimeArgs,
+  getTimeStampNow,
+  Module,
+  ModuleData,
+} from "../test/utils";
+import { Counter, Ops } from "../typechain";
 
 async function main() {
   const [user] = await ethers.getSigners();
@@ -8,29 +14,27 @@ async function main() {
 
   const ops = <Ops>await ethers.getContract("Ops");
   const counter = <Counter>await ethers.getContract("Counter");
-  const forwarder = <Forwarder>await ethers.getContract("Forwarder");
 
   console.log("Submitting Task");
 
   console.log("Counter address: ", counter.address);
 
-  const selector = await ops.getSelector("increaseCount(uint256)");
   const execData = counter.interface.encodeFunctionData("increaseCount", [100]);
-  const resolverData = forwarder.interface.encodeFunctionData("checker", [
-    execData,
-  ]);
+  const interval = 5 * 60;
+  const startTime = await getTimeStampNow();
+  const timeModuleArg = encodeTimeArgs(startTime, interval);
+  const feeToken = ethers.constants.AddressZero;
 
-  const interval = 3 * 60;
+  const moduleData: ModuleData = {
+    modules: [Module.TIME],
+    args: [timeModuleArg],
+  };
 
-  const txn = await ops.createTimedTask(
-    0,
-    interval,
+  const txn = await ops.createTask(
     counter.address,
-    selector,
-    forwarder.address,
-    resolverData,
-    ethers.constants.AddressZero,
-    true
+    execData,
+    moduleData,
+    feeToken
   );
 
   const res = await txn.wait();

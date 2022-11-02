@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: UNLICENSED
-pragma solidity 0.8.12;
+pragma solidity ^0.8.12;
 
 import {
     EnumerableSet
@@ -14,7 +14,7 @@ import {
 import {
     Initializable
 } from "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol";
-import {_transfer, ETH} from "../vendor/gelato/FGelato.sol";
+import {_transfer, ETH} from "../functions/FUtils.sol";
 import {Proxied} from "../vendor/proxy/EIP173/Proxied.sol";
 import {ITaskTreasury} from "../interfaces/ITaskTreasury.sol";
 import {

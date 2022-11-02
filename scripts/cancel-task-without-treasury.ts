@@ -1,5 +1,11 @@
 import { ethers } from "hardhat";
 import {
+  encodeResolverArgs,
+  getTaskId,
+  Module,
+  ModuleData,
+} from "../test/utils";
+import {
   CounterWithoutTreasury,
   CounterResolverWithoutTreasury,
   Ops,
@@ -22,25 +28,25 @@ async function main() {
     await ethers.getContract("CounterResolverWithoutTreasury")
   );
 
-  const selector = await ops.getSelector("increaseCount(uint256)");
-
+  const execSelector = counter.interface.getSighash("increaseCount");
   const resolverData = resolver.interface.encodeFunctionData("checker");
+  const resolverModuleArg = encodeResolverArgs(resolver.address, resolverData);
+  const feeToken = ETH;
 
-  const resolverHash = await ops.getResolverHash(
-    resolver.address,
-    resolverData
-  );
+  const moduleData: ModuleData = {
+    modules: [Module.RESOLVER],
+    args: [resolverModuleArg],
+  };
 
-  const taskHash = await ops.getTaskId(
+  const taskId = getTaskId(
     userAddress,
     counter.address,
-    selector,
-    false,
-    ETH,
-    resolverHash
+    execSelector,
+    moduleData,
+    feeToken
   );
 
-  const txn = await ops.cancelTask(taskHash);
+  const txn = await ops.cancelTask(taskId);
   const res = await txn.wait();
   console.log(res);
 

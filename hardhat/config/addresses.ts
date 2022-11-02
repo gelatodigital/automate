@@ -2,7 +2,6 @@
 import { HardhatRuntimeEnvironment } from "hardhat/types";
 
 import { address as mainnetOps } from "../../deployments/mainnet/Ops.json";
-import { address as mainnetTaskTreasury } from "../../deployments/mainnet/TaskTreasury.json";
 
 export const getGelatoAddress = (network: string): string => {
   const GELATO_MAINNET = "0x3caca7b48d0573d793d3b0279b5f0029180e83b6";
@@ -15,6 +14,7 @@ export const getGelatoAddress = (network: string): string => {
   const GELATO_OPTIMISM = "0x01051113D81D7d6DA508462F2ad6d7fD96cF42Ef";
   const GELATO_MOONBEAM = "0x91f2A140cA47DdF438B9c583b7E71987525019bB";
   const GELATO_MOONRIVER = "0x91f2A140cA47DdF438B9c583b7E71987525019bB";
+  const GELATO_CRONOS = "0x91f2A140cA47DdF438B9c583b7E71987525019bB";
 
   const GELATO_ROPSTEN = "0xCc4CcD69D31F9FfDBD3BFfDe49c6aA886DaB98d9";
   const GELATO_RINKEBY = "0x0630d1b8C2df3F0a68Df578D02075027a6397173";
@@ -59,6 +59,8 @@ export const getGelatoAddress = (network: string): string => {
       return GELATO_OGOERLI;
     case "okovan":
       return GELATO_OKOVAN;
+    case "cronos":
+      return GELATO_CRONOS;
     case "hardhat":
       return GELATO_MAINNET;
     default:
@@ -81,8 +83,12 @@ export const getTaskTreasuryAddress = async (
 ): Promise<string> => {
   const network = hre.network.name;
 
-  if (network == "mainnet" || network == "hardhat") return mainnetTaskTreasury;
-  if (network == "ropsten" || network == "rinkeby" || network == "goerli")
+  if (
+    network == "mainnet" ||
+    network == "ropsten" ||
+    network == "rinkeby" ||
+    network == "goerli"
+  )
     return (await hre.ethers.getContract("TaskTreasury")).address;
 
   return (await hre.ethers.getContract("TaskTreasuryL2")).address;
