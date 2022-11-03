@@ -9,7 +9,7 @@ import "../../../OpsTaskCreator.sol";
  */
 // solhint-disable not-rely-on-time
 // solhint-disable no-empty-blocks
-contract ResolverTaskCreator is OpsTaskCreator {
+contract CounterResolverTaskCreator is OpsTaskCreator {
     uint256 public count;
     uint256 public lastExecuted;
     bytes32 public taskId;

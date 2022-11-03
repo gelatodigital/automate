@@ -5,11 +5,11 @@ import "../../../OpsTaskCreator.sol";
 
 /**
  * @dev
- * Example contract that creates a single exec task.
+ * Example contract that creates a time task.
  */
 // solhint-disable not-rely-on-time
 // solhint-disable no-empty-blocks
-contract SingleExecTaskCreator is OpsTaskCreator {
+contract CounterTimeTaskCreatorWT is OpsTaskCreator {
     uint256 public count;
     uint256 public lastExecuted;
     bytes32 public taskId;
@@ -18,11 +18,11 @@ contract SingleExecTaskCreator is OpsTaskCreator {
 
     event CounterTaskCreated(bytes32 taskId);
 
-    constructor(address _ops, address _fundsOwner)
+    constructor(address payable _ops, address _fundsOwner)
         OpsTaskCreator(_ops, _fundsOwner)
     {}
 
-    function createTask() external {
+    function createTask() external payable {
         require(taskId == bytes32(""), "Already started task");
 
         bytes memory execData = abi.encodeCall(this.increaseCount, (1));
@@ -31,25 +31,31 @@ contract SingleExecTaskCreator is OpsTaskCreator {
             modules: new Module[](2),
             args: new bytes[](2)
         });
-        moduleData.modules[0] = Module.PROXY;
-        moduleData.modules[1] = Module.SINGLE_EXEC;
+        moduleData.modules[0] = Module.TIME;
+        moduleData.modules[1] = Module.PROXY;
 
-        moduleData.args[0] = _proxyModuleArg();
-        moduleData.args[1] = _singleExecModuleArg();
+        moduleData.args[0] = _timeModuleArg(block.timestamp, INTERVAL);
+        moduleData.args[1] = _proxyModuleArg();
 
-        bytes32 id = _createTask(
-            address(this),
-            execData,
-            moduleData,
-            address(0)
-        );
+        bytes32 id = _createTask(address(this), execData, moduleData, ETH);
 
         taskId = id;
         emit CounterTaskCreated(id);
     }
 
     function increaseCount(uint256 _amount) external onlyDedicatedMsgSender {
-        count += _amount;
-        taskId = bytes32("");
+        uint256 newCount = count + _amount;
+
+        if (newCount >= MAX_COUNT) {
+            _cancelTask(taskId);
+            count = 0;
+        } else {
+            count += _amount;
+            lastExecuted = block.timestamp;
+        }
+
+        (uint256 fee, address feeToken) = _getFeeDetails();
+
+        _transfer(fee, feeToken);
     }
 }

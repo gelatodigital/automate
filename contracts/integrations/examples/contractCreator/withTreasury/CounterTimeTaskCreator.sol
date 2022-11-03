@@ -5,11 +5,11 @@ import "../../../OpsTaskCreator.sol";
 
 /**
  * @dev
- * Example contract that creates a resolver task.
+ * Example contract that creates a time task.
  */
 // solhint-disable not-rely-on-time
 // solhint-disable no-empty-blocks
-contract ResolverTaskCreator is OpsTaskCreator {
+contract CounterTimeTaskCreator is OpsTaskCreator {
     uint256 public count;
     uint256 public lastExecuted;
     bytes32 public taskId;
@@ -18,32 +18,30 @@ contract ResolverTaskCreator is OpsTaskCreator {
 
     event CounterTaskCreated(bytes32 taskId);
 
-    constructor(address payable _ops, address _fundsOwner)
+    constructor(address _ops, address _fundsOwner)
         OpsTaskCreator(_ops, _fundsOwner)
     {}
 
-    function createTask() external payable {
+    function createTask() external {
         require(taskId == bytes32(""), "Already started task");
+
+        bytes memory execData = abi.encodeCall(this.increaseCount, (1));
 
         ModuleData memory moduleData = ModuleData({
             modules: new Module[](2),
             args: new bytes[](2)
         });
-
-        moduleData.modules[0] = Module.RESOLVER;
+        moduleData.modules[0] = Module.TIME;
         moduleData.modules[1] = Module.PROXY;
 
-        moduleData.args[0] = _resolverModuleArg(
-            address(this),
-            abi.encodeCall(this.checker, ())
-        );
+        moduleData.args[0] = _timeModuleArg(block.timestamp, INTERVAL);
         moduleData.args[1] = _proxyModuleArg();
 
         bytes32 id = _createTask(
             address(this),
-            abi.encode(this.increaseCount.selector),
+            execData,
             moduleData,
-            ETH
+            address(0)
         );
 
         taskId = id;
@@ -60,19 +58,5 @@ contract ResolverTaskCreator is OpsTaskCreator {
             count += _amount;
             lastExecuted = block.timestamp;
         }
-
-        (uint256 fee, address feeToken) = _getFeeDetails();
-
-        _transfer(fee, feeToken);
-    }
-
-    function checker()
-        external
-        view
-        returns (bool canExec, bytes memory execPayload)
-    {
-        canExec = (block.timestamp - lastExecuted) >= INTERVAL;
-
-        execPayload = abi.encodeCall(this.increaseCount, (1));
     }
 }

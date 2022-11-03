@@ -9,7 +9,7 @@ import "../../../OpsTaskCreator.sol";
  */
 // solhint-disable not-rely-on-time
 // solhint-disable no-empty-blocks
-contract SingleExecTaskCreator is OpsTaskCreator {
+contract CounterSingleExecTaskCreator is OpsTaskCreator {
     uint256 public count;
     uint256 public lastExecuted;
     bytes32 public taskId;
@@ -18,11 +18,11 @@ contract SingleExecTaskCreator is OpsTaskCreator {
 
     event CounterTaskCreated(bytes32 taskId);
 
-    constructor(address payable _ops, address _fundsOwner)
+    constructor(address _ops, address _fundsOwner)
         OpsTaskCreator(_ops, _fundsOwner)
     {}
 
-    function createTask() external payable {
+    function createTask() external {
         require(taskId == bytes32(""), "Already started task");
 
         bytes memory execData = abi.encodeCall(this.increaseCount, (1));
@@ -31,14 +31,18 @@ contract SingleExecTaskCreator is OpsTaskCreator {
             modules: new Module[](2),
             args: new bytes[](2)
         });
-
         moduleData.modules[0] = Module.PROXY;
         moduleData.modules[1] = Module.SINGLE_EXEC;
 
         moduleData.args[0] = _proxyModuleArg();
         moduleData.args[1] = _singleExecModuleArg();
 
-        bytes32 id = _createTask(address(this), execData, moduleData, ETH);
+        bytes32 id = _createTask(
+            address(this),
+            execData,
+            moduleData,
+            address(0)
+        );
 
         taskId = id;
         emit CounterTaskCreated(id);
@@ -47,9 +51,5 @@ contract SingleExecTaskCreator is OpsTaskCreator {
     function increaseCount(uint256 _amount) external onlyDedicatedMsgSender {
         count += _amount;
         taskId = bytes32("");
-
-        (uint256 fee, address feeToken) = _getFeeDetails();
-
-        _transfer(fee, feeToken);
     }
 }
