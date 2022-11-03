@@ -24,6 +24,6 @@ contract CounterResolver {
 
         canExec = (block.timestamp - lastExecuted) > 180;
 
-        execPayload = abi.encodeCall(ICounter.increaseCount, (100));
+        execPayload = abi.encodeCall(ICounter.increaseCount, (1));
     }
 }

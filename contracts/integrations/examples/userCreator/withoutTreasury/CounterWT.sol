@@ -16,11 +16,6 @@ contract CounterWT is OpsReady {
     receive() external payable {}
 
     function increaseCount(uint256 amount) external onlyDedicatedMsgSender {
-        require(
-            ((block.timestamp - lastExecuted) > 180),
-            "Counter: increaseCount: Time not elapsed"
-        );
-
         count += amount;
         lastExecuted = block.timestamp;
 
