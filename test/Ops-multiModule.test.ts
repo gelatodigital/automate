@@ -13,7 +13,7 @@ import hre = require("hardhat");
 const { ethers, deployments } = hre;
 import {
   Ops,
-  CounterWithWhitelist,
+  CounterWL,
   CounterResolver,
   TaskTreasuryUpgradable,
   ResolverModule,
@@ -32,7 +32,7 @@ const INTERVAL = 7 * 60;
 
 describe("Ops multi module test", function () {
   let ops: Ops;
-  let counter: CounterWithWhitelist;
+  let counter: CounterWL;
   let counterResolver: CounterResolver;
   let taskTreasury: TaskTreasuryUpgradable;
   let opsProxyFactory: OpsProxyFactory;
@@ -61,13 +61,9 @@ describe("Ops multi module test", function () {
     [, user] = await hre.ethers.getSigners();
     userAddress = await user.getAddress();
 
-    const counterFactory = await ethers.getContractFactory(
-      "CounterWithWhitelist"
-    );
-
     ops = await ethers.getContract("Ops");
     taskTreasury = await ethers.getContract("TaskTreasuryUpgradable");
-    counter = <CounterWithWhitelist>await counterFactory.deploy();
+    counter = await ethers.getContract("CounterWL");
     counterResolver = await ethers.getContract("CounterResolver");
     opsProxyFactory = await ethers.getContract("OpsProxyFactory");
 

@@ -4,7 +4,7 @@ pragma solidity ^0.8.0;
 import {Ownable} from "@openzeppelin/contracts/access/Ownable.sol";
 
 // solhint-disable not-rely-on-time
-contract CounterWithWhitelist is Ownable {
+contract CounterWL is Ownable {
     uint256 public count;
     uint256 public lastExecuted;
     mapping(address => bool) public whitelisted;

@@ -11,7 +11,7 @@ import hre = require("hardhat");
 const { ethers, deployments } = hre;
 import {
   Ops,
-  Counter,
+  CounterTest,
   CounterResolver,
   TaskTreasuryUpgradable,
   ResolverModule,
@@ -26,7 +26,7 @@ const FEE = ethers.utils.parseEther("0.1");
 
 describe("Ops Resolver module test", function () {
   let ops: Ops;
-  let counter: Counter;
+  let counter: CounterTest;
   let counterResolver: CounterResolver;
   let treasury: TaskTreasuryUpgradable;
   let resolverModule: ResolverModule;
@@ -50,7 +50,7 @@ describe("Ops Resolver module test", function () {
 
     ops = await ethers.getContract("Ops");
     treasury = await ethers.getContract("TaskTreasuryUpgradable");
-    counter = await ethers.getContract("Counter");
+    counter = await ethers.getContract("CounterTest");
     counterResolver = await ethers.getContract("CounterResolver");
     resolverModule = await ethers.getContract("ResolverModule");
     proxyModule = await ethers.getContract("ProxyModule");
