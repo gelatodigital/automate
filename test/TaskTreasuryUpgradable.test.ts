@@ -9,7 +9,7 @@ import {
 } from "./utils";
 import {
   IERC20,
-  Counter,
+  CounterTest,
   Ops,
   TaskTreasuryL2,
   TaskTreasuryUpgradable,
@@ -43,7 +43,7 @@ describe("TaskTreasuryUpgradable test", function () {
   let ops: Ops;
   let oldTreasury: TaskTreasuryL2;
   let treasury: TaskTreasuryUpgradable;
-  let counter: Counter;
+  let counter: CounterTest;
   let resolverModule: ResolverModule;
   let proxyModule: ProxyModule;
   let dai: IERC20;
@@ -68,8 +68,8 @@ describe("TaskTreasuryUpgradable test", function () {
     resolverModule = await ethers.getContract("ResolverModule");
     proxyModule = await ethers.getContract("ProxyModule");
 
-    const counterFactory = await ethers.getContractFactory("Counter");
-    counter = <Counter>await counterFactory.deploy(ops.address);
+    const counterFactory = await ethers.getContractFactory("CounterTest");
+    counter = <CounterTest>await counterFactory.deploy(ops.address);
 
     // get accounts
     await hre.network.provider.request({

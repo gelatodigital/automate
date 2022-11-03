@@ -1,11 +1,11 @@
 import { HardhatRuntimeEnvironment } from "hardhat/types";
 import { DeployFunction } from "hardhat-deploy/types";
-import { sleep } from "../hardhat/utils";
+import { sleep } from "../../hardhat/utils";
 
 const func: DeployFunction = async (hre: HardhatRuntimeEnvironment) => {
   if (hre.network.name !== "hardhat") {
     console.log(
-      `Deploying CounterResolver to ${hre.network.name}. Hit ctrl + c to abort`
+      `Deploying CounterTestWT to ${hre.network.name}. Hit ctrl + c to abort`
     );
     await sleep(10000);
   }
@@ -14,18 +14,17 @@ const func: DeployFunction = async (hre: HardhatRuntimeEnvironment) => {
   const { deploy } = deployments;
   const { deployer } = await hre.getNamedAccounts();
 
-  await deploy("CounterResolver", {
+  await deploy("CounterTestWT", {
     from: deployer,
-    args: [(await hre.ethers.getContract("Counter")).address],
+    args: [(await hre.ethers.getContract("Ops")).address, deployer],
   });
 };
 
 export default func;
 
-func.skip = async (hre: HardhatRuntimeEnvironment) => {
-  const shouldSkip = hre.network.name !== "hardhat";
-  return shouldSkip;
+func.skip = async () => {
+  return true;
 };
 
-func.tags = ["CounterResolver"];
-func.dependencies = ["Counter"];
+func.tags = ["CounterTestWT"];
+func.dependencies = ["Ops"];

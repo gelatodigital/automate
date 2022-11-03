@@ -3,7 +3,7 @@ import hre = require("hardhat");
 const { ethers, deployments } = hre;
 import { Signer } from "@ethersproject/abstract-signer";
 import {
-  CounterWithWhitelist,
+  CounterWL,
   Ops,
   TaskTreasuryUpgradable,
   OpsProxy,
@@ -35,7 +35,7 @@ describe("Ops Proxy module test", function () {
   let opsProxyImplementation: OpsProxy;
   let opsProxyFactory: OpsProxyFactory;
   let treasury: TaskTreasuryUpgradable;
-  let counter: CounterWithWhitelist;
+  let counter: CounterWL;
   let proxyModule: ProxyModule;
   let timeModule: TimeModule;
 
@@ -54,14 +54,10 @@ describe("Ops Proxy module test", function () {
 
     treasury = await ethers.getContract("TaskTreasuryUpgradable");
 
-    const counterFactory = await ethers.getContractFactory(
-      "CounterWithWhitelist"
-    );
-
     ops = await ethers.getContract("Ops");
     proxyModule = await ethers.getContract("ProxyModule");
     timeModule = await ethers.getContract("TimeModule");
-    counter = <CounterWithWhitelist>await counterFactory.deploy();
+    counter = await ethers.getContract("CounterWL");
     opsProxyFactory = await ethers.getContract("OpsProxyFactory");
     opsProxyImplementation = await ethers.getContract("OpsProxy");
 
@@ -251,9 +247,7 @@ describe("Ops Proxy module test", function () {
   });
 
   it("exec - batchExecuteCall", async () => {
-    const counter2Factory = await ethers.getContractFactory(
-      "CounterWithWhitelist"
-    );
+    const counter2Factory = await ethers.getContractFactory("CounterWL");
     const counter2 = await counter2Factory.deploy();
 
     // // whitelist proxy on counter

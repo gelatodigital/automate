@@ -5,7 +5,7 @@ import hre = require("hardhat");
 const { ethers, deployments } = hre;
 import {
   Ops,
-  Counter,
+  CounterTest,
   TaskTreasuryUpgradable,
   ProxyModule,
   SingleExecModule,
@@ -19,7 +19,7 @@ const FEE = ethers.utils.parseEther("0.1");
 
 describe("Ops SingleExec module test", function () {
   let ops: Ops;
-  let counter: Counter;
+  let counter: CounterTest;
   let taskTreasury: TaskTreasuryUpgradable;
   let singleExecModule: SingleExecModule;
   let proxyModule: ProxyModule;
@@ -43,7 +43,7 @@ describe("Ops SingleExec module test", function () {
 
     ops = await ethers.getContract("Ops");
     taskTreasury = await ethers.getContract("TaskTreasuryUpgradable");
-    counter = await ethers.getContract("Counter");
+    counter = await ethers.getContract("CounterTest");
     singleExecModule = await ethers.getContract("SingleExecModule");
     proxyModule = await ethers.getContract("ProxyModule");
     timeModule = await ethers.getContract("TimeModule");

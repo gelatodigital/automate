@@ -14,7 +14,7 @@ import hre = require("hardhat");
 const { ethers, deployments } = hre;
 import {
   Ops,
-  Counter,
+  CounterTest,
   CounterResolver,
   TaskTreasuryUpgradable,
   ResolverModule,
@@ -35,7 +35,7 @@ const FEE = ethers.utils.parseEther("0.1");
 describe("Ops legacy task test", function () {
   let ops: Ops;
   let legacyOps: ILegacyOps;
-  let counter: Counter;
+  let counter: CounterTest;
   let counterResolver: CounterResolver;
   let taskTreasury: TaskTreasuryUpgradable;
   let events: LibEvents;
@@ -60,7 +60,7 @@ describe("Ops legacy task test", function () {
 
     ops = await ethers.getContract("Ops");
     taskTreasury = await ethers.getContract("TaskTreasuryUpgradable");
-    counter = await ethers.getContract("Counter");
+    counter = await ethers.getContract("CounterTest");
     counterResolver = await ethers.getContract("CounterResolver");
     legacyOps = await ethers.getContractAt("ILegacyOps", ops.address);
     events = LibEvents__factory.connect(ops.address, user);
