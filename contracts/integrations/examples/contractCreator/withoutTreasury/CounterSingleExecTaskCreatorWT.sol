@@ -22,6 +22,8 @@ contract CounterSingleExecTaskCreatorWT is OpsTaskCreator {
         OpsTaskCreator(_ops, _fundsOwner)
     {}
 
+    receive() external payable {}
+
     function createTask() external payable {
         require(taskId == bytes32(""), "Already started task");
 

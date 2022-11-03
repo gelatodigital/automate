@@ -13,6 +13,8 @@ contract CounterTestWT is OpsReady {
         OpsReady(_ops, _taskCreator)
     {}
 
+    receive() external payable {}
+
     function increaseCount(uint256 amount) external {
         require(
             ((block.timestamp - lastExecuted) > 180),
