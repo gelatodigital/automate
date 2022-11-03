@@ -18,8 +18,8 @@ contract SingleExecTaskCreator is OpsTaskCreator {
 
     event CounterTaskCreated(bytes32 taskId);
 
-    constructor(address payable _ops, address _owner)
-        OpsTaskCreator(_ops, _owner)
+    constructor(address payable _ops, address _fundsOwner)
+        OpsTaskCreator(_ops, _fundsOwner)
     {}
 
     function createTask() external payable {
@@ -38,12 +38,7 @@ contract SingleExecTaskCreator is OpsTaskCreator {
         moduleData.args[0] = _proxyModuleArg();
         moduleData.args[1] = _singleExecModuleArg();
 
-        bytes32 id = ops.createTask(
-            address(this),
-            execData,
-            moduleData,
-            address(0)
-        );
+        bytes32 id = _createTask(address(this), execData, moduleData, ETH);
 
         taskId = id;
         emit CounterTaskCreated(id);
@@ -53,8 +48,8 @@ contract SingleExecTaskCreator is OpsTaskCreator {
         count += _amount;
         taskId = bytes32("");
 
-        (uint256 amount, address feeToken) = _getFeeDetails();
+        (uint256 fee, address feeToken) = _getFeeDetails();
 
-        _transfer(amount, feeToken);
+        _transfer(fee, feeToken);
     }
 }

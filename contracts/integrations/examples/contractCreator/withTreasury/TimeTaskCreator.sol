@@ -18,7 +18,9 @@ contract TimeTaskCreator is OpsTaskCreator {
 
     event CounterTaskCreated(bytes32 taskId);
 
-    constructor(address _ops, address _owner) OpsTaskCreator(_ops, _owner) {}
+    constructor(address _ops, address _fundsOwner)
+        OpsTaskCreator(_ops, _fundsOwner)
+    {}
 
     function createTask() external {
         require(taskId == bytes32(""), "Already started task");
@@ -35,7 +37,7 @@ contract TimeTaskCreator is OpsTaskCreator {
         moduleData.args[0] = _timeModuleArg(block.timestamp, INTERVAL);
         moduleData.args[1] = _proxyModuleArg();
 
-        bytes32 id = ops.createTask(
+        bytes32 id = _createTask(
             address(this),
             execData,
             moduleData,
@@ -50,7 +52,7 @@ contract TimeTaskCreator is OpsTaskCreator {
         uint256 newCount = count + _amount;
 
         if (newCount >= MAX_COUNT) {
-            ops.cancelTask(taskId);
+            _cancelTask(taskId);
             count = 0;
         } else {
             count += _amount;

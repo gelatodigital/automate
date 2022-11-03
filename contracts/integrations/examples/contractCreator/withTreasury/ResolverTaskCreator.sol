@@ -18,13 +18,12 @@ contract ResolverTaskCreator is OpsTaskCreator {
 
     event CounterTaskCreated(bytes32 taskId);
 
-    constructor(address _ops, address _owner) OpsTaskCreator(_ops, _owner) {}
+    constructor(address _ops, address _fundsOwner)
+        OpsTaskCreator(_ops, _fundsOwner)
+    {}
 
     function createTask() external {
         require(taskId == bytes32(""), "Already started task");
-
-        bytes memory resolverData = abi.encodeCall(this.checker, ());
-        bytes memory execSelector = abi.encode(this.increaseCount.selector);
 
         ModuleData memory moduleData = ModuleData({
             modules: new Module[](2),
@@ -34,12 +33,15 @@ contract ResolverTaskCreator is OpsTaskCreator {
         moduleData.modules[0] = Module.RESOLVER;
         moduleData.modules[1] = Module.PROXY;
 
-        moduleData.args[0] = _resolverModuleArg(address(this), resolverData);
+        moduleData.args[0] = _resolverModuleArg(
+            address(this),
+            abi.encodeCall(this.checker, ())
+        );
         moduleData.args[1] = _proxyModuleArg();
 
-        bytes32 id = ops.createTask(
+        bytes32 id = _createTask(
             address(this),
-            execSelector,
+            abi.encode(this.increaseCount.selector),
             moduleData,
             address(0)
         );
@@ -52,7 +54,7 @@ contract ResolverTaskCreator is OpsTaskCreator {
         uint256 newCount = count + _amount;
 
         if (newCount >= MAX_COUNT) {
-            ops.cancelTask(taskId);
+            _cancelTask(taskId);
             count = 0;
         } else {
             count += _amount;

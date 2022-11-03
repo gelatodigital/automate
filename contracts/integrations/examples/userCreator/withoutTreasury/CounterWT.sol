@@ -19,10 +19,7 @@ contract CounterWT is OpsReady {
         count += amount;
         lastExecuted = block.timestamp;
 
-        uint256 fee;
-        address feeToken;
-
-        (fee, feeToken) = ops.getFeeDetails();
+        (uint256 fee, address feeToken) = _getFeeDetails();
 
         _transfer(fee, feeToken);
     }

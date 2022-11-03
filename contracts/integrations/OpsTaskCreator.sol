@@ -25,7 +25,10 @@ abstract contract OpsTaskCreator is OpsReady {
      * Withdraw funds from this contract's Gelato balance to fundsOwner.
      */
     function withdrawFunds(uint256 _amount, address _token) external {
-        require(msg.sender == fundsOwner, "Only owner can withdraw funds");
+        require(
+            msg.sender == fundsOwner,
+            "Only funds owner can withdraw funds"
+        );
 
         taskTreasury.withdrawFunds(payable(fundsOwner), _token, _amount);
     }

@@ -18,7 +18,9 @@ contract SingleExecTaskCreator is OpsTaskCreator {
 
     event CounterTaskCreated(bytes32 taskId);
 
-    constructor(address _ops, address _owner) OpsTaskCreator(_ops, _owner) {}
+    constructor(address _ops, address _fundsOwner)
+        OpsTaskCreator(_ops, _fundsOwner)
+    {}
 
     function createTask() external {
         require(taskId == bytes32(""), "Already started task");
@@ -35,7 +37,7 @@ contract SingleExecTaskCreator is OpsTaskCreator {
         moduleData.args[0] = _proxyModuleArg();
         moduleData.args[1] = _singleExecModuleArg();
 
-        bytes32 id = ops.createTask(
+        bytes32 id = _createTask(
             address(this),
             execData,
             moduleData,
