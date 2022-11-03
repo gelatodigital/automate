@@ -44,22 +44,22 @@ abstract contract OpsReady {
      * @dev
      * Transfers fee to gelato for synchronous fee payments.
      *
-     * _amount & _feeToken should be queried from IOps.getFeeDetails()
+     * _fee & _feeToken should be queried from IOps.getFeeDetails()
      */
-    function _transfer(uint256 _amount, address _feeToken) internal {
+    function _transfer(uint256 _fee, address _feeToken) internal {
         if (_feeToken == ETH) {
-            (bool success, ) = _gelato.call{value: _amount}("");
+            (bool success, ) = _gelato.call{value: _fee}("");
             require(success, "_transfer: ETH transfer failed");
         } else {
-            SafeERC20.safeTransfer(IERC20(_feeToken), _gelato, _amount);
+            SafeERC20.safeTransfer(IERC20(_feeToken), _gelato, _fee);
         }
     }
 
     function _getFeeDetails()
         internal
         view
-        returns (uint256 amount, address feeToken)
+        returns (uint256 fee, address feeToken)
     {
-        (amount, feeToken) = ops.getFeeDetails();
+        (fee, feeToken) = ops.getFeeDetails();
     }
 }

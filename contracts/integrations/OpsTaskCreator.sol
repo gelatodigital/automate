@@ -30,6 +30,15 @@ abstract contract OpsTaskCreator is OpsReady {
         taskTreasury.withdrawFunds(payable(fundsOwner), _token, _amount);
     }
 
+    function _depositFunds(uint256 _amount, address _token) internal {
+        uint256 ethValue = _token == ETH ? _amount : 0;
+        taskTreasury.depositFunds{value: ethValue}(
+            address(this),
+            _token,
+            _amount
+        );
+    }
+
     function _createTask(
         address _execAddress,
         bytes memory _execDataOrSelector,
