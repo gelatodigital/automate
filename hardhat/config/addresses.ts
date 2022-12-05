@@ -44,6 +44,7 @@ export const getGelatoAddress = (network: string): string => {
     case "avalanche":
       return GELATO_AVALANCHE;
     case "arbitrum":
+    case "arbitrumTest":
       return GELATO_ARBITRUM;
     case "bsc":
       return GELATO_BSC;
@@ -53,6 +54,7 @@ export const getGelatoAddress = (network: string): string => {
     case "mumbaiTest":
       return GELATO_MUMBAI;
     case "optimism":
+    case "optimismTest":
       return GELATO_OPTIMISM;
     case "moonbeam":
       return GELATO_MOONBEAM;

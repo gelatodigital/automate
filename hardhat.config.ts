@@ -45,6 +45,11 @@ const config: HardhatUserConfig = {
       chainId: 42161,
       accounts: DEPLOYER_PK_MAINNET ? [DEPLOYER_PK_MAINNET] : [],
     },
+    arbitrumTest: {
+      url: `https://arb-mainnet.g.alchemy.com/v2/${ALCHEMY_ID}`,
+      chainId: 42161,
+      accounts: DEPLOYER_PK_MAINNET ? [DEPLOYER_PK_MAINNET] : [],
+    },
     avalanche: {
       url: "https://api.avax.network/ext/bc/C/rpc",
       chainId: 43114,
@@ -121,6 +126,11 @@ const config: HardhatUserConfig = {
       accounts: DEPLOYER_PK_MAINNET ? [DEPLOYER_PK_MAINNET] : [],
     },
     optimism: {
+      url: `https://opt-mainnet.g.alchemy.com/v2/${ALCHEMY_ID}`,
+      chainId: 10,
+      accounts: DEPLOYER_PK_MAINNET ? [DEPLOYER_PK_MAINNET] : [],
+    },
+    optimismTest: {
       url: `https://opt-mainnet.g.alchemy.com/v2/${ALCHEMY_ID}`,
       chainId: 10,
       accounts: DEPLOYER_PK_MAINNET ? [DEPLOYER_PK_MAINNET] : [],

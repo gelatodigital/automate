@@ -26,6 +26,7 @@ export const getMaxFee = (network: string): BigNumber => {
     case "avalanche":
       return ethers.utils.parseEther("2");
     case "arbitrum":
+    case "arbitrumTest":
       return ethers.utils.parseEther("0.01");
     case "bsc":
       return ethers.utils.parseEther("0.01");
@@ -35,6 +36,7 @@ export const getMaxFee = (network: string): BigNumber => {
     case "mumbaiTest":
       return ethers.utils.parseEther("0");
     case "optimism":
+    case "optimismTest":
       return ethers.utils.parseEther("0.1");
     case "moonbeam":
       return ethers.utils.parseEther("5");
