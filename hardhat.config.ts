@@ -75,11 +75,6 @@ const config: HardhatUserConfig = {
       chainId: 5,
       url: `https://eth-goerli.alchemyapi.io/v2/${ALCHEMY_ID}`,
     },
-    kovan: {
-      accounts: DEPLOYER_PK_MAINNET ? [DEPLOYER_PK_MAINNET] : [],
-      chainId: 42,
-      url: `https://eth-kovan.alchemyapi.io/v2/${ALCHEMY_ID}`,
-    },
     mainnet: {
       accounts: DEPLOYER_PK_MAINNET ? [DEPLOYER_PK_MAINNET] : [],
       chainId: 1,
@@ -119,21 +114,6 @@ const config: HardhatUserConfig = {
       url: `https://opt-goerli.g.alchemy.com/v2/${ALCHEMY_ID}`,
       chainId: 420,
       accounts: DEPLOYER_PK_MAINNET ? [DEPLOYER_PK_MAINNET] : [],
-    },
-    okovano: {
-      url: `https://opt-kovan.g.alchemy.com/v2/${ALCHEMY_ID}`,
-      chainId: 69,
-      accounts: DEPLOYER_PK_MAINNET ? [DEPLOYER_PK_MAINNET] : [],
-    },
-    rinkeby: {
-      accounts: DEPLOYER_PK_MAINNET ? [DEPLOYER_PK_MAINNET] : [],
-      chainId: 4,
-      url: `https://eth-rinkeby.alchemyapi.io/v2/${ALCHEMY_ID}`,
-    },
-    ropsten: {
-      accounts: DEPLOYER_PK_MAINNET ? [DEPLOYER_PK_MAINNET] : [],
-      chainId: 3,
-      url: `https://eth-ropsten.alchemyapi.io/v2/${ALCHEMY_ID}`,
     },
   },
 
