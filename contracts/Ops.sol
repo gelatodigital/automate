@@ -23,6 +23,7 @@ import {IOps} from "./interfaces/IOps.sol";
  * @notice ExecAddress refers to the contract that has the function which Gelato will call.
  * @notice Modules allow users to customise conditions and specifications when creating a task.
  */
+//solhint-disable function-max-lines
 contract Ops is Gelatofied, Proxied, OpsStorage, IOps {
     using GelatoBytes for bytes;
     using EnumerableSet for EnumerableSet.Bytes32Set;
@@ -96,16 +97,92 @@ contract Ops is Gelatofied, Proxied, OpsStorage, IOps {
             _useTaskTreasuryFunds ? address(0) : _feeToken
         );
 
-        _exec(
+        require(
+            _createdTasks[_taskCreator].contains(taskId),
+            "Ops.exec: Task not found"
+        );
+
+        if (!_useTaskTreasuryFunds) {
+            fee = _txFee;
+            feeToken = _feeToken;
+        }
+
+        bool success = LibTaskModule.onExecTask(
             taskId,
             _taskCreator,
             _execAddress,
             _execData,
             _moduleData.modules,
+            _revertOnFailure,
+            taskModuleAddresses
+        );
+
+        if (_useTaskTreasuryFunds) {
+            taskTreasury.useFunds(_taskCreator, _feeToken, _txFee);
+        } else {
+            delete fee;
+            delete feeToken;
+        }
+
+        emit LibEvents.ExecSuccess(
             _txFee,
             _feeToken,
-            _useTaskTreasuryFunds,
-            _revertOnFailure
+            _execAddress,
+            _execData,
+            taskId,
+            success
+        );
+    }
+
+    ///@inheritdoc IOps
+    function exec1Balance(
+        address _taskCreator,
+        address _execAddress,
+        bytes memory _execData,
+        LibDataTypes.ModuleData calldata _moduleData,
+        Gelato1BalanceParam calldata _oneBalanceParam,
+        bool _revertOnFailure
+    ) external onlyGelato {
+        bytes32 taskId = LibTaskId.getTaskId(
+            _taskCreator,
+            _execAddress,
+            _execData.memorySliceSelector(),
+            _moduleData,
+            address(0) ///@dev a task with useTreasury=true can be charged with 1Balance / Treasury
+        );
+
+        require(
+            _createdTasks[_taskCreator].contains(taskId),
+            "Ops.exec: Task not found"
+        );
+
+        bool success = LibTaskModule.onExecTask(
+            taskId,
+            _taskCreator,
+            _execAddress,
+            _execData,
+            _moduleData.modules,
+            _revertOnFailure,
+            taskModuleAddresses
+        );
+
+        emit LibEvents.ExecSuccess(
+            0,
+            address(0),
+            _execAddress,
+            _execData,
+            taskId,
+            success
+        );
+
+        emit LogUseGelato1Balance(
+            _oneBalanceParam.sponsor,
+            _execAddress,
+            _oneBalanceParam.feeToken,
+            _oneBalanceParam.oneBalanceChainId,
+            _oneBalanceParam.nativeToFeeTokenXRateNumerator,
+            _oneBalanceParam.nativeToFeeTokenXRateDenominator,
+            _oneBalanceParam.correlationId
         );
     }
 
