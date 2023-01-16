@@ -265,55 +265,6 @@ contract Ops is Gelatofied, Proxied, OpsStorage, IOps {
         emit LibEvents.TaskCancelled(_taskId, _taskCreator);
     }
 
-    // solhint-disable function-max-lines
-    function _exec(
-        bytes32 _taskId,
-        address _taskCreator,
-        address _execAddress,
-        bytes memory _execData,
-        LibDataTypes.Module[] memory _modules,
-        uint256 _txFee,
-        address _feeToken,
-        bool _useTaskTreasuryFunds,
-        bool _revertOnFailure
-    ) private {
-        require(
-            _createdTasks[_taskCreator].contains(_taskId),
-            "Ops.exec: Task not found"
-        );
-
-        if (!_useTaskTreasuryFunds) {
-            fee = _txFee;
-            feeToken = _feeToken;
-        }
-
-        bool success = LibTaskModule.onExecTask(
-            _taskId,
-            _taskCreator,
-            _execAddress,
-            _execData,
-            _modules,
-            _revertOnFailure,
-            taskModuleAddresses
-        );
-
-        if (_useTaskTreasuryFunds) {
-            taskTreasury.useFunds(_taskCreator, _feeToken, _txFee);
-        } else {
-            delete fee;
-            delete feeToken;
-        }
-
-        emit LibEvents.ExecSuccess(
-            _txFee,
-            _feeToken,
-            _execAddress,
-            _execData,
-            _taskId,
-            success
-        );
-    }
-
     function _handleLegacyTaskCreation(bytes calldata _callData)
         private
         returns (bytes memory returnData)
