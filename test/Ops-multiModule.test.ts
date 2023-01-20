@@ -216,6 +216,55 @@ describe("Ops multi module test", function () {
     expect(taskIds).to.not.include(taskId);
   });
 
+  it("exec1Balance", async () => {
+    await fastForwardTime(INTERVAL);
+    const countBefore = await counter.count();
+    const [, execData] = await counterResolver.checker();
+
+    const sponsor = userAddress;
+    const target = counter.address;
+    const feeToken = ETH;
+    const oneBalanceChainId = 1;
+    const nativeToFeeTokenXRateNumerator = 1;
+    const nativeToFeeTokenXRateDenominator = 1;
+    const correlationId = ethers.constants.HashZero;
+
+    const gelato1BalanceParam = {
+      sponsor,
+      feeToken,
+      oneBalanceChainId,
+      nativeToFeeTokenXRateNumerator,
+      nativeToFeeTokenXRateDenominator,
+      correlationId,
+    };
+
+    await expect(
+      ops
+        .connect(executor)
+        .exec1Balance(
+          userAddress,
+          counter.address,
+          execData,
+          moduleData,
+          gelato1BalanceParam,
+          true
+        )
+    )
+      .to.emit(ops, "LogUseGelato1Balance")
+      .withArgs(
+        sponsor,
+        target,
+        feeToken,
+        oneBalanceChainId,
+        nativeToFeeTokenXRateNumerator,
+        nativeToFeeTokenXRateDenominator,
+        correlationId
+      );
+
+    const countAfter = await counter.count();
+    expect(countAfter).to.be.gt(countBefore);
+  });
+
   const execute = async (revertOnFailure: boolean) => {
     const [, execData] = await counterResolver.checker();
 
