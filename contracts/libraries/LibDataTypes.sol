@@ -12,13 +12,15 @@ library LibDataTypes {
      * @param PROXY Creates a dedicated caller (msg.sender) to be used when executing the task. {See ProxyModule.sol}
      * @param SINGLE_EXEC Task is cancelled after one execution. {See SingleExecModule.sol}
      * @param ORESOLVER Use off-chain condition & input data for execution. {See OResolverModule.sol}
+     * @param WEB3_FUNCTION Use off-chain condition & input data for execution. {See Web3FunctionModule.sol}
      */
     enum Module {
         RESOLVER,
         TIME,
         PROXY,
         SINGLE_EXEC,
-        ORESOLVER
+        ORESOLVER,
+        WEB3_FUNCTION
     }
 
     /**

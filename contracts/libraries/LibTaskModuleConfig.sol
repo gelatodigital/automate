@@ -39,7 +39,8 @@ library LibTaskModuleConfig {
         if (
             _module == LibDataTypes.Module.TIME ||
             _module == LibDataTypes.Module.PROXY ||
-            _module == LibDataTypes.Module.ORESOLVER
+            _module == LibDataTypes.Module.ORESOLVER ||
+            _module == LibDataTypes.Module.WEB3_FUNCTION
         ) return true;
 
         return false;
