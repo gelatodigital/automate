@@ -20,4 +20,5 @@ abstract contract OpsStorage {
     ///@dev Appended State
     mapping(bytes32 => LibDataTypes.Time) public timedTask;
     mapping(LibDataTypes.Module => address) public taskModuleAddresses;
+    mapping(bytes32 => uint256) public nonce1Balance;
 }

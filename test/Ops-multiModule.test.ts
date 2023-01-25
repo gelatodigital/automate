@@ -238,6 +238,8 @@ describe("Ops multi module test", function () {
       correlationId,
     };
 
+    const nonce1BalanceBefore = await ops.nonce1Balance(taskId);
+
     await expect(
       ops
         .connect(executor)
@@ -261,7 +263,10 @@ describe("Ops multi module test", function () {
         correlationId
       );
 
+    const nonce1BalanceAfter = await ops.nonce1Balance(taskId);
     const countAfter = await counter.count();
+
+    expect(nonce1BalanceAfter).to.be.gt(nonce1BalanceBefore);
     expect(countAfter).to.be.gt(countBefore);
   });
 
