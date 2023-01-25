@@ -166,6 +166,8 @@ contract Ops is Gelatofied, Proxied, OpsStorage, IOps {
             taskModuleAddresses
         );
 
+        nonce1Balance[taskId] += 1;
+
         emit LibEvents.ExecSuccess(
             0,
             address(0),
