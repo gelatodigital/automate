@@ -281,25 +281,43 @@ library LibTaskModule {
     /**
      * @dev
      * - No duplicate modules.
-     * - No RESOLVER && ORESOLVER
+     * - Only RESOLVER || ORESOLVER || WEB3_FUNCTION
      */
     function _validModules(
         uint256 _length,
         LibDataTypes.Module[] memory _modules
     ) private pure {
         if (_length > 1) {
-            bool hasResolver = _modules[0] == LibDataTypes.Module.RESOLVER;
-            for (uint256 i; i < _length - 1; i++) {
+            bool hasResolver = _isResolver(_modules[0]);
+
+            for (uint256 i = 1; i < _length; i++) {
                 require(
-                    _modules[i + 1] > _modules[i],
+                    _modules[i] > _modules[i - 1],
                     "Ops._validModules: Asc only"
                 );
-                if (hasResolver)
+
+                if (_isResolver(_modules[i])) {
                     require(
-                        _modules[i + 1] != LibDataTypes.Module.ORESOLVER,
+                        !hasResolver,
                         "Ops._validModules: Only one resolver"
                     );
+                    hasResolver = true;
+                }
             }
         }
+    }
+
+    function _isResolver(LibDataTypes.Module _module)
+        private
+        pure
+        returns (bool)
+    {
+        if (
+            _module == LibDataTypes.Module.RESOLVER ||
+            _module == LibDataTypes.Module.ORESOLVER ||
+            _module == LibDataTypes.Module.WEB3_FUNCTION
+        ) return true;
+
+        return false;
     }
 }

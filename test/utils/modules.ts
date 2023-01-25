@@ -7,6 +7,7 @@ export enum Module {
   PROXY,
   SINGLE_EXEC,
   ORESOLVER,
+  WEB3_FUNCTION,
 }
 
 export type ModuleData = {
