@@ -7,61 +7,6 @@ import {LibDataTypes} from "../libraries/LibDataTypes.sol";
 import {_call} from "../functions/FExec.sol";
 
 contract Web3FunctionModule is TaskModuleBase, Ownable {
-    bool public whitelistEnabled;
-    mapping(address => bool) public whitelisted;
-
-    constructor() {
-        whitelistEnabled = true;
-    }
-
-    /**
-     * @dev calls Web3FunctionModule to check if task creator is whitelisted.
-     * whitelist state lives in Web3FunctionModule and not on Ops.
-     */
-    function onCreateTask(
-        bytes32,
-        address _taskCreator,
-        address,
-        bytes calldata,
-        bytes calldata
-    ) external override {
-        address addressThis = taskModuleAddresses[
-            LibDataTypes.Module.WEB3_FUNCTION
-        ];
-
-        bytes memory callData = abi.encodeWithSelector(
-            this.onlyWhitelisted.selector,
-            _taskCreator
-        );
-
-        _call(addressThis, callData, 0, true, "");
-    }
-
-    function setWhitelist(address[] memory _taskCreators, bool _whitelist)
-        external
-        onlyOwner
-    {
-        uint256 length = _taskCreators.length;
-        for (uint256 i; i < length; i++)
-            whitelisted[_taskCreators[i]] = _whitelist;
-    }
-
-    function setWhitelistEnabled(bool _enabled) external onlyOwner {
-        whitelistEnabled = _enabled;
-    }
-
-    /**
-     * @dev Requires taskCreator to be whitelisted to create an
-     * Web3Function task only if whitelistEnabled is set to true.
-     */
-    function onlyWhitelisted(address _taskCreator) external view {
-        if (whitelistEnabled)
-            require(
-                whitelisted[_taskCreator],
-                "Web3FunctionModule: Not whitelisted"
-            );
-    }
-
     /**
      * @notice Helper function to encode arguments for Web3FunctionModule.
      *

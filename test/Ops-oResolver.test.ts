@@ -118,7 +118,6 @@ describe("Ops OResolver module test", function () {
 
   it("createTask - only one resolver (ORESOLVER & WEB3_FUNCTION)", async () => {
     await oResolverModule.setWhitelist([userAddress], true);
-    await web3FunctionModule.setWhitelist([userAddress], true);
 
     moduleData = {
       modules: [Module.ORESOLVER, Module.WEB3_FUNCTION],
