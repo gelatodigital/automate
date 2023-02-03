@@ -2,15 +2,15 @@
 pragma solidity ^0.8.12;
 
 import {LibDataTypes} from "./LibDataTypes.sol";
-import {ILegacyOps} from "../interfaces/ILegacyOps.sol";
+import {ILegacyAutomate} from "../interfaces/ILegacyAutomate.sol";
 
 /**
  * @notice Library to keep task creation methods backwards compatible.
- * @notice Legacy create task methods can be found in ILegacyOps.sol
+ * @notice Legacy create task methods can be found in ILegacyAutomate.sol
  */
 library LibLegacyTask {
     /**
-     * @notice Use legacy ops create task calldata to construct
+     * @notice Use legacy Automate create task calldata to construct
      * arguments that conforms to current create task format.
      *
      * @param _funcSig Function signature of calldata.
@@ -26,25 +26,27 @@ library LibLegacyTask {
             address feeToken
         )
     {
-        if (_funcSig == ILegacyOps.createTask.selector) {
+        if (_funcSig == ILegacyAutomate.createTask.selector) {
             (execAddress, execData, moduleData, feeToken) = _resolveCreateTask(
                 _callData[4:]
             );
-        } else if (_funcSig == ILegacyOps.createTaskNoPrepayment.selector) {
+        } else if (
+            _funcSig == ILegacyAutomate.createTaskNoPrepayment.selector
+        ) {
             (
                 execAddress,
                 execData,
                 moduleData,
                 feeToken
             ) = _resolveCreateTaskNoPrepayment(_callData[4:]);
-        } else if (_funcSig == ILegacyOps.createTimedTask.selector) {
+        } else if (_funcSig == ILegacyAutomate.createTimedTask.selector) {
             (
                 execAddress,
                 execData,
                 moduleData,
                 feeToken
             ) = _resolveCreateTimedTask(_callData[4:]);
-        } else revert("Ops.createTask: Function not found");
+        } else revert("Automate.fallback: Function not found");
     }
 
     function _resolveCreateTask(bytes calldata _callDataSliced)

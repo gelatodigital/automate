@@ -5,7 +5,9 @@ import { getGelatoAddress } from "../hardhat/config/addresses";
 
 const func: DeployFunction = async (hre: HardhatRuntimeEnvironment) => {
   if (hre.network.name !== "hardhat") {
-    console.log(`Deploying Ops to ${hre.network.name}. Hit ctrl + c to abort`);
+    console.log(
+      `Deploying Automate to ${hre.network.name}. Hit ctrl + c to abort`
+    );
     await sleep(10000);
   }
 
@@ -18,7 +20,7 @@ const func: DeployFunction = async (hre: HardhatRuntimeEnvironment) => {
     await hre.ethers.getContract("TaskTreasuryUpgradable")
   ).address;
 
-  await deploy("Ops", {
+  await deploy("Automate", {
     from: deployer,
     proxy: {
       owner: deployer,
@@ -34,5 +36,5 @@ func.skip = async (hre: HardhatRuntimeEnvironment) => {
   return shouldSkip;
 };
 
-func.tags = ["Ops"];
+func.tags = ["Automate"];
 func.dependencies = ["TaskTreasuryUpgradable"];

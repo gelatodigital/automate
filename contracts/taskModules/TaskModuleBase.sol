@@ -1,11 +1,11 @@
 // SPDX-License-Identifier: UNLICENSED
 pragma solidity ^0.8.12;
 
-import {OpsStorage} from "../OpsStorage.sol";
+import {AutomateStorage} from "../AutomateStorage.sol";
 import {ITaskModule} from "../interfaces/ITaskModule.sol";
 
 // solhint-disable no-empty-blocks
-abstract contract TaskModuleBase is OpsStorage, ITaskModule {
+abstract contract TaskModuleBase is AutomateStorage, ITaskModule {
     ///@inheritdoc ITaskModule
     function preCreateTask(address _taskCreator, address _execAddress)
         external

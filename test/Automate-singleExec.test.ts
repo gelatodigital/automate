@@ -4,7 +4,7 @@ import { getTaskId, Module, ModuleData } from "./utils";
 import hre = require("hardhat");
 const { ethers, deployments } = hre;
 import {
-  Ops,
+  Automate,
   CounterTest,
   TaskTreasuryUpgradable,
   ProxyModule,
@@ -17,8 +17,8 @@ const ETH = "0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE";
 const ZERO_ADD = ethers.constants.AddressZero;
 const FEE = ethers.utils.parseEther("0.1");
 
-describe("Ops SingleExec module test", function () {
-  let ops: Ops;
+describe("Automate SingleExec module test", function () {
+  let automate: Automate;
   let counter: CounterTest;
   let taskTreasury: TaskTreasuryUpgradable;
   let singleExecModule: SingleExecModule;
@@ -41,7 +41,7 @@ describe("Ops SingleExec module test", function () {
     [, user] = await hre.ethers.getSigners();
     userAddress = await user.getAddress();
 
-    ops = await ethers.getContract("Ops");
+    automate = await ethers.getContract("Automate");
     taskTreasury = await ethers.getContract("TaskTreasuryUpgradable");
     counter = await ethers.getContract("CounterTest");
     singleExecModule = await ethers.getContract("SingleExecModule");
@@ -49,8 +49,8 @@ describe("Ops SingleExec module test", function () {
     timeModule = await ethers.getContract("TimeModule");
 
     // set-up
-    await taskTreasury.updateWhitelistedService(ops.address, true);
-    await ops.setModule(
+    await taskTreasury.updateWhitelistedService(automate.address, true);
+    await automate.setModule(
       [Module.TIME, Module.SINGLE_EXEC, Module.PROXY],
       [timeModule.address, singleExecModule.address, proxyModule.address]
     );
@@ -82,27 +82,27 @@ describe("Ops SingleExec module test", function () {
       ZERO_ADD
     );
 
-    await ops
+    await automate
       .connect(user)
       .createTask(counter.address, execData, moduleData, ZERO_ADD);
   });
 
   it("create task", async () => {
-    const taskIds = await ops.getTaskIdsByUser(userAddress);
+    const taskIds = await automate.getTaskIdsByUser(userAddress);
     expect(taskIds).include(taskId);
   });
 
   it("create task - duplicate", async () => {
     await expect(
-      ops
+      automate
         .connect(user)
         .createTask(counter.address, execData, moduleData, ZERO_ADD)
-    ).to.be.revertedWith("Ops.createTask: Duplicate task");
+    ).to.be.revertedWith("Automate.createTask: Duplicate task");
   });
 
   it("create task - duplicate with different args", async () => {
     moduleData = { ...moduleData, args: ["0x01"] };
-    await ops
+    await automate
       .connect(user)
       .createTask(counter.address, execData, moduleData, ZERO_ADD);
 
@@ -114,7 +114,7 @@ describe("Ops SingleExec module test", function () {
       ZERO_ADD
     );
 
-    const taskIds = await ops.getTaskIdsByUser(userAddress);
+    const taskIds = await automate.getTaskIdsByUser(userAddress);
     expect(taskIds).include(taskId);
   });
 
@@ -126,12 +126,12 @@ describe("Ops SingleExec module test", function () {
     const countAfter = await counter.count();
     expect(countAfter).to.be.gt(countBefore);
 
-    const taskIds = await ops.getTaskIdsByUser(userAddress);
+    const taskIds = await automate.getTaskIdsByUser(userAddress);
     expect(taskIds).not.include(taskId);
   });
 
   const execute = async (revertOnFailure: boolean) => {
-    await ops
+    await automate
       .connect(executor)
       .exec(
         userAddress,

@@ -7,9 +7,9 @@ const main = async () => {
   const ownerAddress = await owner.getAddress();
   console.log("Owner: ", ownerAddress);
 
-  const proxy = <EIP173Proxy>await ethers.getContract("Ops");
+  const proxy = <EIP173Proxy>await ethers.getContract("Automate");
   const implementation = <EIP173Proxy>(
-    await ethers.getContract("Ops_Implementation")
+    await ethers.getContract("Automate_Implementation")
   );
 
   console.log("implementation", implementation.address);

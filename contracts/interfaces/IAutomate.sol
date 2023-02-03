@@ -4,7 +4,7 @@ import {LibDataTypes} from "../libraries/LibDataTypes.sol";
 import {ITaskTreasuryUpgradable} from "./ITaskTreasuryUpgradable.sol";
 
 // solhint-disable max-line-length
-interface IOps {
+interface IAutomate {
     /**
      * @notice Initiates a task with conditions which Gelato will monitor and execute when conditions are met.
      *
@@ -84,6 +84,13 @@ interface IOps {
         returns (bytes32[] memory);
 
     /**
+     * @notice TaskTreasury contract where user deposit funds to be used for fee payments.
+     *
+     * @return ITaskTreasuryUpgradable TaskTreasury contract interface
+     */
+    function taskTreasury() external view returns (ITaskTreasuryUpgradable);
+
+    /**
      * @notice Helper function to compute task id with module arguments
      *
      * @param taskCreator The address which created the task.
@@ -118,11 +125,4 @@ interface IOps {
         address feeToken,
         bytes32 resolverHash
     ) external pure returns (bytes32);
-
-    /**
-     * @notice TaskTreasury contract where user deposit funds to be used for fee payments.
-     *
-     * @return ITaskTreasuryUpgradable TaskTreasury contract interface
-     */
-    function taskTreasury() external view returns (ITaskTreasuryUpgradable);
 }

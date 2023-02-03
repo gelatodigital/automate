@@ -6,10 +6,10 @@ import {
 import {LibDataTypes} from "./libraries/LibDataTypes.sol";
 
 /**
- * @notice Storage layout of Ops smart contract.
+ * @notice Storage layout of Automate smart contract.
  */
 // solhint-disable max-states-count
-abstract contract OpsStorage {
+abstract contract AutomateStorage {
     mapping(bytes32 => address) public taskCreator; ///@dev Deprecated
     mapping(bytes32 => address) public execAddresses; ///@dev Deprecated
     mapping(address => EnumerableSet.Bytes32Set) internal _createdTasks;
