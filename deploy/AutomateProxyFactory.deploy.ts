@@ -5,7 +5,7 @@ import { sleep } from "../hardhat/utils";
 const func: DeployFunction = async (hre: HardhatRuntimeEnvironment) => {
   if (hre.network.name !== "hardhat") {
     console.log(
-      `Deploying OpsProxyFactory to ${hre.network.name}. Hit ctrl + c to abort`
+      `Deploying AutomateProxyFactory to ${hre.network.name}. Hit ctrl + c to abort`
     );
     await sleep(10000);
   }
@@ -17,7 +17,7 @@ const func: DeployFunction = async (hre: HardhatRuntimeEnvironment) => {
   const AUTOMATE = (await hre.ethers.getContract("Automate")).address;
   const OPSPROXY = (await hre.ethers.getContract("OpsProxy")).address;
 
-  await deploy("OpsProxyFactory", {
+  await deploy("AutomateProxyFactory", {
     from: deployer,
     proxy: {
       proxyContract: "EIP173Proxy",
@@ -40,5 +40,5 @@ func.skip = async (hre: HardhatRuntimeEnvironment) => {
   return shouldSkip;
 };
 
-func.tags = ["OpsProxyFactory"];
+func.tags = ["AutomateProxyFactory"];
 func.dependencies = ["OpsProxy"];

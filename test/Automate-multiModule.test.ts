@@ -13,6 +13,7 @@ import hre = require("hardhat");
 const { ethers, deployments } = hre;
 import {
   Automate,
+  AutomateProxyFactory,
   CounterWL,
   CounterResolver,
   TaskTreasuryUpgradable,
@@ -20,7 +21,6 @@ import {
   TimeModule,
   ProxyModule,
   SingleExecModule,
-  OpsProxyFactory,
   OpsProxy,
 } from "../typechain";
 
@@ -35,7 +35,7 @@ describe("Automate multi module test", function () {
   let counter: CounterWL;
   let counterResolver: CounterResolver;
   let taskTreasury: TaskTreasuryUpgradable;
-  let opsProxyFactory: OpsProxyFactory;
+  let automateProxyFactory: AutomateProxyFactory;
   let opsProxy: OpsProxy;
 
   let resolverModule: ResolverModule;
@@ -65,7 +65,7 @@ describe("Automate multi module test", function () {
     taskTreasury = await ethers.getContract("TaskTreasuryUpgradable");
     counter = await ethers.getContract("CounterWL");
     counterResolver = await ethers.getContract("CounterResolver");
-    opsProxyFactory = await ethers.getContract("OpsProxyFactory");
+    automateProxyFactory = await ethers.getContract("AutomateProxyFactory");
 
     resolverModule = await ethers.getContract("ResolverModule");
     timeModule = await ethers.getContract("TimeModule");
@@ -97,7 +97,7 @@ describe("Automate multi module test", function () {
       .depositFunds(userAddress, ETH, depositAmount, { value: depositAmount });
 
     // deploy proxy
-    await opsProxyFactory.connect(user).deploy();
+    await automateProxyFactory.connect(user).deploy();
 
     // create task
     const resolverData =
@@ -124,7 +124,7 @@ describe("Automate multi module test", function () {
       .connect(user)
       .createTask(counter.address, execSelector, moduleData, ZERO_ADD);
 
-    const [proxyAddress] = await opsProxyFactory.getProxyOf(userAddress);
+    const [proxyAddress] = await automateProxyFactory.getProxyOf(userAddress);
     opsProxy = await ethers.getContractAt("OpsProxy", proxyAddress);
 
     // whitelist proxy on counter
