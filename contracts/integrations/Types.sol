@@ -13,7 +13,7 @@ struct ModuleData {
     bytes[] args;
 }
 
-interface IOps {
+interface IAutomate {
     function createTask(
         address execAddress,
         bytes calldata execDataOrSelector,
@@ -44,6 +44,6 @@ interface ITaskTreasuryUpgradable {
     ) external;
 }
 
-interface IOpsProxyFactory {
+interface IAutomateProxyFactory {
     function getProxyOf(address account) external view returns (address, bool);
 }

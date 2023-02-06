@@ -10,12 +10,12 @@ import "./Types.sol";
  * - Have call restrictions for functions to be automated.
  */
 // solhint-disable private-vars-leading-underscore
-abstract contract OpsReady {
-    IOps public immutable ops;
+abstract contract AutomateReady {
+    IAutomate public immutable automate;
     address public immutable dedicatedMsgSender;
     address private immutable _gelato;
     address internal constant ETH = 0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE;
-    address private constant OPS_PROXY_FACTORY =
+    address private constant AUTOMATE_PROXY_FACTORY =
         0xC815dB16D4be6ddf2685C201937905aBf338F5D7;
 
     /**
@@ -32,19 +32,18 @@ abstract contract OpsReady {
      * @dev
      * _taskCreator is the address which will create tasks for this contract.
      */
-    constructor(address _ops, address _taskCreator) {
-        ops = IOps(_ops);
-        _gelato = IOps(_ops).gelato();
-        (dedicatedMsgSender, ) = IOpsProxyFactory(OPS_PROXY_FACTORY).getProxyOf(
-            _taskCreator
-        );
+    constructor(address _automate, address _taskCreator) {
+        automate = IAutomate(_automate);
+        _gelato = IAutomate(_automate).gelato();
+        (dedicatedMsgSender, ) = IAutomateProxyFactory(AUTOMATE_PROXY_FACTORY)
+            .getProxyOf(_taskCreator);
     }
 
     /**
      * @dev
      * Transfers fee to gelato for synchronous fee payments.
      *
-     * _fee & _feeToken should be queried from IOps.getFeeDetails()
+     * _fee & _feeToken should be queried from IAutomate.getFeeDetails()
      */
     function _transfer(uint256 _fee, address _feeToken) internal {
         if (_feeToken == ETH) {
@@ -60,6 +59,6 @@ abstract contract OpsReady {
         view
         returns (uint256 fee, address feeToken)
     {
-        (fee, feeToken) = ops.getFeeDetails();
+        (fee, feeToken) = automate.getFeeDetails();
     }
 }
