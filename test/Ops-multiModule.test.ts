@@ -142,19 +142,19 @@ describe("Ops multi module test", function () {
     expect(thisTaskId).to.be.eql(expectedTaskId);
   });
 
-  it("task created", async () => {
+  it("createTask - task created", async () => {
     const taskIds = await ops.getTaskIdsByUser(userAddress);
     expect(taskIds).include(taskId);
   });
 
-  it("time initialised", async () => {
+  it("createTask - time initialised", async () => {
     const time = await ops.timedTask(taskId);
 
     expect(time.nextExec).to.be.eql(ethers.BigNumber.from(startTime));
     expect(time.interval).to.be.eql(ethers.BigNumber.from(INTERVAL));
   });
 
-  it("wrong module order", async () => {
+  it("createTask - wrong module order", async () => {
     moduleData = {
       modules: [Module.RESOLVER, Module.SINGLE_EXEC, Module.TIME, Module.PROXY],
       args: [resolverArgs, "0x", timeArgs, "0x"],
@@ -167,7 +167,7 @@ describe("Ops multi module test", function () {
     ).to.be.revertedWith("Ops._validModules: Asc only");
   });
 
-  it("duplicate modules", async () => {
+  it("createTask - duplicate modules", async () => {
     moduleData = {
       modules: [Module.RESOLVER, Module.RESOLVER],
       args: [resolverArgs, resolverArgs],
@@ -180,7 +180,7 @@ describe("Ops multi module test", function () {
     ).to.be.revertedWith("Ops._validModules: Asc only");
   });
 
-  it("no modules", async () => {
+  it("createTask - no modules", async () => {
     await counter.setWhitelist(ops.address, true);
     expect(await counter.whitelisted(ops.address)).to.be.true;
     moduleData = { modules: [], args: [] };
@@ -198,6 +198,17 @@ describe("Ops multi module test", function () {
 
     const countAfter = await counter.count();
     expect(countAfter).to.be.gt(countBefore);
+  });
+
+  it("createTask - only one resolver", async () => {
+    moduleData = {
+      modules: [Module.RESOLVER, Module.WEB3_FUNCTION],
+      args: ["0x", "0x"],
+    };
+
+    await expect(
+      ops.createTask(counter.address, execSelector, moduleData, ZERO_ADD)
+    ).to.be.revertedWith("Ops._validModules: Only one resolver");
   });
 
   it("exec - time should revert", async () => {
@@ -220,6 +231,60 @@ describe("Ops multi module test", function () {
 
     const taskIds = await ops.getTaskIdsByUser(userAddress);
     expect(taskIds).to.not.include(taskId);
+  });
+
+  it("exec1Balance", async () => {
+    await fastForwardTime(INTERVAL);
+    const countBefore = await counter.count();
+    const [, execData] = await counterResolver.checker();
+
+    const sponsor = userAddress;
+    const target = counter.address;
+    const feeToken = ETH;
+    const oneBalanceChainId = 1;
+    const nativeToFeeTokenXRateNumerator = 1;
+    const nativeToFeeTokenXRateDenominator = 1;
+    const correlationId = ethers.constants.HashZero;
+
+    const gelato1BalanceParam = {
+      sponsor,
+      feeToken,
+      oneBalanceChainId,
+      nativeToFeeTokenXRateNumerator,
+      nativeToFeeTokenXRateDenominator,
+      correlationId,
+    };
+
+    const nonce1BalanceBefore = await ops.nonce1Balance(taskId);
+
+    await expect(
+      ops
+        .connect(executor)
+        .exec1Balance(
+          userAddress,
+          counter.address,
+          execData,
+          moduleData,
+          gelato1BalanceParam,
+          true
+        )
+    )
+      .to.emit(ops, "LogUseGelato1Balance")
+      .withArgs(
+        sponsor,
+        target,
+        feeToken,
+        oneBalanceChainId,
+        nativeToFeeTokenXRateNumerator,
+        nativeToFeeTokenXRateDenominator,
+        correlationId
+      );
+
+    const nonce1BalanceAfter = await ops.nonce1Balance(taskId);
+    const countAfter = await counter.count();
+
+    expect(nonce1BalanceAfter).to.be.gt(nonce1BalanceBefore);
+    expect(countAfter).to.be.gt(countBefore);
   });
 
   const execute = async (revertOnFailure: boolean) => {

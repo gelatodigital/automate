@@ -278,16 +278,28 @@ library LibTaskModule {
         );
     }
 
-    ///@dev Check for duplicate modules.
+    /**
+     * @dev
+     * - No duplicate modules.
+     * - No RESOLVER && WEB3_FUNCTION
+     */
     function _validModules(
         uint256 _length,
         LibDataTypes.Module[] memory _modules
     ) private pure {
-        if (_length > 1)
-            for (uint256 i; i < _length - 1; i++)
+        if (_length > 1) {
+            bool hasResolver = _modules[0] == LibDataTypes.Module.RESOLVER;
+            for (uint256 i; i < _length - 1; i++) {
                 require(
                     _modules[i + 1] > _modules[i],
                     "Ops._validModules: Asc only"
                 );
+                if (hasResolver)
+                    require(
+                        _modules[i + 1] != LibDataTypes.Module.WEB3_FUNCTION,
+                        "Ops._validModules: Only one resolver"
+                    );
+            }
+        }
     }
 }

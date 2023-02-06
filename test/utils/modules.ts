@@ -6,6 +6,7 @@ export enum Module {
   TIME,
   PROXY,
   SINGLE_EXEC,
+  WEB3_FUNCTION,
 }
 
 export type ModuleData = {

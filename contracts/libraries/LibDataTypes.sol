@@ -11,12 +11,14 @@ library LibDataTypes {
      * @param TIME Repeated execution of task at a specified timing and interval. {See TimeModule.sol}
      * @param PROXY Creates a dedicated caller (msg.sender) to be used when executing the task. {See ProxyModule.sol}
      * @param SINGLE_EXEC Task is cancelled after one execution. {See SingleExecModule.sol}
+     * @param WEB3_FUNCTION Use off-chain condition & input data for execution. {See Web3FunctionModule.sol}
      */
     enum Module {
         RESOLVER,
         TIME,
         PROXY,
-        SINGLE_EXEC
+        SINGLE_EXEC,
+        WEB3_FUNCTION
     }
 
     /**
