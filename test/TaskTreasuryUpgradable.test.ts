@@ -119,7 +119,7 @@ describe("TaskTreasuryUpgradable test", function () {
   });
 
   it("maxFee should be correct", async () => {
-    expect(await treasury.maxFee()).to.be.eql(ethers.utils.parseEther("100"));
+    expect(await treasury.maxFee()).to.be.eql(ethers.BigNumber.from("0"));
   });
 
   it("deposit ETH", async () => {
