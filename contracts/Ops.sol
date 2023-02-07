@@ -29,7 +29,7 @@ contract Ops is Gelatofied, Proxied, OpsStorage, IOps {
     using EnumerableSet for EnumerableSet.Bytes32Set;
 
     // solhint-disable const-name-snakecase
-    string public constant version = "5";
+    string public constant version = "6";
     ITaskTreasuryUpgradable public immutable override taskTreasury;
 
     constructor(address payable _gelato, ITaskTreasuryUpgradable _taskTreasury)
