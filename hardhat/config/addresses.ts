@@ -1,8 +1,3 @@
-/* eslint-disable @typescript-eslint/naming-convention */
-import { HardhatRuntimeEnvironment } from "hardhat/types";
-
-import { address as mainnetOps } from "../../deployments/mainnet/Ops.json";
-
 export const getGelatoAddress = (network: string): string => {
   const GELATO_MAINNET = "0x3caca7b48d0573d793d3b0279b5f0029180e83b6";
   const GELATO_MATIC = "0x7598e84B2E114AB62CAB288CE5f7d5f6bad35BbA";
@@ -69,30 +64,4 @@ export const getGelatoAddress = (network: string): string => {
     default:
       throw new Error("No gelato address for network");
   }
-};
-
-export const getOpsAddress = async (
-  hre: HardhatRuntimeEnvironment
-): Promise<string> => {
-  const network = hre.network.name;
-
-  if (network == "mainnet" || network == "hardhat") return mainnetOps;
-
-  return (await hre.ethers.getContract("Ops")).address;
-};
-
-export const getTaskTreasuryAddress = async (
-  hre: HardhatRuntimeEnvironment
-): Promise<string> => {
-  const network = hre.network.name;
-
-  if (
-    network == "mainnet" ||
-    network == "ropsten" ||
-    network == "rinkeby" ||
-    network == "goerli"
-  )
-    return (await hre.ethers.getContract("TaskTreasury")).address;
-
-  return (await hre.ethers.getContract("TaskTreasuryL2")).address;
 };

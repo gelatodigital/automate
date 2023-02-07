@@ -20,6 +20,7 @@ const func: DeployFunction = async (hre: HardhatRuntimeEnvironment) => {
   await deploy("TaskTreasury", {
     from: deployer,
     args: [GELATO],
+    log: hre.network.name !== "hardhat",
   });
 };
 

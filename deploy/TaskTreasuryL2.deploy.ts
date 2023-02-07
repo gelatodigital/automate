@@ -2,11 +2,10 @@ import { HardhatRuntimeEnvironment } from "hardhat/types";
 import { DeployFunction } from "hardhat-deploy/types";
 import { sleep } from "../hardhat/utils";
 import { getGelatoAddress } from "../hardhat/config/addresses";
-import { getMaxFee } from "../hardhat/config/maxFee";
 import { ethers } from "hardhat";
 
 const func: DeployFunction = async (hre: HardhatRuntimeEnvironment) => {
-  const maxFee = getMaxFee(hre.network.name);
+  const maxFee = 0;
   const GELATO = getGelatoAddress(hre.network.name);
 
   if (hre.network.name !== "hardhat") {
@@ -29,6 +28,7 @@ const func: DeployFunction = async (hre: HardhatRuntimeEnvironment) => {
   await deploy("TaskTreasuryL2", {
     from: deployer,
     args: [GELATO, maxFee],
+    log: hre.network.name !== "hardhat",
   });
 };
 

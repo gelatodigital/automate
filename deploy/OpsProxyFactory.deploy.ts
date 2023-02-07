@@ -20,7 +20,6 @@ const func: DeployFunction = async (hre: HardhatRuntimeEnvironment) => {
   await deploy("OpsProxyFactory", {
     from: deployer,
     proxy: {
-      proxyContract: "EIP173Proxy",
       owner: deployer,
       execute: {
         init: {
@@ -30,6 +29,7 @@ const func: DeployFunction = async (hre: HardhatRuntimeEnvironment) => {
       },
     },
     args: [OPS],
+    log: hre.network.name !== "hardhat",
   });
 };
 

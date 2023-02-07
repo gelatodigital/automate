@@ -16,6 +16,7 @@ const func: DeployFunction = async (hre: HardhatRuntimeEnvironment) => {
 
   await deploy("SingleExecModule", {
     from: deployer,
+    log: hre.network.name !== "hardhat",
   });
 };
 

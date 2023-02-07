@@ -22,10 +22,6 @@ const main = async () => {
 
   console.log("TaskTreasuryL2: Whitelisted TaskTreasuryUpgradable");
 
-  await taskTreasury.connect(owner).addWhitelistedService(ops.address);
-
-  console.log("TaskTreasuryL2: Whitelisted Ops");
-
   await taskTreasuryUpgradable
     .connect(owner)
     .updateWhitelistedService(ops.address, true);

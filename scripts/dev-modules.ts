@@ -6,6 +6,7 @@ import {
   ResolverModule,
   SingleExecModule,
   TimeModule,
+  Web3FunctionModule,
 } from "../typechain";
 
 export const setModules = async () => {
@@ -13,8 +14,8 @@ export const setModules = async () => {
   const ownerAddress = await owner.getAddress();
   console.log("Owner: ", ownerAddress);
 
-  const opsAddress = (<Ops>await ethers.getContract("Ops")).address;
-  const ops = await ethers.getContractAt("Ops", opsAddress);
+  const opsAddress = (await ethers.getContract("Ops")).address;
+  const ops = <Ops>await ethers.getContractAt("Ops", opsAddress);
 
   const resolverModule = <ResolverModule>(
     await ethers.getContract("ResolverModule")
@@ -24,18 +25,23 @@ export const setModules = async () => {
   const singleExecModule = <SingleExecModule>(
     await ethers.getContract("SingleExecModule")
   );
+  const web3FunctionModule = <Web3FunctionModule>(
+    await ethers.getContract("Web3FunctionModule")
+  );
 
   const modules = [
     Module.RESOLVER,
     Module.TIME,
     Module.PROXY,
     Module.SINGLE_EXEC,
+    Module.WEB3_FUNCTION,
   ];
   const moduleAddresses = [
     resolverModule.address,
     timeModule.address,
     proxyModule.address,
     singleExecModule.address,
+    web3FunctionModule.address,
   ];
 
   await ops.setModule(modules, moduleAddresses);
