@@ -3,13 +3,13 @@ pragma solidity ^0.8.12;
 
 import {TaskModuleBase} from "./TaskModuleBase.sol";
 import {IOpsProxy} from "../interfaces/IOpsProxy.sol";
-import {IAutomateProxyFactory} from "../interfaces/IAutomateProxyFactory.sol";
+import {IOpsProxyFactory} from "../interfaces/IOpsProxyFactory.sol";
 
 contract ProxyModule is TaskModuleBase {
-    IAutomateProxyFactory public immutable automateProxyFactory;
+    IOpsProxyFactory public immutable opsProxyFactory;
 
-    constructor(IAutomateProxyFactory _automateProxyFactory) {
-        automateProxyFactory = _automateProxyFactory;
+    constructor(IOpsProxyFactory _opsProxyFactory) {
+        opsProxyFactory = _opsProxyFactory;
     }
 
     /**
@@ -35,7 +35,7 @@ contract ProxyModule is TaskModuleBase {
         override
         returns (address, address)
     {
-        address ownerOfExecAddress = automateProxyFactory.ownerOf(_execAddress);
+        address ownerOfExecAddress = opsProxyFactory.ownerOf(_execAddress);
 
         if (ownerOfExecAddress != address(0)) {
             // creating task to proxy
@@ -47,9 +47,7 @@ contract ProxyModule is TaskModuleBase {
 
             return (ownerOfExecAddress, _execAddress);
         } else {
-            address ownerOfTaskCreator = automateProxyFactory.ownerOf(
-                _taskCreator
-            );
+            address ownerOfTaskCreator = opsProxyFactory.ownerOf(_taskCreator);
 
             if (ownerOfTaskCreator != address(0)) {
                 // creating task to non proxy, with proxy
@@ -68,7 +66,7 @@ contract ProxyModule is TaskModuleBase {
         override
         returns (address)
     {
-        address ownerOfTaskCreator = automateProxyFactory.ownerOf(_taskCreator);
+        address ownerOfTaskCreator = opsProxyFactory.ownerOf(_taskCreator);
 
         if (ownerOfTaskCreator != address(0)) {
             return ownerOfTaskCreator;
@@ -89,7 +87,7 @@ contract ProxyModule is TaskModuleBase {
         address _execAddress,
         bytes calldata _execData
     ) external view override returns (address, bytes memory execData) {
-        (address proxy, ) = automateProxyFactory.getProxyOf(_taskCreator);
+        (address proxy, ) = opsProxyFactory.getProxyOf(_taskCreator);
 
         execData = _execAddress == proxy
             ? _execData
@@ -101,12 +99,12 @@ contract ProxyModule is TaskModuleBase {
     }
 
     function _deployIfNoProxy(address _taskCreator) private {
-        bool isTaskCreatorProxy = automateProxyFactory.ownerOf(_taskCreator) !=
+        bool isTaskCreatorProxy = opsProxyFactory.ownerOf(_taskCreator) !=
             address(0);
 
         if (!isTaskCreatorProxy) {
-            (, bool deployed) = automateProxyFactory.getProxyOf(_taskCreator);
-            if (!deployed) automateProxyFactory.deployFor(_taskCreator);
+            (, bool deployed) = opsProxyFactory.getProxyOf(_taskCreator);
+            if (!deployed) opsProxyFactory.deployFor(_taskCreator);
         }
     }
 

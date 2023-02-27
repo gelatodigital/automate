@@ -44,6 +44,6 @@ interface ITaskTreasuryUpgradable {
     ) external;
 }
 
-interface IAutomateProxyFactory {
+interface IOpsProxyFactory {
     function getProxyOf(address account) external view returns (address, bool);
 }

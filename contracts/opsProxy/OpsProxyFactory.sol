@@ -6,11 +6,11 @@ import {
 } from "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol";
 import {EIP173OpsProxy} from "../vendor/proxy/EIP173/EIP173OpsProxy.sol";
 import {Proxied} from "../vendor/proxy/EIP173/Proxied.sol";
-import {IAutomateProxyFactory} from "../interfaces/IAutomateProxyFactory.sol";
+import {IOpsProxyFactory} from "../interfaces/IOpsProxyFactory.sol";
 
 // solhint-disable max-states-count
-contract AutomateProxyFactory is Initializable, Proxied, IAutomateProxyFactory {
-    address public immutable automate;
+contract OpsProxyFactory is Initializable, Proxied, IOpsProxyFactory {
+    address public immutable ops;
     address public implementation;
     mapping(address => bool) public override whitelistedImplementations;
 
@@ -21,23 +21,17 @@ contract AutomateProxyFactory is Initializable, Proxied, IAutomateProxyFactory {
     mapping(address => address) internal _ownerOf;
 
     modifier onlyOneProxy(address _account) {
-        require(
-            _proxyOf[_account] == address(0),
-            "AutomateProxyFactory: One proxy"
-        );
+        require(_proxyOf[_account] == address(0), "OpsProxyFactory: One proxy");
         _;
     }
 
     modifier notProxy(address _account) {
-        require(
-            _ownerOf[_account] == address(0),
-            "AutomateProxyFactory: No proxy"
-        );
+        require(_ownerOf[_account] == address(0), "OpsProxyFactory: No proxy");
         _;
     }
 
-    constructor(address _automate) {
-        automate = _automate;
+    constructor(address _ops) {
+        ops = _ops;
     }
 
     function initialize(address _implementation) external initializer {
@@ -45,7 +39,7 @@ contract AutomateProxyFactory is Initializable, Proxied, IAutomateProxyFactory {
         whitelistedImplementations[_implementation] = true;
     }
 
-    ///@inheritdoc IAutomateProxyFactory
+    ///@inheritdoc IOpsProxyFactory
     function deploy() external override returns (address payable proxy) {
         proxy = deployFor(msg.sender);
     }
@@ -58,7 +52,7 @@ contract AutomateProxyFactory is Initializable, Proxied, IAutomateProxyFactory {
         require(
             oldImplementation != _newImplementation &&
                 whitelistedImplementations[_newImplementation],
-            "AutomateProxyFactory: Invalid implementation"
+            "OpsProxyFactory: Invalid implementation"
         );
 
         implementation = _newImplementation;
@@ -75,7 +69,7 @@ contract AutomateProxyFactory is Initializable, Proxied, IAutomateProxyFactory {
         emit UpdateWhitelistedImplementation(_implementation, _whitelist);
     }
 
-    ///@inheritdoc IAutomateProxyFactory
+    ///@inheritdoc IOpsProxyFactory
     function getProxyOf(address _account)
         external
         view
@@ -90,12 +84,12 @@ contract AutomateProxyFactory is Initializable, Proxied, IAutomateProxyFactory {
         return (proxyAddress, false);
     }
 
-    ///@inheritdoc IAutomateProxyFactory
+    ///@inheritdoc IOpsProxyFactory
     function ownerOf(address _proxy) external view override returns (address) {
         return _ownerOf[_proxy];
     }
 
-    ///@inheritdoc IAutomateProxyFactory
+    ///@inheritdoc IOpsProxyFactory
     function deployFor(address owner)
         public
         override
@@ -111,7 +105,7 @@ contract AutomateProxyFactory is Initializable, Proxied, IAutomateProxyFactory {
         emit DeployProxy(msg.sender, owner, address(proxy));
     }
 
-    ///@inheritdoc IAutomateProxyFactory
+    ///@inheritdoc IOpsProxyFactory
     function determineProxyAddress(address _account)
         public
         view

@@ -4,10 +4,10 @@ const { ethers, deployments } = hre;
 import { Signer } from "@ethersproject/abstract-signer";
 import {
   Automate,
-  AutomateProxyFactory,
   CounterWL,
   TaskTreasuryUpgradable,
   OpsProxy,
+  OpsProxyFactory,
   ProxyModule,
   TimeModule,
   EIP173ProxyWithCustomReceive,
@@ -33,7 +33,7 @@ describe("Automate Proxy module test", function () {
   let automate: Automate;
   let opsProxy: OpsProxy;
   let opsProxyImplementation: OpsProxy;
-  let automateProxyFactory: AutomateProxyFactory;
+  let opsProxyFactory: OpsProxyFactory;
   let treasury: TaskTreasuryUpgradable;
   let counter: CounterWL;
   let proxyModule: ProxyModule;
@@ -58,7 +58,7 @@ describe("Automate Proxy module test", function () {
     proxyModule = await ethers.getContract("ProxyModule");
     timeModule = await ethers.getContract("TimeModule");
     counter = await ethers.getContract("CounterWL");
-    automateProxyFactory = await ethers.getContract("AutomateProxyFactory");
+    opsProxyFactory = await ethers.getContract("OpsProxyFactory");
     opsProxyImplementation = await ethers.getContract("OpsProxy");
 
     // get accounts
@@ -83,7 +83,7 @@ describe("Automate Proxy module test", function () {
       .depositFunds(userAddress, ETH, depositAmount, { value: depositAmount });
 
     // deploy proxy
-    await automateProxyFactory.connect(user).deploy();
+    await opsProxyFactory.connect(user).deploy();
 
     // create task
     taskCreator = userAddress;
@@ -103,7 +103,7 @@ describe("Automate Proxy module test", function () {
   });
 
   it("create task - with proxy, eoa should own task", async () => {
-    const [proxyAddress] = await automateProxyFactory.getProxyOf(userAddress);
+    const [proxyAddress] = await opsProxyFactory.getProxyOf(userAddress);
     opsProxy = await ethers.getContractAt("OpsProxy", proxyAddress);
     moduleData = { ...moduleData, args: ["0x01"] };
 
@@ -132,10 +132,11 @@ describe("Automate Proxy module test", function () {
   });
 
   it("proxy deployed", async () => {
-    const determinedProxyAddress =
-      await automateProxyFactory.determineProxyAddress(userAddress);
+    const determinedProxyAddress = await opsProxyFactory.determineProxyAddress(
+      userAddress
+    );
 
-    const [proxyAddress, isDeployed] = await automateProxyFactory.getProxyOf(
+    const [proxyAddress, isDeployed] = await opsProxyFactory.getProxyOf(
       userAddress
     );
     opsProxy = await ethers.getContractAt("OpsProxy", proxyAddress);
@@ -145,13 +146,11 @@ describe("Automate Proxy module test", function () {
 
     expect(await opsProxy.ops()).to.be.eql(automate.address);
     expect(await opsProxy.owner()).to.be.eql(userAddress);
-    expect(await automateProxyFactory.ownerOf(proxyAddress)).to.not.be.eql(
-      ZERO_ADD
-    );
+    expect(await opsProxyFactory.ownerOf(proxyAddress)).to.not.be.eql(ZERO_ADD);
   });
 
   it("proxy - properly initialized", async () => {
-    expect(await automateProxyFactory.implementation()).to.be.eql(
+    expect(await opsProxyFactory.implementation()).to.be.eql(
       opsProxyImplementation.address
     );
 
@@ -162,7 +161,7 @@ describe("Automate Proxy module test", function () {
   });
 
   it("proxy - cannot upgrade to not whitelisted implementation", async () => {
-    const [proxyAddress] = await automateProxyFactory.getProxyOf(userAddress);
+    const [proxyAddress] = await opsProxyFactory.getProxyOf(userAddress);
     const opsProxy: EIP173ProxyWithCustomReceive = await ethers.getContractAt(
       "EIP173ProxyWithCustomReceive",
       proxyAddress
@@ -174,13 +173,13 @@ describe("Automate Proxy module test", function () {
   });
 
   it("proxy - only owner can update implementation", async () => {
-    const [proxyAddress] = await automateProxyFactory.getProxyOf(userAddress);
+    const [proxyAddress] = await opsProxyFactory.getProxyOf(userAddress);
     const opsProxy: EIP173ProxyWithCustomReceive = await ethers.getContractAt(
       "EIP173ProxyWithCustomReceive",
       proxyAddress
     );
 
-    await automateProxyFactory
+    await opsProxyFactory
       .connect(deployer)
       .updateWhitelistedImplementations(ETH, true);
 
@@ -200,7 +199,7 @@ describe("Automate Proxy module test", function () {
   });
 
   it("receive", async () => {
-    const [proxyAddress] = await automateProxyFactory.getProxyOf(userAddress);
+    const [proxyAddress] = await opsProxyFactory.getProxyOf(userAddress);
 
     const value = ethers.utils.parseEther("1");
     await deployer.sendTransaction({
@@ -212,7 +211,7 @@ describe("Automate Proxy module test", function () {
   });
 
   it("cancelTask - with proxy, eoa is owner of task", async () => {
-    const [proxyAddress] = await automateProxyFactory.getProxyOf(userAddress);
+    const [proxyAddress] = await opsProxyFactory.getProxyOf(userAddress);
     opsProxy = await ethers.getContractAt("OpsProxy", proxyAddress);
 
     const taskIds = await automate.getTaskIdsByUser(userAddress);
