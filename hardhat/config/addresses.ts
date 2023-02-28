@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/naming-convention */
 import { HardhatRuntimeEnvironment } from "hardhat/types";
 
-import { address as mainnetOps } from "../../deployments/mainnet/Ops.json";
+import { address as mainnetOps } from "../../deployments/mainnet/Automate.json";
 
 export const getGelatoAddress = (network: string): string => {
   const GELATO_MAINNET = "0x3caca7b48d0573d793d3b0279b5f0029180e83b6";
