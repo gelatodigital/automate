@@ -94,5 +94,8 @@ export const getTaskTreasuryAddress = async (
   )
     return (await hre.ethers.getContract("TaskTreasury")).address;
 
+  if (network == "fantom")
+    return (await hre.ethers.getContract("TaskTreasuryFantom")).address;
+
   return (await hre.ethers.getContract("TaskTreasuryL2")).address;
 };
