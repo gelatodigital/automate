@@ -2,16 +2,20 @@
 pragma solidity ^0.8.14;
 
 import "./OpsReady.sol";
+import {IERC20} from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 
 /**
  * @dev Inherit this contract to allow your smart contract
  * to be a task creator and create tasks.
  */
+//solhint-disable const-name-snakecase
 abstract contract OpsTaskCreator is OpsReady {
     using SafeERC20 for IERC20;
 
     address public immutable fundsOwner;
     ITaskTreasuryUpgradable public immutable taskTreasury;
+    IGelato1Balance public constant gelato1Balance =
+        IGelato1Balance(0x7506C12a824d73D9b08564d5Afc22c949434755e);
 
     constructor(address _ops, address _fundsOwner)
         OpsReady(_ops, address(this))
@@ -34,12 +38,41 @@ abstract contract OpsTaskCreator is OpsReady {
     }
 
     function _depositFunds(uint256 _amount, address _token) internal {
-        uint256 ethValue = _token == ETH ? _amount : 0;
+        uint256 ethValue;
+
+        if (_token == ETH) {
+            ethValue = _amount;
+        } else {
+            IERC20(_token).approve(address(taskTreasury), _amount);
+        }
+
         taskTreasury.depositFunds{value: ethValue}(
             address(this),
             _token,
             _amount
         );
+    }
+
+    function _depositFunds1Balance(
+        uint256 _amount,
+        address _token,
+        address _sponsor
+    ) internal {
+        if (_token == ETH) {
+            ///@dev Only deposit ETH on goerli for now.
+            require(block.chainid == 5, "Only deposit ETH on goerli");
+            gelato1Balance.depositNative{value: _amount}(_sponsor);
+        } else {
+            ///@dev Only deposit USDC on polygon for now.
+            require(
+                block.chainid == 137 &&
+                    _token ==
+                    address(0x2791Bca1f2de4661ED88A30C99A7a9449Aa84174),
+                "Only deposit USDC on polygon"
+            );
+            IERC20(_token).approve(address(gelato1Balance), _amount);
+            gelato1Balance.depositToken(_sponsor, _token, _amount);
+        }
     }
 
     function _createTask(
@@ -82,5 +115,12 @@ abstract contract OpsTaskCreator is OpsReady {
 
     function _singleExecModuleArg() internal pure returns (bytes memory) {
         return bytes("");
+    }
+
+    function _web3FunctionModuleArg(
+        string memory _web3FunctionHash,
+        bytes calldata _web3FunctionArgsHex
+    ) internal pure returns (bytes memory) {
+        return abi.encode(_web3FunctionHash, _web3FunctionArgsHex);
     }
 }
