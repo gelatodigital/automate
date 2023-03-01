@@ -13,7 +13,6 @@ abstract contract OpsTaskCreator is OpsReady {
     using SafeERC20 for IERC20;
 
     address public immutable fundsOwner;
-    ITaskTreasuryUpgradable public immutable taskTreasury;
     IGelato1Balance public constant gelato1Balance =
         IGelato1Balance(0x7506C12a824d73D9b08564d5Afc22c949434755e);
 
@@ -21,36 +20,6 @@ abstract contract OpsTaskCreator is OpsReady {
         OpsReady(_ops, address(this))
     {
         fundsOwner = _fundsOwner;
-        taskTreasury = ops.taskTreasury();
-    }
-
-    /**
-     * @dev
-     * Withdraw funds from this contract's Gelato balance to fundsOwner.
-     */
-    function withdrawFunds(uint256 _amount, address _token) external {
-        require(
-            msg.sender == fundsOwner,
-            "Only funds owner can withdraw funds"
-        );
-
-        taskTreasury.withdrawFunds(payable(fundsOwner), _token, _amount);
-    }
-
-    function _depositFunds(uint256 _amount, address _token) internal {
-        uint256 ethValue;
-
-        if (_token == ETH) {
-            ethValue = _amount;
-        } else {
-            IERC20(_token).approve(address(taskTreasury), _amount);
-        }
-
-        taskTreasury.depositFunds{value: ethValue}(
-            address(this),
-            _token,
-            _amount
-        );
     }
 
     function _depositFunds1Balance(

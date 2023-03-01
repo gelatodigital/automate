@@ -27,22 +27,6 @@ interface IOps {
     function getFeeDetails() external view returns (uint256, address);
 
     function gelato() external view returns (address payable);
-
-    function taskTreasury() external view returns (ITaskTreasuryUpgradable);
-}
-
-interface ITaskTreasuryUpgradable {
-    function depositFunds(
-        address receiver,
-        address token,
-        uint256 amount
-    ) external payable;
-
-    function withdrawFunds(
-        address payable receiver,
-        address token,
-        uint256 amount
-    ) external;
 }
 
 interface IOpsProxyFactory {

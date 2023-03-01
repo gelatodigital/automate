@@ -16,7 +16,7 @@ abstract contract OpsReady {
     address private immutable _gelato;
     address internal constant ETH = 0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE;
     address private constant OPS_PROXY_FACTORY =
-        0xC815dB16D4be6ddf2685C201937905aBf338F5D7;
+        0x44bde1bccdD06119262f1fE441FBe7341EaaC185;
 
     /**
      * @dev
