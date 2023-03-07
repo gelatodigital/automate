@@ -12,7 +12,7 @@ import {
 import hre = require("hardhat");
 const { ethers, deployments } = hre;
 import {
-  Ops,
+  Automate,
   CounterWL,
   CounterResolver,
   TaskTreasuryUpgradable,
@@ -30,8 +30,8 @@ const ZERO_ADD = ethers.constants.AddressZero;
 const FEE = ethers.utils.parseEther("0.1");
 const INTERVAL = 7 * 60;
 
-describe("Ops multi module test", function () {
-  let ops: Ops;
+describe("Automate multi module test", function () {
+  let automate: Automate;
   let counter: CounterWL;
   let counterResolver: CounterResolver;
   let taskTreasury: TaskTreasuryUpgradable;
@@ -61,7 +61,7 @@ describe("Ops multi module test", function () {
     [, user] = await hre.ethers.getSigners();
     userAddress = await user.getAddress();
 
-    ops = await ethers.getContract("Ops");
+    automate = await ethers.getContract("Automate");
     taskTreasury = await ethers.getContract("TaskTreasuryUpgradable");
     counter = await ethers.getContract("CounterWL");
     counterResolver = await ethers.getContract("CounterResolver");
@@ -73,8 +73,8 @@ describe("Ops multi module test", function () {
     singleExecModule = await ethers.getContract("SingleExecModule");
 
     // set-up
-    await taskTreasury.updateWhitelistedService(ops.address, true);
-    await ops.setModule(
+    await taskTreasury.updateWhitelistedService(automate.address, true);
+    await automate.setModule(
       [Module.RESOLVER, Module.TIME, Module.PROXY, Module.SINGLE_EXEC],
       [
         resolverModule.address,
@@ -120,7 +120,7 @@ describe("Ops multi module test", function () {
       ZERO_ADD
     );
 
-    await ops
+    await automate
       .connect(user)
       .createTask(counter.address, execSelector, moduleData, ZERO_ADD);
 
@@ -133,7 +133,7 @@ describe("Ops multi module test", function () {
   });
 
   it("getTaskId", async () => {
-    const thisTaskId = await ops[
+    const thisTaskId = await automate[
       "getTaskId(address,address,bytes4,(uint8[],bytes[]),address)"
     ](userAddress, counter.address, execSelector, moduleData, ZERO_ADD);
 
@@ -143,12 +143,12 @@ describe("Ops multi module test", function () {
   });
 
   it("createTask - task created", async () => {
-    const taskIds = await ops.getTaskIdsByUser(userAddress);
+    const taskIds = await automate.getTaskIdsByUser(userAddress);
     expect(taskIds).include(taskId);
   });
 
   it("createTask - time initialised", async () => {
-    const time = await ops.timedTask(taskId);
+    const time = await automate.timedTask(taskId);
 
     expect(time.nextExec).to.be.eql(ethers.BigNumber.from(startTime));
     expect(time.interval).to.be.eql(ethers.BigNumber.from(INTERVAL));
@@ -161,10 +161,10 @@ describe("Ops multi module test", function () {
     };
 
     await expect(
-      ops
+      automate
         .connect(user)
         .createTask(counter.address, execSelector, moduleData, ZERO_ADD)
-    ).to.be.revertedWith("Ops._validModules: Asc only");
+    ).to.be.revertedWith("Automate._validModules: Asc only");
   });
 
   it("createTask - duplicate modules", async () => {
@@ -174,21 +174,21 @@ describe("Ops multi module test", function () {
     };
 
     await expect(
-      ops
+      automate
         .connect(user)
         .createTask(counter.address, execSelector, moduleData, ZERO_ADD)
-    ).to.be.revertedWith("Ops._validModules: Asc only");
+    ).to.be.revertedWith("Automate._validModules: Asc only");
   });
 
   it("createTask - no modules", async () => {
-    await counter.setWhitelist(ops.address, true);
-    expect(await counter.whitelisted(ops.address)).to.be.true;
+    await counter.setWhitelist(automate.address, true);
+    expect(await counter.whitelisted(automate.address)).to.be.true;
     moduleData = { modules: [], args: [] };
     const execData = counter.interface.encodeFunctionData("increaseCount", [
       10,
     ]);
 
-    await ops
+    await automate
       .connect(user)
       .createTask(counter.address, execData, moduleData, ZERO_ADD);
 
@@ -207,13 +207,13 @@ describe("Ops multi module test", function () {
     };
 
     await expect(
-      ops.createTask(counter.address, execSelector, moduleData, ZERO_ADD)
-    ).to.be.revertedWith("Ops._validModules: Only one resolver");
+      automate.createTask(counter.address, execSelector, moduleData, ZERO_ADD)
+    ).to.be.revertedWith("Automate._validModules: Only one resolver");
   });
 
   it("exec - time should revert", async () => {
     await expect(execute(true)).to.be.revertedWith(
-      "Ops.preExecCall: TimeModule: Too early"
+      "Automate.preExecCall: TimeModule: Too early"
     );
   });
 
@@ -226,10 +226,10 @@ describe("Ops multi module test", function () {
     const countAfter = await counter.count();
     expect(countAfter).to.be.gt(countBefore);
 
-    const time = await ops.timedTask(taskId);
+    const time = await automate.timedTask(taskId);
     expect(time.nextExec).to.be.eql(ethers.BigNumber.from(0));
 
-    const taskIds = await ops.getTaskIdsByUser(userAddress);
+    const taskIds = await automate.getTaskIdsByUser(userAddress);
     expect(taskIds).to.not.include(taskId);
   });
 
@@ -255,10 +255,10 @@ describe("Ops multi module test", function () {
       correlationId,
     };
 
-    const nonce1BalanceBefore = await ops.nonce1Balance(taskId);
+    const nonce1BalanceBefore = await automate.nonce1Balance(taskId);
 
     await expect(
-      ops
+      automate
         .connect(executor)
         .exec1Balance(
           userAddress,
@@ -269,7 +269,7 @@ describe("Ops multi module test", function () {
           true
         )
     )
-      .to.emit(ops, "LogUseGelato1Balance")
+      .to.emit(automate, "LogUseGelato1Balance")
       .withArgs(
         sponsor,
         target,
@@ -280,7 +280,7 @@ describe("Ops multi module test", function () {
         correlationId
       );
 
-    const nonce1BalanceAfter = await ops.nonce1Balance(taskId);
+    const nonce1BalanceAfter = await automate.nonce1Balance(taskId);
     const countAfter = await counter.count();
 
     expect(nonce1BalanceAfter).to.be.gt(nonce1BalanceBefore);
@@ -290,7 +290,7 @@ describe("Ops multi module test", function () {
   const execute = async (revertOnFailure: boolean) => {
     const [, execData] = await counterResolver.checker();
 
-    await ops
+    await automate
       .connect(executor)
       .exec(
         userAddress,

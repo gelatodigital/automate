@@ -27,4 +27,3 @@ func.skip = async (hre: HardhatRuntimeEnvironment) => {
 };
 
 func.tags = ["CounterWL"];
-func.dependencies = ["Ops"];

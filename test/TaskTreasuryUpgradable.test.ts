@@ -10,7 +10,7 @@ import {
 import {
   IERC20,
   CounterTest,
-  Ops,
+  Automate,
   TaskTreasuryL2,
   TaskTreasuryUpgradable,
   ResolverModule,
@@ -40,7 +40,7 @@ describe("TaskTreasuryUpgradable test", function () {
 
   let executor: Signer;
 
-  let ops: Ops;
+  let automate: Automate;
   let oldTreasury: TaskTreasuryL2;
   let treasury: TaskTreasuryUpgradable;
   let counter: CounterTest;
@@ -60,7 +60,7 @@ describe("TaskTreasuryUpgradable test", function () {
     userAddress = await user.getAddress();
     user2Address = await user2.getAddress();
 
-    ops = await ethers.getContract("Ops");
+    automate = await ethers.getContract("Automate");
     oldTreasury = await ethers.getContract("TaskTreasuryL2");
     treasury = await ethers.getContract("TaskTreasuryUpgradable");
     dai = await ethers.getContractAt("IERC20", DAI);
@@ -69,7 +69,7 @@ describe("TaskTreasuryUpgradable test", function () {
     proxyModule = await ethers.getContract("ProxyModule");
 
     const counterFactory = await ethers.getContractFactory("CounterTest");
-    counter = <CounterTest>await counterFactory.deploy(ops.address);
+    counter = <CounterTest>await counterFactory.deploy(automate.address);
 
     // get accounts
     await hre.network.provider.request({
@@ -88,14 +88,14 @@ describe("TaskTreasuryUpgradable test", function () {
     await getTokenFromFaucet(WBTC, user2Address, wbtcValue);
 
     // module set-up
-    await ops.setModule(
+    await automate.setModule(
       [Module.RESOLVER, Module.PROXY],
       [resolverModule.address, proxyModule.address]
     );
 
     // whitelist
     oldTreasury.connect(deployer).addWhitelistedService(treasury.address);
-    treasury.connect(deployer).updateWhitelistedService(ops.address, true);
+    treasury.connect(deployer).updateWhitelistedService(automate.address, true);
 
     // create task
     const execSelector = counter.interface.getSighash("increaseCount");
@@ -109,13 +109,13 @@ describe("TaskTreasuryUpgradable test", function () {
       modules: [Module.RESOLVER],
       args: [resolverArgs],
     };
-    await ops
+    await automate
       .connect(user)
       .createTask(execAddress, execSelector, moduleData, ZERO_ADD);
   });
 
   it("ops proxy should have correct treasury address", async () => {
-    expect(await ops.taskTreasury()).to.be.eql(treasury.address);
+    expect(await automate.taskTreasury()).to.be.eql(treasury.address);
   });
 
   it("maxFee should be correct", async () => {
@@ -368,13 +368,13 @@ describe("TaskTreasuryUpgradable test", function () {
       modules: [Module.RESOLVER],
       args: [resolverArgs],
     };
-    await ops
+    await automate
       .connect(user)
       .createTask(execAddress, execSelector, moduleData, ZERO_ADD);
 
     // Execution should revert
     await expect(
-      ops
+      automate
         .connect(executor)
         .exec(
           userAddress,
@@ -386,7 +386,9 @@ describe("TaskTreasuryUpgradable test", function () {
           true,
           true
         )
-    ).to.be.revertedWith("Ops.onExecTask: execAddress cannot be taskTreasury");
+    ).to.be.revertedWith(
+      "Automate.onExecTask: execAddress cannot be taskTreasury"
+    );
   });
 
   //---------------------------Helper functions-------------------------------
@@ -397,7 +399,7 @@ describe("TaskTreasuryUpgradable test", function () {
   ) => {
     const tokenAddress = token == "eth" ? ETH : DAI;
 
-    await ops
+    await automate
       .connect(executor)
       .exec(
         userAddress,

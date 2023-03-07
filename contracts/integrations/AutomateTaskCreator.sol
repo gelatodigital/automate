@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: UNLICENSED
 pragma solidity ^0.8.14;
 
-import "./OpsReady.sol";
+import "./AutomateReady.sol";
 import {IERC20} from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 
 /**
@@ -9,15 +9,15 @@ import {IERC20} from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
  * to be a task creator and create tasks.
  */
 //solhint-disable const-name-snakecase
-abstract contract OpsTaskCreator is OpsReady {
+abstract contract AutomateTaskCreator is AutomateReady {
     using SafeERC20 for IERC20;
 
     address public immutable fundsOwner;
     IGelato1Balance public constant gelato1Balance =
         IGelato1Balance(0x7506C12a824d73D9b08564d5Afc22c949434755e);
 
-    constructor(address _ops, address _fundsOwner)
-        OpsReady(_ops, address(this))
+    constructor(address _automate, address _fundsOwner)
+        AutomateReady(_automate, address(this))
     {
         fundsOwner = _fundsOwner;
     }
@@ -51,7 +51,7 @@ abstract contract OpsTaskCreator is OpsReady {
         address _feeToken
     ) internal returns (bytes32) {
         return
-            ops.createTask(
+            automate.createTask(
                 _execAddress,
                 _execDataOrSelector,
                 _moduleData,
@@ -60,7 +60,7 @@ abstract contract OpsTaskCreator is OpsReady {
     }
 
     function _cancelTask(bytes32 _taskId) internal {
-        ops.cancelTask(_taskId);
+        automate.cancelTask(_taskId);
     }
 
     function _resolverModuleArg(

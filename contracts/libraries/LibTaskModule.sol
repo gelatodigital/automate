@@ -42,7 +42,7 @@ library LibTaskModule {
             (, bytes memory returnData) = _delegateCall(
                 moduleAddress,
                 delegatecallData,
-                "Ops.preCreateTask: "
+                "Automate.preCreateTask: "
             );
 
             (_taskCreator, _execAddress) = abi.decode(
@@ -95,7 +95,7 @@ library LibTaskModule {
             _delegateCall(
                 moduleAddress,
                 delegatecallData,
-                "Ops.onCreateTask: "
+                "Automate.onCreateTask: "
             );
         }
     }
@@ -131,7 +131,7 @@ library LibTaskModule {
             (, bytes memory returnData) = _delegateCall(
                 moduleAddress,
                 delegatecallData,
-                "Ops.preCancelTask: "
+                "Automate.preCancelTask: "
             );
 
             (_taskCreator) = abi.decode(returnData, (address));
@@ -178,7 +178,7 @@ library LibTaskModule {
 
         require(
             _execAddress != _taskTreasury,
-            "Ops.onExecTask: execAddress cannot be taskTreasury"
+            "Automate.onExecTask: execAddress cannot be taskTreasury"
         );
 
         (callSuccess, ) = _call(
@@ -186,7 +186,7 @@ library LibTaskModule {
             abi.encodePacked(_execData, _taskCreator),
             0,
             _revertOnFailure,
-            "Ops.exec: "
+            "Automate.exec: "
         );
 
         _postExecCall(
@@ -223,7 +223,7 @@ library LibTaskModule {
             (, bytes memory returnData) = _delegateCall(
                 _moduleAddresses[i],
                 delegatecallData,
-                "Ops.preExecCall: "
+                "Automate.preExecCall: "
             );
 
             (_execAddress, _execData) = abi.decode(
@@ -258,7 +258,7 @@ library LibTaskModule {
             _delegateCall(
                 _moduleAddresses[i],
                 delegatecallData,
-                "Ops.postExecCall: "
+                "Automate.postExecCall: "
             );
         }
     }
@@ -280,7 +280,7 @@ library LibTaskModule {
     function _moduleInitialised(address _moduleAddress) private pure {
         require(
             _moduleAddress != address(0),
-            "Ops._moduleInitialised: Not init"
+            "Automate._moduleInitialised: Not init"
         );
     }
 
@@ -298,12 +298,12 @@ library LibTaskModule {
             for (uint256 i; i < _length - 1; i++) {
                 require(
                     _modules[i + 1] > _modules[i],
-                    "Ops._validModules: Asc only"
+                    "Automate._validModules: Asc only"
                 );
                 if (hasResolver)
                     require(
                         _modules[i + 1] != LibDataTypes.Module.WEB3_FUNCTION,
-                        "Ops._validModules: Only one resolver"
+                        "Automate._validModules: Only one resolver"
                     );
             }
         }

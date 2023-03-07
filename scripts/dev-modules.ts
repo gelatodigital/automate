@@ -1,7 +1,7 @@
 import { ethers } from "hardhat";
 import { Module } from "../test/utils";
 import {
-  Ops,
+  Automate,
   ProxyModule,
   ResolverModule,
   SingleExecModule,
@@ -14,8 +14,10 @@ export const setModules = async () => {
   const ownerAddress = await owner.getAddress();
   console.log("Owner: ", ownerAddress);
 
-  const opsAddress = (await ethers.getContract("Ops")).address;
-  const ops = <Ops>await ethers.getContractAt("Ops", opsAddress);
+  const automateAddress = (await ethers.getContract("Automate")).address;
+  const automate = <Automate>(
+    await ethers.getContractAt("Automate", automateAddress)
+  );
 
   const resolverModule = <ResolverModule>(
     await ethers.getContract("ResolverModule")
@@ -44,7 +46,7 @@ export const setModules = async () => {
     web3FunctionModule.address,
   ];
 
-  await ops.setModule(modules, moduleAddresses);
+  await automate.setModule(modules, moduleAddresses);
 };
 
 setModules();
