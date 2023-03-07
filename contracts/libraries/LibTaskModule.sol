@@ -7,9 +7,8 @@ import {LibDataTypes} from "./LibDataTypes.sol";
 import {LibTaskModuleConfig} from "./LibTaskModuleConfig.sol";
 import {ITaskModule} from "../interfaces/ITaskModule.sol";
 
-/**
- * @notice Library to call task modules on task creation and execution.
- */
+// solhint-disable function-max-lines
+/// @notice Library to call task modules on task creation and execution.
 library LibTaskModule {
     using LibTaskModuleConfig for LibDataTypes.Module;
 
@@ -144,8 +143,9 @@ library LibTaskModule {
     /**
      * @notice Delegate calls task modules on exec.
      *
+     * @param _taskTreasury Address of the Task Treasury
      * @param _taskId Unique hash of the task. {See LibTaskId-getTaskId}
-     * @param _taskCreator The address which created the task.
+     * @param _taskCreator Address which created the task.
      * @param _execAddress Address of contract that will be called by Gelato.
      * @param _execData Execution data to be called with / function selector.
      * @param _modules Modules that is used for the task. {See LibDataTypes-Module}
@@ -153,6 +153,7 @@ library LibTaskModule {
      * @param taskModuleAddresses The storage reference to the mapping of modules to their address.
      */
     function onExecTask(
+        address _taskTreasury,
         bytes32 _taskId,
         address _taskCreator,
         address _execAddress,
@@ -173,6 +174,11 @@ library LibTaskModule {
             _execData,
             _modules,
             moduleAddresses
+        );
+
+        require(
+            _execAddress != _taskTreasury,
+            "Ops.onExecTask: execAddress cannot be taskTreasury"
         );
 
         (callSuccess, ) = _call(

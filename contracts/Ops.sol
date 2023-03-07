@@ -108,6 +108,7 @@ contract Ops is Gelatofied, Proxied, OpsStorage, IOps {
         }
 
         bool success = LibTaskModule.onExecTask(
+            address(taskTreasury),
             taskId,
             _taskCreator,
             _execAddress,
@@ -157,6 +158,7 @@ contract Ops is Gelatofied, Proxied, OpsStorage, IOps {
         );
 
         bool success = LibTaskModule.onExecTask(
+            address(0),
             taskId,
             _taskCreator,
             _execAddress,

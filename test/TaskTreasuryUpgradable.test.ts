@@ -347,6 +347,48 @@ describe("TaskTreasuryUpgradable test", function () {
     expect(ethTokenBalance).to.be.eql(depositAmount.mul(2));
   });
 
+  it("useFunds - cannot be called via a non-proxy task", async () => {
+    // User A adds funds into task treasury
+    const depositAmount = ethers.utils.parseEther("1");
+    await depositEth(user, depositAmount);
+
+    // User B creates task that aims to drain User A's balance
+    const execSelector = treasury.interface.getSighash("useFunds");
+    execAddress = treasury.address;
+    execData = treasury.interface.encodeFunctionData("useFunds", [
+      userAddress,
+      ETH,
+      depositAmount,
+    ]);
+
+    const resolverAddress = ethers.constants.AddressZero;
+    const resolverData = ethers.constants.HashZero;
+    const resolverArgs = encodeResolverArgs(resolverAddress, resolverData);
+    moduleData = {
+      modules: [Module.RESOLVER],
+      args: [resolverArgs],
+    };
+    await ops
+      .connect(user)
+      .createTask(execAddress, execSelector, moduleData, ZERO_ADD);
+
+    // Execution should revert
+    await expect(
+      ops
+        .connect(executor)
+        .exec(
+          userAddress,
+          execAddress,
+          execData,
+          moduleData,
+          depositAmount,
+          ETH,
+          true,
+          true
+        )
+    ).to.be.revertedWith("Ops.onExecTask: execAddress cannot be taskTreasury");
+  });
+
   //---------------------------Helper functions-------------------------------
   const execute = async (
     token: "eth" | "dai",
