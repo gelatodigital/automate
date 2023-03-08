@@ -13,7 +13,7 @@ import {
 import hre = require("hardhat");
 const { ethers, deployments } = hre;
 import {
-  Ops,
+  Automate,
   CounterTest,
   CounterResolver,
   TaskTreasuryUpgradable,
@@ -21,9 +21,9 @@ import {
   TimeModule,
   ProxyModule,
   SingleExecModule,
-  ILegacyOps,
   LibEvents__factory,
   LibEvents,
+  ILegacyAutomate,
 } from "../typechain";
 import assert = require("assert");
 
@@ -32,9 +32,9 @@ const ETH = "0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE";
 const ZERO_ADD = ethers.constants.AddressZero;
 const FEE = ethers.utils.parseEther("0.1");
 
-describe("Ops legacy task test", function () {
-  let ops: Ops;
-  let legacyOps: ILegacyOps;
+describe("Automate legacy task test", function () {
+  let automate: Automate;
+  let legacyAutomate: ILegacyAutomate;
   let counter: CounterTest;
   let counterResolver: CounterResolver;
   let taskTreasury: TaskTreasuryUpgradable;
@@ -58,12 +58,15 @@ describe("Ops legacy task test", function () {
     [, user] = await hre.ethers.getSigners();
     userAddress = await user.getAddress();
 
-    ops = await ethers.getContract("Ops");
+    automate = await ethers.getContract("Automate");
     taskTreasury = await ethers.getContract("TaskTreasuryUpgradable");
     counter = await ethers.getContract("CounterTest");
     counterResolver = await ethers.getContract("CounterResolver");
-    legacyOps = await ethers.getContractAt("ILegacyOps", ops.address);
-    events = LibEvents__factory.connect(ops.address, user);
+    legacyAutomate = await ethers.getContractAt(
+      "ILegacyAutomate",
+      automate.address
+    );
+    events = LibEvents__factory.connect(automate.address, user);
 
     resolverModule = await ethers.getContract("ResolverModule");
     timeModule = await ethers.getContract("TimeModule");
@@ -71,8 +74,8 @@ describe("Ops legacy task test", function () {
     singleExecModule = await ethers.getContract("SingleExecModule");
 
     // set-up
-    await taskTreasury.updateWhitelistedService(ops.address, true);
-    await ops.setModule(
+    await taskTreasury.updateWhitelistedService(automate.address, true);
+    await automate.setModule(
       [Module.RESOLVER, Module.TIME, Module.PROXY, Module.SINGLE_EXEC],
       [
         resolverModule.address,
@@ -100,7 +103,7 @@ describe("Ops legacy task test", function () {
 
   it("getTaskId", async () => {
     const resolverHash = getResolverHash(counterResolver.address, resolverData);
-    const legacyTaskId = await ops[
+    const legacyTaskId = await automate[
       "getTaskId(address,address,bytes4,bool,address,bytes32)"
     ](userAddress, counter.address, execSelector, true, ZERO_ADD, resolverHash);
 
@@ -132,7 +135,7 @@ describe("Ops legacy task test", function () {
       resolverHash
     );
 
-    const res = await legacyOps
+    const res = await legacyAutomate
       .connect(user)
       .createTask(
         counter.address,
@@ -182,7 +185,7 @@ describe("Ops legacy task test", function () {
       resolverHash
     );
 
-    const res = await legacyOps
+    const res = await legacyAutomate
       .connect(user)
       .createTaskNoPrepayment(
         counter.address,
@@ -238,7 +241,7 @@ describe("Ops legacy task test", function () {
       ZERO_ADD,
       resolverHash
     );
-    const res = await legacyOps
+    const res = await legacyAutomate
       .connect(user)
       .createTimedTask(
         startTime,
@@ -290,21 +293,21 @@ describe("Ops legacy task test", function () {
   it("fallback - data", async () => {
     const data = "0x12345678";
     await expect(
-      user.sendTransaction({ to: ops.address, data })
-    ).to.be.revertedWith("Ops.createTask: Function not found");
+      user.sendTransaction({ to: automate.address, data })
+    ).to.be.revertedWith("Automate.fallback: Function not found");
   });
 
   it("fallback - value", async () => {
     const value = ethers.utils.parseEther("0.1");
-    await expect(user.sendTransaction({ to: ops.address, value })).to.be
+    await expect(user.sendTransaction({ to: automate.address, value })).to.be
       .reverted;
   });
 
   it("fallback - value & data", async () => {
     const data = "0x12345678";
     const value = ethers.utils.parseEther("0.1");
-    await expect(user.sendTransaction({ to: ops.address, value, data })).to.be
-      .reverted;
+    await expect(user.sendTransaction({ to: automate.address, value, data })).to
+      .be.reverted;
   });
 
   const execute = async (useTaskTreasury: boolean) => {
@@ -318,7 +321,7 @@ describe("Ops legacy task test", function () {
       modules: [Module.RESOLVER, Module.TIME],
       args: [resolverArg, "0x"],
     };
-    await ops
+    await automate
       .connect(executor)
       .exec(
         userAddress,

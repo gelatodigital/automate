@@ -4,10 +4,10 @@ pragma solidity ^0.8.0;
 import {ITaskTreasuryUpgradable} from "./ITaskTreasuryUpgradable.sol";
 
 /**
- * @notice Legacy Ops interface with individual create task function for each task type.
- * @notice These function signatures are still supported via fallback. {See Ops.sol-fallback}
+ * @notice Legacy Automate interface with individual create task function for each task type.
+ * @notice These function signatures are still supported via fallback. {See Automate.sol-fallback}
  */
-interface ILegacyOps {
+interface ILegacyAutomate {
     function createTask(
         address _execAddress,
         bytes4 _execSelector,

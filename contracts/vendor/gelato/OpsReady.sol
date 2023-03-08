@@ -6,23 +6,23 @@ import {
     IERC20
 } from "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
 
-interface IOps {
+interface IAutomate {
     function gelato() external view returns (address payable);
 }
 
-abstract contract OpsReady {
-    address public immutable ops;
+abstract contract AutomateReady {
+    address public immutable automate;
     address payable public immutable gelato;
     address public constant ETH = 0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE;
 
-    modifier onlyOps() {
-        require(msg.sender == ops, "OpsReady: onlyOps");
+    modifier onlyAutomate() {
+        require(msg.sender == automate, "AutomateReady: onlyAutomate");
         _;
     }
 
-    constructor(address _ops) {
-        ops = _ops;
-        gelato = IOps(_ops).gelato();
+    constructor(address _automate) {
+        automate = _automate;
+        gelato = IAutomate(_automate).gelato();
     }
 
     function _transfer(uint256 _amount, address _paymentToken) internal {

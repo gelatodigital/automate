@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: UNLICENSED
 pragma solidity ^0.8.0;
 
-import "../../../OpsTaskCreator.sol";
+import "../../../AutomateTaskCreator.sol";
 
 /**
  * @dev
@@ -9,7 +9,7 @@ import "../../../OpsTaskCreator.sol";
  */
 // solhint-disable not-rely-on-time
 // solhint-disable no-empty-blocks
-contract CounterSingleExecTaskCreator is OpsTaskCreator {
+contract CounterSingleExecTaskCreator is AutomateTaskCreator {
     uint256 public count;
     uint256 public lastExecuted;
     bytes32 public taskId;
@@ -18,8 +18,8 @@ contract CounterSingleExecTaskCreator is OpsTaskCreator {
 
     event CounterTaskCreated(bytes32 taskId);
 
-    constructor(address _ops, address _fundsOwner)
-        OpsTaskCreator(_ops, _fundsOwner)
+    constructor(address _automate, address _fundsOwner)
+        AutomateTaskCreator(_automate, _fundsOwner)
     {}
 
     function createTask() external {

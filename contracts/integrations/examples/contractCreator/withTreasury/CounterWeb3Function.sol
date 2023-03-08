@@ -2,11 +2,11 @@
 
 pragma solidity ^0.8.12;
 
-import "../../../OpsTaskCreator.sol";
+import "../../../AutomateTaskCreator.sol";
 
 //solhint-disable no-empty-blocks
 //solhint-disable not-rely-on-time
-contract CounterWeb3Function is OpsTaskCreator {
+contract CounterWeb3Function is AutomateTaskCreator {
     uint256 public count;
     uint256 public lastExecuted;
     bytes32 public taskId;
@@ -15,8 +15,8 @@ contract CounterWeb3Function is OpsTaskCreator {
 
     event CounterTaskCreated(bytes32 taskId);
 
-    constructor(address _ops, address _fundsOwner)
-        OpsTaskCreator(_ops, _fundsOwner)
+    constructor(address _automate, address _fundsOwner)
+        AutomateTaskCreator(_automate, _fundsOwner)
     {}
 
     function createTask(

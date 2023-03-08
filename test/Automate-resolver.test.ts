@@ -10,7 +10,7 @@ import {
 import hre = require("hardhat");
 const { ethers, deployments } = hre;
 import {
-  Ops,
+  Automate,
   CounterTest,
   CounterResolver,
   TaskTreasuryUpgradable,
@@ -24,8 +24,8 @@ const ETH = "0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE";
 const ZERO_ADD = ethers.constants.AddressZero;
 const FEE = ethers.utils.parseEther("0.1");
 
-describe("Ops Resolver module test", function () {
-  let ops: Ops;
+describe("Automate Resolver module test", function () {
+  let automate: Automate;
   let counter: CounterTest;
   let counterResolver: CounterResolver;
   let treasury: TaskTreasuryUpgradable;
@@ -48,7 +48,7 @@ describe("Ops Resolver module test", function () {
     [, user] = await hre.ethers.getSigners();
     userAddress = await user.getAddress();
 
-    ops = await ethers.getContract("Ops");
+    automate = await ethers.getContract("Automate");
     treasury = await ethers.getContract("TaskTreasuryUpgradable");
     counter = await ethers.getContract("CounterTest");
     counterResolver = await ethers.getContract("CounterResolver");
@@ -57,8 +57,8 @@ describe("Ops Resolver module test", function () {
     timeModule = await ethers.getContract("TimeModule");
 
     // set-up
-    await treasury.updateWhitelistedService(ops.address, true);
-    await ops.setModule(
+    await treasury.updateWhitelistedService(automate.address, true);
+    await automate.setModule(
       [Module.RESOLVER, Module.TIME, Module.PROXY],
       [resolverModule.address, timeModule.address, proxyModule.address]
     );
@@ -96,29 +96,29 @@ describe("Ops Resolver module test", function () {
       resolverHash
     );
 
-    await ops
+    await automate
       .connect(user)
       .createTask(counter.address, execSelector, moduleData, ZERO_ADD);
   });
 
   it("create task", async () => {
-    const taskIds = await ops.getTaskIdsByUser(userAddress);
+    const taskIds = await automate.getTaskIdsByUser(userAddress);
     expect(taskIds).include(taskId);
   });
 
   it("create task - duplicate", async () => {
     await expect(
-      ops
+      automate
         .connect(user)
         .createTask(counter.address, execSelector, moduleData, ZERO_ADD)
-    ).to.be.revertedWith("Ops.createTask: Duplicate task");
+    ).to.be.revertedWith("Automate.createTask: Duplicate task");
   });
 
   it("cancel non existant task", async () => {
-    await ops.connect(user).cancelTask(taskId);
+    await automate.connect(user).cancelTask(taskId);
 
-    await expect(ops.connect(user).cancelTask(taskId)).to.be.revertedWith(
-      "Ops.cancelTask: Task not found"
+    await expect(automate.connect(user).cancelTask(taskId)).to.be.revertedWith(
+      "Automate.cancelTask: Task not found"
     );
   });
 
@@ -141,7 +141,7 @@ describe("Ops Resolver module test", function () {
 
     // will fail in off-chain simulation
     await expect(execute(true)).to.be.revertedWith(
-      "Ops.exec: Counter: increaseCount: Time not elapsed"
+      "Automate.exec: Counter: increaseCount: Time not elapsed"
     );
     // will not fail on-chain
     const balanceBefore = await treasury.userTokenBalance(userAddress, ETH);
@@ -156,10 +156,10 @@ describe("Ops Resolver module test", function () {
 
   it("getTaskIdsByUser", async () => {
     // create 2nd task
-    await ops
+    await automate
       .connect(user)
       .createTask(counter.address, execSelector, moduleData, ETH);
-    const taskIds = await ops.getTaskIdsByUser(userAddress);
+    const taskIds = await automate.getTaskIdsByUser(userAddress);
 
     expect(taskIds.length).to.be.eql(2);
     expect(taskIds).include(taskId);
@@ -168,7 +168,7 @@ describe("Ops Resolver module test", function () {
   const execute = async (revertOnFailure: boolean) => {
     const [, execData] = await counterResolver.checker();
 
-    await ops
+    await automate
       .connect(executor)
       .exec(
         userAddress,

@@ -5,7 +5,7 @@ import {ITaskTreasuryUpgradable} from "./ITaskTreasuryUpgradable.sol";
 import {IGelato1Balance} from "./IGelato1Balance.sol";
 
 // solhint-disable max-line-length
-interface IOps is IGelato1Balance {
+interface IAutomate is IGelato1Balance {
     /**
      * @notice Initiates a task with conditions which Gelato will monitor and execute when conditions are met.
      *

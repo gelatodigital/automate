@@ -7,7 +7,7 @@ import {
 import {Gelatofied} from "./vendor/gelato/Gelatofied.sol";
 import {GelatoBytes} from "./vendor/gelato/GelatoBytes.sol";
 import {Proxied} from "./vendor/proxy/EIP173/Proxied.sol";
-import {OpsStorage} from "./OpsStorage.sol";
+import {AutomateStorage} from "./AutomateStorage.sol";
 import {LibDataTypes} from "./libraries/LibDataTypes.sol";
 import {LibEvents} from "./libraries/LibEvents.sol";
 import {LibLegacyTask} from "./libraries/LibLegacyTask.sol";
@@ -16,15 +16,15 @@ import {LibTaskModule} from "./libraries/LibTaskModule.sol";
 import {
     ITaskTreasuryUpgradable
 } from "./interfaces/ITaskTreasuryUpgradable.sol";
-import {IOps} from "./interfaces/IOps.sol";
+import {IAutomate} from "./interfaces/IAutomate.sol";
 
 /**
- * @notice Ops enables everyone to have Gelato monitor and execute transactions.
+ * @notice Automate enables everyone to have Gelato monitor and execute transactions.
  * @notice ExecAddress refers to the contract that has the function which Gelato will call.
  * @notice Modules allow users to customise conditions and specifications when creating a task.
  */
 //solhint-disable function-max-lines
-contract Ops is Gelatofied, Proxied, OpsStorage, IOps {
+contract Automate is Gelatofied, Proxied, AutomateStorage, IAutomate {
     using GelatoBytes for bytes;
     using EnumerableSet for EnumerableSet.Bytes32Set;
 
@@ -43,7 +43,7 @@ contract Ops is Gelatofied, Proxied, OpsStorage, IOps {
         returnData = _handleLegacyTaskCreation(_callData);
     }
 
-    ///@inheritdoc IOps
+    ///@inheritdoc IAutomate
     function createTask(
         address _execAddress,
         bytes calldata _execDataOrSelector,
@@ -67,7 +67,7 @@ contract Ops is Gelatofied, Proxied, OpsStorage, IOps {
         );
     }
 
-    ///@inheritdoc IOps
+    ///@inheritdoc IAutomate
     function cancelTask(bytes32 _taskId) external {
         address _taskCreator = LibTaskModule.preCancelTask(
             _taskId,
@@ -78,7 +78,7 @@ contract Ops is Gelatofied, Proxied, OpsStorage, IOps {
         _cancelTask(_taskCreator, _taskId);
     }
 
-    ///@inheritdoc IOps
+    ///@inheritdoc IAutomate
     function exec(
         address _taskCreator,
         address _execAddress,
@@ -99,7 +99,7 @@ contract Ops is Gelatofied, Proxied, OpsStorage, IOps {
 
         require(
             _createdTasks[_taskCreator].contains(taskId),
-            "Ops.exec: Task not found"
+            "Automate.exec: Task not found"
         );
 
         if (!_useTaskTreasuryFunds) {
@@ -108,6 +108,7 @@ contract Ops is Gelatofied, Proxied, OpsStorage, IOps {
         }
 
         bool success = LibTaskModule.onExecTask(
+            address(taskTreasury),
             taskId,
             _taskCreator,
             _execAddress,
@@ -134,7 +135,7 @@ contract Ops is Gelatofied, Proxied, OpsStorage, IOps {
         );
     }
 
-    ///@inheritdoc IOps
+    ///@inheritdoc IAutomate
     function exec1Balance(
         address _taskCreator,
         address _execAddress,
@@ -153,10 +154,11 @@ contract Ops is Gelatofied, Proxied, OpsStorage, IOps {
 
         require(
             _createdTasks[_taskCreator].contains(taskId),
-            "Ops.exec: Task not found"
+            "Automate.exec: Task not found"
         );
 
         bool success = LibTaskModule.onExecTask(
+            address(0),
             taskId,
             _taskCreator,
             _execAddress,
@@ -188,7 +190,7 @@ contract Ops is Gelatofied, Proxied, OpsStorage, IOps {
         );
     }
 
-    ///@inheritdoc IOps
+    ///@inheritdoc IAutomate
     function setModule(
         LibDataTypes.Module[] calldata _modules,
         address[] calldata _moduleAddresses
@@ -199,12 +201,12 @@ contract Ops is Gelatofied, Proxied, OpsStorage, IOps {
         }
     }
 
-    ///@inheritdoc IOps
+    ///@inheritdoc IAutomate
     function getFeeDetails() external view returns (uint256, address) {
         return (fee, feeToken);
     }
 
-    ///@inheritdoc IOps
+    ///@inheritdoc IAutomate
     function getTaskIdsByUser(address _taskCreator)
         external
         view
@@ -215,7 +217,7 @@ contract Ops is Gelatofied, Proxied, OpsStorage, IOps {
         return taskIds;
     }
 
-    ///@inheritdoc IOps
+    ///@inheritdoc IAutomate
     function getTaskId(
         address taskCreator,
         address execAddress,
@@ -232,7 +234,7 @@ contract Ops is Gelatofied, Proxied, OpsStorage, IOps {
         );
     }
 
-    ///@inheritdoc IOps
+    ///@inheritdoc IAutomate
     function getTaskId(
         address taskCreator,
         address execAddress,
@@ -268,7 +270,7 @@ contract Ops is Gelatofied, Proxied, OpsStorage, IOps {
 
         require(
             !_createdTasks[_taskCreator].contains(taskId),
-            "Ops.createTask: Duplicate task"
+            "Automate.createTask: Duplicate task"
         );
 
         LibTaskModule.onCreateTask(
@@ -295,7 +297,7 @@ contract Ops is Gelatofied, Proxied, OpsStorage, IOps {
     function _cancelTask(address _taskCreator, bytes32 _taskId) private {
         require(
             _createdTasks[_taskCreator].contains(_taskId),
-            "Ops.cancelTask: Task not found"
+            "Automate.cancelTask: Task not found"
         );
 
         _createdTasks[_taskCreator].remove(_taskId);

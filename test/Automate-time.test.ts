@@ -4,7 +4,7 @@ import { expect } from "chai";
 import hre = require("hardhat");
 const { ethers, deployments } = hre;
 import {
-  Ops,
+  Automate,
   TaskTreasuryUpgradable,
   CounterTest,
   ProxyModule,
@@ -26,10 +26,10 @@ const ZERO_ADD = ethers.constants.AddressZero;
 const INTERVAL = 7 * 60;
 const FEE = ethers.utils.parseEther("0.1");
 
-describe("Ops Time module test", function () {
+describe("Automate Time module test", function () {
   this.timeout(0);
 
-  let ops: Ops;
+  let automate: Automate;
   let taskTreasury: TaskTreasuryUpgradable;
   let counter: CounterTest;
   let timeModule: TimeModule;
@@ -51,15 +51,15 @@ describe("Ops Time module test", function () {
     [, user] = await ethers.getSigners();
     userAddress = await user.getAddress();
 
-    ops = await ethers.getContract("Ops");
+    automate = await ethers.getContract("Automate");
     taskTreasury = await ethers.getContract("TaskTreasuryUpgradable");
     counter = await ethers.getContract("CounterTest");
     timeModule = await ethers.getContract("TimeModule");
     proxyModule = await ethers.getContract("ProxyModule");
 
     // set-up
-    await taskTreasury.updateWhitelistedService(ops.address, true);
-    await ops.setModule(
+    await taskTreasury.updateWhitelistedService(automate.address, true);
+    await automate.setModule(
       [Module.TIME, Module.PROXY],
       [timeModule.address, proxyModule.address]
     );
@@ -93,19 +93,19 @@ describe("Ops Time module test", function () {
       ZERO_ADD
     );
 
-    await ops
+    await automate
       .connect(user)
       .createTask(counter.address, execData, moduleData, ZERO_ADD);
   });
 
   it("create task", async () => {
-    const taskIds = await ops.getTaskIdsByUser(userAddress);
+    const taskIds = await automate.getTaskIdsByUser(userAddress);
     expect(taskIds).include(taskId);
   });
 
   it("time not elapsed", async () => {
     await expect(execute()).to.be.revertedWith(
-      "Ops.preExecCall: TimeModule: Too early"
+      "Automate.preExecCall: TimeModule: Too early"
     );
   });
 
@@ -121,7 +121,7 @@ describe("Ops Time module test", function () {
     // executable in Counter but not in Time module
     await fastForwardTime(3 * 60);
     await expect(execute()).to.be.revertedWith(
-      "Ops.preExecCall: TimeModule: Too early"
+      "Automate.preExecCall: TimeModule: Too early"
     );
   });
 
@@ -137,21 +137,21 @@ describe("Ops Time module test", function () {
     // executable in Counter but not in Time module
     await fastForwardTime(3 * 60);
     await expect(execute()).to.be.revertedWith(
-      "Ops.preExecCall: TimeModule: Too early"
+      "Automate.preExecCall: TimeModule: Too early"
     );
 
-    const time = await ops.timedTask(taskId);
+    const time = await automate.timedTask(taskId);
     expect(time.nextExec).to.be.gt(await getTimeStampNow());
   });
 
   it("set module", async () => {
     await expect(
-      ops.connect(user).setModule([Module.PROXY], [ZERO_ADD])
+      automate.connect(user).setModule([Module.PROXY], [ZERO_ADD])
     ).to.be.revertedWith("NOT_AUTHORIZED");
   });
 
   const execute = async () => {
-    await ops
+    await automate
       .connect(executor)
       .exec(
         userAddress,

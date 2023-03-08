@@ -4,7 +4,7 @@ const { ethers, deployments } = hre;
 import { Signer } from "@ethersproject/abstract-signer";
 import {
   CounterWL,
-  Ops,
+  Automate,
   TaskTreasuryUpgradable,
   OpsProxy,
   OpsProxyFactory,
@@ -19,7 +19,7 @@ const ETH = "0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee";
 const ZERO_ADD = ethers.constants.AddressZero;
 const FEE = ethers.utils.parseEther("0.1");
 
-describe("Ops Proxy module test", function () {
+describe("Automate Proxy module test", function () {
   this.timeout(0);
 
   let deployer: Signer;
@@ -30,7 +30,7 @@ describe("Ops Proxy module test", function () {
   let userAddress: string;
   let user2Address: string;
 
-  let ops: Ops;
+  let automate: Automate;
   let opsProxy: OpsProxy;
   let opsProxyImplementation: OpsProxy;
   let opsProxyFactory: OpsProxyFactory;
@@ -54,7 +54,7 @@ describe("Ops Proxy module test", function () {
 
     treasury = await ethers.getContract("TaskTreasuryUpgradable");
 
-    ops = await ethers.getContract("Ops");
+    automate = await ethers.getContract("Automate");
     proxyModule = await ethers.getContract("ProxyModule");
     timeModule = await ethers.getContract("TimeModule");
     counter = await ethers.getContract("CounterWL");
@@ -72,8 +72,8 @@ describe("Ops Proxy module test", function () {
     executor = await ethers.getSigner(GELATO);
 
     // set-up
-    await treasury.updateWhitelistedService(ops.address, true);
-    await ops.setModule(
+    await treasury.updateWhitelistedService(automate.address, true);
+    await automate.setModule(
       [Module.TIME, Module.PROXY],
       [timeModule.address, proxyModule.address]
     );
@@ -98,7 +98,7 @@ describe("Ops Proxy module test", function () {
   });
 
   it("create task", async () => {
-    const taskIds = await ops.getTaskIdsByUser(userAddress);
+    const taskIds = await automate.getTaskIdsByUser(userAddress);
     expect(taskIds).to.include(taskId);
   });
 
@@ -107,7 +107,7 @@ describe("Ops Proxy module test", function () {
     opsProxy = await ethers.getContractAt("OpsProxy", proxyAddress);
     moduleData = { ...moduleData, args: ["0x01"] };
 
-    const createTaskData = ops.interface.encodeFunctionData("createTask", [
+    const createTaskData = automate.interface.encodeFunctionData("createTask", [
       execAddress,
       execData,
       moduleData,
@@ -116,7 +116,7 @@ describe("Ops Proxy module test", function () {
 
     const executeCallData = opsProxy.interface.encodeFunctionData(
       "executeCall",
-      [ops.address, createTaskData, 0]
+      [automate.address, createTaskData, 0]
     );
 
     await user.sendTransaction({
@@ -124,7 +124,7 @@ describe("Ops Proxy module test", function () {
       data: executeCallData,
     });
 
-    const taskIds = await ops.getTaskIdsByUser(userAddress);
+    const taskIds = await automate.getTaskIdsByUser(userAddress);
 
     computeTaskId();
 
@@ -144,7 +144,7 @@ describe("Ops Proxy module test", function () {
     expect(isDeployed).to.be.true;
     expect(proxyAddress).to.be.eql(determinedProxyAddress);
 
-    expect(await opsProxy.ops()).to.be.eql(ops.address);
+    expect(await opsProxy.ops()).to.be.eql(automate.address);
     expect(await opsProxy.owner()).to.be.eql(userAddress);
     expect(await opsProxyFactory.ownerOf(proxyAddress)).to.not.be.eql(ZERO_ADD);
   });
@@ -154,8 +154,8 @@ describe("Ops Proxy module test", function () {
       opsProxyImplementation.address
     );
 
-    expect(await opsProxyImplementation.ops()).to.be.eql(ops.address);
-    expect(await opsProxy.ops()).to.be.eql(ops.address);
+    expect(await opsProxyImplementation.ops()).to.be.eql(automate.address);
+    expect(await opsProxy.ops()).to.be.eql(automate.address);
     expect(await opsProxyImplementation.owner()).to.be.eql(ZERO_ADD);
     expect(await opsProxy.owner()).to.be.eql(userAddress);
   });
@@ -214,20 +214,20 @@ describe("Ops Proxy module test", function () {
     const [proxyAddress] = await opsProxyFactory.getProxyOf(userAddress);
     opsProxy = await ethers.getContractAt("OpsProxy", proxyAddress);
 
-    const taskIds = await ops.getTaskIdsByUser(userAddress);
+    const taskIds = await automate.getTaskIdsByUser(userAddress);
 
-    const cancelTaskData = ops.interface.encodeFunctionData("cancelTask", [
+    const cancelTaskData = automate.interface.encodeFunctionData("cancelTask", [
       taskIds[0],
     ]);
 
     const executeCallData = opsProxy.interface.encodeFunctionData(
       "executeCall",
-      [ops.address, cancelTaskData, 0]
+      [automate.address, cancelTaskData, 0]
     );
 
     await user.sendTransaction({ to: opsProxy.address, data: executeCallData });
 
-    const taskIdsAfter = await ops.getTaskIdsByUser(userAddress);
+    const taskIdsAfter = await automate.getTaskIdsByUser(userAddress);
     expect(taskIdsAfter).to.not.include(taskIds[0]);
   });
 
@@ -302,7 +302,7 @@ describe("Ops Proxy module test", function () {
 
     computeTaskId();
 
-    const taskIds = await ops.getTaskIdsByUser(userAddress);
+    const taskIds = await automate.getTaskIdsByUser(userAddress);
     expect(taskIds).to.include(taskId);
 
     const countBefore = await counter.count();
@@ -323,7 +323,7 @@ describe("Ops Proxy module test", function () {
 
     computeTaskId();
 
-    const taskIds = await ops.getTaskIdsByUser(userAddress);
+    const taskIds = await automate.getTaskIdsByUser(userAddress);
     expect(taskIds).to.include(taskId);
 
     await expect(execute()).to.be.reverted;
@@ -348,7 +348,7 @@ describe("Ops Proxy module test", function () {
 
     computeTaskId();
 
-    const taskIds = await ops.getTaskIdsByUser(userAddress);
+    const taskIds = await automate.getTaskIdsByUser(userAddress);
     expect(taskIds).to.include(taskId);
 
     const countBefore = await counter.count();
@@ -370,7 +370,7 @@ describe("Ops Proxy module test", function () {
     taskCreator = user2Address;
 
     await expect(createTask(user2)).to.be.revertedWith(
-      "Ops.preCreateTask: ProxyModule: Only owner of proxy"
+      "Automate.preCreateTask: ProxyModule: Only owner of proxy"
     );
   });
 
@@ -387,12 +387,12 @@ describe("Ops Proxy module test", function () {
     taskCreator = user2Address;
 
     await expect(createTask(user2)).to.be.revertedWith(
-      "Ops.preCreateTask: ProxyModule: Only owner of proxy"
+      "Automate.preCreateTask: ProxyModule: Only owner of proxy"
     );
   });
 
   const execute = async () => {
-    await ops
+    await automate
       .connect(executor)
       .exec(
         taskCreator,
@@ -407,7 +407,7 @@ describe("Ops Proxy module test", function () {
   };
 
   const createTask = async (signer: Signer) => {
-    await ops
+    await automate
       .connect(signer)
       .createTask(execAddress, execData, moduleData, ZERO_ADD);
   };
