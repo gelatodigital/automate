@@ -16,7 +16,7 @@ const func: DeployFunction = async (hre: HardhatRuntimeEnvironment) => {
 
   await deploy("CounterTest", {
     from: deployer,
-    args: [(await hre.ethers.getContract("Ops")).address],
+    args: [(await hre.ethers.getContract("Automate")).address],
   });
 };
 
@@ -28,4 +28,4 @@ func.skip = async (hre: HardhatRuntimeEnvironment) => {
 };
 
 func.tags = ["CounterTest"];
-func.dependencies = ["Ops"];
+func.dependencies = ["Automate"];

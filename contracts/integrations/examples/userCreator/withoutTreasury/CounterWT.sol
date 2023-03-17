@@ -1,16 +1,16 @@
 // SPDX-License-Identifier: UNLICENSED
 pragma solidity ^0.8.0;
 
-import {OpsReady} from "../../../OpsReady.sol";
+import {AutomateReady} from "../../../AutomateReady.sol";
 
 // solhint-disable not-rely-on-time
 // solhint-disable no-empty-blocks
-contract CounterWT is OpsReady {
+contract CounterWT is AutomateReady {
     uint256 public count;
     uint256 public lastExecuted;
 
-    constructor(address _ops, address _taskCreator)
-        OpsReady(_ops, _taskCreator)
+    constructor(address _automate, address _taskCreator)
+        AutomateReady(_automate, _taskCreator)
     {}
 
     receive() external payable {}

@@ -13,7 +13,7 @@ struct ModuleData {
     bytes[] args;
 }
 
-interface IOps {
+interface IAutomate {
     function createTask(
         address execAddress,
         bytes calldata execDataOrSelector,

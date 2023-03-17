@@ -1,5 +1,5 @@
 {
-  "name": "gelato-ops",
+  "name": "gelato-automate",
   "version": "1.0.0",
   "description": "",
   "main": "hardhat.config.js",

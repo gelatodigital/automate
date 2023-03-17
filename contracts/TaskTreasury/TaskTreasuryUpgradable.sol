@@ -67,7 +67,7 @@ contract TaskTreasuryUpgradable is
         __ReentrancyGuard_init();
     }
 
-    /// @notice Function called by whitelisted services to handle payments, e.g. Gelato Ops
+    /// @notice Function called by whitelisted services to handle payments, e.g. Gelato Automate
     /// @param _user Address of user whose balance will be deducted
     /// @param _token Token to be used for payment by users
     /// @param _amount Amount to be deducted

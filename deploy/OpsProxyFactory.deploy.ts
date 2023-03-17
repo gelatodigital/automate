@@ -14,7 +14,7 @@ const func: DeployFunction = async (hre: HardhatRuntimeEnvironment) => {
   const { deploy } = deployments;
   const { deployer } = await hre.getNamedAccounts();
 
-  const OPS = (await hre.ethers.getContract("Ops")).address;
+  const AUTOMATE = (await hre.ethers.getContract("Automate")).address;
   const OPSPROXY = (await hre.ethers.getContract("OpsProxy")).address;
 
   await deploy("OpsProxyFactory", {
@@ -29,7 +29,7 @@ const func: DeployFunction = async (hre: HardhatRuntimeEnvironment) => {
         },
       },
     },
-    args: [OPS],
+    args: [AUTOMATE],
   });
 };
 

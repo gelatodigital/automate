@@ -2,12 +2,12 @@
 pragma solidity ^0.8.0;
 
 contract CounterTest {
-    address public ops;
+    address public automate;
     uint256 public count;
     uint256 public lastExecuted;
 
-    constructor(address payable _ops) {
-        ops = _ops;
+    constructor(address payable _automate) {
+        automate = _automate;
     }
 
     // solhint-disable not-rely-on-time
