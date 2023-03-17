@@ -79,7 +79,7 @@ contract TaskTreasuryUpgradable is
         if (maxFee != 0)
             require(maxFee >= _amount, "TaskTreasury: Overcharged");
 
-        uint256 balanceInOld = oldTreasury.userTokenBalance(_user, _token);
+        uint256 balanceInOld = _oldTreasuryUserTokenBalance(_user, _token);
 
         if (_amount <= balanceInOld) {
             oldTreasury.useFunds(_token, _amount, _user);
@@ -196,7 +196,7 @@ contract TaskTreasuryUpgradable is
         returns (address[] memory)
     {
         address[] memory tokensInNew = _tokens[_user].values();
-        address[] memory tokensInOld = oldTreasury.getCreditTokensByUser(_user);
+        address[] memory tokensInOld = _oldTreasuryGetCreditTokensByUser(_user);
 
         uint256 tokensInOldOnlyLength;
         for (uint256 i; i < tokensInOld.length; i++) {
@@ -249,7 +249,7 @@ contract TaskTreasuryUpgradable is
         returns (uint256)
     {
         uint256 balanceInNew = userTokenBalance(_user, _token);
-        uint256 balanceInOld = oldTreasury.userTokenBalance(_user, _token);
+        uint256 balanceInOld = _oldTreasuryUserTokenBalance(_user, _token);
 
         uint256 balance = balanceInNew + balanceInOld;
 
@@ -333,5 +333,29 @@ contract TaskTreasuryUpgradable is
         );
         shares[_user][_token] -= sharesToPay;
         shares[admin][_token] += sharesToPay;
+    }
+
+    function _oldTreasuryGetCreditTokensByUser(address _user)
+        private
+        view
+        returns (address[] memory)
+    {
+        if (address(oldTreasury) != address(0)) {
+            return oldTreasury.getCreditTokensByUser(_user);
+        }
+
+        return new address[](0);
+    }
+
+    function _oldTreasuryUserTokenBalance(address _user, address _token)
+        private
+        view
+        returns (uint256)
+    {
+        if (address(oldTreasury) != address(0)) {
+            return oldTreasury.userTokenBalance(_user, _token);
+        }
+
+        return 0;
     }
 }
