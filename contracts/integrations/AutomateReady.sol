@@ -15,8 +15,6 @@ abstract contract AutomateReady {
     address public immutable dedicatedMsgSender;
     address private immutable _gelato;
     address internal constant ETH = 0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE;
-    address private constant OPS_PROXY_FACTORY =
-        0x44bde1bccdD06119262f1fE441FBe7341EaaC185;
 
     /**
      * @dev
@@ -35,9 +33,16 @@ abstract contract AutomateReady {
     constructor(address _automate, address _taskCreator) {
         automate = IAutomate(_automate);
         _gelato = IAutomate(_automate).gelato();
-        (dedicatedMsgSender, ) = IOpsProxyFactory(OPS_PROXY_FACTORY).getProxyOf(
-            _taskCreator
+
+        address proxyModuleAddress = IAutomate(_automate).taskModuleAddresses(
+            Module.PROXY
         );
+
+        address opsProxyFactoryAddress = IProxyModule(proxyModuleAddress)
+            .opsProxyFactory();
+
+        (dedicatedMsgSender, ) = IOpsProxyFactory(opsProxyFactoryAddress)
+            .getProxyOf(_taskCreator);
     }
 
     /**

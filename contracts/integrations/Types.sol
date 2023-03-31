@@ -27,6 +27,12 @@ interface IAutomate {
     function getFeeDetails() external view returns (uint256, address);
 
     function gelato() external view returns (address payable);
+
+    function taskModuleAddresses(Module) external view returns (address);
+}
+
+interface IProxyModule {
+    function opsProxyFactory() external view returns (address);
 }
 
 interface IOpsProxyFactory {
