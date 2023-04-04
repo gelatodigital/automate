@@ -16,6 +16,8 @@ const func: DeployFunction = async (hre: HardhatRuntimeEnvironment) => {
 
   await deploy("TimeModule", {
     from: deployer,
+    log: hre.network.name !== "hardhat",
+    gasLimit: 2_000_000,
   });
 };
 

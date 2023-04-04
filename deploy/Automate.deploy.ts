@@ -26,6 +26,8 @@ const func: DeployFunction = async (hre: HardhatRuntimeEnvironment) => {
       owner: deployer,
     },
     args: [GELATO, UPGRADABLE_TREASURY],
+    log: hre.network.name !== "hardhat",
+    gasLimit: 7_000_000,
   });
 };
 
