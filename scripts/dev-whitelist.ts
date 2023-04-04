@@ -1,5 +1,5 @@
 import { ethers } from "hardhat";
-import { Automate, TaskTreasuryL2, TaskTreasuryUpgradable } from "../typechain";
+import { Automate, TaskTreasuryUpgradable } from "../typechain";
 
 const main = async () => {
   const [owner] = await ethers.getSigners();
@@ -8,19 +8,9 @@ const main = async () => {
 
   const automate = <Automate>await ethers.getContract("Automate");
 
-  const taskTreasury = <TaskTreasuryL2>(
-    await ethers.getContract("TaskTreasuryL2")
-  );
-
   const taskTreasuryUpgradable = <TaskTreasuryUpgradable>(
     await ethers.getContract("TaskTreasuryUpgradable")
   );
-
-  await taskTreasury
-    .connect(owner)
-    .addWhitelistedService(taskTreasuryUpgradable.address);
-
-  console.log("TaskTreasuryL2: Whitelisted TaskTreasuryUpgradable");
 
   await taskTreasuryUpgradable
     .connect(owner)

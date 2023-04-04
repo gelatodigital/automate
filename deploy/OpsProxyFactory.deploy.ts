@@ -30,6 +30,7 @@ const func: DeployFunction = async (hre: HardhatRuntimeEnvironment) => {
     },
     args: [AUTOMATE],
     log: hre.network.name !== "hardhat",
+    gasLimit: 3_000_000,
   });
 };
 
@@ -41,4 +42,3 @@ func.skip = async (hre: HardhatRuntimeEnvironment) => {
 };
 
 func.tags = ["OpsProxyFactory"];
-func.dependencies = ["OpsProxy"];

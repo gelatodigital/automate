@@ -1,9 +1,13 @@
 import { HardhatRuntimeEnvironment } from "hardhat/types";
 import { DeployFunction } from "hardhat-deploy/types";
 import { sleep } from "../hardhat/utils";
+import hre = require("hardhat");
 
 const func: DeployFunction = async (hre: HardhatRuntimeEnvironment) => {
-  const OLD_TREASURY = (await hre.ethers.getContract("TaskTreasuryL2")).address;
+  const OLD_TREASURY =
+    hre.network.name === "hardhat"
+      ? (await hre.ethers.getContract("TaskTreasuryL2")).address
+      : hre.ethers.constants.AddressZero;
   const maxFee = 0;
 
   if (hre.network.name !== "hardhat") {
@@ -33,6 +37,7 @@ const func: DeployFunction = async (hre: HardhatRuntimeEnvironment) => {
     },
     args: [OLD_TREASURY],
     log: hre.network.name !== "hardhat",
+    gasLimit: 5_000_000,
   });
 };
 
@@ -44,4 +49,4 @@ func.skip = async (hre: HardhatRuntimeEnvironment) => {
 };
 
 func.tags = ["TaskTreasuryUpgradable"];
-func.dependencies = ["TaskTreasuryL2"];
+func.dependencies = hre.network.name === "hardhat" ? ["TaskTreasuryL2"] : [];

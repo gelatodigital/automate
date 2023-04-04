@@ -20,6 +20,7 @@ const func: DeployFunction = async (hre: HardhatRuntimeEnvironment) => {
     from: deployer,
     args: [AUTOMATE],
     log: hre.network.name !== "hardhat",
+    gasLimit: 3_000_000,
   });
 };
 
