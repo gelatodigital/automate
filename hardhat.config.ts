@@ -18,8 +18,9 @@ const ALCHEMY_ID = process.env.ALCHEMY_ID;
 assert.ok(ALCHEMY_ID, "no Alchemy ID in process.env");
 
 // @dev fill this out
-const DEPLOYER_PK_MAINNET = process.env.DEPLOYER_PK_MAINNET;
-const ETHERSCAN_API = process.env.ETHERSCAN_API;
+const PROD_PK = process.env.PROD_PK;
+const DEV_PK = process.env.DEV_PK;
+const ETHERSCAN_API = process.env.ETHERSCAN_MATIC_API;
 
 // ================================= CONFIG =========================================
 const config: HardhatUserConfig = {
@@ -43,82 +44,87 @@ const config: HardhatUserConfig = {
     arbitrum: {
       url: `https://arb-mainnet.g.alchemy.com/v2/${ALCHEMY_ID}`,
       chainId: 42161,
-      accounts: DEPLOYER_PK_MAINNET ? [DEPLOYER_PK_MAINNET] : [],
+      accounts: PROD_PK ? [PROD_PK] : [],
     },
     avalanche: {
       url: "https://api.avax.network/ext/bc/C/rpc",
       chainId: 43114,
-      accounts: DEPLOYER_PK_MAINNET ? [DEPLOYER_PK_MAINNET] : [],
+      accounts: PROD_PK ? [PROD_PK] : [],
     },
     baseGoerli: {
       url: "https://goerli.base.org",
       chainId: 84531,
-      accounts: DEPLOYER_PK_MAINNET ? [DEPLOYER_PK_MAINNET] : [],
+      accounts: PROD_PK ? [PROD_PK] : [],
     },
     bsc: {
       url: "https://bsc-dataseed.binance.org/",
       chainId: 56,
-      accounts: DEPLOYER_PK_MAINNET ? [DEPLOYER_PK_MAINNET] : [],
+      accounts: PROD_PK ? [PROD_PK] : [],
     },
     cronos: {
-      accounts: DEPLOYER_PK_MAINNET ? [DEPLOYER_PK_MAINNET] : [],
+      accounts: PROD_PK ? [PROD_PK] : [],
       chainId: 25,
       url: `https://evm.cronos.org`,
     },
     fantom: {
-      accounts: DEPLOYER_PK_MAINNET ? [DEPLOYER_PK_MAINNET] : [],
+      accounts: PROD_PK ? [PROD_PK] : [],
       chainId: 250,
       url: `https://rpcapi.fantom.network/`,
     },
     gnosis: {
       url: "https://rpc.gnosischain.com",
       chainId: 100,
-      accounts: DEPLOYER_PK_MAINNET ? [DEPLOYER_PK_MAINNET] : [],
+      accounts: PROD_PK ? [PROD_PK] : [],
     },
     goerli: {
-      accounts: DEPLOYER_PK_MAINNET ? [DEPLOYER_PK_MAINNET] : [],
+      accounts: PROD_PK ? [PROD_PK] : [],
       chainId: 5,
       url: `https://eth-goerli.alchemyapi.io/v2/${ALCHEMY_ID}`,
     },
     mainnet: {
-      accounts: DEPLOYER_PK_MAINNET ? [DEPLOYER_PK_MAINNET] : [],
+      accounts: PROD_PK ? [PROD_PK] : [],
       chainId: 1,
       url: `https://eth-mainnet.alchemyapi.io/v2/${ALCHEMY_ID}`,
     },
     matic: {
       url: `https://polygon-mainnet.g.alchemy.com/v2/${ALCHEMY_ID}`,
       chainId: 137,
-      accounts: DEPLOYER_PK_MAINNET ? [DEPLOYER_PK_MAINNET] : [],
+      accounts: PROD_PK ? [PROD_PK] : [],
     },
     moonbeam: {
       url: `https://rpc.api.moonbeam.network`,
       chainId: 1284,
-      accounts: DEPLOYER_PK_MAINNET ? [DEPLOYER_PK_MAINNET] : [],
+      accounts: PROD_PK ? [PROD_PK] : [],
     },
     moonriver: {
       url: `https://rpc.api.moonriver.moonbeam.network`,
       chainId: 1285,
-      accounts: DEPLOYER_PK_MAINNET ? [DEPLOYER_PK_MAINNET] : [],
+      accounts: PROD_PK ? [PROD_PK] : [],
     },
     mumbai: {
       url: `https://polygon-mumbai.g.alchemy.com/v2/${ALCHEMY_ID}`,
       chainId: 80001,
-      accounts: DEPLOYER_PK_MAINNET ? [DEPLOYER_PK_MAINNET] : [],
+      accounts: PROD_PK ? [PROD_PK] : [],
+    },
+    mumbaiDev: {
+      url: `https://polygon-mumbai.g.alchemy.com/v2/${ALCHEMY_ID}`,
+      chainId: 80001,
+      accounts: DEV_PK ? [DEV_PK] : [],
     },
     optimism: {
       url: `https://opt-mainnet.g.alchemy.com/v2/${ALCHEMY_ID}`,
       chainId: 10,
-      accounts: DEPLOYER_PK_MAINNET ? [DEPLOYER_PK_MAINNET] : [],
+      accounts: PROD_PK ? [PROD_PK] : [],
     },
     arbgoerli: {
       url: "https://goerli-rollup.arbitrum.io/rpc",
       chainId: 421613,
-      accounts: DEPLOYER_PK_MAINNET ? [DEPLOYER_PK_MAINNET] : [],
+      accounts: PROD_PK ? [PROD_PK] : [],
     },
     ogoerli: {
       url: `https://opt-goerli.g.alchemy.com/v2/${ALCHEMY_ID}`,
       chainId: 420,
-      accounts: DEPLOYER_PK_MAINNET ? [DEPLOYER_PK_MAINNET] : [],
+      accounts: PROD_PK ? [PROD_PK] : [],
     },
   },
 
