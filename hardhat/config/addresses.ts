@@ -13,6 +13,7 @@ export const getGelatoAddress = (network: string): string => {
 
   const GELATO_GOERLI = "0x683913B3A32ada4F8100458A3E1675425BdAa7DF";
   const GELATO_MUMBAI = "0x25aD59adbe00C2d80c86d01e2E05e1294DA84823";
+  const GELATO_MUMBAI_DEV = "0x266E4AB6baD069aFc28d3C2CC129f6F8455b1dc2";
   const GELATO_AGOERLI = "0xF82D64357D9120a760e1E4C75f646C0618eFc2F3";
   const GELATO_OGOERLI = "0xF82D64357D9120a760e1E4C75f646C0618eFc2F3";
   const GELATO_BASEGOERLI = "0xbe77Cd403Be3F2C7EEBC3427360D3f9e5d528F43";
@@ -35,8 +36,9 @@ export const getGelatoAddress = (network: string): string => {
     case "gnosis":
       return GELATO_GNOSIS;
     case "mumbai":
-    case "mumbaiDev":
       return GELATO_MUMBAI;
+    case "mumbaiDev":
+      return GELATO_MUMBAI_DEV;
     case "optimism":
       return GELATO_OPTIMISM;
     case "moonbeam":
