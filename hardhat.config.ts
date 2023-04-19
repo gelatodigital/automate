@@ -50,6 +50,11 @@ const config: HardhatUserConfig = {
       chainId: 43114,
       accounts: DEPLOYER_PK_MAINNET ? [DEPLOYER_PK_MAINNET] : [],
     },
+    baseGoerli: {
+      url: "https://goerli.base.org",
+      chainId: 84531,
+      accounts: DEPLOYER_PK_MAINNET ? [DEPLOYER_PK_MAINNET] : [],
+    },
     bsc: {
       url: "https://bsc-dataseed.binance.org/",
       chainId: 56,

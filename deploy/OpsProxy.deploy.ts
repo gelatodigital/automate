@@ -19,6 +19,8 @@ const func: DeployFunction = async (hre: HardhatRuntimeEnvironment) => {
   await deploy("OpsProxy", {
     from: deployer,
     args: [AUTOMATE],
+    log: hre.network.name !== "hardhat",
+    gasLimit: 3_000_000,
   });
 };
 
