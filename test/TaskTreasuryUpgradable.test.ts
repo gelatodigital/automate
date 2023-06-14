@@ -119,7 +119,7 @@ describe("TaskTreasuryUpgradable test", function () {
   });
 
   it("maxFee should be correct", async () => {
-    expect(await treasury.maxFee()).to.be.eql(ethers.BigNumber.from("0"));
+    expect(await treasury.maxFee()).to.be.eq(ethers.BigNumber.from("0"));
   });
 
   it("deposit ETH", async () => {
@@ -343,8 +343,8 @@ describe("TaskTreasuryUpgradable test", function () {
       userAddress,
       ETH
     );
-    expect(daiTokenBalance).to.be.eql(depositAmount.mul(2));
-    expect(ethTokenBalance).to.be.eql(depositAmount.mul(2));
+    expect(daiTokenBalance).to.be.eq(depositAmount.mul(2));
+    expect(ethTokenBalance).to.be.eq(depositAmount.mul(2));
   });
 
   it("useFunds - cannot be called via a non-proxy task", async () => {
@@ -417,7 +417,7 @@ describe("TaskTreasuryUpgradable test", function () {
       tokenAddress
     );
 
-    expect(balanceAfter).to.be.eql(expectedTreasuryBalance);
+    expect(balanceAfter).to.be.eq(expectedTreasuryBalance);
   };
 
   const depositEth = async (signer: Signer, depositAmount: BigNumber) => {
@@ -435,7 +435,7 @@ describe("TaskTreasuryUpgradable test", function () {
 
     const balanceAfter = await treasury.userTokenBalance(signerAddress, ETH);
 
-    expect(balanceAfter).to.be.eql(balanceBefore.add(depositAmount));
+    expect(balanceAfter).to.be.eq(balanceBefore.add(depositAmount));
   };
 
   const depositErc20 = async (
@@ -460,7 +460,7 @@ describe("TaskTreasuryUpgradable test", function () {
       tokenAddress
     );
 
-    expect(balanceAfter).to.be.eql(balanceBefore.add(depositAmount));
+    expect(balanceAfter).to.be.eq(balanceBefore.add(depositAmount));
   };
 
   const withdraw = async (
@@ -488,10 +488,10 @@ describe("TaskTreasuryUpgradable test", function () {
     );
     const balanceAfter = await getBalance(deployerAddress, token);
 
-    expect(treasuryBalanceAfter).to.be.eql(
+    expect(treasuryBalanceAfter).to.be.eq(
       treasuryBalanceBefore.sub(withdrawAmount)
     );
-    expect(balanceAfter).to.be.eql(balanceBefore.add(withdrawAmount));
+    expect(balanceAfter).to.be.eq(balanceBefore.add(withdrawAmount));
   };
 
   const getBalance = async (

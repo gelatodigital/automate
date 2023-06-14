@@ -263,8 +263,8 @@ describe("Automate legacy task test", function () {
       txn.events[0].topics
     );
     expect(decoded.taskId).to.be.eql(taskId);
-    expect(decoded.nextExec).to.be.eql(ethers.BigNumber.from(startTime));
-    expect(decoded.interval).to.be.eql(ethers.BigNumber.from(interval));
+    expect(decoded.nextExec).to.be.eq(ethers.BigNumber.from(startTime));
+    expect(decoded.interval).to.be.eq(ethers.BigNumber.from(interval));
 
     // TaskCreated
     const decoded2 = events.interface.decodeEventLog(

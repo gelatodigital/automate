@@ -150,8 +150,8 @@ describe("Automate multi module test", function () {
   it("createTask - time initialised", async () => {
     const time = await automate.timedTask(taskId);
 
-    expect(time.nextExec).to.be.eql(ethers.BigNumber.from(startTime));
-    expect(time.interval).to.be.eql(ethers.BigNumber.from(INTERVAL));
+    expect(time.nextExec).to.be.eq(ethers.BigNumber.from(startTime));
+    expect(time.interval).to.be.eq(ethers.BigNumber.from(INTERVAL));
   });
 
   it("createTask - wrong module order", async () => {
@@ -227,7 +227,7 @@ describe("Automate multi module test", function () {
     expect(countAfter).to.be.gt(countBefore);
 
     const time = await automate.timedTask(taskId);
-    expect(time.nextExec).to.be.eql(ethers.BigNumber.from(0));
+    expect(time.nextExec).to.be.eq(ethers.BigNumber.from(0));
 
     const taskIds = await automate.getTaskIdsByUser(userAddress);
     expect(taskIds).to.not.include(taskId);
