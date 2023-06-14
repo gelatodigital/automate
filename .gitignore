@@ -7,6 +7,8 @@ node_modules
 #hardhat
 artifacts/
 cache/
+artifacts-zk/
+cache-zk/
 
 # Typechain generation
 typechain

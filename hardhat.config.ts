@@ -5,6 +5,8 @@ import "@nomiclabs/hardhat-ethers";
 import "@nomiclabs/hardhat-waffle";
 import "@typechain/hardhat";
 import "hardhat-deploy";
+import "@matterlabs/hardhat-zksync-solc";
+import "@matterlabs/hardhat-zksync-verify";
 
 // Process Env Variables
 import * as dotenv from "dotenv";
@@ -41,6 +43,8 @@ const config: HardhatUserConfig = {
         blockNumber: 14068500,
       },
     },
+
+    // Prod
     arbitrum: {
       url: `https://arb-mainnet.g.alchemy.com/v2/${ALCHEMY_ID}`,
       chainId: 42161,
@@ -49,11 +53,6 @@ const config: HardhatUserConfig = {
     avalanche: {
       url: "https://api.avax.network/ext/bc/C/rpc",
       chainId: 43114,
-      accounts: PROD_PK ? [PROD_PK] : [],
-    },
-    baseGoerli: {
-      url: "https://goerli.base.org",
-      chainId: 84531,
       accounts: PROD_PK ? [PROD_PK] : [],
     },
     bsc: {
@@ -75,11 +74,6 @@ const config: HardhatUserConfig = {
       url: "https://rpc.gnosischain.com",
       chainId: 100,
       accounts: PROD_PK ? [PROD_PK] : [],
-    },
-    goerli: {
-      accounts: PROD_PK ? [PROD_PK] : [],
-      chainId: 5,
-      url: `https://eth-goerli.alchemyapi.io/v2/${ALCHEMY_ID}`,
     },
     mainnet: {
       accounts: PROD_PK ? [PROD_PK] : [],
@@ -106,19 +100,41 @@ const config: HardhatUserConfig = {
       chainId: 80001,
       accounts: PROD_PK ? [PROD_PK] : [],
     },
-    mumbaiDev: {
-      url: `https://polygon-mumbai.g.alchemy.com/v2/${ALCHEMY_ID}`,
-      chainId: 80001,
-      accounts: DEV_PK ? [DEV_PK] : [],
-    },
     optimism: {
       url: `https://opt-mainnet.g.alchemy.com/v2/${ALCHEMY_ID}`,
       chainId: 10,
       accounts: PROD_PK ? [PROD_PK] : [],
     },
+    zksync: {
+      zksync: true,
+      url: "https://mainnet.era.zksync.io",
+      chainId: 324,
+      accounts: PROD_PK ? [PROD_PK] : [],
+      verifyURL:
+        "https://zksync2-mainnet-explorer.zksync.io/contract_verification",
+    },
+
+    // Dev
+    mumbaiDev: {
+      url: `https://polygon-mumbai.g.alchemy.com/v2/${ALCHEMY_ID}`,
+      chainId: 80001,
+      accounts: DEV_PK ? [DEV_PK] : [],
+    },
+
+    // Staging
     arbgoerli: {
       url: "https://goerli-rollup.arbitrum.io/rpc",
       chainId: 421613,
+      accounts: PROD_PK ? [PROD_PK] : [],
+    },
+    baseGoerli: {
+      url: "https://goerli.base.org",
+      chainId: 84531,
+      accounts: PROD_PK ? [PROD_PK] : [],
+    },
+    goerli: {
+      url: `https://eth-goerli.alchemyapi.io/v2/${ALCHEMY_ID}`,
+      chainId: 5,
       accounts: PROD_PK ? [PROD_PK] : [],
     },
     ogoerli: {
