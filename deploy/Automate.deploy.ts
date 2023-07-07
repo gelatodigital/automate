@@ -1,10 +1,10 @@
 import { HardhatRuntimeEnvironment } from "hardhat/types";
 import { DeployFunction } from "hardhat-deploy/types";
-import { sleep } from "../hardhat/utils";
+import { isTesting, isZksync, sleep } from "../hardhat/utils";
 import { getGelatoAddress } from "../hardhat/config/addresses";
 
 const func: DeployFunction = async (hre: HardhatRuntimeEnvironment) => {
-  if (hre.network.name !== "hardhat") {
+  if (!isTesting(hre.network.name)) {
     console.log(
       `Deploying Automate to ${hre.network.name}. Hit ctrl + c to abort`
     );
@@ -23,10 +23,11 @@ const func: DeployFunction = async (hre: HardhatRuntimeEnvironment) => {
   await deploy("Automate", {
     from: deployer,
     proxy: {
+      proxyContract: isZksync(hre.network.name) ? "EIP173Proxy" : undefined,
       owner: deployer,
     },
     args: [GELATO, UPGRADABLE_TREASURY],
-    log: hre.network.name !== "hardhat",
+    log: !isTesting(hre.network.name),
     gasLimit: 7_000_000,
   });
 };
@@ -34,7 +35,7 @@ const func: DeployFunction = async (hre: HardhatRuntimeEnvironment) => {
 export default func;
 
 func.skip = async (hre: HardhatRuntimeEnvironment) => {
-  const shouldSkip = hre.network.name !== "hardhat";
+  const shouldSkip = !isTesting(hre.network.name);
   return shouldSkip;
 };
 
