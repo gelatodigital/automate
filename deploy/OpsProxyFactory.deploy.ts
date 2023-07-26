@@ -1,9 +1,9 @@
 import { HardhatRuntimeEnvironment } from "hardhat/types";
 import { DeployFunction } from "hardhat-deploy/types";
-import { sleep } from "../hardhat/utils";
+import { isTesting, isZksync, sleep } from "../hardhat/utils";
 
 const func: DeployFunction = async (hre: HardhatRuntimeEnvironment) => {
-  if (hre.network.name !== "hardhat") {
+  if (!isTesting(hre.network.name)) {
     console.log(
       `Deploying OpsProxyFactory to ${hre.network.name}. Hit ctrl + c to abort`
     );
@@ -20,6 +20,7 @@ const func: DeployFunction = async (hre: HardhatRuntimeEnvironment) => {
   await deploy("OpsProxyFactory", {
     from: deployer,
     proxy: {
+      proxyContract: isZksync(hre.network.name) ? "EIP173Proxy" : undefined,
       owner: deployer,
       execute: {
         init: {
@@ -29,7 +30,7 @@ const func: DeployFunction = async (hre: HardhatRuntimeEnvironment) => {
       },
     },
     args: [AUTOMATE],
-    log: hre.network.name !== "hardhat",
+    log: !isTesting(hre.network.name),
     gasLimit: 3_000_000,
   });
 };
@@ -37,7 +38,7 @@ const func: DeployFunction = async (hre: HardhatRuntimeEnvironment) => {
 export default func;
 
 func.skip = async (hre: HardhatRuntimeEnvironment) => {
-  const shouldSkip = hre.network.name !== "hardhat";
+  const shouldSkip = !isTesting(hre.network.name);
   return shouldSkip;
 };
 

@@ -10,13 +10,16 @@ export const getGelatoAddress = (network: string): string => {
   const GELATO_MOONBEAM = "0x91f2A140cA47DdF438B9c583b7E71987525019bB";
   const GELATO_MOONRIVER = "0x91f2A140cA47DdF438B9c583b7E71987525019bB";
   const GELATO_CRONOS = "0x91f2A140cA47DdF438B9c583b7E71987525019bB";
+  const GELATO_ZKSYNC = "0x52cb9f60225aA830AE420126BC8e3d5B2fc5bCf4";
 
   const GELATO_GOERLI = "0x683913B3A32ada4F8100458A3E1675425BdAa7DF";
   const GELATO_MUMBAI = "0x25aD59adbe00C2d80c86d01e2E05e1294DA84823";
-  const GELATO_MUMBAI_DEV = "0x266E4AB6baD069aFc28d3C2CC129f6F8455b1dc2";
   const GELATO_AGOERLI = "0xF82D64357D9120a760e1E4C75f646C0618eFc2F3";
   const GELATO_OGOERLI = "0xF82D64357D9120a760e1E4C75f646C0618eFc2F3";
   const GELATO_BASEGOERLI = "0xbe77Cd403Be3F2C7EEBC3427360D3f9e5d528F43";
+  const GELATO_ZKSYNCGOERLI = "0x296530a4224D5A5669a3f0C772EC7337ca3D3f1d";
+
+  const GELATO_MUMBAI_DEV = "0x266E4AB6baD069aFc28d3C2CC129f6F8455b1dc2";
 
   switch (network) {
     case "mainnet":
@@ -53,6 +56,11 @@ export const getGelatoAddress = (network: string): string => {
       return GELATO_OGOERLI;
     case "cronos":
       return GELATO_CRONOS;
+    case "zksync":
+    case "zksyncLocal":
+      return GELATO_ZKSYNC;
+    case "zksyncGoerli":
+      return GELATO_ZKSYNCGOERLI;
     case "hardhat":
       return GELATO_MAINNET;
     default:

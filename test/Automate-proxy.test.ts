@@ -207,7 +207,7 @@ describe("Automate Proxy module test", function () {
       value,
     });
 
-    expect(await ethers.provider.getBalance(proxyAddress)).to.be.eql(value);
+    expect(await ethers.provider.getBalance(proxyAddress)).to.be.eq(value);
   });
 
   it("cancelTask - with proxy, eoa is owner of task", async () => {

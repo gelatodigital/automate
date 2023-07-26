@@ -1,16 +1,15 @@
 import { HardhatRuntimeEnvironment } from "hardhat/types";
 import { DeployFunction } from "hardhat-deploy/types";
-import { sleep } from "../hardhat/utils";
+import { isTesting, sleep } from "../hardhat/utils";
 import hre = require("hardhat");
 
 const func: DeployFunction = async (hre: HardhatRuntimeEnvironment) => {
-  const OLD_TREASURY =
-    hre.network.name === "hardhat"
-      ? (await hre.ethers.getContract("TaskTreasuryL2")).address
-      : hre.ethers.constants.AddressZero;
+  const OLD_TREASURY = isTesting(hre.network.name)
+    ? (await hre.ethers.getContract("TaskTreasuryL2")).address
+    : hre.ethers.constants.AddressZero;
   const maxFee = 0;
 
-  if (hre.network.name !== "hardhat") {
+  if (!isTesting(hre.network.name)) {
     console.log(
       `Deploying TaskTreasuryUpgradable to ${hre.network.name}. Hit ctrl + c to abort`
     );
@@ -44,9 +43,9 @@ const func: DeployFunction = async (hre: HardhatRuntimeEnvironment) => {
 export default func;
 
 func.skip = async (hre: HardhatRuntimeEnvironment) => {
-  const shouldSkip = hre.network.name !== "hardhat";
+  const shouldSkip = !isTesting(hre.network.name);
   return shouldSkip;
 };
 
 func.tags = ["TaskTreasuryUpgradable"];
-func.dependencies = hre.network.name === "hardhat" ? ["TaskTreasuryL2"] : [];
+func.dependencies = isTesting(hre.network.name) ? ["TaskTreasuryL2"] : [];

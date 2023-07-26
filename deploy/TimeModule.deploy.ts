@@ -1,9 +1,9 @@
 import { HardhatRuntimeEnvironment } from "hardhat/types";
 import { DeployFunction } from "hardhat-deploy/types";
-import { sleep } from "../hardhat/utils";
+import { isTesting, sleep } from "../hardhat/utils";
 
 const func: DeployFunction = async (hre: HardhatRuntimeEnvironment) => {
-  if (hre.network.name !== "hardhat") {
+  if (!isTesting(hre.network.name)) {
     console.log(
       `Deploying TimeModule to ${hre.network.name}. Hit ctrl + c to abort`
     );
@@ -16,7 +16,7 @@ const func: DeployFunction = async (hre: HardhatRuntimeEnvironment) => {
 
   await deploy("TimeModule", {
     from: deployer,
-    log: hre.network.name !== "hardhat",
+    log: !isTesting(hre.network.name),
     gasLimit: 2_000_000,
   });
 };
@@ -24,7 +24,7 @@ const func: DeployFunction = async (hre: HardhatRuntimeEnvironment) => {
 export default func;
 
 func.skip = async (hre: HardhatRuntimeEnvironment) => {
-  const shouldSkip = hre.network.name !== "hardhat";
+  const shouldSkip = !isTesting(hre.network.name);
   return shouldSkip;
 };
 

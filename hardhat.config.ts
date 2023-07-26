@@ -5,6 +5,8 @@ import "@nomiclabs/hardhat-ethers";
 import "@nomiclabs/hardhat-waffle";
 import "@typechain/hardhat";
 import "hardhat-deploy";
+import "@matterlabs/hardhat-zksync-solc";
+import "@matterlabs/hardhat-zksync-verify";
 
 // Process Env Variables
 import * as dotenv from "dotenv";
@@ -41,6 +43,18 @@ const config: HardhatUserConfig = {
         blockNumber: 14068500,
       },
     },
+
+    // Local
+    zksyncLocal: {
+      url: "http://localhost:3050",
+      zksync: true,
+      accounts: [
+        "0x7726827caac94a7f9e1b160f7ea819f172f7b6f9d2a97f992c38edeab82d4110", //0x36615Cf349d7F6344891B1e7CA7C72883F5dc049
+        "0xac1e735be8536c6534bb4f17f06f6afc73b2b5ba84ac2cfb12f7461b20c0bbe3", //0xa61464658AfeAf65CccaaFD3a512b69A83B77618
+      ],
+    },
+
+    // Prod
     arbitrum: {
       url: `https://arb-mainnet.g.alchemy.com/v2/${ALCHEMY_ID}`,
       chainId: 42161,
@@ -49,11 +63,6 @@ const config: HardhatUserConfig = {
     avalanche: {
       url: "https://api.avax.network/ext/bc/C/rpc",
       chainId: 43114,
-      accounts: PROD_PK ? [PROD_PK] : [],
-    },
-    baseGoerli: {
-      url: "https://goerli.base.org",
-      chainId: 84531,
       accounts: PROD_PK ? [PROD_PK] : [],
     },
     bsc: {
@@ -75,11 +84,6 @@ const config: HardhatUserConfig = {
       url: "https://rpc.gnosischain.com",
       chainId: 100,
       accounts: PROD_PK ? [PROD_PK] : [],
-    },
-    goerli: {
-      accounts: PROD_PK ? [PROD_PK] : [],
-      chainId: 5,
-      url: `https://eth-goerli.alchemyapi.io/v2/${ALCHEMY_ID}`,
     },
     mainnet: {
       accounts: PROD_PK ? [PROD_PK] : [],
@@ -106,19 +110,41 @@ const config: HardhatUserConfig = {
       chainId: 80001,
       accounts: PROD_PK ? [PROD_PK] : [],
     },
-    mumbaiDev: {
-      url: `https://polygon-mumbai.g.alchemy.com/v2/${ALCHEMY_ID}`,
-      chainId: 80001,
-      accounts: DEV_PK ? [DEV_PK] : [],
-    },
     optimism: {
       url: `https://opt-mainnet.g.alchemy.com/v2/${ALCHEMY_ID}`,
       chainId: 10,
       accounts: PROD_PK ? [PROD_PK] : [],
     },
+    zksync: {
+      zksync: true,
+      url: "https://mainnet.era.zksync.io",
+      chainId: 324,
+      accounts: PROD_PK ? [PROD_PK] : [],
+      verifyURL:
+        "https://zksync2-mainnet-explorer.zksync.io/contract_verification",
+    },
+
+    // Dev
+    mumbaiDev: {
+      url: `https://polygon-mumbai.g.alchemy.com/v2/${ALCHEMY_ID}`,
+      chainId: 80001,
+      accounts: DEV_PK ? [DEV_PK] : [],
+    },
+
+    // Staging
     arbgoerli: {
       url: "https://goerli-rollup.arbitrum.io/rpc",
       chainId: 421613,
+      accounts: PROD_PK ? [PROD_PK] : [],
+    },
+    baseGoerli: {
+      url: "https://goerli.base.org",
+      chainId: 84531,
+      accounts: PROD_PK ? [PROD_PK] : [],
+    },
+    goerli: {
+      url: `https://eth-goerli.alchemyapi.io/v2/${ALCHEMY_ID}`,
+      chainId: 5,
       accounts: PROD_PK ? [PROD_PK] : [],
     },
     ogoerli: {
