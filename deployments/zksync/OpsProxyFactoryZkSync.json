@@ -497,7 +497,7 @@
     "methodName": "initialize",
     "args": ["0xd72Cb1Db20bc4F1De6B98297A40b9BE77A7b3067"]
   },
-  "implementation": "0x761AD7fDF60b63297B8E9ED7F625bB4E734c7663",
+  "implementation": "0x00666b065d3a939e5Bf35c3639E56551620C4a42",
   "devdoc": {
     "kind": "dev",
     "methods": {},

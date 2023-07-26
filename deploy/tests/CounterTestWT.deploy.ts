@@ -1,9 +1,9 @@
 import { HardhatRuntimeEnvironment } from "hardhat/types";
 import { DeployFunction } from "hardhat-deploy/types";
-import { sleep } from "../../hardhat/utils";
+import { isTesting, sleep } from "../../hardhat/utils";
 
 const func: DeployFunction = async (hre: HardhatRuntimeEnvironment) => {
-  if (hre.network.name !== "hardhat") {
+  if (!isTesting(hre.network.name)) {
     console.log(
       `Deploying CounterTestWT to ${hre.network.name}. Hit ctrl + c to abort`
     );

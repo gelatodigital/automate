@@ -57,6 +57,7 @@ export const getGelatoAddress = (network: string): string => {
     case "cronos":
       return GELATO_CRONOS;
     case "zksync":
+    case "zksyncLocal":
       return GELATO_ZKSYNC;
     case "zksyncGoerli":
       return GELATO_ZKSYNCGOERLI;

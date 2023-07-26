@@ -44,6 +44,16 @@ const config: HardhatUserConfig = {
       },
     },
 
+    // Local
+    zksyncLocal: {
+      url: "http://localhost:3050",
+      zksync: true,
+      accounts: [
+        "0x7726827caac94a7f9e1b160f7ea819f172f7b6f9d2a97f992c38edeab82d4110", //0x36615Cf349d7F6344891B1e7CA7C72883F5dc049
+        "0xac1e735be8536c6534bb4f17f06f6afc73b2b5ba84ac2cfb12f7461b20c0bbe3", //0xa61464658AfeAf65CccaaFD3a512b69A83B77618
+      ],
+    },
+
     // Prod
     arbitrum: {
       url: `https://arb-mainnet.g.alchemy.com/v2/${ALCHEMY_ID}`,
