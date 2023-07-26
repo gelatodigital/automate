@@ -12,13 +12,15 @@ library LibDataTypes {
      * @param PROXY Creates a dedicated caller (msg.sender) to be used when executing the task. {See ProxyModule.sol}
      * @param SINGLE_EXEC Task is cancelled after one execution. {See SingleExecModule.sol}
      * @param WEB3_FUNCTION Use off-chain condition & input data for execution. {See Web3FunctionModule.sol}
+     * @param TRIGGER Repeated execution of task ata a specified timing and interval or cron. {See TriggerModule.sol}
      */
     enum Module {
         RESOLVER,
         TIME,
         PROXY,
         SINGLE_EXEC,
-        WEB3_FUNCTION
+        WEB3_FUNCTION,
+        TRIGGER
     }
 
     /**
@@ -41,5 +43,47 @@ library LibDataTypes {
     struct Time {
         uint128 nextExec;
         uint128 interval;
+    }
+
+    /**
+     * @notice Types of trigger
+     *
+     * @param TIME Time triggered tasks, starting at a specific time and triggered intervally
+     * @param CRON Cron triggered tasks, triggered according to the cron conditions
+     */
+    enum TriggerType {
+        TIME,
+        CRON
+    }
+
+    /**
+     * @notice Struct for trigger module
+     *
+     * @param triggerType Type of the trigger
+     * @param triggerConfig Trigger configuration that shuold be parsed according to triggerType
+     */
+    struct TriggerModuleData {
+        TriggerType triggerType;
+        bytes triggerConfig;
+    }
+
+    /**
+     * @notice Struct for Time trigger configuration
+     *
+     * @param start Starting timestamp for the task, 0 = now
+     * @param interval Trigger interval in seconds
+     */
+    struct TimeTriggerConfig {
+        uint128 start;
+        uint128 interval;
+    }
+
+    /**
+     * @notice Struct for Cron trigger configuration
+     *
+     * @param expression Cron expression
+     */
+    struct CronTriggerConfig {
+        string expression;
     }
 }
