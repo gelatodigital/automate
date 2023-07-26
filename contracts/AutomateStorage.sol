@@ -21,6 +21,7 @@ abstract contract AutomateStorage {
     mapping(bytes32 => LibDataTypes.Time) public timedTask;
     mapping(LibDataTypes.Module => address) public taskModuleAddresses;
     mapping(bytes32 => uint256) public nonce1Balance;
+    mapping(bytes32 => LibDataTypes.TriggerType) public triggerTaskTypes;
     mapping(bytes32 => LibDataTypes.TimeTriggerConfig) public timeTriggerTask;
     mapping(bytes32 => LibDataTypes.CronTriggerConfig) public cronTriggerTask;
 }
