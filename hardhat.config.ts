@@ -18,6 +18,8 @@ import assert from "assert";
 // @dev Put this in .env
 const ALCHEMY_ID = process.env.ALCHEMY_ID;
 assert.ok(ALCHEMY_ID, "no Alchemy ID in process.env");
+const INFURA_ID = process.env.INFURA_ID;
+assert.ok(INFURA_ID, "no Infura ID in process.env");
 
 // @dev fill this out
 const PROD_PK = process.env.PROD_PK;
@@ -83,6 +85,11 @@ const config: HardhatUserConfig = {
     gnosis: {
       url: "https://rpc.gnosischain.com",
       chainId: 100,
+      accounts: PROD_PK ? [PROD_PK] : [],
+    },
+    linea: {
+      url: `https://linea-mainnet.infura.io/v3/${INFURA_ID}`,
+      chainId: 59144,
       accounts: PROD_PK ? [PROD_PK] : [],
     },
     mainnet: {

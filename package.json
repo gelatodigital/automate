@@ -40,7 +40,7 @@
     "ethereum-waffle": "^3.4.0",
     "ethers": "^5.7.2",
     "hardhat": "^2.9.1",
-    "hardhat-deploy": "^0.11.30",
+    "hardhat-deploy": "^0.11.34",
     "hardhat-gas-reporter": "^1.0.8",
     "husky": "7.0.4",
     "lint-staged": "12.3.5",
