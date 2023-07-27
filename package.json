@@ -4,8 +4,9 @@
   "description": "",
   "main": "hardhat.config.js",
   "scripts": {
-    "build": "yarn compile --force && npx tsc",
+    "build": "yarn compile --force && yarn compile:zksync --force && npx tsc",
     "compile": "npx hardhat compile",
+    "compile:zksync": "npx hardhat compile --network zksync",
     "verify": "npx hardhat etherscan-verify",
     "test": "npx hardhat test",
     "format": "prettier --write '*/**/*.{js,sol,json,md,ts}'",
