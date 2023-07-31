@@ -63,25 +63,4 @@ library LibEvents {
         uint128 indexed nextExec,
         uint128 indexed interval
     );
-
-    /**
-     * @notice Emitted when TriggerModule is initialised with Time Trigger.
-     *
-     * @param taskId Unique hash of the task. {See LibTaskId-getTaskId}
-     * @param start Time when the first execution will occur.
-     * @param interval Time interval between each execution.
-     */
-    event TimeTriggerSet(
-        bytes32 indexed taskId,
-        uint128 indexed start,
-        uint128 indexed interval
-    );
-
-    /**
-     * @notice Emitted when TriggerModule is initialised with Cron Trigger.
-     *
-     * @param taskId Unique hash of the task. {See LibTaskId-getTaskId}
-     * @param expression Cron expression of the task
-     */
-    event CronTriggerSet(bytes32 indexed taskId, string indexed expression);
 }
