@@ -18,7 +18,9 @@ contract TriggerModule is TaskModuleBase {
         pure
         returns (bytes memory)
     {
-        return abi.encode(_start, _interval);
+        bytes memory triggerConfig = abi.encode(_start, _interval);
+
+        return abi.encode(LibDataTypes.TriggerType.TIME, triggerConfig);
     }
 
     /**
