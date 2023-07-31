@@ -3,7 +3,6 @@ pragma solidity ^0.8.12;
 
 import {TaskModuleBase} from "./TaskModuleBase.sol";
 import {LibDataTypes} from "../libraries/LibDataTypes.sol";
-import {LibEvents} from "../libraries/LibEvents.sol";
 
 // solhint-disable not-rely-on-time
 contract TriggerModule is TaskModuleBase {
