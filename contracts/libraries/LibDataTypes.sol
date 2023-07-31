@@ -66,24 +66,4 @@ library LibDataTypes {
         TriggerType triggerType;
         bytes triggerConfig;
     }
-
-    /**
-     * @notice Struct for Time trigger configuration
-     *
-     * @param start Starting timestamp for the task, 0 = now
-     * @param interval Trigger interval in seconds
-     */
-    struct TimeTriggerConfig {
-        uint128 start;
-        uint128 interval;
-    }
-
-    /**
-     * @notice Struct for Cron trigger configuration
-     *
-     * @param expression Cron expression
-     */
-    struct CronTriggerConfig {
-        string expression;
-    }
 }
