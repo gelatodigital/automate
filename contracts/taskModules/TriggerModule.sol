@@ -33,28 +33,4 @@ contract TriggerModule is TaskModuleBase {
     {
         return abi.encode(_expression);
     }
-
-    function _decodeModuleArg(bytes calldata _arg)
-        private
-        pure
-        returns (LibDataTypes.TriggerModuleData memory moduleData)
-    {
-        (moduleData) = abi.decode(_arg, (LibDataTypes.TriggerModuleData));
-    }
-
-    function _decodeTimeTriggerModuleArg(bytes memory _arg)
-        private
-        pure
-        returns (uint128 start, uint128 interval)
-    {
-        (start, interval) = abi.decode(_arg, (uint128, uint128));
-    }
-
-    function _decodeCronTriggerModuleArg(bytes memory _arg)
-        private
-        pure
-        returns (string memory expression)
-    {
-        (expression) = abi.decode(_arg, (string));
-    }
 }
