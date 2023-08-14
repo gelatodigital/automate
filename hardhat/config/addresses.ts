@@ -1,6 +1,6 @@
 export const getGelatoAddress = (network: string): string => {
   const GELATO_MAINNET = "0x3caca7b48d0573d793d3b0279b5f0029180e83b6";
-  const GELATO_MATIC = "0x7598e84B2E114AB62CAB288CE5f7d5f6bad35BbA";
+  const GELATO_POLYGON = "0x7598e84B2E114AB62CAB288CE5f7d5f6bad35BbA";
   const GELATO_FANTOM = "0xebA27A2301975FF5BF7864b99F55A4f7A457ED10";
   const GELATO_AVALANCHE = "0x7C5c4Af1618220C090A6863175de47afb20fa9Df";
   const GELATO_ARBITRUM = "0x4775aF8FEf4809fE10bf05867d2b038a4b5B2146";
@@ -29,8 +29,8 @@ export const getGelatoAddress = (network: string): string => {
       return GELATO_MAINNET;
     case "goerli":
       return GELATO_GOERLI;
-    case "matic":
-      return GELATO_MATIC;
+    case "polygon":
+      return GELATO_POLYGON;
     case "fantom":
       return GELATO_FANTOM;
     case "avalanche":
