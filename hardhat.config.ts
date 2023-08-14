@@ -67,6 +67,11 @@ const config: HardhatUserConfig = {
       chainId: 43114,
       accounts: PROD_PK ? [PROD_PK] : [],
     },
+    base: {
+      url: `https://mainnet.base.org`,
+      chainId: 8453,
+      accounts: PROD_PK ? [PROD_PK] : [],
+    },
     bsc: {
       url: "https://bsc-dataseed.binance.org/",
       chainId: 56,
