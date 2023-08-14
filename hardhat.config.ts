@@ -127,6 +127,11 @@ const config: HardhatUserConfig = {
       chainId: 10,
       accounts: PROD_PK ? [PROD_PK] : [],
     },
+    polygonZk: {
+      url: "https://zkevm-rpc.com",
+      chainId: 1101,
+      accounts: PROD_PK ? [PROD_PK] : [],
+    },
     zksync: {
       zksync: true,
       url: "https://mainnet.era.zksync.io",
