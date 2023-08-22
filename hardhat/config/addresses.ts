@@ -68,7 +68,7 @@ export const getGelatoAddress = (network: string): string => {
       return GELATO_ZKSYNCGOERLI;
     case "linea":
       return GELATO_LINEA;
-    case "polygonZk":
+    case "polygonzk":
       return GELATO_POLYGON_ZK;
     case "hardhat":
       return GELATO_MAINNET;

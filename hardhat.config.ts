@@ -102,11 +102,6 @@ const config: HardhatUserConfig = {
       chainId: 1,
       url: `https://eth-mainnet.alchemyapi.io/v2/${ALCHEMY_ID}`,
     },
-    polygon: {
-      url: `https://polygon-mainnet.g.alchemy.com/v2/${ALCHEMY_ID}`,
-      chainId: 137,
-      accounts: PROD_PK ? [PROD_PK] : [],
-    },
     moonbeam: {
       url: `https://rpc.api.moonbeam.network`,
       chainId: 1284,
@@ -127,7 +122,12 @@ const config: HardhatUserConfig = {
       chainId: 10,
       accounts: PROD_PK ? [PROD_PK] : [],
     },
-    polygonZk: {
+    polygon: {
+      url: `https://polygon-mainnet.g.alchemy.com/v2/${ALCHEMY_ID}`,
+      chainId: 137,
+      accounts: PROD_PK ? [PROD_PK] : [],
+    },
+    polygonzk: {
       url: "https://zkevm-rpc.com",
       chainId: 1101,
       accounts: PROD_PK ? [PROD_PK] : [],
