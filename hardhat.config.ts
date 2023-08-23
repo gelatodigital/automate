@@ -67,6 +67,11 @@ const config: HardhatUserConfig = {
       chainId: 43114,
       accounts: PROD_PK ? [PROD_PK] : [],
     },
+    base: {
+      url: `https://mainnet.base.org`,
+      chainId: 8453,
+      accounts: PROD_PK ? [PROD_PK] : [],
+    },
     bsc: {
       url: "https://bsc-dataseed.binance.org/",
       chainId: 56,
@@ -97,11 +102,6 @@ const config: HardhatUserConfig = {
       chainId: 1,
       url: `https://eth-mainnet.alchemyapi.io/v2/${ALCHEMY_ID}`,
     },
-    matic: {
-      url: `https://polygon-mainnet.g.alchemy.com/v2/${ALCHEMY_ID}`,
-      chainId: 137,
-      accounts: PROD_PK ? [PROD_PK] : [],
-    },
     moonbeam: {
       url: `https://rpc.api.moonbeam.network`,
       chainId: 1284,
@@ -120,6 +120,16 @@ const config: HardhatUserConfig = {
     optimism: {
       url: `https://opt-mainnet.g.alchemy.com/v2/${ALCHEMY_ID}`,
       chainId: 10,
+      accounts: PROD_PK ? [PROD_PK] : [],
+    },
+    polygon: {
+      url: `https://polygon-mainnet.g.alchemy.com/v2/${ALCHEMY_ID}`,
+      chainId: 137,
+      accounts: PROD_PK ? [PROD_PK] : [],
+    },
+    polygonzk: {
+      url: "https://zkevm-rpc.com",
+      chainId: 1101,
       accounts: PROD_PK ? [PROD_PK] : [],
     },
     zksync: {

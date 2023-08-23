@@ -1,6 +1,6 @@
 export const getGelatoAddress = (network: string): string => {
   const GELATO_MAINNET = "0x3caca7b48d0573d793d3b0279b5f0029180e83b6";
-  const GELATO_MATIC = "0x7598e84B2E114AB62CAB288CE5f7d5f6bad35BbA";
+  const GELATO_POLYGON = "0x7598e84B2E114AB62CAB288CE5f7d5f6bad35BbA";
   const GELATO_FANTOM = "0xebA27A2301975FF5BF7864b99F55A4f7A457ED10";
   const GELATO_AVALANCHE = "0x7C5c4Af1618220C090A6863175de47afb20fa9Df";
   const GELATO_ARBITRUM = "0x4775aF8FEf4809fE10bf05867d2b038a4b5B2146";
@@ -12,6 +12,8 @@ export const getGelatoAddress = (network: string): string => {
   const GELATO_CRONOS = "0x91f2A140cA47DdF438B9c583b7E71987525019bB";
   const GELATO_ZKSYNC = "0x52cb9f60225aA830AE420126BC8e3d5B2fc5bCf4";
   const GELATO_LINEA = "0xc2a813699bF2353380c625e3D6b544dC42963941";
+  const GELATO_BASE = "0x08EFb6D315c7e74C39620c9AAEA289730f43a429";
+  const GELATO_POLYGON_ZK = "0x08EFb6D315c7e74C39620c9AAEA289730f43a429";
 
   const GELATO_GOERLI = "0x683913B3A32ada4F8100458A3E1675425BdAa7DF";
   const GELATO_MUMBAI = "0x25aD59adbe00C2d80c86d01e2E05e1294DA84823";
@@ -27,14 +29,16 @@ export const getGelatoAddress = (network: string): string => {
       return GELATO_MAINNET;
     case "goerli":
       return GELATO_GOERLI;
-    case "matic":
-      return GELATO_MATIC;
+    case "polygon":
+      return GELATO_POLYGON;
     case "fantom":
       return GELATO_FANTOM;
     case "avalanche":
       return GELATO_AVALANCHE;
     case "arbitrum":
       return GELATO_ARBITRUM;
+    case "base":
+      return GELATO_BASE;
     case "bsc":
       return GELATO_BSC;
     case "gnosis":
@@ -64,6 +68,8 @@ export const getGelatoAddress = (network: string): string => {
       return GELATO_ZKSYNCGOERLI;
     case "linea":
       return GELATO_LINEA;
+    case "polygonzk":
+      return GELATO_POLYGON_ZK;
     case "hardhat":
       return GELATO_MAINNET;
     default:
