@@ -1,12 +1,12 @@
 import { HardhatUserConfig } from "hardhat/config";
 
 // PLUGINS
+import "@matterlabs/hardhat-zksync-solc";
+import "@matterlabs/hardhat-zksync-verify";
 import "@nomiclabs/hardhat-ethers";
 import "@nomiclabs/hardhat-waffle";
 import "@typechain/hardhat";
 import "hardhat-deploy";
-import "@matterlabs/hardhat-zksync-solc";
-import "@matterlabs/hardhat-zksync-verify";
 
 // Process Env Variables
 import * as dotenv from "dotenv";
@@ -42,7 +42,7 @@ const config: HardhatUserConfig = {
       // timeout: 150000,
       forking: {
         url: `https://eth-mainnet.alchemyapi.io/v2/${ALCHEMY_ID}`,
-        blockNumber: 14068500,
+        blockNumber: 18000000,
       },
     },
 
