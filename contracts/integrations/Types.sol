@@ -48,3 +48,7 @@ interface IGelato1Balance {
         uint256 _amount
     ) external;
 }
+
+interface IGelato {
+    function feeCollector() external view returns (address);
+}
