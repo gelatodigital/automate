@@ -13,7 +13,7 @@ import "./Types.sol";
 abstract contract AutomateReady {
     IAutomate public immutable automate;
     address public immutable dedicatedMsgSender;
-    address private immutable _gelato;
+    address private immutable feeCollector;
     address internal constant ETH = 0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE;
     address private constant OPS_PROXY_FACTORY =
         0xC815dB16D4be6ddf2685C201937905aBf338F5D7;
@@ -34,7 +34,10 @@ abstract contract AutomateReady {
      */
     constructor(address _automate, address _taskCreator) {
         automate = IAutomate(_automate);
-        _gelato = IAutomate(_automate).gelato();
+        IGelato gelato = IGelato(IAutomate(_automate).gelato());
+
+        feeCollector = gelato.feeCollector();
+
         (dedicatedMsgSender, ) = IOpsProxyFactory(OPS_PROXY_FACTORY).getProxyOf(
             _taskCreator
         );
@@ -48,10 +51,10 @@ abstract contract AutomateReady {
      */
     function _transfer(uint256 _fee, address _feeToken) internal {
         if (_feeToken == ETH) {
-            (bool success, ) = _gelato.call{value: _fee}("");
+            (bool success, ) = feeCollector.call{value: _fee}("");
             require(success, "_transfer: ETH transfer failed");
         } else {
-            SafeERC20.safeTransfer(IERC20(_feeToken), _gelato, _fee);
+            SafeERC20.safeTransfer(IERC20(_feeToken), feeCollector, _fee);
         }
     }
 
