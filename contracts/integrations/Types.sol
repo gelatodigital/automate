@@ -47,3 +47,7 @@ interface ITaskTreasuryUpgradable {
 interface IOpsProxyFactory {
     function getProxyOf(address account) external view returns (address, bool);
 }
+
+interface IGelato {
+    function feeCollector() external view returns (address);
+}
