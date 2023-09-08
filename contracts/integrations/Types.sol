@@ -6,7 +6,13 @@ enum Module {
     TIME,
     PROXY,
     SINGLE_EXEC,
-    WEB3_FUNCTION
+    WEB3_FUNCTION,
+    TRIGGER
+}
+
+enum TriggerType {
+    TIME,
+    CRON
 }
 
 struct ModuleData {
