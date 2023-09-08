@@ -15,9 +15,7 @@ contract CounterWeb3Function is AutomateTaskCreator {
 
     event CounterTaskCreated(bytes32 taskId);
 
-    constructor(address _automate, address _fundsOwner)
-        AutomateTaskCreator(_automate, _fundsOwner)
-    {}
+    constructor(address _automate) AutomateTaskCreator(_automate) {}
 
     function createTask(
         string memory _web3FunctionHash,

@@ -16,7 +16,7 @@ const func: DeployFunction = async (hre: HardhatRuntimeEnvironment) => {
 
   await deploy("CounterTestWT", {
     from: deployer,
-    args: [(await hre.ethers.getContract("Automate")).address, deployer],
+    args: [(await hre.ethers.getContract("Automate")).address],
   });
 };
 
