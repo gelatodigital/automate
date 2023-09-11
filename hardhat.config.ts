@@ -24,7 +24,7 @@ assert.ok(INFURA_ID, "no Infura ID in process.env");
 // @dev fill this out
 const PROD_PK = process.env.PROD_PK;
 const DEV_PK = process.env.DEV_PK;
-const ETHERSCAN_API = process.env.ETHERSCAN_MATIC_API;
+const ETHERSCAN_API = process.env.ETHERSCAN_API;
 
 // ================================= CONFIG =========================================
 const config: HardhatUserConfig = {
