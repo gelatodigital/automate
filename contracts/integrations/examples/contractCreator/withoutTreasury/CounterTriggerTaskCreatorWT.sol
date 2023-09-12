@@ -5,22 +5,20 @@ import "../../../AutomateTaskCreator.sol";
 
 /**
  * @dev
- * Example contract that creates a time task.
+ * Example contract that creates a trigger task.
  */
 // solhint-disable not-rely-on-time
 // solhint-disable no-empty-blocks
-contract CounterTimeTaskCreatorWT is AutomateTaskCreator {
+contract CounterTriggerTaskCreatorWT is AutomateTaskCreator {
     uint256 public count;
     uint256 public lastExecuted;
     bytes32 public taskId;
     uint256 public constant MAX_COUNT = 5;
-    uint256 public constant INTERVAL = 3 minutes;
+    uint128 public constant INTERVAL = 3 minutes;
 
     event CounterTaskCreated(bytes32 taskId);
 
-    constructor(address payable _automate, address _fundsOwner)
-        AutomateTaskCreator(_automate, _fundsOwner)
-    {}
+    constructor(address payable _automate) AutomateTaskCreator(_automate) {}
 
     receive() external payable {}
 
@@ -36,7 +34,10 @@ contract CounterTimeTaskCreatorWT is AutomateTaskCreator {
         moduleData.modules[0] = Module.TIME;
         moduleData.modules[1] = Module.PROXY;
 
-        moduleData.args[0] = _timeModuleArg(block.timestamp, INTERVAL);
+        moduleData.args[0] = _timeTriggerModuleArg(
+            uint128(block.timestamp),
+            INTERVAL
+        );
         moduleData.args[1] = _proxyModuleArg();
 
         bytes32 id = _createTask(address(this), execData, moduleData, ETH);

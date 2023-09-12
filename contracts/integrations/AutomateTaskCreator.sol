@@ -9,18 +9,14 @@ import {IERC20} from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
  * to be a task creator and create tasks.
  */
 //solhint-disable const-name-snakecase
+//solhint-disable no-empty-blocks
 abstract contract AutomateTaskCreator is AutomateReady {
     using SafeERC20 for IERC20;
 
-    address public immutable fundsOwner;
     IGelato1Balance public constant gelato1Balance =
         IGelato1Balance(0x7506C12a824d73D9b08564d5Afc22c949434755e);
 
-    constructor(address _automate, address _fundsOwner)
-        AutomateReady(_automate, address(this))
-    {
-        fundsOwner = _fundsOwner;
-    }
+    constructor(address _automate) AutomateReady(_automate, address(this)) {}
 
     function _depositFunds1Balance(
         uint256 _amount,
@@ -70,14 +66,6 @@ abstract contract AutomateTaskCreator is AutomateReady {
         return abi.encode(_resolverAddress, _resolverData);
     }
 
-    function _timeModuleArg(uint256 _startTime, uint256 _interval)
-        internal
-        pure
-        returns (bytes memory)
-    {
-        return abi.encode(uint128(_startTime), uint128(_interval));
-    }
-
     function _proxyModuleArg() internal pure returns (bytes memory) {
         return bytes("");
     }
@@ -88,8 +76,28 @@ abstract contract AutomateTaskCreator is AutomateReady {
 
     function _web3FunctionModuleArg(
         string memory _web3FunctionHash,
-        bytes calldata _web3FunctionArgsHex
+        bytes memory _web3FunctionArgsHex
     ) internal pure returns (bytes memory) {
         return abi.encode(_web3FunctionHash, _web3FunctionArgsHex);
+    }
+
+    function _timeTriggerModuleArg(uint128 _start, uint128 _interval)
+        internal
+        pure
+        returns (bytes memory)
+    {
+        bytes memory triggerConfig = abi.encode(_start, _interval);
+
+        return abi.encode(TriggerType.TIME, triggerConfig);
+    }
+
+    function _cronTriggerModuleArg(string memory _expression)
+        internal
+        pure
+        returns (bytes memory)
+    {
+        bytes memory triggerConfig = abi.encode(_expression);
+
+        return abi.encode(TriggerType.CRON, triggerConfig);
     }
 }

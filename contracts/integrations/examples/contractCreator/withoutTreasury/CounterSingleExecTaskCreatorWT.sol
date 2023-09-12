@@ -18,9 +18,7 @@ contract CounterSingleExecTaskCreatorWT is AutomateTaskCreator {
 
     event CounterTaskCreated(bytes32 taskId);
 
-    constructor(address payable _automate, address _fundsOwner)
-        AutomateTaskCreator(_automate, _fundsOwner)
-    {}
+    constructor(address payable _automate) AutomateTaskCreator(_automate) {}
 
     receive() external payable {}
 
