@@ -137,7 +137,7 @@ library LibLegacyTask {
         ) = _decodeTimedTaskCallData(_callDataSliced);
         LibDataTypes.Module[] memory modules = new LibDataTypes.Module[](2);
         modules[0] = LibDataTypes.Module.RESOLVER;
-        modules[1] = LibDataTypes.Module.TIME;
+        modules[1] = LibDataTypes.Module.DEPRECATED_TIME;
 
         bytes[] memory args = new bytes[](2);
         args[0] = resolverModuleArgs;

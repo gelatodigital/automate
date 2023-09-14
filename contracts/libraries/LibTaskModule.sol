@@ -24,9 +24,9 @@ library LibTaskModule {
         address _execAddress,
         mapping(LibDataTypes.Module => address) storage taskModuleAddresses
     ) internal returns (address, address) {
-        uint256 length = uint256(type(LibDataTypes.Module).max);
+        uint256 length = uint256(type(LibDataTypes.Module).max) + 1;
 
-        for (uint256 i; i <= length; i++) {
+        for (uint256 i; i < length; i++) {
             LibDataTypes.Module module = LibDataTypes.Module(i);
             if (!module.requirePreCreate()) continue;
 
@@ -74,7 +74,7 @@ library LibTaskModule {
     ) internal {
         uint256 length = _moduleData.modules.length;
 
-        _validModules(length, _moduleData.modules);
+        _validModules(_moduleData.modules);
 
         for (uint256 i; i < length; i++) {
             LibDataTypes.Module module = _moduleData.modules[i];
@@ -286,25 +286,36 @@ library LibTaskModule {
 
     /**
      * @dev
+     * - No deprecated modules.
      * - No duplicate modules.
      * - No RESOLVER && WEB3_FUNCTION
      */
-    function _validModules(
-        uint256 _length,
-        LibDataTypes.Module[] memory _modules
-    ) private pure {
-        if (_length > 1) {
-            bool hasResolver = _modules[0] == LibDataTypes.Module.RESOLVER;
-            for (uint256 i; i < _length - 1; i++) {
+    function _validModules(LibDataTypes.Module[] memory _modules) private pure {
+        uint256 length = _modules.length;
+
+        uint256 existsLength = uint256(type(LibDataTypes.Module).max) + 1;
+        bool[] memory exists = new bool[](existsLength);
+
+        for (uint256 i = 0; i < length; i++) {
+            if (i > 0) {
                 require(
-                    _modules[i + 1] > _modules[i],
+                    _modules[i] > _modules[i - 1],
                     "Automate._validModules: Asc only"
                 );
-                if (hasResolver)
-                    require(
-                        _modules[i + 1] != LibDataTypes.Module.WEB3_FUNCTION,
-                        "Automate._validModules: Only one resolver"
-                    );
+            }
+
+            exists[uint256(_modules[i])] = true;
+
+            require(
+                _modules[i] != LibDataTypes.Module.DEPRECATED_TIME,
+                "Automate._validModules: TIME is no longer valid"
+            );
+
+            if (_modules[i] == LibDataTypes.Module.WEB3_FUNCTION) {
+                require(
+                    !exists[uint256(LibDataTypes.Module.RESOLVER)],
+                    "Automate._validModules: Only one resolver allowed"
+                );
             }
         }
     }

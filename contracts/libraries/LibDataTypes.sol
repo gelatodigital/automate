@@ -8,7 +8,7 @@ library LibDataTypes {
      * @notice Whitelisted modules that are available for users to customise conditions and specifications of their tasks.
      *
      * @param RESOLVER Use dynamic condition & input data for execution. {See ResolverModule.sol}
-     * @param TIME Repeated execution of task at a specified timing and interval. {See TimeModule.sol}
+     * @param DEPRECATED_TIME deprecated
      * @param PROXY Creates a dedicated caller (msg.sender) to be used when executing the task. {See ProxyModule.sol}
      * @param SINGLE_EXEC Task is cancelled after one execution. {See SingleExecModule.sol}
      * @param WEB3_FUNCTION Use off-chain condition & input data for execution. {See Web3FunctionModule.sol}
@@ -16,7 +16,7 @@ library LibDataTypes {
      */
     enum Module {
         RESOLVER,
-        TIME,
+        DEPRECATED_TIME, // @deprecated
         PROXY,
         SINGLE_EXEC,
         WEB3_FUNCTION,

@@ -98,7 +98,7 @@ library LibTaskId {
             (length == 1 && _modules[0] == LibDataTypes.Module.RESOLVER) ||
             (length == 2 &&
                 _modules[0] == LibDataTypes.Module.RESOLVER &&
-                _modules[1] == LibDataTypes.Module.TIME)
+                _modules[1] == LibDataTypes.Module.DEPRECATED_TIME)
         ) return true;
 
         return false;

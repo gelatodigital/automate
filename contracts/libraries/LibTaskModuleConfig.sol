@@ -23,10 +23,7 @@ library LibTaskModuleConfig {
         pure
         returns (bool)
     {
-        if (
-            _module == LibDataTypes.Module.TIME ||
-            _module == LibDataTypes.Module.PROXY
-        ) return true;
+        if (_module == LibDataTypes.Module.PROXY) return true;
 
         return false;
     }
@@ -36,10 +33,7 @@ library LibTaskModuleConfig {
         pure
         returns (bool)
     {
-        if (
-            _module == LibDataTypes.Module.TIME ||
-            _module == LibDataTypes.Module.PROXY
-        ) return true;
+        if (_module == LibDataTypes.Module.PROXY) return true;
 
         return false;
     }
@@ -49,10 +43,7 @@ library LibTaskModuleConfig {
         pure
         returns (bool)
     {
-        if (
-            _module == LibDataTypes.Module.TIME ||
-            _module == LibDataTypes.Module.PROXY
-        ) return true;
+        if (_module == LibDataTypes.Module.PROXY) return true;
 
         return false;
     }
