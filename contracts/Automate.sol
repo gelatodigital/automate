@@ -146,8 +146,6 @@ contract Automate is Gelatofied, Proxied, AutomateStorage, IAutomate {
             taskModuleAddresses
         );
 
-        nonce1Balance[taskId] += 1;
-
         emit LibEvents.ExecSuccess(
             0,
             address(0),
