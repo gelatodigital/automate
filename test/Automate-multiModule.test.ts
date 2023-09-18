@@ -1,34 +1,26 @@
 import { Signer } from "@ethersproject/abstract-signer";
 import { expect } from "chai";
 import {
-  encodeResolverArgs,
-  encodeTimeArgs,
-  fastForwardTime,
-  getTaskId,
-  getTimeStampNow,
-  Module,
-  ModuleData,
-} from "./utils";
+  Automate,
+  CounterResolver,
+  CounterWL,
+  OpsProxy,
+  OpsProxyFactory,
+  ProxyModule,
+  ResolverModule,
+  SingleExecModule,
+  TaskTreasuryUpgradable,
+  TriggerModule,
+  Web3FunctionModule,
+} from "../typechain";
+import { Module, ModuleData, encodeResolverArgs, getTaskId } from "./utils";
 import hre = require("hardhat");
 const { ethers, deployments } = hre;
-import {
-  Automate,
-  CounterWL,
-  CounterResolver,
-  TaskTreasuryUpgradable,
-  ResolverModule,
-  TimeModule,
-  ProxyModule,
-  SingleExecModule,
-  OpsProxyFactory,
-  OpsProxy,
-} from "../typechain";
 
 const GELATO = "0x3caca7b48d0573d793d3b0279b5f0029180e83b6";
 const ETH = "0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE";
 const ZERO_ADD = ethers.constants.AddressZero;
 const FEE = ethers.utils.parseEther("0.1");
-const INTERVAL = 7 * 60;
 
 describe("Automate multi module test", function () {
   let automate: Automate;
@@ -39,9 +31,11 @@ describe("Automate multi module test", function () {
   let opsProxy: OpsProxy;
 
   let resolverModule: ResolverModule;
-  let timeModule: TimeModule;
+
   let proxyModule: ProxyModule;
   let singleExecModule: SingleExecModule;
+  let web3FunctionModule: Web3FunctionModule;
+  let triggerModule: TriggerModule;
 
   let user: Signer;
   let userAddress: string;
@@ -51,9 +45,7 @@ describe("Automate multi module test", function () {
   let taskId: string;
   let execSelector: string;
   let moduleData: ModuleData;
-  let timeArgs: string;
   let resolverArgs: string;
-  let startTime: number;
 
   beforeEach(async function () {
     await deployments.fixture();
@@ -68,19 +60,27 @@ describe("Automate multi module test", function () {
     opsProxyFactory = await ethers.getContract("OpsProxyFactory");
 
     resolverModule = await ethers.getContract("ResolverModule");
-    timeModule = await ethers.getContract("TimeModule");
     proxyModule = await ethers.getContract("ProxyModule");
     singleExecModule = await ethers.getContract("SingleExecModule");
+    web3FunctionModule = await ethers.getContract("Web3FunctionModule");
+    triggerModule = await ethers.getContract("TriggerModule");
 
     // set-up
     await taskTreasury.updateWhitelistedService(automate.address, true);
     await automate.setModule(
-      [Module.RESOLVER, Module.TIME, Module.PROXY, Module.SINGLE_EXEC],
+      [
+        Module.RESOLVER,
+        Module.PROXY,
+        Module.SINGLE_EXEC,
+        Module.WEB3_FUNCTION,
+        Module.TRIGGER,
+      ],
       [
         resolverModule.address,
-        timeModule.address,
         proxyModule.address,
         singleExecModule.address,
+        web3FunctionModule.address,
+        triggerModule.address,
       ]
     );
 
@@ -104,12 +104,10 @@ describe("Automate multi module test", function () {
       counterResolver.interface.encodeFunctionData("checker");
     resolverArgs = encodeResolverArgs(counterResolver.address, resolverData);
 
-    startTime = (await getTimeStampNow()) + INTERVAL;
-    timeArgs = encodeTimeArgs(startTime, INTERVAL);
     execSelector = counter.interface.getSighash("increaseCount");
     moduleData = {
-      modules: [Module.RESOLVER, Module.TIME, Module.PROXY, Module.SINGLE_EXEC],
-      args: [resolverArgs, timeArgs, "0x", "0x"],
+      modules: [Module.RESOLVER, Module.PROXY, Module.SINGLE_EXEC],
+      args: [resolverArgs, "0x", "0x"],
     };
 
     taskId = getTaskId(
@@ -133,9 +131,13 @@ describe("Automate multi module test", function () {
   });
 
   it("getTaskId", async () => {
-    const thisTaskId = await automate[
-      "getTaskId(address,address,bytes4,(uint8[],bytes[]),address)"
-    ](userAddress, counter.address, execSelector, moduleData, ZERO_ADD);
+    const thisTaskId = await automate.getTaskId(
+      userAddress,
+      counter.address,
+      execSelector,
+      moduleData,
+      ZERO_ADD
+    );
 
     const expectedTaskId = taskId;
 
@@ -147,17 +149,10 @@ describe("Automate multi module test", function () {
     expect(taskIds).include(taskId);
   });
 
-  it("createTask - time initialised", async () => {
-    const time = await automate.timedTask(taskId);
-
-    expect(time.nextExec).to.be.eq(ethers.BigNumber.from(startTime));
-    expect(time.interval).to.be.eq(ethers.BigNumber.from(INTERVAL));
-  });
-
   it("createTask - wrong module order", async () => {
     moduleData = {
-      modules: [Module.RESOLVER, Module.SINGLE_EXEC, Module.TIME, Module.PROXY],
-      args: [resolverArgs, "0x", timeArgs, "0x"],
+      modules: [Module.RESOLVER, Module.SINGLE_EXEC, Module.PROXY],
+      args: [resolverArgs, "0x", "0x"],
     };
 
     await expect(
@@ -211,14 +206,7 @@ describe("Automate multi module test", function () {
     ).to.be.revertedWith("Automate._validModules: Only one resolver");
   });
 
-  it("exec - time should revert", async () => {
-    await expect(execute(true)).to.be.revertedWith(
-      "Automate.preExecCall: TimeModule: Too early"
-    );
-  });
-
   it("exec", async () => {
-    await fastForwardTime(INTERVAL);
     const countBefore = await counter.count();
 
     await execute(true);
@@ -234,7 +222,6 @@ describe("Automate multi module test", function () {
   });
 
   it("exec1Balance", async () => {
-    await fastForwardTime(INTERVAL);
     const countBefore = await counter.count();
     const [, execData] = await counterResolver.checker();
 

@@ -1,23 +1,17 @@
 import { Signer } from "@ethersproject/abstract-signer";
 import { expect } from "chai";
 import {
-  encodeResolverArgs,
-  getLegacyTaskId,
-  getResolverHash,
-  Module,
-  ModuleData,
-} from "./utils";
-import hre = require("hardhat");
-const { ethers, deployments } = hre;
-import {
   Automate,
-  CounterTest,
   CounterResolver,
-  TaskTreasuryUpgradable,
-  ResolverModule,
+  CounterTest,
   ProxyModule,
+  ResolverModule,
+  TaskTreasuryUpgradable,
   TimeModule,
 } from "../typechain";
+import { Module, ModuleData, encodeResolverArgs, getTaskId } from "./utils";
+import hre = require("hardhat");
+const { ethers, deployments } = hre;
 
 const GELATO = "0x3caca7b48d0573d793d3b0279b5f0029180e83b6";
 const ETH = "0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE";
@@ -86,14 +80,12 @@ describe("Automate Resolver module test", function () {
       modules: [Module.RESOLVER],
       args: [resolverArgs],
     };
-    const resolverHash = getResolverHash(counterResolver.address, resolverData);
-    taskId = getLegacyTaskId(
+    taskId = taskId = getTaskId(
       userAddress,
       counter.address,
       execSelector,
-      true,
-      ZERO_ADD,
-      resolverHash
+      moduleData,
+      ZERO_ADD
     );
 
     await automate
