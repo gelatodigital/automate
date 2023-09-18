@@ -3,7 +3,7 @@ import { expect } from "chai";
 import {
   Automate,
   CounterWL,
-  EIP173ProxyWithCustomReceive,
+  EIP173OpsProxy,
   OpsProxy,
   OpsProxyFactory,
   ProxyModule,
@@ -150,8 +150,8 @@ describe("Automate Proxy module test", function () {
 
   it("proxy - cannot upgrade to not whitelisted implementation", async () => {
     const [proxyAddress] = await opsProxyFactory.getProxyOf(userAddress);
-    const opsProxy: EIP173ProxyWithCustomReceive = await ethers.getContractAt(
-      "EIP173ProxyWithCustomReceive",
+    const opsProxy: EIP173OpsProxy = await ethers.getContractAt(
+      "EIP173OpsProxy",
       proxyAddress
     );
 
@@ -162,8 +162,8 @@ describe("Automate Proxy module test", function () {
 
   it("proxy - only owner can update implementation", async () => {
     const [proxyAddress] = await opsProxyFactory.getProxyOf(userAddress);
-    const opsProxy: EIP173ProxyWithCustomReceive = await ethers.getContractAt(
-      "EIP173ProxyWithCustomReceive",
+    const opsProxy: EIP173OpsProxy = await ethers.getContractAt(
+      "EIP173OpsProxy",
       proxyAddress
     );
 
