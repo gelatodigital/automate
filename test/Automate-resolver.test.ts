@@ -2,7 +2,6 @@ import { Signer } from "@ethersproject/abstract-signer";
 import { expect } from "chai";
 import {
   Automate,
-  CounterResolver,
   CounterTest,
   ProxyModule,
   ResolverModule,
@@ -21,7 +20,6 @@ const FEE = ethers.utils.parseEther("0.1");
 describe("Automate Resolver module test", function () {
   let automate: Automate;
   let counter: CounterTest;
-  let counterResolver: CounterResolver;
   let treasury: TaskTreasuryUpgradable;
   let resolverModule: ResolverModule;
   let proxyModule: ProxyModule;
@@ -45,7 +43,6 @@ describe("Automate Resolver module test", function () {
     automate = await ethers.getContract("Automate");
     treasury = await ethers.getContract("TaskTreasuryUpgradable");
     counter = await ethers.getContract("CounterTest");
-    counterResolver = await ethers.getContract("CounterResolver");
     resolverModule = await ethers.getContract("ResolverModule");
     proxyModule = await ethers.getContract("ProxyModule");
     timeModule = await ethers.getContract("TimeModule");
@@ -69,16 +66,12 @@ describe("Automate Resolver module test", function () {
       .depositFunds(userAddress, ETH, depositAmount, { value: depositAmount });
 
     // create task
-    const resolverData =
-      counterResolver.interface.encodeFunctionData("checker");
-    const resolverArgs = encodeResolverArgs(
-      counterResolver.address,
-      resolverData
-    );
+    const resolverData = counter.interface.encodeFunctionData("checker");
+    const resolverArgs = encodeResolverArgs(counter.address, resolverData);
     execSelector = counter.interface.getSighash("increaseCount");
     moduleData = {
-      modules: [Module.RESOLVER],
-      args: [resolverArgs],
+      modules: [Module.RESOLVER, Module.PROXY],
+      args: [resolverArgs, "0x"],
     };
     taskId = taskId = getTaskId(
       userAddress,
@@ -132,13 +125,26 @@ describe("Automate Resolver module test", function () {
     expect(count2).to.be.gt(count);
 
     // will fail in off-chain simulation
-    await expect(execute(true)).to.be.revertedWith(
-      "Automate.exec: Counter: increaseCount: Time not elapsed"
+    execSelector = counter.interface.getSighash("increaseCountReverts");
+    const resolverData = counter.interface.encodeFunctionData("checkerReverts");
+    const resolverArgs = encodeResolverArgs(counter.address, resolverData);
+    moduleData = {
+      modules: [Module.RESOLVER, Module.PROXY],
+      args: [resolverArgs, "0x"],
+    };
+
+    await automate
+      .connect(user)
+      .createTask(counter.address, execSelector, moduleData, ZERO_ADD);
+
+    await expect(execute(true, true)).to.be.revertedWith(
+      "Automate.exec: OpsProxy.executeCall: Counter: reverts"
     );
+
     // will not fail on-chain
     const balanceBefore = await treasury.userTokenBalance(userAddress, ETH);
 
-    await execute(false);
+    await execute(false, true);
 
     const balanceAfter = await treasury.userTokenBalance(userAddress, ETH);
     const count3 = await counter.count();
@@ -157,8 +163,10 @@ describe("Automate Resolver module test", function () {
     expect(taskIds).include(taskId);
   });
 
-  const execute = async (revertOnFailure: boolean) => {
-    const [, execData] = await counterResolver.checker();
+  const execute = async (revertOnFailure: boolean, callReverts = false) => {
+    const [, execData] = callReverts
+      ? await counter.checkerReverts()
+      : await counter.checker();
 
     await automate
       .connect(executor)

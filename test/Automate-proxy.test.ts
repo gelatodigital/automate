@@ -1,18 +1,18 @@
-import { expect } from "chai";
-import hre = require("hardhat");
-const { ethers, deployments } = hre;
 import { Signer } from "@ethersproject/abstract-signer";
+import { expect } from "chai";
 import {
-  CounterWL,
   Automate,
-  TaskTreasuryUpgradable,
+  CounterWL,
+  EIP173ProxyWithCustomReceive,
   OpsProxy,
   OpsProxyFactory,
   ProxyModule,
+  TaskTreasuryUpgradable,
   TimeModule,
-  EIP173ProxyWithCustomReceive,
 } from "../typechain";
-import { getTaskId, Module, ModuleData } from "./utils";
+import { Module, ModuleData, getTaskId } from "./utils";
+import hre = require("hardhat");
+const { ethers, deployments } = hre;
 
 const GELATO = "0x3CACa7b48D0573D793d3b0279b5F0029180E83b6";
 const ETH = "0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee";
@@ -267,8 +267,7 @@ describe("Automate Proxy module test", function () {
 
     execData = batchExecuteCallData;
     execAddress = opsProxy.address;
-    // proxy module not included as module encodes with `executeCall`
-    moduleData = { modules: [], args: [] };
+    moduleData = { modules: [Module.PROXY], args: ["0x"] };
 
     await createTask(user);
 
@@ -330,7 +329,7 @@ describe("Automate Proxy module test", function () {
   });
 
   it("exec - without proxy module initialised", async () => {
-    // // whitelist proxy on counter
+    // whitelist proxy on counter
     await counter.connect(deployer).setWhitelist(opsProxy.address, true);
     expect(await counter.whitelisted(opsProxy.address)).to.be.true;
 
@@ -342,7 +341,7 @@ describe("Automate Proxy module test", function () {
       0,
     ]);
     execData = proxyExecData;
-    moduleData = { modules: [], args: [] };
+    moduleData = { modules: [Module.PROXY], args: ["0x"] };
 
     await createTask(user);
 

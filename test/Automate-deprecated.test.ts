@@ -3,7 +3,6 @@ import { expect } from "chai";
 import {
   Automate,
   Counter,
-  CounterResolver,
   ProxyModule,
   ResolverModule,
   SingleExecModule,
@@ -12,15 +11,7 @@ import {
   TriggerModule,
   Web3FunctionModule,
 } from "../typechain";
-import {
-  Module,
-  encodeResolverArgs,
-  encodeTimeArgs,
-  getLegacyTaskId,
-  getResolverHash,
-  getTaskId,
-  getTimeStampNow,
-} from "./utils";
+import { Module, encodeTimeArgs, getTimeStampNow } from "./utils";
 import hre = require("hardhat");
 const { ethers, deployments } = hre;
 
@@ -30,7 +21,6 @@ describe("Automate deprecated test", function () {
   let automate: Automate;
   let taskTreasury: TaskTreasuryUpgradable;
   let counter: Counter;
-  let counterResolver: CounterResolver;
 
   let resolverModule: ResolverModule;
   let timeModule: TimeModule;
@@ -40,18 +30,15 @@ describe("Automate deprecated test", function () {
   let triggerModule: TriggerModule;
 
   let user: Signer;
-  let userAddress: string;
 
   beforeEach(async function () {
     await deployments.fixture();
 
     [, user] = await hre.ethers.getSigners();
-    userAddress = await user.getAddress();
 
     automate = await ethers.getContract("Automate");
     taskTreasury = await ethers.getContract("TaskTreasuryUpgradable");
     counter = await ethers.getContract("CounterTest");
-    counterResolver = await ethers.getContract("CounterResolver");
 
     resolverModule = await ethers.getContract("ResolverModule");
     timeModule = await ethers.getContract("TimeModule");
@@ -97,47 +84,7 @@ describe("Automate deprecated test", function () {
       automate
         .connect(user)
         .createTask(counter.address, execSelector, moduleData, ZERO_ADD)
-    ).to.be.revertedWith("Automate._validModules: TIME is no longer valid");
-  });
-
-  it("deprecated legacy task id", async () => {
-    const resolverData =
-      counterResolver.interface.encodeFunctionData("checker");
-    const resolverArgs = encodeResolverArgs(
-      counterResolver.address,
-      resolverData
-    );
-    const execSelector = counter.interface.getSighash("increaseCount");
-    const moduleData = {
-      modules: [Module.RESOLVER],
-      args: [resolverArgs],
-    };
-    const resolverHash = getResolverHash(counterResolver.address, resolverData);
-
-    const legacyTaskId = getLegacyTaskId(
-      userAddress,
-      counter.address,
-      execSelector,
-      true,
-      ZERO_ADD,
-      resolverHash
-    );
-
-    const taskId = getTaskId(
-      userAddress,
-      counter.address,
-      execSelector,
-      moduleData,
-      ZERO_ADD
-    );
-
-    await automate
-      .connect(user)
-      .createTask(counter.address, execSelector, moduleData, ZERO_ADD);
-
-    const taskIds = await automate.getTaskIdsByUser(userAddress);
-    expect(taskIds).not.include(legacyTaskId);
-    expect(taskIds).to.include(taskId);
+    ).to.be.revertedWith("Automate._validModules: TIME is deprecated");
   });
 
   it("fallback - data", async () => {

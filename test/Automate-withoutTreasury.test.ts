@@ -73,8 +73,8 @@ describe("Automate Without Treasury test", function () {
     // create task
     execData = counterWT.interface.encodeFunctionData("increaseCount", [10]);
     moduleData = {
-      modules: [Module.SINGLE_EXEC],
-      args: ["0x"],
+      modules: [Module.PROXY, Module.SINGLE_EXEC],
+      args: ["0x", "0x"],
     };
     execSelector = counterWT.interface.getSighash("increaseCount");
     taskId = getTaskId(

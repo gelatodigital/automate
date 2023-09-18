@@ -1,21 +1,21 @@
-import { expect } from "chai";
 import { Signer } from "@ethersproject/abstract-signer";
+import { expect } from "chai";
 import { BigNumber } from "ethers";
 import {
-  encodeResolverArgs,
-  getTokenFromFaucet,
-  Module,
-  ModuleData,
-} from "./utils";
-import {
-  IERC20,
-  CounterTest,
   Automate,
+  CounterTest,
+  IERC20,
+  ProxyModule,
+  ResolverModule,
   TaskTreasuryL2,
   TaskTreasuryUpgradable,
-  ResolverModule,
-  ProxyModule,
 } from "../typechain";
+import {
+  Module,
+  ModuleData,
+  encodeResolverArgs,
+  getTokenFromFaucet,
+} from "./utils";
 
 import hre = require("hardhat");
 const { ethers, deployments } = hre;
@@ -106,8 +106,8 @@ describe("TaskTreasuryUpgradable test", function () {
     const resolverData = ethers.constants.HashZero;
     const resolverArgs = encodeResolverArgs(resolverAddress, resolverData);
     moduleData = {
-      modules: [Module.RESOLVER],
-      args: [resolverArgs],
+      modules: [Module.RESOLVER, Module.PROXY],
+      args: [resolverArgs, "0x"],
     };
     await automate
       .connect(user)
@@ -347,7 +347,7 @@ describe("TaskTreasuryUpgradable test", function () {
     expect(ethTokenBalance).to.be.eq(depositAmount.mul(2));
   });
 
-  it("useFunds - cannot be called via a non-proxy task", async () => {
+  it("useFunds - cannot be called as task cannot be created without PROXY", async () => {
     // User A adds funds into task treasury
     const depositAmount = ethers.utils.parseEther("1");
     await depositEth(user, depositAmount);
@@ -361,18 +361,26 @@ describe("TaskTreasuryUpgradable test", function () {
       depositAmount,
     ]);
 
-    const resolverAddress = ethers.constants.AddressZero;
-    const resolverData = ethers.constants.HashZero;
-    const resolverArgs = encodeResolverArgs(resolverAddress, resolverData);
     moduleData = {
-      modules: [Module.RESOLVER],
-      args: [resolverArgs],
+      modules: [],
+      args: [],
     };
+
+    await expect(
+      automate
+        .connect(user)
+        .createTask(execAddress, execSelector, moduleData, ZERO_ADD)
+    ).to.be.revertedWith("Automate._validModules: PROXY is required");
+
+    moduleData = {
+      modules: [Module.PROXY],
+      args: ["0x"],
+    };
+
     await automate
       .connect(user)
       .createTask(execAddress, execSelector, moduleData, ZERO_ADD);
 
-    // Execution should revert
     await expect(
       automate
         .connect(executor)
@@ -387,7 +395,7 @@ describe("TaskTreasuryUpgradable test", function () {
           true
         )
     ).to.be.revertedWith(
-      "Automate.onExecTask: execAddress cannot be taskTreasury"
+      "Automate.exec: OpsProxy.executeCall: TaskTreasury: onlyWhitelistedServices"
     );
   });
 

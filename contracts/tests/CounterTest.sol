@@ -21,6 +21,13 @@ contract CounterTest {
         lastExecuted = block.timestamp;
     }
 
+    function increaseCountReverts(uint256 amount) external {
+        require(false, "Counter: reverts");
+
+        count += amount;
+        lastExecuted = block.timestamp;
+    }
+
     function checker()
         external
         view
@@ -29,5 +36,15 @@ contract CounterTest {
         canExec = (block.timestamp - lastExecuted) > 180;
 
         execPayload = abi.encodeCall(this.increaseCount, (1));
+    }
+
+    function checkerReverts()
+        external
+        view
+        returns (bool canExec, bytes memory execPayload)
+    {
+        canExec = (block.timestamp - lastExecuted) > 180;
+
+        execPayload = abi.encodeCall(this.increaseCountReverts, (1));
     }
 }

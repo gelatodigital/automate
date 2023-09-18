@@ -31,7 +31,6 @@ describe("Automate multi module test", function () {
   let opsProxy: OpsProxy;
 
   let resolverModule: ResolverModule;
-
   let proxyModule: ProxyModule;
   let singleExecModule: SingleExecModule;
   let web3FunctionModule: Web3FunctionModule;
@@ -164,8 +163,8 @@ describe("Automate multi module test", function () {
 
   it("createTask - duplicate modules", async () => {
     moduleData = {
-      modules: [Module.RESOLVER, Module.RESOLVER],
-      args: [resolverArgs, resolverArgs],
+      modules: [Module.RESOLVER, Module.RESOLVER, Module.PROXY],
+      args: [resolverArgs, resolverArgs, "0x"],
     };
 
     await expect(
@@ -175,10 +174,34 @@ describe("Automate multi module test", function () {
     ).to.be.revertedWith("Automate._validModules: Asc only");
   });
 
+  it("createTask - only one resolver", async () => {
+    moduleData = {
+      modules: [Module.RESOLVER, Module.PROXY, Module.WEB3_FUNCTION],
+      args: ["0x", "0x", "0x"],
+    };
+
+    await expect(
+      automate.createTask(counter.address, execSelector, moduleData, ZERO_ADD)
+    ).to.be.revertedWith(
+      "Automate._validModules: Only RESOLVER or WEB3_FUNCTION"
+    );
+  });
+
   it("createTask - no modules", async () => {
+    moduleData = {
+      modules: [],
+      args: [],
+    };
+
+    await expect(
+      automate.createTask(counter.address, execSelector, moduleData, ZERO_ADD)
+    ).to.be.revertedWith("Automate._validModules: PROXY is required");
+  });
+
+  it("createTask - only proxy", async () => {
     await counter.setWhitelist(automate.address, true);
     expect(await counter.whitelisted(automate.address)).to.be.true;
-    moduleData = { modules: [], args: [] };
+    moduleData = { modules: [Module.PROXY], args: ["0x"] };
     const execData = counter.interface.encodeFunctionData("increaseCount", [
       10,
     ]);
@@ -193,17 +216,6 @@ describe("Automate multi module test", function () {
 
     const countAfter = await counter.count();
     expect(countAfter).to.be.gt(countBefore);
-  });
-
-  it("createTask - only one resolver", async () => {
-    moduleData = {
-      modules: [Module.RESOLVER, Module.WEB3_FUNCTION],
-      args: ["0x", "0x"],
-    };
-
-    await expect(
-      automate.createTask(counter.address, execSelector, moduleData, ZERO_ADD)
-    ).to.be.revertedWith("Automate._validModules: Only one resolver");
   });
 
   it("exec", async () => {

@@ -1,16 +1,16 @@
 import { Signer } from "@ethersproject/abstract-signer";
 import { expect } from "chai";
-import { getTaskId, Module, ModuleData } from "./utils";
-import hre = require("hardhat");
-const { ethers, deployments } = hre;
 import {
   Automate,
   CounterTest,
-  TaskTreasuryUpgradable,
   ProxyModule,
   SingleExecModule,
+  TaskTreasuryUpgradable,
   TimeModule,
 } from "../typechain";
+import { getTaskId, Module, ModuleData } from "./utils";
+import hre = require("hardhat");
+const { ethers, deployments } = hre;
 
 const GELATO = "0x3caca7b48d0573d793d3b0279b5f0029180e83b6";
 const ETH = "0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE";
@@ -70,8 +70,8 @@ describe("Automate SingleExec module test", function () {
     // create task
     execData = counter.interface.encodeFunctionData("increaseCount", [10]);
     moduleData = {
-      modules: [Module.SINGLE_EXEC],
-      args: ["0x"],
+      modules: [Module.PROXY, Module.SINGLE_EXEC],
+      args: ["0x", "0x"],
     };
     execSelector = counter.interface.getSighash("increaseCount");
     taskId = getTaskId(
