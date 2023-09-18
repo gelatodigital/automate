@@ -286,9 +286,10 @@ library LibTaskModule {
 
     /**
      * @dev
-     * - No deprecated modules.
-     * - No duplicate modules.
+     * - No duplicate modules
+     * - No deprecated TIME
      * - No RESOLVER && WEB3_FUNCTION
+     * - PROXY is required
      */
     function _validModules(LibDataTypes.Module[] memory _modules) private pure {
         uint256 length = _modules.length;
@@ -305,18 +306,22 @@ library LibTaskModule {
             }
 
             exists[uint256(_modules[i])] = true;
-
-            require(
-                _modules[i] != LibDataTypes.Module.DEPRECATED_TIME,
-                "Automate._validModules: TIME is no longer valid"
-            );
-
-            if (_modules[i] == LibDataTypes.Module.WEB3_FUNCTION) {
-                require(
-                    !exists[uint256(LibDataTypes.Module.RESOLVER)],
-                    "Automate._validModules: Only one resolver allowed"
-                );
-            }
         }
+
+        require(
+            !exists[uint256(LibDataTypes.Module.DEPRECATED_TIME)],
+            "Automate._validModules: TIME is deprecated"
+        );
+
+        require(
+            !(exists[uint256(LibDataTypes.Module.RESOLVER)] &&
+                exists[uint256(LibDataTypes.Module.WEB3_FUNCTION)]),
+            "Automate._validModules: Only RESOLVER or WEB3_FUNCTION"
+        );
+
+        require(
+            exists[uint256(LibDataTypes.Module.PROXY)],
+            "Automate._validModules: PROXY is required"
+        );
     }
 }
