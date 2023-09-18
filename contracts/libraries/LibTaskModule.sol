@@ -143,7 +143,6 @@ library LibTaskModule {
     /**
      * @notice Delegate calls task modules on exec.
      *
-     * @param _taskTreasury Address of the Task Treasury
      * @param _taskId Unique hash of the task. {See LibTaskId-getTaskId}
      * @param _taskCreator Address which created the task.
      * @param _execAddress Address of contract that will be called by Gelato.
@@ -153,7 +152,6 @@ library LibTaskModule {
      * @param taskModuleAddresses The storage reference to the mapping of modules to their address.
      */
     function onExecTask(
-        address _taskTreasury,
         bytes32 _taskId,
         address _taskCreator,
         address _execAddress,
@@ -174,11 +172,6 @@ library LibTaskModule {
             _execData,
             _modules,
             moduleAddresses
-        );
-
-        require(
-            _execAddress != _taskTreasury,
-            "Automate.onExecTask: execAddress cannot be taskTreasury"
         );
 
         (callSuccess, ) = _call(

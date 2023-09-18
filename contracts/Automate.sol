@@ -12,9 +12,6 @@ import {LibDataTypes} from "./libraries/LibDataTypes.sol";
 import {LibEvents} from "./libraries/LibEvents.sol";
 import {LibTaskId} from "./libraries/LibTaskId.sol";
 import {LibTaskModule} from "./libraries/LibTaskModule.sol";
-import {
-    ITaskTreasuryUpgradable
-} from "./interfaces/ITaskTreasuryUpgradable.sol";
 import {IAutomate} from "./interfaces/IAutomate.sol";
 
 /**
@@ -23,19 +20,15 @@ import {IAutomate} from "./interfaces/IAutomate.sol";
  * @notice Modules allow users to customise conditions and specifications when creating a task.
  */
 //solhint-disable function-max-lines
+//solhint-disable no-empty-blocks
 contract Automate is Gelatofied, Proxied, AutomateStorage, IAutomate {
     using GelatoBytes for bytes;
     using EnumerableSet for EnumerableSet.Bytes32Set;
 
     // solhint-disable const-name-snakecase
     string public constant version = "6";
-    ITaskTreasuryUpgradable public immutable override taskTreasury;
 
-    constructor(address payable _gelato, ITaskTreasuryUpgradable _taskTreasury)
-        Gelatofied(_gelato)
-    {
-        taskTreasury = _taskTreasury;
-    }
+    constructor(address payable _gelato) Gelatofied(_gelato) {}
 
     ///@inheritdoc IAutomate
     function createTask(
@@ -80,7 +73,6 @@ contract Automate is Gelatofied, Proxied, AutomateStorage, IAutomate {
         LibDataTypes.ModuleData calldata _moduleData,
         uint256 _txFee,
         address _feeToken,
-        bool _useTaskTreasuryFunds,
         bool _revertOnFailure
     ) external onlyGelato {
         bytes32 taskId = LibTaskId.getTaskId(
@@ -88,7 +80,7 @@ contract Automate is Gelatofied, Proxied, AutomateStorage, IAutomate {
             _execAddress,
             _execData.memorySliceSelector(),
             _moduleData,
-            _useTaskTreasuryFunds ? address(0) : _feeToken
+            _feeToken
         );
 
         require(
@@ -96,13 +88,10 @@ contract Automate is Gelatofied, Proxied, AutomateStorage, IAutomate {
             "Automate.exec: Task not found"
         );
 
-        if (!_useTaskTreasuryFunds) {
-            fee = _txFee;
-            feeToken = _feeToken;
-        }
+        fee = _txFee;
+        feeToken = _feeToken;
 
         bool success = LibTaskModule.onExecTask(
-            address(taskTreasury),
             taskId,
             _taskCreator,
             _execAddress,
@@ -112,12 +101,8 @@ contract Automate is Gelatofied, Proxied, AutomateStorage, IAutomate {
             taskModuleAddresses
         );
 
-        if (_useTaskTreasuryFunds) {
-            taskTreasury.useFunds(_taskCreator, _feeToken, _txFee);
-        } else {
-            delete fee;
-            delete feeToken;
-        }
+        delete fee;
+        delete feeToken;
 
         emit LibEvents.ExecSuccess(
             _txFee,
@@ -152,7 +137,6 @@ contract Automate is Gelatofied, Proxied, AutomateStorage, IAutomate {
         );
 
         bool success = LibTaskModule.onExecTask(
-            address(0),
             taskId,
             _taskCreator,
             _execAddress,

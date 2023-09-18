@@ -18,7 +18,7 @@ library LibTaskId {
      * @param execAddress Address of contract that will be called by Gelato.
      * @param execSelector Signature of the function which will be called by Gelato.
      * @param moduleData  Conditional modules that will be used. {See LibDataTypes-ModuleData}
-     * @param feeToken Address of token to be used as payment. Use address(0) if TaskTreasury is being used, 0xeeeeee... for ETH or native tokens.
+     * @param feeToken Address of token to be used as payment. Use address(0) if Gelato 1Balance is being used, 0xeeeeee... for ETH or native tokens.
      */
     function getTaskId(
         address taskCreator,

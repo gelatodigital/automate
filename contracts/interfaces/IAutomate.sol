@@ -1,7 +1,6 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.0;
 import {LibDataTypes} from "../libraries/LibDataTypes.sol";
-import {ITaskTreasuryUpgradable} from "./ITaskTreasuryUpgradable.sol";
 import {IGelato1Balance} from "./IGelato1Balance.sol";
 
 // solhint-disable max-line-length
@@ -12,7 +11,7 @@ interface IAutomate is IGelato1Balance {
      * @param execAddress Address of contract that should be called by Gelato.
      * @param execData Execution data to be called with / function selector if execution data is yet to be determined.
      * @param moduleData Conditional modules that will be used. {See LibDataTypes-ModuleData}
-     * @param feeToken Address of token to be used as payment. Use address(0) if TaskTreasury is being used, 0xeeeeee... for ETH or native tokens.
+     * @param feeToken Address of token to be used as payment. Use address(0) if Gelato 1Balance is being used, 0xeeeeee... for ETH or native tokens.
      *
      * @return taskId Unique hash of the task created.
      */
@@ -31,15 +30,14 @@ interface IAutomate is IGelato1Balance {
     function cancelTask(bytes32 taskId) external;
 
     /**
-     * @notice Execution API called by Gelato.
+     * @notice Execution API called by Gelato, using Sync Fee as fee payment method
      *
      * @param taskCreator The address which created the task.
      * @param execAddress Address of contract that should be called by Gelato.
      * @param execData Execution data to be called with / function selector if execution data is yet to be determined.
      * @param moduleData Conditional modules that will be used. {See LibDataTypes-ModuleData}
-     * @param txFee Fee paid to Gelato for execution, deducted on the TaskTreasury or transfered to Gelato.
+     * @param txFee Fee paid to Gelato for execution, transfered to Gelato.feeCollector().
      * @param feeToken Token used to pay for the execution. ETH = 0xeeeeee...
-     * @param useTaskTreasuryFunds If taskCreator's balance on TaskTreasury should pay for the tx.
      * @param revertOnFailure To revert or not if call to execAddress fails. (Used for off-chain simulations)
      */
     function exec(
@@ -49,7 +47,6 @@ interface IAutomate is IGelato1Balance {
         LibDataTypes.ModuleData calldata moduleData,
         uint256 txFee,
         address feeToken,
-        bool useTaskTreasuryFunds,
         bool revertOnFailure
     ) external;
 
@@ -104,20 +101,13 @@ interface IAutomate is IGelato1Balance {
         returns (bytes32[] memory);
 
     /**
-     * @notice TaskTreasury contract where user deposit funds to be used for fee payments.
-     *
-     * @return ITaskTreasuryUpgradable TaskTreasury contract interface
-     */
-    function taskTreasury() external view returns (ITaskTreasuryUpgradable);
-
-    /**
      * @notice Helper function to compute task id with module arguments
      *
      * @param taskCreator The address which created the task.
      * @param execAddress Address of contract that will be called by Gelato.
      * @param execSelector Signature of the function which will be called by Gelato.
      * @param moduleData  Conditional modules that will be used. {See LibDataTypes-ModuleData}
-     * @param feeToken Address of token to be used as payment. Use address(0) if TaskTreasury is being used, 0xeeeeee... for ETH or native tokens.
+     * @param feeToken Address of token to be used as payment. Use address(0) if Gelato 1Balance is being used, 0xeeeeee... for ETH or native tokens.
      */
     function getTaskId(
         address taskCreator,
