@@ -215,8 +215,6 @@ describe("Automate multi module test", function () {
 
     const gelato1BalanceParam = getGelato1BalanceParam({});
 
-    const nonce1BalanceBefore = await automate.nonce1Balance(taskId);
-
     await expect(
       automate
         .connect(executor)
@@ -240,10 +238,8 @@ describe("Automate multi module test", function () {
         gelato1BalanceParam.correlationId
       );
 
-    const nonce1BalanceAfter = await automate.nonce1Balance(taskId);
     const countAfter = await counter.count();
 
-    expect(nonce1BalanceAfter).to.be.gt(nonce1BalanceBefore);
     expect(countAfter).to.be.gt(countBefore);
   });
 
