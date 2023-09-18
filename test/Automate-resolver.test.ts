@@ -5,22 +5,20 @@ import {
   CounterTest,
   ProxyModule,
   ResolverModule,
-  TaskTreasuryUpgradable,
   TimeModule,
 } from "../typechain";
 import { Module, ModuleData, encodeResolverArgs, getTaskId } from "./utils";
+import { getGelato1BalanceParam } from "./utils/1balance";
 import hre = require("hardhat");
 const { ethers, deployments } = hre;
 
 const GELATO = "0x3caca7b48d0573d793d3b0279b5f0029180e83b6";
 const ETH = "0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE";
 const ZERO_ADD = ethers.constants.AddressZero;
-const FEE = ethers.utils.parseEther("0.1");
 
 describe("Automate Resolver module test", function () {
   let automate: Automate;
   let counter: CounterTest;
-  let treasury: TaskTreasuryUpgradable;
   let resolverModule: ResolverModule;
   let proxyModule: ProxyModule;
   let timeModule: TimeModule;
@@ -41,14 +39,12 @@ describe("Automate Resolver module test", function () {
     userAddress = await user.getAddress();
 
     automate = await ethers.getContract("Automate");
-    treasury = await ethers.getContract("TaskTreasuryUpgradable");
     counter = await ethers.getContract("CounterTest");
     resolverModule = await ethers.getContract("ResolverModule");
     proxyModule = await ethers.getContract("ProxyModule");
     timeModule = await ethers.getContract("TimeModule");
 
     // set-up
-    await treasury.updateWhitelistedService(automate.address, true);
     await automate.setModule(
       [Module.RESOLVER, Module.TIME, Module.PROXY],
       [resolverModule.address, timeModule.address, proxyModule.address]
@@ -59,11 +55,6 @@ describe("Automate Resolver module test", function () {
       params: [GELATO],
     });
     executor = ethers.provider.getSigner(GELATO);
-    // deposit funds
-    const depositAmount = ethers.utils.parseEther("1");
-    await treasury
-      .connect(user)
-      .depositFunds(userAddress, ETH, depositAmount, { value: depositAmount });
 
     // create task
     const resolverData = counter.interface.encodeFunctionData("checker");
@@ -142,14 +133,10 @@ describe("Automate Resolver module test", function () {
     );
 
     // will not fail on-chain
-    const balanceBefore = await treasury.userTokenBalance(userAddress, ETH);
-
     await execute(false, true);
 
-    const balanceAfter = await treasury.userTokenBalance(userAddress, ETH);
     const count3 = await counter.count();
     expect(count3).to.be.eql(count2);
-    expect(balanceAfter).to.be.lt(balanceBefore);
   });
 
   it("getTaskIdsByUser", async () => {
@@ -168,16 +155,16 @@ describe("Automate Resolver module test", function () {
       ? await counter.checkerReverts()
       : await counter.checker();
 
+    const gelato1BalanceParam = getGelato1BalanceParam({});
+
     await automate
       .connect(executor)
-      .exec(
+      .exec1Balance(
         userAddress,
         counter.address,
         execData,
         moduleData,
-        FEE,
-        ETH,
-        true,
+        gelato1BalanceParam,
         revertOnFailure
       );
   };

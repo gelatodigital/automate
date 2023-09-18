@@ -9,24 +9,21 @@ import {
   ProxyModule,
   ResolverModule,
   SingleExecModule,
-  TaskTreasuryUpgradable,
   TriggerModule,
   Web3FunctionModule,
 } from "../typechain";
 import { Module, ModuleData, encodeResolverArgs, getTaskId } from "./utils";
+import { getGelato1BalanceParam } from "./utils/1balance";
 import hre = require("hardhat");
 const { ethers, deployments } = hre;
 
 const GELATO = "0x3caca7b48d0573d793d3b0279b5f0029180e83b6";
-const ETH = "0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE";
 const ZERO_ADD = ethers.constants.AddressZero;
-const FEE = ethers.utils.parseEther("0.1");
 
 describe("Automate multi module test", function () {
   let automate: Automate;
   let counter: CounterWL;
   let counterResolver: CounterResolver;
-  let taskTreasury: TaskTreasuryUpgradable;
   let opsProxyFactory: OpsProxyFactory;
   let opsProxy: OpsProxy;
 
@@ -53,7 +50,6 @@ describe("Automate multi module test", function () {
     userAddress = await user.getAddress();
 
     automate = await ethers.getContract("Automate");
-    taskTreasury = await ethers.getContract("TaskTreasuryUpgradable");
     counter = await ethers.getContract("CounterWL");
     counterResolver = await ethers.getContract("CounterResolver");
     opsProxyFactory = await ethers.getContract("OpsProxyFactory");
@@ -65,7 +61,6 @@ describe("Automate multi module test", function () {
     triggerModule = await ethers.getContract("TriggerModule");
 
     // set-up
-    await taskTreasury.updateWhitelistedService(automate.address, true);
     await automate.setModule(
       [
         Module.RESOLVER,
@@ -88,12 +83,6 @@ describe("Automate multi module test", function () {
       params: [GELATO],
     });
     executor = ethers.provider.getSigner(GELATO);
-
-    // deposit funds
-    const depositAmount = ethers.utils.parseEther("1");
-    await taskTreasury
-      .connect(user)
-      .depositFunds(userAddress, ETH, depositAmount, { value: depositAmount });
 
     // deploy proxy
     await opsProxyFactory.connect(user).deploy();
@@ -218,41 +207,13 @@ describe("Automate multi module test", function () {
     expect(countAfter).to.be.gt(countBefore);
   });
 
-  it("exec", async () => {
-    const countBefore = await counter.count();
-
-    await execute(true);
-
-    const countAfter = await counter.count();
-    expect(countAfter).to.be.gt(countBefore);
-
-    const time = await automate.timedTask(taskId);
-    expect(time.nextExec).to.be.eq(ethers.BigNumber.from(0));
-
-    const taskIds = await automate.getTaskIdsByUser(userAddress);
-    expect(taskIds).to.not.include(taskId);
-  });
-
   it("exec1Balance", async () => {
     const countBefore = await counter.count();
     const [, execData] = await counterResolver.checker();
 
-    const sponsor = userAddress;
     const target = counter.address;
-    const feeToken = ETH;
-    const oneBalanceChainId = 1;
-    const nativeToFeeTokenXRateNumerator = 1;
-    const nativeToFeeTokenXRateDenominator = 1;
-    const correlationId = ethers.constants.HashZero;
 
-    const gelato1BalanceParam = {
-      sponsor,
-      feeToken,
-      oneBalanceChainId,
-      nativeToFeeTokenXRateNumerator,
-      nativeToFeeTokenXRateDenominator,
-      correlationId,
-    };
+    const gelato1BalanceParam = getGelato1BalanceParam({});
 
     const nonce1BalanceBefore = await automate.nonce1Balance(taskId);
 
@@ -270,13 +231,13 @@ describe("Automate multi module test", function () {
     )
       .to.emit(automate, "LogUseGelato1Balance")
       .withArgs(
-        sponsor,
+        gelato1BalanceParam.sponsor,
         target,
-        feeToken,
-        oneBalanceChainId,
-        nativeToFeeTokenXRateNumerator,
-        nativeToFeeTokenXRateDenominator,
-        correlationId
+        gelato1BalanceParam.feeToken,
+        gelato1BalanceParam.oneBalanceChainId,
+        gelato1BalanceParam.nativeToFeeTokenXRateNumerator,
+        gelato1BalanceParam.nativeToFeeTokenXRateDenominator,
+        gelato1BalanceParam.correlationId
       );
 
     const nonce1BalanceAfter = await automate.nonce1Balance(taskId);
@@ -289,16 +250,16 @@ describe("Automate multi module test", function () {
   const execute = async (revertOnFailure: boolean) => {
     const [, execData] = await counterResolver.checker();
 
+    const gelato1BalanceParam = getGelato1BalanceParam({});
+
     await automate
       .connect(executor)
-      .exec(
+      .exec1Balance(
         userAddress,
         counter.address,
         execData,
         moduleData,
-        FEE,
-        ETH,
-        true,
+        gelato1BalanceParam,
         revertOnFailure
       );
   };

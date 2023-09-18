@@ -6,7 +6,6 @@ import {
   ProxyModule,
   ResolverModule,
   SingleExecModule,
-  TaskTreasuryUpgradable,
   TimeModule,
   TriggerModule,
   Web3FunctionModule,
@@ -19,7 +18,6 @@ const ZERO_ADD = ethers.constants.AddressZero;
 
 describe("Automate deprecated test", function () {
   let automate: Automate;
-  let taskTreasury: TaskTreasuryUpgradable;
   let counter: Counter;
 
   let resolverModule: ResolverModule;
@@ -37,7 +35,6 @@ describe("Automate deprecated test", function () {
     [, user] = await hre.ethers.getSigners();
 
     automate = await ethers.getContract("Automate");
-    taskTreasury = await ethers.getContract("TaskTreasuryUpgradable");
     counter = await ethers.getContract("CounterTest");
 
     resolverModule = await ethers.getContract("ResolverModule");
@@ -48,7 +45,6 @@ describe("Automate deprecated test", function () {
     triggerModule = await ethers.getContract("TriggerModule");
 
     // set-up
-    await taskTreasury.updateWhitelistedService(automate.address, true);
     await automate.setModule(
       [
         Module.RESOLVER,

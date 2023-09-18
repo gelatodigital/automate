@@ -6,7 +6,6 @@ import {
   IGelato,
   ProxyModule,
   SingleExecModule,
-  TaskTreasuryUpgradable,
   TimeModule,
 } from "../typechain";
 import { Module, ModuleData, getTaskId } from "./utils";
@@ -17,10 +16,9 @@ const GELATO = "0x3caca7b48d0573d793d3b0279b5f0029180e83b6";
 const ETH = "0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE";
 const FEE = ethers.utils.parseEther("0.1");
 
-describe("Automate Without Treasury test", function () {
+describe("Automate Without 1Balance test", function () {
   let automate: Automate;
   let counterWT: CounterTestWT;
-  let taskTreasury: TaskTreasuryUpgradable;
   let singleExecModule: SingleExecModule;
   let proxyModule: ProxyModule;
   let timeModule: TimeModule;
@@ -46,13 +44,11 @@ describe("Automate Without Treasury test", function () {
     userAddress = await user.getAddress();
 
     automate = await ethers.getContract("Automate");
-    taskTreasury = await ethers.getContract("TaskTreasuryUpgradable");
     singleExecModule = await ethers.getContract("SingleExecModule");
     proxyModule = await ethers.getContract("ProxyModule");
     timeModule = await ethers.getContract("TimeModule");
 
     // set-up
-    await taskTreasury.updateWhitelistedService(automate.address, true);
     await automate.setModule(
       [Module.TIME, Module.SINGLE_EXEC, Module.PROXY],
       [timeModule.address, singleExecModule.address, proxyModule.address]
@@ -140,7 +136,6 @@ describe("Automate Without Treasury test", function () {
         moduleData,
         FEE,
         ETH,
-        false,
         revertOnFailure
       );
   };
