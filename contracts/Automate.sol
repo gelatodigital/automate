@@ -10,7 +10,6 @@ import {Proxied} from "./vendor/proxy/EIP173/Proxied.sol";
 import {AutomateStorage} from "./AutomateStorage.sol";
 import {LibDataTypes} from "./libraries/LibDataTypes.sol";
 import {LibEvents} from "./libraries/LibEvents.sol";
-import {LibLegacyTask} from "./libraries/LibLegacyTask.sol";
 import {LibTaskId} from "./libraries/LibTaskId.sol";
 import {LibTaskModule} from "./libraries/LibTaskModule.sol";
 import {
@@ -36,11 +35,6 @@ contract Automate is Gelatofied, Proxied, AutomateStorage, IAutomate {
         Gelatofied(_gelato)
     {
         taskTreasury = _taskTreasury;
-    }
-
-    // prettier-ignore
-    fallback(bytes calldata _callData) external returns(bytes memory returnData){
-        returnData = _handleLegacyTaskCreation(_callData);
     }
 
     ///@inheritdoc IAutomate
@@ -234,25 +228,6 @@ contract Automate is Gelatofied, Proxied, AutomateStorage, IAutomate {
         );
     }
 
-    ///@inheritdoc IAutomate
-    function getTaskId(
-        address taskCreator,
-        address execAddress,
-        bytes4 execSelector,
-        bool useTaskTreasuryFunds,
-        address feeToken,
-        bytes32 resolverHash
-    ) external pure returns (bytes32 taskId) {
-        taskId = LibTaskId.getLegacyTaskId(
-            taskCreator,
-            execAddress,
-            execSelector,
-            useTaskTreasuryFunds,
-            feeToken,
-            resolverHash
-        );
-    }
-
     function _createTask(
         address _taskCreator,
         address _execAddress,
@@ -303,29 +278,5 @@ contract Automate is Gelatofied, Proxied, AutomateStorage, IAutomate {
         _createdTasks[_taskCreator].remove(_taskId);
 
         emit LibEvents.TaskCancelled(_taskId, _taskCreator);
-    }
-
-    function _handleLegacyTaskCreation(bytes calldata _callData)
-        private
-        returns (bytes memory returnData)
-    {
-        bytes4 funcSig = _callData.calldataSliceSelector();
-
-        (
-            address execAddress,
-            bytes memory execData,
-            LibDataTypes.ModuleData memory moduleData,
-            address feeToken_
-        ) = LibLegacyTask.getCreateTaskArg(funcSig, _callData);
-
-        bytes32 taskId = _createTask(
-            msg.sender,
-            execAddress,
-            execData,
-            moduleData,
-            feeToken_
-        );
-
-        returnData = abi.encodePacked(taskId);
     }
 }
