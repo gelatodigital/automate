@@ -18,7 +18,7 @@ abstract contract AutomateStorage {
     address public feeToken;
 
     ///@dev Appended State
-    mapping(bytes32 => LibDataTypes.Time) public timedTask;
+    mapping(bytes32 => LibDataTypes.Time) public timedTask; ///@dev Deprecated
     mapping(LibDataTypes.Module => address) public taskModuleAddresses;
     mapping(bytes32 => uint256) public nonce1Balance; ///@dev Deprecated
 }

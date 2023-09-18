@@ -50,17 +50,4 @@ library LibEvents {
         bytes32 taskId,
         bool callSuccess
     );
-
-    /**
-     * @notice Emitted when TimeModule is initialised.
-     *
-     * @param taskId Unique hash of the task. {See LibTaskId-getTaskId}
-     * @param nextExec Time when the next execution will occur.
-     * @param interval Time interval between each execution.
-     */
-    event TimerSet(
-        bytes32 indexed taskId,
-        uint128 indexed nextExec,
-        uint128 indexed interval
-    );
 }
