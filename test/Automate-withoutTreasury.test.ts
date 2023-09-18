@@ -6,7 +6,6 @@ import {
   IGelato,
   ProxyModule,
   SingleExecModule,
-  TimeModule,
 } from "../typechain";
 import { Module, ModuleData, getTaskId } from "./utils";
 import hre = require("hardhat");
@@ -21,7 +20,6 @@ describe("Automate Without 1Balance test", function () {
   let counterWT: CounterTestWT;
   let singleExecModule: SingleExecModule;
   let proxyModule: ProxyModule;
-  let timeModule: TimeModule;
   let feeCollector: string;
 
   let user: Signer;
@@ -46,12 +44,11 @@ describe("Automate Without 1Balance test", function () {
     automate = await ethers.getContract("Automate");
     singleExecModule = await ethers.getContract("SingleExecModule");
     proxyModule = await ethers.getContract("ProxyModule");
-    timeModule = await ethers.getContract("TimeModule");
 
     // set-up
     await automate.setModule(
-      [Module.TIME, Module.SINGLE_EXEC, Module.PROXY],
-      [timeModule.address, singleExecModule.address, proxyModule.address]
+      [Module.SINGLE_EXEC, Module.PROXY],
+      [singleExecModule.address, proxyModule.address]
     );
 
     // Automate Proxy module need to be set-up before being able to deploy CounterTestWT

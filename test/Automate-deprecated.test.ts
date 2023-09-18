@@ -6,7 +6,6 @@ import {
   ProxyModule,
   ResolverModule,
   SingleExecModule,
-  TimeModule,
   TriggerModule,
   Web3FunctionModule,
 } from "../typechain";
@@ -21,7 +20,6 @@ describe("Automate deprecated test", function () {
   let counter: Counter;
 
   let resolverModule: ResolverModule;
-  let timeModule: TimeModule;
   let proxyModule: ProxyModule;
   let singleExecModule: SingleExecModule;
   let web3FunctionModule: Web3FunctionModule;
@@ -38,7 +36,6 @@ describe("Automate deprecated test", function () {
     counter = await ethers.getContract("CounterTest");
 
     resolverModule = await ethers.getContract("ResolverModule");
-    timeModule = await ethers.getContract("TimeModule");
     proxyModule = await ethers.getContract("ProxyModule");
     singleExecModule = await ethers.getContract("SingleExecModule");
     web3FunctionModule = await ethers.getContract("Web3FunctionModule");
@@ -48,7 +45,6 @@ describe("Automate deprecated test", function () {
     await automate.setModule(
       [
         Module.RESOLVER,
-        Module.TIME,
         Module.PROXY,
         Module.SINGLE_EXEC,
         Module.WEB3_FUNCTION,
@@ -56,7 +52,6 @@ describe("Automate deprecated test", function () {
       ],
       [
         resolverModule.address,
-        timeModule.address,
         proxyModule.address,
         singleExecModule.address,
         web3FunctionModule.address,
@@ -72,7 +67,7 @@ describe("Automate deprecated test", function () {
 
     const execSelector = counter.interface.getSighash("increaseCount");
     const moduleData = {
-      modules: [Module.TIME, Module.PROXY],
+      modules: [Module.DEPRECATED_TIME, Module.PROXY],
       args: [timeArgs, "0x"],
     };
 

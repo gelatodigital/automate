@@ -5,7 +5,6 @@ import {
   CounterTest,
   ProxyModule,
   SingleExecModule,
-  TimeModule,
 } from "../typechain";
 import { Module, ModuleData, getTaskId } from "./utils";
 import { getGelato1BalanceParam } from "./utils/1balance";
@@ -20,7 +19,6 @@ describe("Automate SingleExec module test", function () {
   let counter: CounterTest;
   let singleExecModule: SingleExecModule;
   let proxyModule: ProxyModule;
-  let timeModule: TimeModule;
 
   let user: Signer;
   let userAddress: string;
@@ -42,12 +40,11 @@ describe("Automate SingleExec module test", function () {
     counter = await ethers.getContract("CounterTest");
     singleExecModule = await ethers.getContract("SingleExecModule");
     proxyModule = await ethers.getContract("ProxyModule");
-    timeModule = await ethers.getContract("TimeModule");
 
     // set-up
     await automate.setModule(
-      [Module.TIME, Module.SINGLE_EXEC, Module.PROXY],
-      [timeModule.address, singleExecModule.address, proxyModule.address]
+      [Module.SINGLE_EXEC, Module.PROXY],
+      [singleExecModule.address, proxyModule.address]
     );
 
     await hre.network.provider.request({

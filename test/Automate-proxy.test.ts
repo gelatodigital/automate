@@ -7,7 +7,6 @@ import {
   OpsProxy,
   OpsProxyFactory,
   ProxyModule,
-  TimeModule,
 } from "../typechain";
 import { Module, ModuleData, getTaskId } from "./utils";
 import { getGelato1BalanceParam } from "./utils/1balance";
@@ -35,7 +34,6 @@ describe("Automate Proxy module test", function () {
   let opsProxyFactory: OpsProxyFactory;
   let counter: CounterWL;
   let proxyModule: ProxyModule;
-  let timeModule: TimeModule;
 
   let taskCreator: string;
   let execAddress: string;
@@ -52,7 +50,6 @@ describe("Automate Proxy module test", function () {
 
     automate = await ethers.getContract("Automate");
     proxyModule = await ethers.getContract("ProxyModule");
-    timeModule = await ethers.getContract("TimeModule");
     counter = await ethers.getContract("CounterWL");
     opsProxyFactory = await ethers.getContract("OpsProxyFactory");
     opsProxyImplementation = await ethers.getContract("OpsProxy");
@@ -65,10 +62,7 @@ describe("Automate Proxy module test", function () {
     executor = await ethers.getSigner(GELATO);
 
     // set-up
-    await automate.setModule(
-      [Module.TIME, Module.PROXY],
-      [timeModule.address, proxyModule.address]
-    );
+    await automate.setModule([Module.PROXY], [proxyModule.address]);
 
     // deploy proxy
     await opsProxyFactory.connect(user).deploy();

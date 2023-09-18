@@ -5,7 +5,6 @@ import {
   CounterTest,
   ProxyModule,
   ResolverModule,
-  TimeModule,
 } from "../typechain";
 import { Module, ModuleData, encodeResolverArgs, getTaskId } from "./utils";
 import { getGelato1BalanceParam } from "./utils/1balance";
@@ -21,7 +20,6 @@ describe("Automate Resolver module test", function () {
   let counter: CounterTest;
   let resolverModule: ResolverModule;
   let proxyModule: ProxyModule;
-  let timeModule: TimeModule;
 
   let user: Signer;
   let userAddress: string;
@@ -42,12 +40,11 @@ describe("Automate Resolver module test", function () {
     counter = await ethers.getContract("CounterTest");
     resolverModule = await ethers.getContract("ResolverModule");
     proxyModule = await ethers.getContract("ProxyModule");
-    timeModule = await ethers.getContract("TimeModule");
 
     // set-up
     await automate.setModule(
-      [Module.RESOLVER, Module.TIME, Module.PROXY],
-      [resolverModule.address, timeModule.address, proxyModule.address]
+      [Module.RESOLVER, Module.PROXY],
+      [resolverModule.address, proxyModule.address]
     );
 
     await hre.network.provider.request({
