@@ -12,7 +12,8 @@ enum Module {
 
 enum TriggerType {
     TIME,
-    CRON
+    CRON,
+    EVENT
 }
 
 struct ModuleData {

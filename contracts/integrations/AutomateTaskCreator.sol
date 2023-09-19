@@ -100,4 +100,18 @@ abstract contract AutomateTaskCreator is AutomateReady {
 
         return abi.encode(TriggerType.CRON, triggerConfig);
     }
+
+    function _eventTriggerModuleArg(
+        address _address,
+        bytes32[] memory _topicsFlattened,
+        uint256[] memory _topicPositions
+    ) internal pure returns (bytes memory) {
+        bytes memory triggerConfig = abi.encode(
+            _address,
+            _topicsFlattened,
+            _topicPositions
+        );
+
+        return abi.encode(TriggerType.EVENT, triggerConfig);
+    }
 }
