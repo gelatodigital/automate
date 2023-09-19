@@ -118,4 +118,35 @@ describe("AutomateTaskCreator test", function () {
     expect(expectedModuleData.modules).to.eql(cronTriggerModuleData[0]);
     expect(expectedModuleData.args).to.eql(cronTriggerModuleData[1]);
   });
+
+  it("should return event trigger module data", async () => {
+    const [address, topicsFlattened, topicPositionBigNumber] =
+      await automateTaskCreator.eventTriggerArg();
+
+    const topicPosition: number[] = [];
+    for (const position of topicPositionBigNumber) {
+      topicPosition.push(position.toNumber());
+    }
+
+    const topics = automateModule.constructTopics(
+      topicsFlattened,
+      topicPosition
+    );
+
+    const eventTriggerModuleData =
+      await automateTaskCreator.eventTriggerModuleData();
+
+    const expectedModuleData = await automateModule.encodeModuleArgs({
+      trigger: {
+        type: TriggerType.EVENT,
+        filter: {
+          address,
+          topics,
+        },
+      },
+    });
+
+    expect(expectedModuleData.modules).to.eql(eventTriggerModuleData[0]);
+    expect(expectedModuleData.args).to.eql(eventTriggerModuleData[1]);
+  });
 });

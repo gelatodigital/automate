@@ -103,6 +103,32 @@ contract AutomateTaskCreatorTest is AutomateTaskCreator {
         return moduleData;
     }
 
+    function eventTriggerModuleData()
+        external
+        pure
+        returns (ModuleData memory)
+    {
+        (
+            address _address,
+            bytes32[] memory _topicsFlattened,
+            uint256[] memory _topicPositions
+        ) = eventTriggerArg();
+
+        ModuleData memory moduleData = ModuleData({
+            modules: new Module[](1),
+            args: new bytes[](1)
+        });
+
+        moduleData.modules[0] = Module.TRIGGER;
+        moduleData.args[0] = _eventTriggerModuleArg(
+            _address,
+            _topicsFlattened,
+            _topicPositions
+        );
+
+        return moduleData;
+    }
+
     function resolverModuleArgs() public pure returns (address, bytes memory) {
         return (0x1d810c54fa36a9Af4c9f547328CBe91f41444c19, "0xcf5303cf");
     }
@@ -129,5 +155,37 @@ contract AutomateTaskCreatorTest is AutomateTaskCreator {
 
     function cronTriggerArg() public pure returns (string memory) {
         return "*/5 * * * *";
+    }
+
+    function eventTriggerArg()
+        public
+        pure
+        returns (
+            address,
+            bytes32[] memory,
+            uint256[] memory
+        )
+    {
+        bytes32[] memory topicsFlattened = new bytes32[](5);
+        uint256[] memory topicPositions = new uint256[](5);
+
+        topicsFlattened[0] = keccak256("topic0");
+        topicsFlattened[1] = keccak256("topic1");
+        topicsFlattened[2] = keccak256("topic2");
+        topicsFlattened[3] = keccak256("topic3");
+        topicsFlattened[4] = keccak256("topic4");
+
+        // [0,1,2,[3,4]]
+        topicPositions[0] = 0;
+        topicPositions[1] = 1;
+        topicPositions[2] = 2;
+        topicPositions[3] = 3;
+        topicPositions[4] = 3;
+
+        return (
+            address(0x1d810c54fa36a9Af4c9f547328CBe91f41444c19),
+            topicsFlattened,
+            topicPositions
+        );
     }
 }
