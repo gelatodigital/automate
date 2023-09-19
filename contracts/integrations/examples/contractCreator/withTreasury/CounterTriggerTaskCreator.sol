@@ -9,7 +9,7 @@ import "../../../AutomateTaskCreator.sol";
  */
 // solhint-disable not-rely-on-time
 // solhint-disable no-empty-blocks
-contract CounterTimeTaskCreator is AutomateTaskCreator {
+contract CounterTriggerTaskCreator is AutomateTaskCreator {
     uint256 public count;
     uint256 public lastExecuted;
     bytes32 public taskId;
@@ -29,7 +29,7 @@ contract CounterTimeTaskCreator is AutomateTaskCreator {
             modules: new Module[](2),
             args: new bytes[](2)
         });
-        moduleData.modules[0] = Module.TIME;
+        moduleData.modules[0] = Module.TRIGGER;
         moduleData.modules[1] = Module.PROXY;
 
         moduleData.args[0] = _timeTriggerModuleArg(
