@@ -110,7 +110,7 @@ contract AutomateTaskCreatorTest is AutomateTaskCreator {
     {
         (
             address _address,
-            bytes32[] memory _topicsFlattened,
+            bytes32[] memory _topics,
             uint256[] memory _topicPositions
         ) = eventTriggerArg();
 
@@ -122,7 +122,7 @@ contract AutomateTaskCreatorTest is AutomateTaskCreator {
         moduleData.modules[0] = Module.TRIGGER;
         moduleData.args[0] = _eventTriggerModuleArg(
             _address,
-            _topicsFlattened,
+            _topics,
             _topicPositions
         );
 
@@ -166,14 +166,14 @@ contract AutomateTaskCreatorTest is AutomateTaskCreator {
             uint256[] memory
         )
     {
-        bytes32[] memory topicsFlattened = new bytes32[](5);
+        bytes32[] memory topics = new bytes32[](5);
         uint256[] memory topicPositions = new uint256[](5);
 
-        topicsFlattened[0] = keccak256("topic0");
-        topicsFlattened[1] = keccak256("topic1");
-        topicsFlattened[2] = keccak256("topic2");
-        topicsFlattened[3] = keccak256("topic3");
-        topicsFlattened[4] = keccak256("topic4");
+        topics[0] = keccak256("topic0");
+        topics[1] = keccak256("topic1");
+        topics[2] = keccak256("topic2");
+        topics[3] = keccak256("topic3");
+        topics[4] = keccak256("topic4");
 
         // [0,1,2,[3,4]]
         topicPositions[0] = 0;
@@ -184,7 +184,7 @@ contract AutomateTaskCreatorTest is AutomateTaskCreator {
 
         return (
             address(0x1d810c54fa36a9Af4c9f547328CBe91f41444c19),
-            topicsFlattened,
+            topics,
             topicPositions
         );
     }

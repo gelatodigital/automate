@@ -120,7 +120,7 @@ describe("AutomateTaskCreator test", function () {
   });
 
   it("should return event trigger module data", async () => {
-    const [address, topicsFlattened, topicPositionBigNumber] =
+    const [address, topics, topicPositionBigNumber] =
       await automateTaskCreator.eventTriggerArg();
 
     const topicPosition: number[] = [];
@@ -128,8 +128,8 @@ describe("AutomateTaskCreator test", function () {
       topicPosition.push(position.toNumber());
     }
 
-    const topics = automateModule.constructTopics(
-      topicsFlattened,
+    const constructedTopics = automateModule.constructTopics(
+      topics,
       topicPosition
     );
 
@@ -141,7 +141,7 @@ describe("AutomateTaskCreator test", function () {
         type: TriggerType.EVENT,
         filter: {
           address,
-          topics,
+          topics: constructedTopics,
         },
       },
     });
