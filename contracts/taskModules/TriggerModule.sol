@@ -41,22 +41,18 @@ contract TriggerModule is TaskModuleBase {
      * @notice Helper function to encode arguments for TriggerModule for Event.
      *
      * @param _address Address to listen to for events.
-     * @param _topics Array of topics to filter .
-     * @param _topicPositions Position of the topics in the array (starts from 0).
+     * @param _topicSets Set of topics to filter at each topic position
      *
-     * e.g. - [[A,B],null,[C,D]]
-     * _topics: [A,B,C,D]
-     * _topicPositions: [0,0,2,2]
      */
     function encodeEventTriggerModuleArg(
         address _address,
-        bytes32[] memory _topics,
-        uint256[] memory _topicPositions
+        bytes32[][] memory _topicSets,
+        uint256 _blockConfirmations
     ) external pure returns (bytes memory) {
         bytes memory triggerConfig = abi.encode(
             _address,
-            _topics,
-            _topicPositions
+            _topicSets,
+            _blockConfirmations
         );
 
         return abi.encode(LibDataTypes.TriggerType.EVENT, triggerConfig);

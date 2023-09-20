@@ -110,8 +110,8 @@ contract AutomateTaskCreatorTest is AutomateTaskCreator {
     {
         (
             address _address,
-            bytes32[] memory _topics,
-            uint256[] memory _topicPositions
+            bytes32[][] memory _topicSets,
+            uint256 _blockConfirmations
         ) = eventTriggerArg();
 
         ModuleData memory moduleData = ModuleData({
@@ -122,8 +122,8 @@ contract AutomateTaskCreatorTest is AutomateTaskCreator {
         moduleData.modules[0] = Module.TRIGGER;
         moduleData.args[0] = _eventTriggerModuleArg(
             _address,
-            _topics,
-            _topicPositions
+            _topicSets,
+            _blockConfirmations
         );
 
         return moduleData;
@@ -162,30 +162,25 @@ contract AutomateTaskCreatorTest is AutomateTaskCreator {
         pure
         returns (
             address,
-            bytes32[] memory,
-            uint256[] memory
+            bytes32[][] memory,
+            uint256
         )
     {
-        bytes32[] memory topics = new bytes32[](5);
-        uint256[] memory topicPositions = new uint256[](5);
+        // [[A],[],[B,C],[]]
+        bytes32[][] memory topicSets = new bytes32[][](4);
+        //[A]
+        topicSets[0] = new bytes32[](1);
+        topicSets[0][0] = keccak256("A");
 
-        topics[0] = keccak256("topic0");
-        topics[1] = keccak256("topic1");
-        topics[2] = keccak256("topic2");
-        topics[3] = keccak256("topic3");
-        topics[4] = keccak256("topic4");
-
-        // [0,1,2,[3,4]]
-        topicPositions[0] = 0;
-        topicPositions[1] = 1;
-        topicPositions[2] = 2;
-        topicPositions[3] = 3;
-        topicPositions[4] = 3;
+        //[B,C]
+        topicSets[2] = new bytes32[](2);
+        topicSets[2][0] = keccak256("B");
+        topicSets[2][1] = keccak256("C");
 
         return (
             address(0x1d810c54fa36a9Af4c9f547328CBe91f41444c19),
-            topics,
-            topicPositions
+            topicSets,
+            100
         );
     }
 }
