@@ -30,14 +30,14 @@ abstract contract AutomateReadyUpgradeable is Initializable {
         _;
     }
 
-    /**
-     * @dev
-     * _taskCreator is the address which will create tasks for this contract.
-     */
     constructor(address _automate) {
         automate = IAutomate(_automate);
     }
 
+    /**
+     * @dev
+     * _taskCreator is the address which will create tasks for this contract.
+     */
     function __AutomateReady_init(address _taskCreator)
         internal
         onlyInitializing
