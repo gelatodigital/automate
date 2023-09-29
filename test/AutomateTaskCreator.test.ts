@@ -1,30 +1,80 @@
 import { AutomateModule, TriggerType } from "@gelatonetwork/automate-sdk";
 import { expect } from "chai";
-import { AutomateTaskCreatorTest } from "../typechain";
+import {
+  Automate,
+  AutomateTaskCreatorTest,
+  AutomateTaskCreatorUpgradeableTest,
+  IGelato,
+  OpsProxyFactory,
+  ProxyModule,
+} from "../typechain";
 import { Module } from "./utils";
 import hre = require("hardhat");
 const { ethers, deployments } = hre;
 
 describe("AutomateTaskCreator test", function () {
+  let automate: Automate;
+  let proxyModule: ProxyModule;
   let automateTaskCreator: AutomateTaskCreatorTest;
+  let automateTaskCreatorUpgradeable: AutomateTaskCreatorUpgradeableTest;
   let automateModule: AutomateModule;
 
   before(async function () {
     await deployments.fixture();
+    const [deployer] = await ethers.getSigners();
+    const deployerAddress = await deployer.getAddress();
 
     automateModule = new AutomateModule();
 
-    const automate = await ethers.getContract("Automate");
-    const proxyModule = await ethers.getContract("ProxyModule");
+    automate = await ethers.getContract("Automate");
+    proxyModule = await ethers.getContract("ProxyModule");
 
     await automate.setModule([Module.PROXY], [proxyModule.address]);
 
     const automateTaskCreatorFactory = await ethers.getContractFactory(
       "AutomateTaskCreatorTest"
     );
+
+    const res = await deployments.deploy("AutomateTaskCreatorUpgradeableTest", {
+      from: deployerAddress,
+      args: [automate.address],
+      proxy: { execute: { init: { methodName: "initialize", args: [] } } },
+    });
+
     automateTaskCreator = (await automateTaskCreatorFactory.deploy(
       automate.address
     )) as AutomateTaskCreatorTest;
+
+    automateTaskCreatorUpgradeable = (await ethers.getContractAt(
+      "AutomateTaskCreatorUpgradeableTest",
+      res.address
+    )) as AutomateTaskCreatorUpgradeableTest;
+  });
+
+  it("should initialize upgradeable contract", async () => {
+    const dedicatedMsgSender =
+      await automateTaskCreatorUpgradeable.dedicatedMsgSender();
+    const feeCollector = await automateTaskCreatorUpgradeable.getFeeCollector();
+
+    const proxyFactoryAddress = await proxyModule.opsProxyFactory();
+    const proxyFactory = (await ethers.getContractAt(
+      "OpsProxyFactory",
+      proxyFactoryAddress
+    )) as OpsProxyFactory;
+
+    const [expectedDedicatedMsgSender] = await proxyFactory.getProxyOf(
+      automateTaskCreatorUpgradeable.address
+    );
+
+    const gelatoAddress = await automate.gelato();
+    const gelato = (await ethers.getContractAt(
+      "IGelato",
+      gelatoAddress
+    )) as IGelato;
+    const expectedFeeCollector = await gelato.feeCollector();
+
+    expect(dedicatedMsgSender).to.be.eql(expectedDedicatedMsgSender);
+    expect(feeCollector).to.be.eql(expectedFeeCollector);
   });
 
   it("should return resolver module data", async () => {
