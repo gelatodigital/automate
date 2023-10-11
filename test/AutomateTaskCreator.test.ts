@@ -120,7 +120,7 @@ describe("AutomateTaskCreator test", function () {
   });
 
   it("should return event trigger module data", async () => {
-    const [address, topicSets, blockConfirmations] =
+    const [address, topics, blockConfirmations] =
       await automateTaskCreator.eventTriggerArg();
 
     const eventTriggerModuleData =
@@ -131,7 +131,7 @@ describe("AutomateTaskCreator test", function () {
         type: TriggerType.EVENT,
         filter: {
           address,
-          topicSets,
+          topics,
         },
         blockConfirmations: blockConfirmations.toNumber(),
       },

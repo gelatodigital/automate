@@ -110,7 +110,7 @@ contract AutomateTaskCreatorTest is AutomateTaskCreator {
     {
         (
             address _address,
-            bytes32[][] memory _topicSets,
+            bytes32[][] memory _topics,
             uint256 _blockConfirmations
         ) = eventTriggerArg();
 
@@ -122,7 +122,7 @@ contract AutomateTaskCreatorTest is AutomateTaskCreator {
         moduleData.modules[0] = Module.TRIGGER;
         moduleData.args[0] = _eventTriggerModuleArg(
             _address,
-            _topicSets,
+            _topics,
             _blockConfirmations
         );
 
@@ -167,19 +167,19 @@ contract AutomateTaskCreatorTest is AutomateTaskCreator {
         )
     {
         // [[A],[],[B,C],[]]
-        bytes32[][] memory topicSets = new bytes32[][](4);
+        bytes32[][] memory topics = new bytes32[][](4);
         //[A]
-        topicSets[0] = new bytes32[](1);
-        topicSets[0][0] = keccak256("A");
+        topics[0] = new bytes32[](1);
+        topics[0][0] = keccak256("A");
 
         //[B,C]
-        topicSets[2] = new bytes32[](2);
-        topicSets[2][0] = keccak256("B");
-        topicSets[2][1] = keccak256("C");
+        topics[2] = new bytes32[](2);
+        topics[2][0] = keccak256("B");
+        topics[2][1] = keccak256("C");
 
         return (
             address(0x1d810c54fa36a9Af4c9f547328CBe91f41444c19),
-            topicSets,
+            topics,
             100
         );
     }
