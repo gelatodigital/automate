@@ -7,12 +7,11 @@ const main = async () => {
   const ownerAddress = await owner.getAddress();
   console.log("Owner: ", ownerAddress);
 
-  const proxy = <EIP173Proxy>await ethers.getContract("Automate");
-  const implementation = <EIP173Proxy>(
-    await ethers.getContract("Automate_Implementation")
-  );
+  const proxy = (await ethers.getContract("Automate_Proxy")) as EIP173Proxy;
+  const implementation = await ethers.getContract("Automate_Implementation");
 
-  console.log("implementation", implementation.address);
+  console.log("proxy: ", proxy.address);
+  console.log("implementation: ", implementation.address);
   await sleep(10000);
   await proxy.upgradeTo(implementation.address);
 };
