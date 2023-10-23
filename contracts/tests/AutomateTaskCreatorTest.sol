@@ -103,6 +103,32 @@ contract AutomateTaskCreatorTest is AutomateTaskCreator {
         return moduleData;
     }
 
+    function eventTriggerModuleData()
+        external
+        pure
+        returns (ModuleData memory)
+    {
+        (
+            address _address,
+            bytes32[][] memory _topics,
+            uint256 _blockConfirmations
+        ) = eventTriggerArg();
+
+        ModuleData memory moduleData = ModuleData({
+            modules: new Module[](1),
+            args: new bytes[](1)
+        });
+
+        moduleData.modules[0] = Module.TRIGGER;
+        moduleData.args[0] = _eventTriggerModuleArg(
+            _address,
+            _topics,
+            _blockConfirmations
+        );
+
+        return moduleData;
+    }
+
     function resolverModuleArgs() public pure returns (address, bytes memory) {
         return (0x1d810c54fa36a9Af4c9f547328CBe91f41444c19, "0xcf5303cf");
     }
@@ -129,5 +155,32 @@ contract AutomateTaskCreatorTest is AutomateTaskCreator {
 
     function cronTriggerArg() public pure returns (string memory) {
         return "*/5 * * * *";
+    }
+
+    function eventTriggerArg()
+        public
+        pure
+        returns (
+            address,
+            bytes32[][] memory,
+            uint256
+        )
+    {
+        // [[A],[],[B,C],[]]
+        bytes32[][] memory topics = new bytes32[][](4);
+        //[A]
+        topics[0] = new bytes32[](1);
+        topics[0][0] = keccak256("A");
+
+        //[B,C]
+        topics[2] = new bytes32[](2);
+        topics[2][0] = keccak256("B");
+        topics[2][1] = keccak256("C");
+
+        return (
+            address(0x1d810c54fa36a9Af4c9f547328CBe91f41444c19),
+            topics,
+            100
+        );
     }
 }

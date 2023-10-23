@@ -10,9 +10,6 @@ import {LibDataTypes} from "./LibDataTypes.sol";
 library LibTaskId {
     /**
      * @notice Returns taskId of taskCreator.
-     * @notice To maintain the taskId of legacy tasks, if
-     * resolver module or resolver and time module is used,
-     * we will compute task id the legacy way.
      *
      * @param taskCreator The address which created the task.
      * @param execAddress Address of contract that will be called by Gelato.

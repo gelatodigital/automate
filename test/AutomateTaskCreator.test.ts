@@ -168,4 +168,26 @@ describe("AutomateTaskCreator test", function () {
     expect(expectedModuleData.modules).to.eql(cronTriggerModuleData[0]);
     expect(expectedModuleData.args).to.eql(cronTriggerModuleData[1]);
   });
+
+  it("should return event trigger module data", async () => {
+    const [address, topics, blockConfirmations] =
+      await automateTaskCreator.eventTriggerArg();
+
+    const eventTriggerModuleData =
+      await automateTaskCreator.eventTriggerModuleData();
+
+    const expectedModuleData = await automateModule.encodeModuleArgs({
+      trigger: {
+        type: TriggerType.EVENT,
+        filter: {
+          address,
+          topics,
+        },
+        blockConfirmations: blockConfirmations.toNumber(),
+      },
+    });
+
+    expect(expectedModuleData.modules).to.eql(eventTriggerModuleData[0]);
+    expect(expectedModuleData.args).to.eql(eventTriggerModuleData[1]);
+  });
 });

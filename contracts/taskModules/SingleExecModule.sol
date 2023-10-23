@@ -18,7 +18,6 @@ contract SingleExecModule is TaskModuleBase {
         bytes calldata
     ) external override {
         _createdTasks[_taskCreator].remove(_taskId);
-        delete timedTask[_taskId];
 
         emit LibEvents.TaskCancelled(_taskId, _taskCreator);
     }

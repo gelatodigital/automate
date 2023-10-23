@@ -128,7 +128,7 @@ contract Automate is Gelatofied, Proxied, AutomateStorage, IAutomate {
             _execAddress,
             _execData.memorySliceSelector(),
             _moduleData,
-            address(0) ///@dev a task with useTreasury=true can be charged with 1Balance / Treasury
+            address(0)
         );
 
         require(

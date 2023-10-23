@@ -77,20 +77,10 @@ const config: HardhatUserConfig = {
       chainId: 56,
       accounts: PROD_PK ? [PROD_PK] : [],
     },
-    cronos: {
-      accounts: PROD_PK ? [PROD_PK] : [],
-      chainId: 25,
-      url: `https://evm.cronos.org`,
-    },
     fantom: {
       accounts: PROD_PK ? [PROD_PK] : [],
       chainId: 250,
       url: `https://rpcapi.fantom.network/`,
-    },
-    gnosis: {
-      url: "https://rpc.gnosischain.com",
-      chainId: 100,
-      accounts: PROD_PK ? [PROD_PK] : [],
     },
     linea: {
       url: `https://linea-mainnet.infura.io/v3/${INFURA_ID}`,
@@ -101,21 +91,6 @@ const config: HardhatUserConfig = {
       accounts: PROD_PK ? [PROD_PK] : [],
       chainId: 1,
       url: `https://eth-mainnet.alchemyapi.io/v2/${ALCHEMY_ID}`,
-    },
-    moonbeam: {
-      url: `https://rpc.api.moonbeam.network`,
-      chainId: 1284,
-      accounts: PROD_PK ? [PROD_PK] : [],
-    },
-    moonriver: {
-      url: `https://rpc.api.moonriver.moonbeam.network`,
-      chainId: 1285,
-      accounts: PROD_PK ? [PROD_PK] : [],
-    },
-    mumbai: {
-      url: `https://polygon-mumbai.g.alchemy.com/v2/${ALCHEMY_ID}`,
-      chainId: 80001,
-      accounts: PROD_PK ? [PROD_PK] : [],
     },
     optimism: {
       url: `https://opt-mainnet.g.alchemy.com/v2/${ALCHEMY_ID}`,
@@ -162,6 +137,11 @@ const config: HardhatUserConfig = {
     goerli: {
       url: `https://eth-goerli.alchemyapi.io/v2/${ALCHEMY_ID}`,
       chainId: 5,
+      accounts: PROD_PK ? [PROD_PK] : [],
+    },
+    mumbai: {
+      url: `https://polygon-mumbai.g.alchemy.com/v2/${ALCHEMY_ID}`,
+      chainId: 80001,
       accounts: PROD_PK ? [PROD_PK] : [],
     },
     ogoerli: {
