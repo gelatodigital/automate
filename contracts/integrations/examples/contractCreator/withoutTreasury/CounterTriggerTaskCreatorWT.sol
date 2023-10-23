@@ -31,7 +31,7 @@ contract CounterTriggerTaskCreatorWT is AutomateTaskCreator {
             modules: new Module[](2),
             args: new bytes[](2)
         });
-        moduleData.modules[0] = Module.TIME;
+        moduleData.modules[0] = Module.TRIGGER;
         moduleData.modules[1] = Module.PROXY;
 
         moduleData.args[0] = _timeTriggerModuleArg(

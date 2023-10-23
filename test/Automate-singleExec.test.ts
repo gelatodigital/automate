@@ -1,29 +1,24 @@
 import { Signer } from "@ethersproject/abstract-signer";
 import { expect } from "chai";
-import { getTaskId, Module, ModuleData } from "./utils";
-import hre = require("hardhat");
-const { ethers, deployments } = hre;
 import {
   Automate,
   CounterTest,
-  TaskTreasuryUpgradable,
   ProxyModule,
   SingleExecModule,
-  TimeModule,
 } from "../typechain";
+import { Module, ModuleData, getTaskId } from "./utils";
+import { getGelato1BalanceParam } from "./utils/1balance";
+import hre = require("hardhat");
+const { ethers, deployments } = hre;
 
 const GELATO = "0x3caca7b48d0573d793d3b0279b5f0029180e83b6";
-const ETH = "0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE";
 const ZERO_ADD = ethers.constants.AddressZero;
-const FEE = ethers.utils.parseEther("0.1");
 
 describe("Automate SingleExec module test", function () {
   let automate: Automate;
   let counter: CounterTest;
-  let taskTreasury: TaskTreasuryUpgradable;
   let singleExecModule: SingleExecModule;
   let proxyModule: ProxyModule;
-  let timeModule: TimeModule;
 
   let user: Signer;
   let userAddress: string;
@@ -42,17 +37,14 @@ describe("Automate SingleExec module test", function () {
     userAddress = await user.getAddress();
 
     automate = await ethers.getContract("Automate");
-    taskTreasury = await ethers.getContract("TaskTreasuryUpgradable");
     counter = await ethers.getContract("CounterTest");
     singleExecModule = await ethers.getContract("SingleExecModule");
     proxyModule = await ethers.getContract("ProxyModule");
-    timeModule = await ethers.getContract("TimeModule");
 
     // set-up
-    await taskTreasury.updateWhitelistedService(automate.address, true);
     await automate.setModule(
-      [Module.TIME, Module.SINGLE_EXEC, Module.PROXY],
-      [timeModule.address, singleExecModule.address, proxyModule.address]
+      [Module.SINGLE_EXEC, Module.PROXY],
+      [singleExecModule.address, proxyModule.address]
     );
 
     await hre.network.provider.request({
@@ -61,17 +53,11 @@ describe("Automate SingleExec module test", function () {
     });
     executor = ethers.provider.getSigner(GELATO);
 
-    // deposit funds
-    const depositAmount = ethers.utils.parseEther("1");
-    await taskTreasury
-      .connect(user)
-      .depositFunds(userAddress, ETH, depositAmount, { value: depositAmount });
-
     // create task
     execData = counter.interface.encodeFunctionData("increaseCount", [10]);
     moduleData = {
-      modules: [Module.SINGLE_EXEC],
-      args: ["0x"],
+      modules: [Module.PROXY, Module.SINGLE_EXEC],
+      args: ["0x", "0x"],
     };
     execSelector = counter.interface.getSighash("increaseCount");
     taskId = getTaskId(
@@ -131,16 +117,16 @@ describe("Automate SingleExec module test", function () {
   });
 
   const execute = async (revertOnFailure: boolean) => {
+    const gelato1BalanceParam = getGelato1BalanceParam({});
+
     await automate
       .connect(executor)
-      .exec(
+      .exec1Balance(
         userAddress,
         counter.address,
         execData,
         moduleData,
-        FEE,
-        ETH,
-        true,
+        gelato1BalanceParam,
         revertOnFailure
       );
   };

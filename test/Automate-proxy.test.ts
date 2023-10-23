@@ -1,23 +1,21 @@
-import { expect } from "chai";
-import hre = require("hardhat");
-const { ethers, deployments } = hre;
 import { Signer } from "@ethersproject/abstract-signer";
+import { expect } from "chai";
 import {
-  CounterWL,
   Automate,
-  TaskTreasuryUpgradable,
+  CounterWL,
+  EIP173OpsProxy,
   OpsProxy,
   OpsProxyFactory,
   ProxyModule,
-  TimeModule,
-  EIP173ProxyWithCustomReceive,
 } from "../typechain";
-import { getTaskId, Module, ModuleData } from "./utils";
+import { Module, ModuleData, getTaskId } from "./utils";
+import { getGelato1BalanceParam } from "./utils/1balance";
+import hre = require("hardhat");
+const { ethers, deployments } = hre;
 
 const GELATO = "0x3CACa7b48D0573D793d3b0279b5F0029180E83b6";
 const ETH = "0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee";
 const ZERO_ADD = ethers.constants.AddressZero;
-const FEE = ethers.utils.parseEther("0.1");
 
 describe("Automate Proxy module test", function () {
   this.timeout(0);
@@ -34,10 +32,8 @@ describe("Automate Proxy module test", function () {
   let opsProxy: OpsProxy;
   let opsProxyImplementation: OpsProxy;
   let opsProxyFactory: OpsProxyFactory;
-  let treasury: TaskTreasuryUpgradable;
   let counter: CounterWL;
   let proxyModule: ProxyModule;
-  let timeModule: TimeModule;
 
   let taskCreator: string;
   let execAddress: string;
@@ -52,17 +48,11 @@ describe("Automate Proxy module test", function () {
     userAddress = await user.getAddress();
     user2Address = await user2.getAddress();
 
-    treasury = await ethers.getContract("TaskTreasuryUpgradable");
-
     automate = await ethers.getContract("Automate");
     proxyModule = await ethers.getContract("ProxyModule");
-    timeModule = await ethers.getContract("TimeModule");
     counter = await ethers.getContract("CounterWL");
     opsProxyFactory = await ethers.getContract("OpsProxyFactory");
     opsProxyImplementation = await ethers.getContract("OpsProxy");
-
-    // get accounts
-    const depositAmount = ethers.utils.parseEther("10");
 
     await hre.network.provider.request({
       method: "hardhat_impersonateAccount",
@@ -72,15 +62,7 @@ describe("Automate Proxy module test", function () {
     executor = await ethers.getSigner(GELATO);
 
     // set-up
-    await treasury.updateWhitelistedService(automate.address, true);
-    await automate.setModule(
-      [Module.TIME, Module.PROXY],
-      [timeModule.address, proxyModule.address]
-    );
-
-    await treasury
-      .connect(user)
-      .depositFunds(userAddress, ETH, depositAmount, { value: depositAmount });
+    await automate.setModule([Module.PROXY], [proxyModule.address]);
 
     // deploy proxy
     await opsProxyFactory.connect(user).deploy();
@@ -162,8 +144,8 @@ describe("Automate Proxy module test", function () {
 
   it("proxy - cannot upgrade to not whitelisted implementation", async () => {
     const [proxyAddress] = await opsProxyFactory.getProxyOf(userAddress);
-    const opsProxy: EIP173ProxyWithCustomReceive = await ethers.getContractAt(
-      "EIP173ProxyWithCustomReceive",
+    const opsProxy: EIP173OpsProxy = await ethers.getContractAt(
+      "EIP173OpsProxy",
       proxyAddress
     );
 
@@ -174,8 +156,8 @@ describe("Automate Proxy module test", function () {
 
   it("proxy - only owner can update implementation", async () => {
     const [proxyAddress] = await opsProxyFactory.getProxyOf(userAddress);
-    const opsProxy: EIP173ProxyWithCustomReceive = await ethers.getContractAt(
-      "EIP173ProxyWithCustomReceive",
+    const opsProxy: EIP173OpsProxy = await ethers.getContractAt(
+      "EIP173OpsProxy",
       proxyAddress
     );
 
@@ -267,8 +249,7 @@ describe("Automate Proxy module test", function () {
 
     execData = batchExecuteCallData;
     execAddress = opsProxy.address;
-    // proxy module not included as module encodes with `executeCall`
-    moduleData = { modules: [], args: [] };
+    moduleData = { modules: [Module.PROXY], args: ["0x"] };
 
     await createTask(user);
 
@@ -330,7 +311,7 @@ describe("Automate Proxy module test", function () {
   });
 
   it("exec - without proxy module initialised", async () => {
-    // // whitelist proxy on counter
+    // whitelist proxy on counter
     await counter.connect(deployer).setWhitelist(opsProxy.address, true);
     expect(await counter.whitelisted(opsProxy.address)).to.be.true;
 
@@ -342,7 +323,7 @@ describe("Automate Proxy module test", function () {
       0,
     ]);
     execData = proxyExecData;
-    moduleData = { modules: [], args: [] };
+    moduleData = { modules: [Module.PROXY], args: ["0x"] };
 
     await createTask(user);
 
@@ -392,16 +373,16 @@ describe("Automate Proxy module test", function () {
   });
 
   const execute = async () => {
+    const gelato1BalanceParam = getGelato1BalanceParam({});
+
     await automate
       .connect(executor)
-      .exec(
+      .exec1Balance(
         taskCreator,
         execAddress,
         execData,
         moduleData,
-        FEE,
-        ETH,
-        true,
+        gelato1BalanceParam,
         true
       );
   };

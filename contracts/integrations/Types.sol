@@ -3,7 +3,7 @@ pragma solidity ^0.8.12;
 
 enum Module {
     RESOLVER,
-    TIME,
+    DEPRECATED_TIME,
     PROXY,
     SINGLE_EXEC,
     WEB3_FUNCTION,

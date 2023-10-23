@@ -1,47 +1,37 @@
 import { Signer } from "@ethersproject/abstract-signer";
 import { expect } from "chai";
 import {
-  encodeResolverArgs,
-  encodeTimeArgs,
-  fastForwardTime,
-  getTaskId,
-  getTimeStampNow,
-  Module,
-  ModuleData,
-} from "./utils";
+  Automate,
+  CounterResolver,
+  CounterWL,
+  OpsProxy,
+  OpsProxyFactory,
+  ProxyModule,
+  ResolverModule,
+  SingleExecModule,
+  TriggerModule,
+  Web3FunctionModule,
+} from "../typechain";
+import { Module, ModuleData, encodeResolverArgs, getTaskId } from "./utils";
+import { getGelato1BalanceParam } from "./utils/1balance";
 import hre = require("hardhat");
 const { ethers, deployments } = hre;
-import {
-  Automate,
-  CounterWL,
-  CounterResolver,
-  TaskTreasuryUpgradable,
-  ResolverModule,
-  TimeModule,
-  ProxyModule,
-  SingleExecModule,
-  OpsProxyFactory,
-  OpsProxy,
-} from "../typechain";
 
 const GELATO = "0x3caca7b48d0573d793d3b0279b5f0029180e83b6";
-const ETH = "0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE";
 const ZERO_ADD = ethers.constants.AddressZero;
-const FEE = ethers.utils.parseEther("0.1");
-const INTERVAL = 7 * 60;
 
 describe("Automate multi module test", function () {
   let automate: Automate;
   let counter: CounterWL;
   let counterResolver: CounterResolver;
-  let taskTreasury: TaskTreasuryUpgradable;
   let opsProxyFactory: OpsProxyFactory;
   let opsProxy: OpsProxy;
 
   let resolverModule: ResolverModule;
-  let timeModule: TimeModule;
   let proxyModule: ProxyModule;
   let singleExecModule: SingleExecModule;
+  let web3FunctionModule: Web3FunctionModule;
+  let triggerModule: TriggerModule;
 
   let user: Signer;
   let userAddress: string;
@@ -51,9 +41,7 @@ describe("Automate multi module test", function () {
   let taskId: string;
   let execSelector: string;
   let moduleData: ModuleData;
-  let timeArgs: string;
   let resolverArgs: string;
-  let startTime: number;
 
   beforeEach(async function () {
     await deployments.fixture();
@@ -62,25 +50,31 @@ describe("Automate multi module test", function () {
     userAddress = await user.getAddress();
 
     automate = await ethers.getContract("Automate");
-    taskTreasury = await ethers.getContract("TaskTreasuryUpgradable");
     counter = await ethers.getContract("CounterWL");
     counterResolver = await ethers.getContract("CounterResolver");
     opsProxyFactory = await ethers.getContract("OpsProxyFactory");
 
     resolverModule = await ethers.getContract("ResolverModule");
-    timeModule = await ethers.getContract("TimeModule");
     proxyModule = await ethers.getContract("ProxyModule");
     singleExecModule = await ethers.getContract("SingleExecModule");
+    web3FunctionModule = await ethers.getContract("Web3FunctionModule");
+    triggerModule = await ethers.getContract("TriggerModule");
 
     // set-up
-    await taskTreasury.updateWhitelistedService(automate.address, true);
     await automate.setModule(
-      [Module.RESOLVER, Module.TIME, Module.PROXY, Module.SINGLE_EXEC],
+      [
+        Module.RESOLVER,
+        Module.PROXY,
+        Module.SINGLE_EXEC,
+        Module.WEB3_FUNCTION,
+        Module.TRIGGER,
+      ],
       [
         resolverModule.address,
-        timeModule.address,
         proxyModule.address,
         singleExecModule.address,
+        web3FunctionModule.address,
+        triggerModule.address,
       ]
     );
 
@@ -90,12 +84,6 @@ describe("Automate multi module test", function () {
     });
     executor = ethers.provider.getSigner(GELATO);
 
-    // deposit funds
-    const depositAmount = ethers.utils.parseEther("1");
-    await taskTreasury
-      .connect(user)
-      .depositFunds(userAddress, ETH, depositAmount, { value: depositAmount });
-
     // deploy proxy
     await opsProxyFactory.connect(user).deploy();
 
@@ -104,12 +92,10 @@ describe("Automate multi module test", function () {
       counterResolver.interface.encodeFunctionData("checker");
     resolverArgs = encodeResolverArgs(counterResolver.address, resolverData);
 
-    startTime = (await getTimeStampNow()) + INTERVAL;
-    timeArgs = encodeTimeArgs(startTime, INTERVAL);
     execSelector = counter.interface.getSighash("increaseCount");
     moduleData = {
-      modules: [Module.RESOLVER, Module.TIME, Module.PROXY, Module.SINGLE_EXEC],
-      args: [resolverArgs, timeArgs, "0x", "0x"],
+      modules: [Module.RESOLVER, Module.PROXY, Module.SINGLE_EXEC],
+      args: [resolverArgs, "0x", "0x"],
     };
 
     taskId = getTaskId(
@@ -133,9 +119,13 @@ describe("Automate multi module test", function () {
   });
 
   it("getTaskId", async () => {
-    const thisTaskId = await automate[
-      "getTaskId(address,address,bytes4,(uint8[],bytes[]),address)"
-    ](userAddress, counter.address, execSelector, moduleData, ZERO_ADD);
+    const thisTaskId = await automate.getTaskId(
+      userAddress,
+      counter.address,
+      execSelector,
+      moduleData,
+      ZERO_ADD
+    );
 
     const expectedTaskId = taskId;
 
@@ -147,17 +137,10 @@ describe("Automate multi module test", function () {
     expect(taskIds).include(taskId);
   });
 
-  it("createTask - time initialised", async () => {
-    const time = await automate.timedTask(taskId);
-
-    expect(time.nextExec).to.be.eq(ethers.BigNumber.from(startTime));
-    expect(time.interval).to.be.eq(ethers.BigNumber.from(INTERVAL));
-  });
-
   it("createTask - wrong module order", async () => {
     moduleData = {
-      modules: [Module.RESOLVER, Module.SINGLE_EXEC, Module.TIME, Module.PROXY],
-      args: [resolverArgs, "0x", timeArgs, "0x"],
+      modules: [Module.RESOLVER, Module.SINGLE_EXEC, Module.PROXY],
+      args: [resolverArgs, "0x", "0x"],
     };
 
     await expect(
@@ -169,8 +152,8 @@ describe("Automate multi module test", function () {
 
   it("createTask - duplicate modules", async () => {
     moduleData = {
-      modules: [Module.RESOLVER, Module.RESOLVER],
-      args: [resolverArgs, resolverArgs],
+      modules: [Module.RESOLVER, Module.RESOLVER, Module.PROXY],
+      args: [resolverArgs, resolverArgs, "0x"],
     };
 
     await expect(
@@ -180,10 +163,34 @@ describe("Automate multi module test", function () {
     ).to.be.revertedWith("Automate._validModules: Asc only");
   });
 
+  it("createTask - only one resolver", async () => {
+    moduleData = {
+      modules: [Module.RESOLVER, Module.PROXY, Module.WEB3_FUNCTION],
+      args: ["0x", "0x", "0x"],
+    };
+
+    await expect(
+      automate.createTask(counter.address, execSelector, moduleData, ZERO_ADD)
+    ).to.be.revertedWith(
+      "Automate._validModules: Only RESOLVER or WEB3_FUNCTION"
+    );
+  });
+
   it("createTask - no modules", async () => {
+    moduleData = {
+      modules: [],
+      args: [],
+    };
+
+    await expect(
+      automate.createTask(counter.address, execSelector, moduleData, ZERO_ADD)
+    ).to.be.revertedWith("Automate._validModules: PROXY is required");
+  });
+
+  it("createTask - only proxy", async () => {
     await counter.setWhitelist(automate.address, true);
     expect(await counter.whitelisted(automate.address)).to.be.true;
-    moduleData = { modules: [], args: [] };
+    moduleData = { modules: [Module.PROXY], args: ["0x"] };
     const execData = counter.interface.encodeFunctionData("increaseCount", [
       10,
     ]);
@@ -200,62 +207,13 @@ describe("Automate multi module test", function () {
     expect(countAfter).to.be.gt(countBefore);
   });
 
-  it("createTask - only one resolver", async () => {
-    moduleData = {
-      modules: [Module.RESOLVER, Module.WEB3_FUNCTION],
-      args: ["0x", "0x"],
-    };
-
-    await expect(
-      automate.createTask(counter.address, execSelector, moduleData, ZERO_ADD)
-    ).to.be.revertedWith("Automate._validModules: Only one resolver");
-  });
-
-  it("exec - time should revert", async () => {
-    await expect(execute(true)).to.be.revertedWith(
-      "Automate.preExecCall: TimeModule: Too early"
-    );
-  });
-
-  it("exec", async () => {
-    await fastForwardTime(INTERVAL);
-    const countBefore = await counter.count();
-
-    await execute(true);
-
-    const countAfter = await counter.count();
-    expect(countAfter).to.be.gt(countBefore);
-
-    const time = await automate.timedTask(taskId);
-    expect(time.nextExec).to.be.eq(ethers.BigNumber.from(0));
-
-    const taskIds = await automate.getTaskIdsByUser(userAddress);
-    expect(taskIds).to.not.include(taskId);
-  });
-
   it("exec1Balance", async () => {
-    await fastForwardTime(INTERVAL);
     const countBefore = await counter.count();
     const [, execData] = await counterResolver.checker();
 
-    const sponsor = userAddress;
     const target = counter.address;
-    const feeToken = ETH;
-    const oneBalanceChainId = 1;
-    const nativeToFeeTokenXRateNumerator = 1;
-    const nativeToFeeTokenXRateDenominator = 1;
-    const correlationId = ethers.constants.HashZero;
 
-    const gelato1BalanceParam = {
-      sponsor,
-      feeToken,
-      oneBalanceChainId,
-      nativeToFeeTokenXRateNumerator,
-      nativeToFeeTokenXRateDenominator,
-      correlationId,
-    };
-
-    const nonce1BalanceBefore = await automate.nonce1Balance(taskId);
+    const gelato1BalanceParam = getGelato1BalanceParam({});
 
     await expect(
       automate
@@ -271,35 +229,33 @@ describe("Automate multi module test", function () {
     )
       .to.emit(automate, "LogUseGelato1Balance")
       .withArgs(
-        sponsor,
+        gelato1BalanceParam.sponsor,
         target,
-        feeToken,
-        oneBalanceChainId,
-        nativeToFeeTokenXRateNumerator,
-        nativeToFeeTokenXRateDenominator,
-        correlationId
+        gelato1BalanceParam.feeToken,
+        gelato1BalanceParam.oneBalanceChainId,
+        gelato1BalanceParam.nativeToFeeTokenXRateNumerator,
+        gelato1BalanceParam.nativeToFeeTokenXRateDenominator,
+        gelato1BalanceParam.correlationId
       );
 
-    const nonce1BalanceAfter = await automate.nonce1Balance(taskId);
     const countAfter = await counter.count();
 
-    expect(nonce1BalanceAfter).to.be.gt(nonce1BalanceBefore);
     expect(countAfter).to.be.gt(countBefore);
   });
 
   const execute = async (revertOnFailure: boolean) => {
     const [, execData] = await counterResolver.checker();
 
+    const gelato1BalanceParam = getGelato1BalanceParam({});
+
     await automate
       .connect(executor)
-      .exec(
+      .exec1Balance(
         userAddress,
         counter.address,
         execData,
         moduleData,
-        FEE,
-        ETH,
-        true,
+        gelato1BalanceParam,
         revertOnFailure
       );
   };

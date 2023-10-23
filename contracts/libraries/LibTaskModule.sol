@@ -24,9 +24,9 @@ library LibTaskModule {
         address _execAddress,
         mapping(LibDataTypes.Module => address) storage taskModuleAddresses
     ) internal returns (address, address) {
-        uint256 length = uint256(type(LibDataTypes.Module).max);
+        uint256 length = uint256(type(LibDataTypes.Module).max) + 1;
 
-        for (uint256 i; i <= length; i++) {
+        for (uint256 i; i < length; i++) {
             LibDataTypes.Module module = LibDataTypes.Module(i);
             if (!module.requirePreCreate()) continue;
 
@@ -74,7 +74,7 @@ library LibTaskModule {
     ) internal {
         uint256 length = _moduleData.modules.length;
 
-        _validModules(length, _moduleData.modules);
+        _validModules(_moduleData.modules);
 
         for (uint256 i; i < length; i++) {
             LibDataTypes.Module module = _moduleData.modules[i];
@@ -143,7 +143,6 @@ library LibTaskModule {
     /**
      * @notice Delegate calls task modules on exec.
      *
-     * @param _taskTreasury Address of the Task Treasury
      * @param _taskId Unique hash of the task. {See LibTaskId-getTaskId}
      * @param _taskCreator Address which created the task.
      * @param _execAddress Address of contract that will be called by Gelato.
@@ -153,7 +152,6 @@ library LibTaskModule {
      * @param taskModuleAddresses The storage reference to the mapping of modules to their address.
      */
     function onExecTask(
-        address _taskTreasury,
         bytes32 _taskId,
         address _taskCreator,
         address _execAddress,
@@ -174,11 +172,6 @@ library LibTaskModule {
             _execData,
             _modules,
             moduleAddresses
-        );
-
-        require(
-            _execAddress != _taskTreasury,
-            "Automate.onExecTask: execAddress cannot be taskTreasury"
         );
 
         (callSuccess, ) = _call(
@@ -286,26 +279,42 @@ library LibTaskModule {
 
     /**
      * @dev
-     * - No duplicate modules.
+     * - No duplicate modules
+     * - No deprecated TIME
      * - No RESOLVER && WEB3_FUNCTION
+     * - PROXY is required
      */
-    function _validModules(
-        uint256 _length,
-        LibDataTypes.Module[] memory _modules
-    ) private pure {
-        if (_length > 1) {
-            bool hasResolver = _modules[0] == LibDataTypes.Module.RESOLVER;
-            for (uint256 i; i < _length - 1; i++) {
+    function _validModules(LibDataTypes.Module[] memory _modules) private pure {
+        uint256 length = _modules.length;
+
+        uint256 existsLength = uint256(type(LibDataTypes.Module).max) + 1;
+        bool[] memory exists = new bool[](existsLength);
+
+        for (uint256 i = 0; i < length; i++) {
+            if (i > 0) {
                 require(
-                    _modules[i + 1] > _modules[i],
+                    _modules[i] > _modules[i - 1],
                     "Automate._validModules: Asc only"
                 );
-                if (hasResolver)
-                    require(
-                        _modules[i + 1] != LibDataTypes.Module.WEB3_FUNCTION,
-                        "Automate._validModules: Only one resolver"
-                    );
             }
+
+            exists[uint256(_modules[i])] = true;
         }
+
+        require(
+            !exists[uint256(LibDataTypes.Module.DEPRECATED_TIME)],
+            "Automate._validModules: TIME is deprecated"
+        );
+
+        require(
+            !(exists[uint256(LibDataTypes.Module.RESOLVER)] &&
+                exists[uint256(LibDataTypes.Module.WEB3_FUNCTION)]),
+            "Automate._validModules: Only RESOLVER or WEB3_FUNCTION"
+        );
+
+        require(
+            exists[uint256(LibDataTypes.Module.PROXY)],
+            "Automate._validModules: PROXY is required"
+        );
     }
 }

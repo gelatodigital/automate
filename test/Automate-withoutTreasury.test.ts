@@ -6,8 +6,6 @@ import {
   IGelato,
   ProxyModule,
   SingleExecModule,
-  TaskTreasuryUpgradable,
-  TimeModule,
 } from "../typechain";
 import { Module, ModuleData, getTaskId } from "./utils";
 import hre = require("hardhat");
@@ -17,13 +15,11 @@ const GELATO = "0x3caca7b48d0573d793d3b0279b5f0029180e83b6";
 const ETH = "0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE";
 const FEE = ethers.utils.parseEther("0.1");
 
-describe("Automate Without Treasury test", function () {
+describe("Automate Without 1Balance test", function () {
   let automate: Automate;
   let counterWT: CounterTestWT;
-  let taskTreasury: TaskTreasuryUpgradable;
   let singleExecModule: SingleExecModule;
   let proxyModule: ProxyModule;
-  let timeModule: TimeModule;
   let feeCollector: string;
 
   let user: Signer;
@@ -46,16 +42,13 @@ describe("Automate Without Treasury test", function () {
     userAddress = await user.getAddress();
 
     automate = await ethers.getContract("Automate");
-    taskTreasury = await ethers.getContract("TaskTreasuryUpgradable");
     singleExecModule = await ethers.getContract("SingleExecModule");
     proxyModule = await ethers.getContract("ProxyModule");
-    timeModule = await ethers.getContract("TimeModule");
 
     // set-up
-    await taskTreasury.updateWhitelistedService(automate.address, true);
     await automate.setModule(
-      [Module.TIME, Module.SINGLE_EXEC, Module.PROXY],
-      [timeModule.address, singleExecModule.address, proxyModule.address]
+      [Module.SINGLE_EXEC, Module.PROXY],
+      [singleExecModule.address, proxyModule.address]
     );
 
     // Automate Proxy module need to be set-up before being able to deploy CounterTestWT
@@ -73,8 +66,8 @@ describe("Automate Without Treasury test", function () {
     // create task
     execData = counterWT.interface.encodeFunctionData("increaseCount", [10]);
     moduleData = {
-      modules: [Module.SINGLE_EXEC],
-      args: ["0x"],
+      modules: [Module.PROXY, Module.SINGLE_EXEC],
+      args: ["0x", "0x"],
     };
     execSelector = counterWT.interface.getSighash("increaseCount");
     taskId = getTaskId(
@@ -140,7 +133,6 @@ describe("Automate Without Treasury test", function () {
         moduleData,
         FEE,
         ETH,
-        false,
         revertOnFailure
       );
   };

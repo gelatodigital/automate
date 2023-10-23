@@ -3,7 +3,7 @@ import { ethers } from "hardhat";
 /* eslint-disable @typescript-eslint/naming-convention */
 export enum Module {
   RESOLVER,
-  TIME,
+  DEPRECATED_TIME,
   PROXY,
   SINGLE_EXEC,
   WEB3_FUNCTION,
