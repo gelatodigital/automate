@@ -54,7 +54,8 @@ library LibDataTypes {
     enum TriggerType {
         TIME,
         CRON,
-        EVENT
+        EVENT,
+        BLOCK
     }
 
     /**

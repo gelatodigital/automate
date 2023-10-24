@@ -190,4 +190,18 @@ describe("AutomateTaskCreator test", function () {
     expect(expectedModuleData.modules).to.eql(eventTriggerModuleData[0]);
     expect(expectedModuleData.args).to.eql(eventTriggerModuleData[1]);
   });
+
+  it("should return block trigger module data", async () => {
+    const blockTriggerModuleData =
+      await automateTaskCreator.blockTriggerModuleData();
+
+    const expectedModuleData = await automateModule.encodeModuleArgs({
+      trigger: {
+        type: TriggerType.BLOCK,
+      },
+    });
+
+    expect(expectedModuleData.modules).to.eql(blockTriggerModuleData[0]);
+    expect(expectedModuleData.args).to.eql(blockTriggerModuleData[1]);
+  });
 });

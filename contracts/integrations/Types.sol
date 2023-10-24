@@ -13,7 +13,8 @@ enum Module {
 enum TriggerType {
     TIME,
     CRON,
-    EVENT
+    EVENT,
+    BLOCK
 }
 
 struct ModuleData {
