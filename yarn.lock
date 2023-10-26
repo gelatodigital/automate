@@ -890,10 +890,10 @@
     "@ethersproject/properties" "^5.7.0"
     "@ethersproject/strings" "^5.7.0"
 
-"@gelatonetwork/automate-sdk@^2.19.3-beta":
-  version "2.19.3-beta"
-  resolved "https://registry.yarnpkg.com/@gelatonetwork/automate-sdk/-/automate-sdk-2.19.3-beta.tgz#74cf86a29b725164e3293057e415cda8dcca153e"
-  integrity sha512-rY+SzHdmNkjbZLwRpjrDDSmTYZEd/8TnaJYhB/RlYIc+IqyhBkia/dZxEGF5MW5yZ9zeN0VRAHZ5IFSlUogGWQ==
+"@gelatonetwork/automate-sdk@^2.20.3-beta":
+  version "2.20.3-beta"
+  resolved "https://registry.yarnpkg.com/@gelatonetwork/automate-sdk/-/automate-sdk-2.20.3-beta.tgz#2d4c9b8dcd3d8529312ade0c52cad5be8294c1dc"
+  integrity sha512-7hUTzvwdgLU7FAl3dAYe2dn/OJYWHkz+RhQYbGur2DLARZe8qLQ/JeifTJ2YytAhqSTLFgU77Vf1NAEvZS115g==
   dependencies:
     axios "^1.4.0"
     buffer "^6.0.3"

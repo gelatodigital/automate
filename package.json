@@ -57,7 +57,7 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "@gelatonetwork/automate-sdk": "^2.19.3-beta"
+    "@gelatonetwork/automate-sdk": "^2.20.3-beta"
   },
   "lint-staged": {
     "*.{js,sol,json,md,ts,yml,yaml}": "prettier --write",
