@@ -82,6 +82,11 @@ const config: HardhatUserConfig = {
       chainId: 250,
       url: `https://rpcapi.fantom.network/`,
     },
+    gnosis: {
+      accounts: PROD_PK ? [PROD_PK] : [],
+      chainId: 100,
+      url: `https://gnosis-mainnet.public.blastapi.io`,
+    },
     linea: {
       url: `https://linea-mainnet.infura.io/v3/${INFURA_ID}`,
       chainId: 59144,
