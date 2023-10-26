@@ -57,4 +57,15 @@ contract TriggerModule is TaskModuleBase {
 
         return abi.encode(LibDataTypes.TriggerType.EVENT, triggerConfig);
     }
+
+    /**
+     * @notice Helper function to encode arguments for TriggerModule for Block.
+     */
+    function encodeBlockTriggerModuleArg()
+        external
+        pure
+        returns (bytes memory)
+    {
+        return abi.encode(LibDataTypes.TriggerType.BLOCK);
+    }
 }

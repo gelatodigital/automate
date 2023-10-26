@@ -105,4 +105,8 @@ abstract contract AutomateTaskCreatorUpgradeable is AutomateReadyUpgradeable {
 
         return abi.encode(TriggerType.CRON, triggerConfig);
     }
+
+    function _blockTriggerModuleArg() internal pure returns (bytes memory) {
+        return abi.encode(TriggerType.BLOCK);
+    }
 }

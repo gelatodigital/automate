@@ -129,6 +129,22 @@ contract AutomateTaskCreatorTest is AutomateTaskCreator {
         return moduleData;
     }
 
+    function blockTriggerModuleData()
+        external
+        pure
+        returns (ModuleData memory)
+    {
+        ModuleData memory moduleData = ModuleData({
+            modules: new Module[](1),
+            args: new bytes[](1)
+        });
+
+        moduleData.modules[0] = Module.TRIGGER;
+        moduleData.args[0] = _blockTriggerModuleArg();
+
+        return moduleData;
+    }
+
     function resolverModuleArgs() public pure returns (address, bytes memory) {
         return (0x1d810c54fa36a9Af4c9f547328CBe91f41444c19, "0xcf5303cf");
     }
