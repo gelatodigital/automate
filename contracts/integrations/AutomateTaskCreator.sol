@@ -116,6 +116,8 @@ abstract contract AutomateTaskCreator is AutomateReady {
     }
 
     function _blockTriggerModuleArg() internal pure returns (bytes memory) {
-        return abi.encode(TriggerType.BLOCK);
+        bytes memory triggerConfig = abi.encode(bytes(""));
+
+        return abi.encode(TriggerType.BLOCK, triggerConfig);
     }
 }
