@@ -112,11 +112,6 @@ const config: HardhatUserConfig = {
       chainId: 1101,
       accounts: PROD_PK ? [PROD_PK] : [],
     },
-    zkatana: {
-      url: "https://rpc.zkatana.gelato.digital",
-      chainId: 1261120,
-      accounts: PROD_PK ? [PROD_PK] : [],
-    },
     zksync: {
       zksync: true,
       url: "https://mainnet.era.zksync.io",
@@ -157,6 +152,16 @@ const config: HardhatUserConfig = {
     ogoerli: {
       url: `https://opt-goerli.g.alchemy.com/v2/${ALCHEMY_ID}`,
       chainId: 420,
+      accounts: PROD_PK ? [PROD_PK] : [],
+    },
+    sepolia: {
+      url: `https://eth-sepolia.g.alchemy.com/v2/${ALCHEMY_ID}`,
+      chainId: 11155111,
+      accounts: PROD_PK ? [PROD_PK] : [],
+    },
+    zkatana: {
+      url: "https://rpc.zkatana.gelato.digital",
+      chainId: 1261120,
       accounts: PROD_PK ? [PROD_PK] : [],
     },
   },

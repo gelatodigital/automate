@@ -15,6 +15,7 @@ export const getGelatoAddress = (network: string): string => {
   const GELATO_BASE = "0x08EFb6D315c7e74C39620c9AAEA289730f43a429";
   const GELATO_POLYGON_ZK = "0x08EFb6D315c7e74C39620c9AAEA289730f43a429";
   const GELATO_ZKATANA = "0xF82D64357D9120a760e1E4C75f646C0618eFc2F3";
+  const GELATO_SEPOLIA = "0xCf8EDB3333Fae73b23f689229F4De6Ac95d1f707";
 
   const GELATO_GOERLI = "0x683913B3A32ada4F8100458A3E1675425BdAa7DF";
   const GELATO_MUMBAI = "0x25aD59adbe00C2d80c86d01e2E05e1294DA84823";
@@ -73,6 +74,8 @@ export const getGelatoAddress = (network: string): string => {
       return GELATO_POLYGON_ZK;
     case "zkatana":
       return GELATO_ZKATANA;
+    case "sepolia":
+      return GELATO_SEPOLIA;
     case "hardhat":
       return GELATO_MAINNET;
     default:
