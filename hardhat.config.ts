@@ -159,6 +159,11 @@ const config: HardhatUserConfig = {
       chainId: 11155111,
       accounts: PROD_PK ? [PROD_PK] : [],
     },
+    unreal: {
+      url: `https://rpc.unreal.gelato.digital`,
+      chainId: 18231,
+      accounts: PROD_PK ? [PROD_PK] : [],
+    },
     zkatana: {
       url: "https://rpc.zkatana.gelato.digital",
       chainId: 1261120,
