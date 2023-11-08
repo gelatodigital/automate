@@ -1,78 +1,38 @@
-export const getGelatoAddress = (network: string): string => {
-  const GELATO_MAINNET = "0x3caca7b48d0573d793d3b0279b5f0029180e83b6";
-  const GELATO_POLYGON = "0x7598e84B2E114AB62CAB288CE5f7d5f6bad35BbA";
-  const GELATO_FANTOM = "0xebA27A2301975FF5BF7864b99F55A4f7A457ED10";
-  const GELATO_AVALANCHE = "0x7C5c4Af1618220C090A6863175de47afb20fa9Df";
-  const GELATO_ARBITRUM = "0x4775aF8FEf4809fE10bf05867d2b038a4b5B2146";
-  const GELATO_BSC = "0x7C5c4Af1618220C090A6863175de47afb20fa9Df";
-  const GELATO_GNOSIS = "0x29b6603D17B9D8f021EcB8845B6FD06E1Adf89DE";
-  const GELATO_OPTIMISM = "0x01051113D81D7d6DA508462F2ad6d7fD96cF42Ef";
-  const GELATO_MOONBEAM = "0x91f2A140cA47DdF438B9c583b7E71987525019bB";
-  const GELATO_MOONRIVER = "0x91f2A140cA47DdF438B9c583b7E71987525019bB";
-  const GELATO_CRONOS = "0x91f2A140cA47DdF438B9c583b7E71987525019bB";
-  const GELATO_ZKSYNC = "0x52cb9f60225aA830AE420126BC8e3d5B2fc5bCf4";
-  const GELATO_LINEA = "0xc2a813699bF2353380c625e3D6b544dC42963941";
-  const GELATO_BASE = "0x08EFb6D315c7e74C39620c9AAEA289730f43a429";
-  const GELATO_POLYGON_ZK = "0x08EFb6D315c7e74C39620c9AAEA289730f43a429";
+export const getGelatoAddress = (network: string) => {
+  const addresses: { [network: string]: string } = {
+    arbgoerli: "0xF82D64357D9120a760e1E4C75f646C0618eFc2F3",
+    arbitrum: "0x4775aF8FEf4809fE10bf05867d2b038a4b5B2146",
+    avalanche: "0x7C5c4Af1618220C090A6863175de47afb20fa9Df",
+    base: "0x08EFb6D315c7e74C39620c9AAEA289730f43a429",
+    baseGoerli: "0xbe77Cd403Be3F2C7EEBC3427360D3f9e5d528F43",
+    bsc: "0x7C5c4Af1618220C090A6863175de47afb20fa9Df",
+    cronos: "0x91f2A140cA47DdF438B9c583b7E71987525019bB",
+    fantom: "0xebA27A2301975FF5BF7864b99F55A4f7A457ED10",
+    geloptestnet: "0xF82D64357D9120a760e1E4C75f646C0618eFc2F3",
+    gnosis: "0x29b6603D17B9D8f021EcB8845B6FD06E1Adf89DE",
+    goerli: "0x683913B3A32ada4F8100458A3E1675425BdAa7DF",
+    hardhat: "0x3caca7b48d0573d793d3b0279b5f0029180e83b6",
+    linea: "0xc2a813699bF2353380c625e3D6b544dC42963941",
+    mainnet: "0x3caca7b48d0573d793d3b0279b5f0029180e83b6",
+    moonbeam: "0x91f2A140cA47DdF438B9c583b7E71987525019bB",
+    moonriver: "0x91f2A140cA47DdF438B9c583b7E71987525019bB",
+    mumbai: "0x25aD59adbe00C2d80c86d01e2E05e1294DA84823",
+    mumbaiDev: "0x266E4AB6baD069aFc28d3C2CC129f6F8455b1dc2",
+    ogoerli: "0xF82D64357D9120a760e1E4C75f646C0618eFc2F3",
+    optimism: "0x01051113D81D7d6DA508462F2ad6d7fD96cF42Ef",
+    polygon: "0x7598e84B2E114AB62CAB288CE5f7d5f6bad35BbA",
+    polygonzk: "0x08EFb6D315c7e74C39620c9AAEA289730f43a429",
+    sepolia: "0xCf8EDB3333Fae73b23f689229F4De6Ac95d1f707",
+    unreal: "0xF82D64357D9120a760e1E4C75f646C0618eFc2F3",
+    zkatana: "0xF82D64357D9120a760e1E4C75f646C0618eFc2F3",
+    zksync: "0x52cb9f60225aA830AE420126BC8e3d5B2fc5bCf4",
+    zksyncGoerli: "0x296530a4224D5A5669a3f0C772EC7337ca3D3f1d",
+    zksyncLocal: "0x52cb9f60225aA830AE420126BC8e3d5B2fc5bCf4",
+  };
 
-  const GELATO_GOERLI = "0x683913B3A32ada4F8100458A3E1675425BdAa7DF";
-  const GELATO_MUMBAI = "0x25aD59adbe00C2d80c86d01e2E05e1294DA84823";
-  const GELATO_AGOERLI = "0xF82D64357D9120a760e1E4C75f646C0618eFc2F3";
-  const GELATO_OGOERLI = "0xF82D64357D9120a760e1E4C75f646C0618eFc2F3";
-  const GELATO_BASEGOERLI = "0xbe77Cd403Be3F2C7EEBC3427360D3f9e5d528F43";
-  const GELATO_ZKSYNCGOERLI = "0x296530a4224D5A5669a3f0C772EC7337ca3D3f1d";
-
-  const GELATO_MUMBAI_DEV = "0x266E4AB6baD069aFc28d3C2CC129f6F8455b1dc2";
-
-  switch (network) {
-    case "mainnet":
-      return GELATO_MAINNET;
-    case "goerli":
-      return GELATO_GOERLI;
-    case "polygon":
-      return GELATO_POLYGON;
-    case "fantom":
-      return GELATO_FANTOM;
-    case "avalanche":
-      return GELATO_AVALANCHE;
-    case "arbitrum":
-      return GELATO_ARBITRUM;
-    case "base":
-      return GELATO_BASE;
-    case "bsc":
-      return GELATO_BSC;
-    case "gnosis":
-      return GELATO_GNOSIS;
-    case "mumbai":
-      return GELATO_MUMBAI;
-    case "mumbaiDev":
-      return GELATO_MUMBAI_DEV;
-    case "optimism":
-      return GELATO_OPTIMISM;
-    case "moonbeam":
-      return GELATO_MOONBEAM;
-    case "moonriver":
-      return GELATO_MOONRIVER;
-    case "arbgoerli":
-      return GELATO_AGOERLI;
-    case "baseGoerli":
-      return GELATO_BASEGOERLI;
-    case "ogoerli":
-      return GELATO_OGOERLI;
-    case "cronos":
-      return GELATO_CRONOS;
-    case "zksync":
-    case "zksyncLocal":
-      return GELATO_ZKSYNC;
-    case "zksyncGoerli":
-      return GELATO_ZKSYNCGOERLI;
-    case "linea":
-      return GELATO_LINEA;
-    case "polygonzk":
-      return GELATO_POLYGON_ZK;
-    case "hardhat":
-      return GELATO_MAINNET;
-    default:
-      throw new Error("No gelato address for network");
+  if (!addresses[network]) {
+    throw new Error("No gelato address for network");
   }
+
+  return addresses[network];
 };
