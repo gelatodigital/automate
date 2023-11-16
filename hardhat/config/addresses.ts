@@ -2,6 +2,7 @@ export const getGelatoAddress = (network: string) => {
   const addresses: { [network: string]: string } = {
     arbgoerli: "0xF82D64357D9120a760e1E4C75f646C0618eFc2F3",
     arbitrum: "0x4775aF8FEf4809fE10bf05867d2b038a4b5B2146",
+    arbsepolia: "0xF82D64357D9120a760e1E4C75f646C0618eFc2F3",
     avalanche: "0x7C5c4Af1618220C090A6863175de47afb20fa9Df",
     base: "0x08EFb6D315c7e74C39620c9AAEA289730f43a429",
     baseGoerli: "0xbe77Cd403Be3F2C7EEBC3427360D3f9e5d528F43",
@@ -20,6 +21,7 @@ export const getGelatoAddress = (network: string) => {
     mumbaiDev: "0x266E4AB6baD069aFc28d3C2CC129f6F8455b1dc2",
     ogoerli: "0xF82D64357D9120a760e1E4C75f646C0618eFc2F3",
     optimism: "0x01051113D81D7d6DA508462F2ad6d7fD96cF42Ef",
+    osepolia: "0x2d4E9d6ac373d09033BF0b6579A881bF84B9Ee3A",
     polygon: "0x7598e84B2E114AB62CAB288CE5f7d5f6bad35BbA",
     polygonzk: "0x08EFb6D315c7e74C39620c9AAEA289730f43a429",
     sepolia: "0xCf8EDB3333Fae73b23f689229F4De6Ac95d1f707",

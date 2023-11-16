@@ -134,6 +134,11 @@ const config: HardhatUserConfig = {
       chainId: 421613,
       accounts: PROD_PK ? [PROD_PK] : [],
     },
+    arbsepolia: {
+      url: `https://sepolia-rollup.arbitrum.io/rpc`,
+      chainId: 421614,
+      accounts: PROD_PK ? [PROD_PK] : [],
+    },
     baseGoerli: {
       url: "https://goerli.base.org",
       chainId: 84531,
@@ -157,6 +162,11 @@ const config: HardhatUserConfig = {
     ogoerli: {
       url: `https://opt-goerli.g.alchemy.com/v2/${ALCHEMY_ID}`,
       chainId: 420,
+      accounts: PROD_PK ? [PROD_PK] : [],
+    },
+    osepolia: {
+      url: `https://sepolia.optimism.io`,
+      chainId: 11155420,
       accounts: PROD_PK ? [PROD_PK] : [],
     },
     sepolia: {
