@@ -63,15 +63,7 @@ contract OpsProxy is Proxied, IOpsProxy {
         bytes calldata _data,
         uint256 _value
     ) private {
-        (, bytes memory returnData) = _call(
-            _target,
-            _data,
-            _value,
-            true,
-            "OpsProxy.executeCall: "
-        );
-
-        emit ExecuteCall(_target, _data, _value, returnData);
+        _call(_target, _data, _value, true, "OpsProxy.executeCall: ");
     }
 
     function _getTaskCreator() private pure returns (address taskCreator) {
