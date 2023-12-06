@@ -12,6 +12,7 @@ import {LibDataTypes} from "./libraries/LibDataTypes.sol";
 import {LibEvents} from "./libraries/LibEvents.sol";
 import {LibTaskId} from "./libraries/LibTaskId.sol";
 import {LibTaskModule} from "./libraries/LibTaskModule.sol";
+import {LibSimpleTaskModule} from "./libraries/LibSimpleTaskModule.sol";
 import {IAutomate} from "./interfaces/IAutomate.sol";
 
 /**
@@ -154,6 +155,43 @@ contract Automate is Gelatofied, Proxied, AutomateStorage, IAutomate {
             taskId,
             success
         );
+
+        emit LogUseGelato1Balance(
+            _oneBalanceParam.sponsor,
+            _execAddress,
+            _oneBalanceParam.feeToken,
+            _oneBalanceParam.oneBalanceChainId,
+            _oneBalanceParam.nativeToFeeTokenXRateNumerator,
+            _oneBalanceParam.nativeToFeeTokenXRateDenominator,
+            _oneBalanceParam.correlationId
+        );
+    }
+
+    function exec1BalanceSimple(
+        address _taskCreator,
+        address _execAddress,
+        bytes memory _execData,
+        bytes32 _taskId,
+        Gelato1BalanceParam calldata _oneBalanceParam,
+        bool _revertOnFailure,
+        bool _singleExec
+    ) external onlyGelato {
+        require(
+            _createdTasks[_taskCreator].contains(_taskId),
+            "Automate.exec: Task not found"
+        );
+
+        bool success = LibSimpleTaskModule.onExecTask(
+            _taskId,
+            _taskCreator,
+            _execAddress,
+            _execData,
+            _revertOnFailure,
+            _singleExec,
+            taskModuleAddresses
+        );
+
+        emit LibEvents.ExecSuccess1Balance(_taskId, success);
 
         emit LogUseGelato1Balance(
             _oneBalanceParam.sponsor,
