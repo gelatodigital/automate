@@ -50,4 +50,12 @@ library LibEvents {
         bytes32 taskId,
         bool callSuccess
     );
+
+    /**
+     * @notice Emitted when `exec1Balance` is called.
+     *
+     * @param taskId Unique hash of the task. {See LibTaskId-getTaskId}
+     * @param callSuccess Status of the call to execAddress.
+     */
+    event ExecSuccess1Balance(bytes32 taskId, bool callSuccess);
 }
