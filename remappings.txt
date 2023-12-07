@@ -1,0 +1,7 @@
+ds-test/=lib/forge-std/lib/ds-test/src/
+forge-std/=lib/forge-std/src/
+hardhat/=node_modules/hardhat/
+prb/-est/=lib/prb-test/src/
+openzeppelin-contracts/=lib/openzeppelin-contracts/contracts/
+@openzeppelin/contracts/=node_modules/@openzeppelin/contracts
+@openzeppelin/contracts-upgradeable/=node_modules/@openzeppelin/contracts-upgradeable
