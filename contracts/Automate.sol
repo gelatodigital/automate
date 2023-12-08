@@ -156,23 +156,15 @@ contract Automate is Gelatofied, Proxied, AutomateStorage, IAutomate {
             success
         );
 
-        emit LogUseGelato1Balance(
-            _oneBalanceParam.sponsor,
-            _execAddress,
-            _oneBalanceParam.feeToken,
-            _oneBalanceParam.oneBalanceChainId,
-            _oneBalanceParam.nativeToFeeTokenXRateNumerator,
-            _oneBalanceParam.nativeToFeeTokenXRateDenominator,
-            _oneBalanceParam.correlationId
-        );
+        emit LogUseGelato1Balance(_oneBalanceParam.correlationId);
     }
 
     function exec1BalanceSimple(
         address _taskCreator,
         address _execAddress,
-        bytes memory _execData,
         bytes32 _taskId,
-        Gelato1BalanceParam calldata _oneBalanceParam,
+        bytes32 _correlationId,
+        bytes memory _execData,
         bool _revertOnFailure,
         bool _singleExec
     ) external onlyGelato {
@@ -193,15 +185,7 @@ contract Automate is Gelatofied, Proxied, AutomateStorage, IAutomate {
 
         emit LibEvents.ExecSuccess1Balance(_taskId, success);
 
-        emit LogUseGelato1Balance(
-            _oneBalanceParam.sponsor,
-            _execAddress,
-            _oneBalanceParam.feeToken,
-            _oneBalanceParam.oneBalanceChainId,
-            _oneBalanceParam.nativeToFeeTokenXRateNumerator,
-            _oneBalanceParam.nativeToFeeTokenXRateDenominator,
-            _oneBalanceParam.correlationId
-        );
+        emit LogUseGelato1Balance(_correlationId);
     }
 
     ///@inheritdoc IAutomate
