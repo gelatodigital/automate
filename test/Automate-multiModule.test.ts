@@ -211,8 +211,6 @@ describe("Automate multi module test", function () {
     const countBefore = await counter.count();
     const [, execData] = await counterResolver.checker();
 
-    const target = counter.address;
-
     const gelato1BalanceParam = getGelato1BalanceParam({});
 
     await expect(
@@ -228,15 +226,7 @@ describe("Automate multi module test", function () {
         )
     )
       .to.emit(automate, "LogUseGelato1Balance")
-      .withArgs(
-        gelato1BalanceParam.sponsor,
-        target,
-        gelato1BalanceParam.feeToken,
-        gelato1BalanceParam.oneBalanceChainId,
-        gelato1BalanceParam.nativeToFeeTokenXRateNumerator,
-        gelato1BalanceParam.nativeToFeeTokenXRateDenominator,
-        gelato1BalanceParam.correlationId
-      );
+      .withArgs(gelato1BalanceParam.correlationId);
 
     const countAfter = await counter.count();
 
