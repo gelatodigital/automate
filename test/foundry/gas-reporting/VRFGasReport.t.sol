@@ -102,9 +102,9 @@ contract VRFGasReport is AutomateModuleHelper, Contracts {
         automate.exec1BalanceSimple(
             _users.user,
             _dedicatedMsgSender,
-            execData,
             taskId,
-            _mock1BalanceParam(),
+            _mockCorrelationId(),
+            execData,
             true,
             false
         );
@@ -213,7 +213,11 @@ contract VRFGasReport is AutomateModuleHelper, Contracts {
             oneBalanceChainId: 5,
             nativeToFeeTokenXRateNumerator: 1,
             nativeToFeeTokenXRateDenominator: 1,
-            correlationId: keccak256("correlationId")
+            correlationId: _mockCorrelationId()
         });
+    }
+
+    function _mockCorrelationId() private view returns (bytes32 correlationId) {
+        correlationId = keccak256("correlationId");
     }
 }
