@@ -116,6 +116,28 @@ describe("Automate SingleExec module test", function () {
     expect(taskIds).not.include(taskId);
   });
 
+  it("exec1BalanceSimple", async () => {
+    const countBefore = await counter.count();
+
+    await automate
+      .connect(executor)
+      .exec1BalanceSimple(
+        userAddress,
+        counter.address,
+        taskId,
+        ethers.constants.HashZero,
+        execData,
+        true,
+        true
+      );
+
+    const countAfter = await counter.count();
+    expect(countAfter).to.be.gt(countBefore);
+
+    const taskIds = await automate.getTaskIdsByUser(userAddress);
+    expect(taskIds).not.include(taskId);
+  });
+
   const execute = async (revertOnFailure: boolean) => {
     const gelato1BalanceParam = getGelato1BalanceParam({});
 
