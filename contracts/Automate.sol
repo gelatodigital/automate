@@ -159,6 +159,7 @@ contract Automate is Gelatofied, Proxied, AutomateStorage, IAutomate {
         emit LogUseGelato1Balance(_oneBalanceParam.correlationId);
     }
 
+    ///@inheritdoc IAutomate
     function exec1BalanceSimple(
         address _taskCreator,
         address _execAddress,
@@ -183,7 +184,7 @@ contract Automate is Gelatofied, Proxied, AutomateStorage, IAutomate {
             taskModuleAddresses
         );
 
-        emit LibEvents.ExecSuccess1Balance(_taskId, success);
+        emit LibEvents.ExecSuccess1BalanceSimple(_taskId, success);
 
         emit LogUseGelato1Balance(_correlationId);
     }

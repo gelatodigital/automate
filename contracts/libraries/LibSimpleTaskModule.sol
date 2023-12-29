@@ -9,12 +9,12 @@ import {LibTaskModuleConfig} from "./LibTaskModuleConfig.sol";
 import {ITaskModule} from "../interfaces/ITaskModule.sol";
 
 // solhint-disable function-max-lines
-/// @notice Library to call task modules on task creation and execution.
+/// @notice Simplified library for task executions
 library LibSimpleTaskModule {
     using LibTaskModuleConfig for LibDataTypes.Module;
 
     /**
-     * @notice Delegate calls task modules on exec.
+     * @notice Delegate calls SingleExecModule on exec for single exec tasks.
      *
      * @param _taskId Unique hash of the task. {See LibTaskId-getTaskId}
      * @param _taskCreator Address which created the task.
