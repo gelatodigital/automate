@@ -233,6 +233,33 @@ describe("Automate multi module test", function () {
     expect(countAfter).to.be.gt(countBefore);
   });
 
+  it("exec1BalanceSimple", async () => {
+    const countBefore = await counter.count();
+    const [, execData] = await counterResolver.checker();
+
+    const dmsExecData = opsProxy.interface.encodeFunctionData("executeCall", [
+      counter.address,
+      execData,
+      0,
+    ]);
+
+    await automate
+      .connect(executor)
+      .exec1BalanceSimple(
+        userAddress,
+        opsProxy.address,
+        taskId,
+        ethers.constants.HashZero,
+        dmsExecData,
+        true,
+        false
+      );
+
+    const countAfter = await counter.count();
+
+    expect(countAfter).to.be.gt(countBefore);
+  });
+
   const execute = async (revertOnFailure: boolean) => {
     const [, execData] = await counterResolver.checker();
 
