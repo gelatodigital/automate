@@ -144,6 +144,11 @@ const config: HardhatUserConfig = {
       chainId: 84531,
       accounts: PROD_PK ? [PROD_PK] : [],
     },
+    gelopcelestiatestnet: {
+      url: `https://rpc.op-celestia-testnet.gelato.digital`,
+      chainId: 123420111,
+      accounts: PROD_PK ? [PROD_PK] : [],
+    },
     geloptestnet: {
       url: `https://rpc.op-testnet.gelato.digital`,
       chainId: 42069,
