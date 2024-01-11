@@ -181,7 +181,7 @@ contract Automate is Gelatofied, Proxied, AutomateStorage, IAutomate {
             _execData,
             _revertOnFailure,
             _singleExec,
-            taskModuleAddresses
+            _createdTasks
         );
 
         emit LibEvents.ExecSuccess1BalanceSimple(_taskId, success);

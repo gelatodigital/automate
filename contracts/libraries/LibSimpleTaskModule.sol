@@ -2,8 +2,12 @@
 
 pragma solidity ^0.8.12;
 
+import {
+    EnumerableSet
+} from "@openzeppelin/contracts/utils/structs/EnumerableSet.sol";
 import {_call, _delegateCall} from "../functions/FExec.sol";
 import {LibDataTypes} from "./LibDataTypes.sol";
+import {LibEvents} from "./LibEvents.sol";
 import {LibTaskModule} from "./LibTaskModule.sol";
 import {LibTaskModuleConfig} from "./LibTaskModuleConfig.sol";
 import {ITaskModule} from "../interfaces/ITaskModule.sol";
@@ -11,6 +15,7 @@ import {ITaskModule} from "../interfaces/ITaskModule.sol";
 // solhint-disable function-max-lines
 /// @notice Simplified library for task executions
 library LibSimpleTaskModule {
+    using EnumerableSet for EnumerableSet.Bytes32Set;
     using LibTaskModuleConfig for LibDataTypes.Module;
 
     /**
@@ -22,7 +27,7 @@ library LibSimpleTaskModule {
      * @param _execData Execution data to be called with / function selector.
      * @param _revertOnFailure To revert or not if call to execAddress fails.
      * @param _singleExec If task is a single exec task.
-     * @param taskModuleAddresses The storage reference to the mapping of modules to their address.
+     * @param _createdTasks The storage reference of owner to the taskIds created mapping.
      */
     function onExecTask(
         bytes32 _taskId,
@@ -31,7 +36,7 @@ library LibSimpleTaskModule {
         bytes memory _execData,
         bool _revertOnFailure,
         bool _singleExec,
-        mapping(LibDataTypes.Module => address) storage taskModuleAddresses
+        mapping(address => EnumerableSet.Bytes32Set) storage _createdTasks
     ) internal returns (bool callSuccess) {
         (callSuccess, ) = _call(
             _execAddress,
@@ -42,22 +47,8 @@ library LibSimpleTaskModule {
         );
 
         if (_singleExec) {
-            LibDataTypes.Module[] memory modules = new LibDataTypes.Module[](1);
-            address[] memory moduleAddresses = new address[](1);
-
-            modules[0] = LibDataTypes.Module.SINGLE_EXEC;
-            moduleAddresses[0] = taskModuleAddresses[
-                LibDataTypes.Module.SINGLE_EXEC
-            ];
-
-            LibTaskModule.postExecCall(
-                _taskId,
-                _taskCreator,
-                _execAddress,
-                _execData,
-                modules,
-                moduleAddresses
-            );
+            _createdTasks[_taskCreator].remove(_taskId);
+            emit LibEvents.TaskCancelled(_taskId, _taskCreator);
         }
     }
 }
