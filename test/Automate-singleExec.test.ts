@@ -116,12 +116,12 @@ describe("Automate SingleExec module test", function () {
     expect(taskIds).not.include(taskId);
   });
 
-  it("exec1BalanceSimple", async () => {
+  it("execBypassModule", async () => {
     const countBefore = await counter.count();
 
     await automate
       .connect(executor)
-      .exec1BalanceSimple(
+      .execBypassModule(
         userAddress,
         counter.address,
         taskId,

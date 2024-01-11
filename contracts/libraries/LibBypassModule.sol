@@ -14,7 +14,7 @@ import {ITaskModule} from "../interfaces/ITaskModule.sol";
 
 // solhint-disable function-max-lines
 /// @notice Simplified library for task executions
-library LibSimpleTaskModule {
+library LibBypassModule {
     using EnumerableSet for EnumerableSet.Bytes32Set;
     using LibTaskModuleConfig for LibDataTypes.Module;
 

@@ -12,7 +12,7 @@ import {LibDataTypes} from "./libraries/LibDataTypes.sol";
 import {LibEvents} from "./libraries/LibEvents.sol";
 import {LibTaskId} from "./libraries/LibTaskId.sol";
 import {LibTaskModule} from "./libraries/LibTaskModule.sol";
-import {LibSimpleTaskModule} from "./libraries/LibSimpleTaskModule.sol";
+import {LibBypassModule} from "./libraries/LibBypassModule.sol";
 import {IAutomate} from "./interfaces/IAutomate.sol";
 
 /**
@@ -160,7 +160,7 @@ contract Automate is Gelatofied, Proxied, AutomateStorage, IAutomate {
     }
 
     ///@inheritdoc IAutomate
-    function exec1BalanceSimple(
+    function execBypassModule(
         address _taskCreator,
         address _execAddress,
         bytes32 _taskId,
@@ -174,7 +174,7 @@ contract Automate is Gelatofied, Proxied, AutomateStorage, IAutomate {
             "Automate.exec: Task not found"
         );
 
-        bool success = LibSimpleTaskModule.onExecTask(
+        bool success = LibBypassModule.onExecTask(
             _taskId,
             _taskCreator,
             _execAddress,
@@ -184,7 +184,7 @@ contract Automate is Gelatofied, Proxied, AutomateStorage, IAutomate {
             _createdTasks
         );
 
-        emit LibEvents.ExecSuccess1BalanceSimple(_taskId, success);
+        emit LibEvents.ExecBypassModuleSuccess(_taskId, success);
 
         emit LogUseGelato1Balance(_correlationId);
     }

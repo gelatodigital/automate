@@ -80,7 +80,7 @@ interface IAutomate is IGelato1Balance {
      * @param revertOnFailure To revert or not if call to execAddress fails. (Used for off-chain simulations)
      * @param singleExec If the task is a SingleExec task. If true, task will be cancelled after execution.
      */
-    function exec1BalanceSimple(
+    function execBypassModule(
         address taskCreator,
         address execAddress,
         bytes32 taskId,
