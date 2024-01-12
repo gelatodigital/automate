@@ -1,0 +1,218 @@
+{
+  "address": "0x49A3Bb231f1e92C4F901B83B980f85da841E8080",
+  "abi": [
+    {
+      "inputs": [
+        {
+          "internalType": "address",
+          "name": "_ops",
+          "type": "address"
+        }
+      ],
+      "stateMutability": "nonpayable",
+      "type": "constructor"
+    },
+    {
+      "anonymous": false,
+      "inputs": [
+        {
+          "indexed": true,
+          "internalType": "address",
+          "name": "target",
+          "type": "address"
+        },
+        {
+          "indexed": false,
+          "internalType": "bytes",
+          "name": "data",
+          "type": "bytes"
+        },
+        {
+          "indexed": false,
+          "internalType": "uint256",
+          "name": "value",
+          "type": "uint256"
+        },
+        {
+          "indexed": false,
+          "internalType": "bytes",
+          "name": "returnData",
+          "type": "bytes"
+        }
+      ],
+      "name": "ExecuteCall",
+      "type": "event"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "address[]",
+          "name": "_targets",
+          "type": "address[]"
+        },
+        {
+          "internalType": "bytes[]",
+          "name": "_datas",
+          "type": "bytes[]"
+        },
+        {
+          "internalType": "uint256[]",
+          "name": "_values",
+          "type": "uint256[]"
+        }
+      ],
+      "name": "batchExecuteCall",
+      "outputs": [],
+      "stateMutability": "payable",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "address",
+          "name": "_target",
+          "type": "address"
+        },
+        {
+          "internalType": "bytes",
+          "name": "_data",
+          "type": "bytes"
+        },
+        {
+          "internalType": "uint256",
+          "name": "_value",
+          "type": "uint256"
+        }
+      ],
+      "name": "executeCall",
+      "outputs": [],
+      "stateMutability": "payable",
+      "type": "function"
+    },
+    {
+      "inputs": [],
+      "name": "ops",
+      "outputs": [
+        {
+          "internalType": "address",
+          "name": "",
+          "type": "address"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [],
+      "name": "owner",
+      "outputs": [
+        {
+          "internalType": "address",
+          "name": "",
+          "type": "address"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [],
+      "name": "version",
+      "outputs": [
+        {
+          "internalType": "uint256",
+          "name": "",
+          "type": "uint256"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "stateMutability": "payable",
+      "type": "receive"
+    }
+  ],
+  "transactionHash": "0x4ce8f40be77f4da405a50f8b44464af1efb0a937dd257edcd507a8d6668f1d76",
+  "receipt": {
+    "to": null,
+    "from": "0xF1108379d71ff2A785899F4C36010f841F1Fea04",
+    "contractAddress": "0x49A3Bb231f1e92C4F901B83B980f85da841E8080",
+    "transactionIndex": 1,
+    "gasUsed": "1040107",
+    "logsBloom": "0x00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000",
+    "blockHash": "0xbf900117d2315bd8e87c32627d6264f6d20df54bd8cac53b0a035ca93f89b7d5",
+    "transactionHash": "0x4ce8f40be77f4da405a50f8b44464af1efb0a937dd257edcd507a8d6668f1d76",
+    "logs": [],
+    "blockNumber": 853652,
+    "cumulativeGasUsed": "1090596",
+    "status": 1,
+    "byzantium": true
+  },
+  "args": ["0x2A6C106ae13B558BB9E2Ec64Bd2f1f7BEFF3A5E0"],
+  "numDeployments": 1,
+  "solcInputHash": "6b8e62dda7b180fb31163b9e8eb5473d",
+  "metadata": "{\"compiler\":{\"version\":\"0.8.14+commit.80d49f37\"},\"language\":\"Solidity\",\"output\":{\"abi\":[{\"inputs\":[{\"internalType\":\"address\",\"name\":\"_ops\",\"type\":\"address\"}],\"stateMutability\":\"nonpayable\",\"type\":\"constructor\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":true,\"internalType\":\"address\",\"name\":\"target\",\"type\":\"address\"},{\"indexed\":false,\"internalType\":\"bytes\",\"name\":\"data\",\"type\":\"bytes\"},{\"indexed\":false,\"internalType\":\"uint256\",\"name\":\"value\",\"type\":\"uint256\"},{\"indexed\":false,\"internalType\":\"bytes\",\"name\":\"returnData\",\"type\":\"bytes\"}],\"name\":\"ExecuteCall\",\"type\":\"event\"},{\"inputs\":[{\"internalType\":\"address[]\",\"name\":\"_targets\",\"type\":\"address[]\"},{\"internalType\":\"bytes[]\",\"name\":\"_datas\",\"type\":\"bytes[]\"},{\"internalType\":\"uint256[]\",\"name\":\"_values\",\"type\":\"uint256[]\"}],\"name\":\"batchExecuteCall\",\"outputs\":[],\"stateMutability\":\"payable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"_target\",\"type\":\"address\"},{\"internalType\":\"bytes\",\"name\":\"_data\",\"type\":\"bytes\"},{\"internalType\":\"uint256\",\"name\":\"_value\",\"type\":\"uint256\"}],\"name\":\"executeCall\",\"outputs\":[],\"stateMutability\":\"payable\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"ops\",\"outputs\":[{\"internalType\":\"address\",\"name\":\"\",\"type\":\"address\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"owner\",\"outputs\":[{\"internalType\":\"address\",\"name\":\"\",\"type\":\"address\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"version\",\"outputs\":[{\"internalType\":\"uint256\",\"name\":\"\",\"type\":\"uint256\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"stateMutability\":\"payable\",\"type\":\"receive\"}],\"devdoc\":{\"kind\":\"dev\",\"methods\":{\"batchExecuteCall(address[],bytes[],uint256[])\":{\"params\":{\"datas\":\"Datas for each contract call.\",\"targets\":\"Addresses of contracts to be called.\",\"values\":\"Native token value for each contract call.\"}},\"executeCall(address,bytes,uint256)\":{\"params\":{\"data\":\"Data for contract call.\",\"target\":\"Address of contracts to be called.\",\"value\":\"Native token value for contract call.\"}},\"owner()\":{\"returns\":{\"_0\":\"address Owner of the proxy\"}}},\"stateVariables\":{\"ops\":{\"return\":\"address Ops smart contract address\",\"returns\":{\"_0\":\"address Ops smart contract address\"}},\"version\":{\"return\":\"uint256 version of OpsProxy.\",\"returns\":{\"_0\":\"uint256 version of OpsProxy.\"}}},\"version\":1},\"userdoc\":{\"events\":{\"ExecuteCall(address,bytes,uint256,bytes)\":{\"notice\":\"Emitted when proxy calls a contract successfully in `executeCall`\"}},\"kind\":\"user\",\"methods\":{\"batchExecuteCall(address[],bytes[],uint256[])\":{\"notice\":\"Multicall to different contracts with different datas.\"},\"executeCall(address,bytes,uint256)\":{\"notice\":\"Call to a single contract.\"}},\"version\":1}},\"settings\":{\"compilationTarget\":{\"contracts/opsProxy/OpsProxy.sol\":\"OpsProxy\"},\"evmVersion\":\"london\",\"libraries\":{},\"metadata\":{\"bytecodeHash\":\"ipfs\",\"useLiteralContent\":true},\"optimizer\":{\"enabled\":false,\"runs\":200},\"remappings\":[]},\"sources\":{\"contracts/functions/FExec.sol\":{\"content\":\"// SPDX-License-Identifier: MIT\\npragma solidity ^0.8.12;\\n\\nimport {GelatoBytes} from \\\"../vendor/gelato/GelatoBytes.sol\\\";\\n\\n// solhint-disable private-vars-leading-underscore\\n// solhint-disable func-visibility\\n\\nfunction _call(\\n    address _add,\\n    bytes memory _data,\\n    uint256 _value,\\n    bool _revertOnFailure,\\n    string memory _tracingInfo\\n) returns (bool success, bytes memory returnData) {\\n    (success, returnData) = _add.call{value: _value}(_data);\\n\\n    if (!success && _revertOnFailure)\\n        GelatoBytes.revertWithError(returnData, _tracingInfo);\\n}\\n\\nfunction _delegateCall(\\n    address _add,\\n    bytes memory _data,\\n    string memory _tracingInfo\\n) returns (bool success, bytes memory returnData) {\\n    (success, returnData) = _add.delegatecall(_data);\\n\\n    if (!success) GelatoBytes.revertWithError(returnData, _tracingInfo);\\n}\\n\",\"keccak256\":\"0x48375d0645cf4dfe7d3f18dc727cbb2322a09233a2e9cce9352a73acc357bf07\",\"license\":\"MIT\"},\"contracts/interfaces/IOpsProxy.sol\":{\"content\":\"// SPDX-License-Identifier: MIT\\npragma solidity ^0.8.12;\\n\\ninterface IOpsProxy {\\n    /**\\n     * @notice Emitted when proxy calls a contract successfully in `executeCall`\\n     *\\n     * @param target Address of contract that is called\\n     * @param data Data used in the call.\\n     * @param value Native token value used in the call.\\n     * @param returnData Data returned by the call.\\n     */\\n    event ExecuteCall(\\n        address indexed target,\\n        bytes data,\\n        uint256 value,\\n        bytes returnData\\n    );\\n\\n    /**\\n     * @notice Multicall to different contracts with different datas.\\n     *\\n     * @param targets Addresses of contracts to be called.\\n     * @param datas Datas for each contract call.\\n     * @param values Native token value for each contract call.\\n     */\\n    function batchExecuteCall(\\n        address[] calldata targets,\\n        bytes[] calldata datas,\\n        uint256[] calldata values\\n    ) external payable;\\n\\n    /**\\n     * @notice Call to a single contract.\\n     *\\n     * @param target Address of contracts to be called.\\n     * @param data Data for contract call.\\n     * @param value Native token value for contract call.\\n     */\\n    function executeCall(\\n        address target,\\n        bytes calldata data,\\n        uint256 value\\n    ) external payable;\\n\\n    /**\\n     * @return address Ops smart contract address\\n     */\\n    function ops() external view returns (address);\\n\\n    /**\\n     * @return address Owner of the proxy\\n     */\\n    function owner() external view returns (address);\\n\\n    /**\\n     * @return uint256 version of OpsProxy.\\n     */\\n    function version() external view returns (uint256);\\n}\\n\",\"keccak256\":\"0x1b6e349287dfeb2735da8d3f7ae0aa5865996f7dd58622773b449a76bcaf881a\",\"license\":\"MIT\"},\"contracts/opsProxy/OpsProxy.sol\":{\"content\":\"// SPDX-License-Identifier: UNLICENSED\\npragma solidity ^0.8.12;\\n\\nimport {Proxied} from \\\"../vendor/proxy/EIP173/Proxied.sol\\\";\\nimport {_call} from \\\"../functions/FExec.sol\\\";\\nimport {IOpsProxy} from \\\"../interfaces/IOpsProxy.sol\\\";\\n\\ncontract OpsProxy is Proxied, IOpsProxy {\\n    // solhint-disable const-name-snakecase\\n    uint256 public constant override version = 1;\\n    address public immutable override ops;\\n\\n    modifier onlyAuth() {\\n        address proxyOwner = owner();\\n        if (msg.sender != proxyOwner) {\\n            require(msg.sender == ops, \\\"OpsProxy: Not authorised\\\");\\n            require(\\n                _getTaskCreator() == proxyOwner,\\n                \\\"OpsProxy: Only tasks created by owner\\\"\\n            );\\n        } // else msg.sender == proxyOwner\\n        _;\\n    }\\n\\n    // solhint-disable no-empty-blocks\\n    constructor(address _ops) {\\n        ops = _ops;\\n    }\\n\\n    receive() external payable {}\\n\\n    ///@inheritdoc IOpsProxy\\n    function batchExecuteCall(\\n        address[] calldata _targets,\\n        bytes[] calldata _datas,\\n        uint256[] calldata _values\\n    ) external payable override onlyAuth {\\n        uint256 length = _targets.length;\\n        require(\\n            length == _datas.length && length == _values.length,\\n            \\\"OpsProxy: Length mismatch\\\"\\n        );\\n\\n        for (uint256 i; i < length; i++)\\n            _executeCall(_targets[i], _datas[i], _values[i]);\\n    }\\n\\n    ///@inheritdoc IOpsProxy\\n    function executeCall(\\n        address _target,\\n        bytes calldata _data,\\n        uint256 _value\\n    ) external payable override onlyAuth {\\n        _executeCall(_target, _data, _value);\\n    }\\n\\n    function owner() public view returns (address) {\\n        return _proxyAdmin();\\n    }\\n\\n    function _executeCall(\\n        address _target,\\n        bytes calldata _data,\\n        uint256 _value\\n    ) private {\\n        (, bytes memory returnData) = _call(\\n            _target,\\n            _data,\\n            _value,\\n            true,\\n            \\\"OpsProxy.executeCall: \\\"\\n        );\\n\\n        emit ExecuteCall(_target, _data, _value, returnData);\\n    }\\n\\n    function _getTaskCreator() private pure returns (address taskCreator) {\\n        assembly {\\n            taskCreator := shr(96, calldataload(sub(calldatasize(), 20)))\\n        }\\n    }\\n}\\n\",\"keccak256\":\"0xe5a2a44ed1843680adaff1fb47d27c29557e40f66492fce669f1ee7813578701\",\"license\":\"UNLICENSED\"},\"contracts/vendor/gelato/GelatoBytes.sol\":{\"content\":\"// SPDX-License-Identifier: UNLICENSED\\npragma solidity ^0.8.12;\\n\\nlibrary GelatoBytes {\\n    function calldataSliceSelector(bytes calldata _bytes)\\n        internal\\n        pure\\n        returns (bytes4 selector)\\n    {\\n        selector =\\n            _bytes[0] |\\n            (bytes4(_bytes[1]) >> 8) |\\n            (bytes4(_bytes[2]) >> 16) |\\n            (bytes4(_bytes[3]) >> 24);\\n    }\\n\\n    function memorySliceSelector(bytes memory _bytes)\\n        internal\\n        pure\\n        returns (bytes4 selector)\\n    {\\n        selector =\\n            _bytes[0] |\\n            (bytes4(_bytes[1]) >> 8) |\\n            (bytes4(_bytes[2]) >> 16) |\\n            (bytes4(_bytes[3]) >> 24);\\n    }\\n\\n    function revertWithError(bytes memory _bytes, string memory _tracingInfo)\\n        internal\\n        pure\\n    {\\n        // 68: 32-location, 32-length, 4-ErrorSelector, UTF-8 err\\n        if (_bytes.length % 32 == 4) {\\n            bytes4 selector;\\n            assembly {\\n                selector := mload(add(0x20, _bytes))\\n            }\\n            if (selector == 0x08c379a0) {\\n                // Function selector for Error(string)\\n                assembly {\\n                    _bytes := add(_bytes, 68)\\n                }\\n                revert(string(abi.encodePacked(_tracingInfo, string(_bytes))));\\n            } else {\\n                revert(\\n                    string(abi.encodePacked(_tracingInfo, \\\"NoErrorSelector\\\"))\\n                );\\n            }\\n        } else {\\n            revert(\\n                string(abi.encodePacked(_tracingInfo, \\\"UnexpectedReturndata\\\"))\\n            );\\n        }\\n    }\\n\\n    function returnError(bytes memory _bytes, string memory _tracingInfo)\\n        internal\\n        pure\\n        returns (string memory)\\n    {\\n        // 68: 32-location, 32-length, 4-ErrorSelector, UTF-8 err\\n        if (_bytes.length % 32 == 4) {\\n            bytes4 selector;\\n            assembly {\\n                selector := mload(add(0x20, _bytes))\\n            }\\n            if (selector == 0x08c379a0) {\\n                // Function selector for Error(string)\\n                assembly {\\n                    _bytes := add(_bytes, 68)\\n                }\\n                return string(abi.encodePacked(_tracingInfo, string(_bytes)));\\n            } else {\\n                return\\n                    string(abi.encodePacked(_tracingInfo, \\\"NoErrorSelector\\\"));\\n            }\\n        } else {\\n            return\\n                string(abi.encodePacked(_tracingInfo, \\\"UnexpectedReturndata\\\"));\\n        }\\n    }\\n}\\n\",\"keccak256\":\"0x6ec59b2c6f678f3bbe186677e5970e59e46a40d22881dc813c49ffb18e417951\",\"license\":\"UNLICENSED\"},\"contracts/vendor/proxy/EIP173/Proxied.sol\":{\"content\":\"// SPDX-License-Identifier: GPL-3.0\\npragma solidity ^0.8.12;\\n\\nabstract contract Proxied {\\n    /// @notice to be used by initialisation / postUpgrade function so that only the proxy's admin can execute them\\n    /// It also allows these functions to be called inside a contructor\\n    /// even if the contract is meant to be used without proxy\\n    modifier proxied() {\\n        address proxyAdminAddress = _proxyAdmin();\\n        // With hardhat-deploy proxies\\n        // the proxyAdminAddress is zero only for the implementation contract\\n        // if the implementation contract want to be used as a standalone/immutable contract\\n        // it simply has to execute the `proxied` function\\n        // This ensure the proxyAdminAddress is never zero post deployment\\n        // And allow you to keep the same code for both proxied contract and immutable contract\\n        if (proxyAdminAddress == address(0)) {\\n            // ensure can not be called twice when used outside of proxy : no admin\\n            // solhint-disable-next-line security/no-inline-assembly\\n            assembly {\\n                sstore(\\n                    0xb53127684a568b3173ae13b9f8a6016e243e63b6e8ee1178d6a717850b5d6103,\\n                    0xFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF\\n                )\\n            }\\n        } else {\\n            require(msg.sender == proxyAdminAddress);\\n        }\\n        _;\\n    }\\n\\n    modifier onlyProxyAdmin() {\\n        require(msg.sender == _proxyAdmin(), \\\"NOT_AUTHORIZED\\\");\\n        _;\\n    }\\n\\n    function _proxyAdmin() internal view returns (address adminAddress) {\\n        // solhint-disable-next-line security/no-inline-assembly\\n        assembly {\\n            adminAddress := sload(\\n                0xb53127684a568b3173ae13b9f8a6016e243e63b6e8ee1178d6a717850b5d6103\\n            )\\n        }\\n    }\\n}\\n\",\"keccak256\":\"0x428ced1961d42c505a3e49d90498f92f4b0df8537e5ffa59f14ba375d99150a1\",\"license\":\"GPL-3.0\"}},\"version\":1}",
+  "bytecode": "0x60a06040523480156200001157600080fd5b5060405162001317380380620013178339818101604052810190620000379190620000dc565b8073ffffffffffffffffffffffffffffffffffffffff1660808173ffffffffffffffffffffffffffffffffffffffff1681525050506200010e565b600080fd5b600073ffffffffffffffffffffffffffffffffffffffff82169050919050565b6000620000a48262000077565b9050919050565b620000b68162000097565b8114620000c257600080fd5b50565b600081519050620000d681620000ab565b92915050565b600060208284031215620000f557620000f462000072565b5b60006200010584828501620000c5565b91505092915050565b6080516111df6200013860003960008181610154015281816102be01526104b501526111df6000f3fe60806040526004361061004e5760003560e01c806354132d781461005a57806354fd4d50146100765780638da5cb5b146100a1578063c0e8c0c2146100cc578063e70abe92146100e857610055565b3661005557005b600080fd5b610074600480360381019061006f91906108fa565b610113565b005b34801561008257600080fd5b5061008b610269565b604051610098919061097d565b60405180910390f35b3480156100ad57600080fd5b506100b661026e565b6040516100c391906109a7565b60405180910390f35b6100e660048036038101906100e19190610ac4565b61027d565b005b3480156100f457600080fd5b506100fd6104b3565b60405161010a91906109a7565b60405180910390f35b600061011d61026e565b90508073ffffffffffffffffffffffffffffffffffffffff163373ffffffffffffffffffffffffffffffffffffffff1614610256577f000000000000000000000000000000000000000000000000000000000000000073ffffffffffffffffffffffffffffffffffffffff163373ffffffffffffffffffffffffffffffffffffffff16146101e0576040517f08c379a00000000000000000000000000000000000000000000000000000000081526004016101d790610bd5565b60405180910390fd5b8073ffffffffffffffffffffffffffffffffffffffff166101ff6104d7565b73ffffffffffffffffffffffffffffffffffffffff1614610255576040517f08c379a000000000000000000000000000000000000000000000000000000000815260040161024c90610c67565b60405180910390fd5b5b610262858585856104e6565b5050505050565b600181565b60006102786105cd565b905090565b600061028761026e565b90508073ffffffffffffffffffffffffffffffffffffffff163373ffffffffffffffffffffffffffffffffffffffff16146103c0577f000000000000000000000000000000000000000000000000000000000000000073ffffffffffffffffffffffffffffffffffffffff163373ffffffffffffffffffffffffffffffffffffffff161461034a576040517f08c379a000000000000000000000000000000000000000000000000000000000815260040161034190610bd5565b60405180910390fd5b8073ffffffffffffffffffffffffffffffffffffffff166103696104d7565b73ffffffffffffffffffffffffffffffffffffffff16146103bf576040517f08c379a00000000000000000000000000000000000000000000000000000000081526004016103b690610c67565b60405180910390fd5b5b600087879050905085859050811480156103dc57508383905081145b61041b576040517f08c379a000000000000000000000000000000000000000000000000000000000815260040161041290610cd3565b60405180910390fd5b60005b818110156104a85761049589898381811061043c5761043b610cf3565b5b90506020020160208101906104519190610d22565b88888481811061046457610463610cf3565b5b90506020028101906104769190610d5e565b88888681811061048957610488610cf3565b5b905060200201356104e6565b80806104a090610df0565b91505061041e565b505050505050505050565b7f000000000000000000000000000000000000000000000000000000000000000081565b6000601436033560601c905090565b600061056f8585858080601f016020809104026020016040519081016040528093929190818152602001838380828437600081840152601f19601f820116905080830192505050505050508460016040518060400160405280601681526020017f4f707350726f78792e6578656375746543616c6c3a20000000000000000000008152506105f6565b9150508473ffffffffffffffffffffffffffffffffffffffff167f8f8f4d49bbb03ffac818a5d588ec1786a4d2d17269871cbf5b1745f58b64c15d858585856040516105be9493929190610f0d565b60405180910390a25050505050565b60007fb53127684a568b3173ae13b9f8a6016e243e63b6e8ee1178d6a717850b5d610354905090565b600060608673ffffffffffffffffffffffffffffffffffffffff1685876040516106209190610f90565b60006040518083038185875af1925050503d806000811461065d576040519150601f19603f3d011682016040523d82523d6000602084013e610662565b606091505b508092508193505050811580156106765750835b15610686576106858184610690565b5b9550959350505050565b6004602083516106a09190610fd6565b0361079b576000826020015190506308c379a060e01b817bffffffffffffffffffffffffffffffffffffffffffffffffffffffff19160361073f5760448301925081836040516020016106f492919061104e565b6040516020818303038152906040526040517f08c379a000000000000000000000000000000000000000000000000000000000815260040161073691906110ab565b60405180910390fd5b816040516020016107509190611119565b6040516020818303038152906040526040517f08c379a000000000000000000000000000000000000000000000000000000000815260040161079291906110ab565b60405180910390fd5b806040516020016107ac9190611187565b6040516020818303038152906040526040517f08c379a00000000000000000000000000000000000000000000000000000000081526004016107ee91906110ab565b60405180910390fd5b600080fd5b600080fd5b600073ffffffffffffffffffffffffffffffffffffffff82169050919050565b600061082c82610801565b9050919050565b61083c81610821565b811461084757600080fd5b50565b60008135905061085981610833565b92915050565b600080fd5b600080fd5b600080fd5b60008083601f8401126108845761088361085f565b5b8235905067ffffffffffffffff8111156108a1576108a0610864565b5b6020830191508360018202830111156108bd576108bc610869565b5b9250929050565b6000819050919050565b6108d7816108c4565b81146108e257600080fd5b50565b6000813590506108f4816108ce565b92915050565b60008060008060608587031215610914576109136107f7565b5b60006109228782880161084a565b945050602085013567ffffffffffffffff811115610943576109426107fc565b5b61094f8782880161086e565b93509350506040610962878288016108e5565b91505092959194509250565b610977816108c4565b82525050565b6000602082019050610992600083018461096e565b92915050565b6109a181610821565b82525050565b60006020820190506109bc6000830184610998565b92915050565b60008083601f8401126109d8576109d761085f565b5b8235905067ffffffffffffffff8111156109f5576109f4610864565b5b602083019150836020820283011115610a1157610a10610869565b5b9250929050565b60008083601f840112610a2e57610a2d61085f565b5b8235905067ffffffffffffffff811115610a4b57610a4a610864565b5b602083019150836020820283011115610a6757610a66610869565b5b9250929050565b60008083601f840112610a8457610a8361085f565b5b8235905067ffffffffffffffff811115610aa157610aa0610864565b5b602083019150836020820283011115610abd57610abc610869565b5b9250929050565b60008060008060008060608789031215610ae157610ae06107f7565b5b600087013567ffffffffffffffff811115610aff57610afe6107fc565b5b610b0b89828a016109c2565b9650965050602087013567ffffffffffffffff811115610b2e57610b2d6107fc565b5b610b3a89828a01610a18565b9450945050604087013567ffffffffffffffff811115610b5d57610b5c6107fc565b5b610b6989828a01610a6e565b92509250509295509295509295565b600082825260208201905092915050565b7f4f707350726f78793a204e6f7420617574686f72697365640000000000000000600082015250565b6000610bbf601883610b78565b9150610bca82610b89565b602082019050919050565b60006020820190508181036000830152610bee81610bb2565b9050919050565b7f4f707350726f78793a204f6e6c79207461736b7320637265617465642062792060008201527f6f776e6572000000000000000000000000000000000000000000000000000000602082015250565b6000610c51602583610b78565b9150610c5c82610bf5565b604082019050919050565b60006020820190508181036000830152610c8081610c44565b9050919050565b7f4f707350726f78793a204c656e677468206d69736d6174636800000000000000600082015250565b6000610cbd601983610b78565b9150610cc882610c87565b602082019050919050565b60006020820190508181036000830152610cec81610cb0565b9050919050565b7f4e487b7100000000000000000000000000000000000000000000000000000000600052603260045260246000fd5b600060208284031215610d3857610d376107f7565b5b6000610d468482850161084a565b91505092915050565b600080fd5b600080fd5b600080fd5b60008083356001602003843603038112610d7b57610d7a610d4f565b5b80840192508235915067ffffffffffffffff821115610d9d57610d9c610d54565b5b602083019250600182023603831315610db957610db8610d59565b5b509250929050565b7f4e487b7100000000000000000000000000000000000000000000000000000000600052601160045260246000fd5b6000610dfb826108c4565b91507fffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff8203610e2d57610e2c610dc1565b5b600182019050919050565b600082825260208201905092915050565b82818337600083830152505050565b6000601f19601f8301169050919050565b6000610e758385610e38565b9350610e82838584610e49565b610e8b83610e58565b840190509392505050565b600081519050919050565b60005b83811015610ebf578082015181840152602081019050610ea4565b83811115610ece576000848401525b50505050565b6000610edf82610e96565b610ee98185610e38565b9350610ef9818560208601610ea1565b610f0281610e58565b840191505092915050565b60006060820190508181036000830152610f28818688610e69565b9050610f37602083018561096e565b8181036040830152610f498184610ed4565b905095945050505050565b600081905092915050565b6000610f6a82610e96565b610f748185610f54565b9350610f84818560208601610ea1565b80840191505092915050565b6000610f9c8284610f5f565b915081905092915050565b7f4e487b7100000000000000000000000000000000000000000000000000000000600052601260045260246000fd5b6000610fe1826108c4565b9150610fec836108c4565b925082610ffc57610ffb610fa7565b5b828206905092915050565b600081519050919050565b600081905092915050565b600061102882611007565b6110328185611012565b9350611042818560208601610ea1565b80840191505092915050565b600061105a828561101d565b9150611066828461101d565b91508190509392505050565b600061107d82611007565b6110878185610b78565b9350611097818560208601610ea1565b6110a081610e58565b840191505092915050565b600060208201905081810360008301526110c58184611072565b905092915050565b7f4e6f4572726f7253656c6563746f720000000000000000000000000000000000600082015250565b6000611103600f83611012565b915061110e826110cd565b600f82019050919050565b6000611125828461101d565b9150611130826110f6565b915081905092915050565b7f556e657870656374656452657475726e64617461000000000000000000000000600082015250565b6000611171601483611012565b915061117c8261113b565b601482019050919050565b6000611193828461101d565b915061119e82611164565b91508190509291505056fea2646970667358221220925e8abf4f8b318f74a9a344b29c6785f3cc7ee8f12ec00fec31b621e6bdc76064736f6c634300080e0033",
+  "deployedBytecode": "0x60806040526004361061004e5760003560e01c806354132d781461005a57806354fd4d50146100765780638da5cb5b146100a1578063c0e8c0c2146100cc578063e70abe92146100e857610055565b3661005557005b600080fd5b610074600480360381019061006f91906108fa565b610113565b005b34801561008257600080fd5b5061008b610269565b604051610098919061097d565b60405180910390f35b3480156100ad57600080fd5b506100b661026e565b6040516100c391906109a7565b60405180910390f35b6100e660048036038101906100e19190610ac4565b61027d565b005b3480156100f457600080fd5b506100fd6104b3565b60405161010a91906109a7565b60405180910390f35b600061011d61026e565b90508073ffffffffffffffffffffffffffffffffffffffff163373ffffffffffffffffffffffffffffffffffffffff1614610256577f000000000000000000000000000000000000000000000000000000000000000073ffffffffffffffffffffffffffffffffffffffff163373ffffffffffffffffffffffffffffffffffffffff16146101e0576040517f08c379a00000000000000000000000000000000000000000000000000000000081526004016101d790610bd5565b60405180910390fd5b8073ffffffffffffffffffffffffffffffffffffffff166101ff6104d7565b73ffffffffffffffffffffffffffffffffffffffff1614610255576040517f08c379a000000000000000000000000000000000000000000000000000000000815260040161024c90610c67565b60405180910390fd5b5b610262858585856104e6565b5050505050565b600181565b60006102786105cd565b905090565b600061028761026e565b90508073ffffffffffffffffffffffffffffffffffffffff163373ffffffffffffffffffffffffffffffffffffffff16146103c0577f000000000000000000000000000000000000000000000000000000000000000073ffffffffffffffffffffffffffffffffffffffff163373ffffffffffffffffffffffffffffffffffffffff161461034a576040517f08c379a000000000000000000000000000000000000000000000000000000000815260040161034190610bd5565b60405180910390fd5b8073ffffffffffffffffffffffffffffffffffffffff166103696104d7565b73ffffffffffffffffffffffffffffffffffffffff16146103bf576040517f08c379a00000000000000000000000000000000000000000000000000000000081526004016103b690610c67565b60405180910390fd5b5b600087879050905085859050811480156103dc57508383905081145b61041b576040517f08c379a000000000000000000000000000000000000000000000000000000000815260040161041290610cd3565b60405180910390fd5b60005b818110156104a85761049589898381811061043c5761043b610cf3565b5b90506020020160208101906104519190610d22565b88888481811061046457610463610cf3565b5b90506020028101906104769190610d5e565b88888681811061048957610488610cf3565b5b905060200201356104e6565b80806104a090610df0565b91505061041e565b505050505050505050565b7f000000000000000000000000000000000000000000000000000000000000000081565b6000601436033560601c905090565b600061056f8585858080601f016020809104026020016040519081016040528093929190818152602001838380828437600081840152601f19601f820116905080830192505050505050508460016040518060400160405280601681526020017f4f707350726f78792e6578656375746543616c6c3a20000000000000000000008152506105f6565b9150508473ffffffffffffffffffffffffffffffffffffffff167f8f8f4d49bbb03ffac818a5d588ec1786a4d2d17269871cbf5b1745f58b64c15d858585856040516105be9493929190610f0d565b60405180910390a25050505050565b60007fb53127684a568b3173ae13b9f8a6016e243e63b6e8ee1178d6a717850b5d610354905090565b600060608673ffffffffffffffffffffffffffffffffffffffff1685876040516106209190610f90565b60006040518083038185875af1925050503d806000811461065d576040519150601f19603f3d011682016040523d82523d6000602084013e610662565b606091505b508092508193505050811580156106765750835b15610686576106858184610690565b5b9550959350505050565b6004602083516106a09190610fd6565b0361079b576000826020015190506308c379a060e01b817bffffffffffffffffffffffffffffffffffffffffffffffffffffffff19160361073f5760448301925081836040516020016106f492919061104e565b6040516020818303038152906040526040517f08c379a000000000000000000000000000000000000000000000000000000000815260040161073691906110ab565b60405180910390fd5b816040516020016107509190611119565b6040516020818303038152906040526040517f08c379a000000000000000000000000000000000000000000000000000000000815260040161079291906110ab565b60405180910390fd5b806040516020016107ac9190611187565b6040516020818303038152906040526040517f08c379a00000000000000000000000000000000000000000000000000000000081526004016107ee91906110ab565b60405180910390fd5b600080fd5b600080fd5b600073ffffffffffffffffffffffffffffffffffffffff82169050919050565b600061082c82610801565b9050919050565b61083c81610821565b811461084757600080fd5b50565b60008135905061085981610833565b92915050565b600080fd5b600080fd5b600080fd5b60008083601f8401126108845761088361085f565b5b8235905067ffffffffffffffff8111156108a1576108a0610864565b5b6020830191508360018202830111156108bd576108bc610869565b5b9250929050565b6000819050919050565b6108d7816108c4565b81146108e257600080fd5b50565b6000813590506108f4816108ce565b92915050565b60008060008060608587031215610914576109136107f7565b5b60006109228782880161084a565b945050602085013567ffffffffffffffff811115610943576109426107fc565b5b61094f8782880161086e565b93509350506040610962878288016108e5565b91505092959194509250565b610977816108c4565b82525050565b6000602082019050610992600083018461096e565b92915050565b6109a181610821565b82525050565b60006020820190506109bc6000830184610998565b92915050565b60008083601f8401126109d8576109d761085f565b5b8235905067ffffffffffffffff8111156109f5576109f4610864565b5b602083019150836020820283011115610a1157610a10610869565b5b9250929050565b60008083601f840112610a2e57610a2d61085f565b5b8235905067ffffffffffffffff811115610a4b57610a4a610864565b5b602083019150836020820283011115610a6757610a66610869565b5b9250929050565b60008083601f840112610a8457610a8361085f565b5b8235905067ffffffffffffffff811115610aa157610aa0610864565b5b602083019150836020820283011115610abd57610abc610869565b5b9250929050565b60008060008060008060608789031215610ae157610ae06107f7565b5b600087013567ffffffffffffffff811115610aff57610afe6107fc565b5b610b0b89828a016109c2565b9650965050602087013567ffffffffffffffff811115610b2e57610b2d6107fc565b5b610b3a89828a01610a18565b9450945050604087013567ffffffffffffffff811115610b5d57610b5c6107fc565b5b610b6989828a01610a6e565b92509250509295509295509295565b600082825260208201905092915050565b7f4f707350726f78793a204e6f7420617574686f72697365640000000000000000600082015250565b6000610bbf601883610b78565b9150610bca82610b89565b602082019050919050565b60006020820190508181036000830152610bee81610bb2565b9050919050565b7f4f707350726f78793a204f6e6c79207461736b7320637265617465642062792060008201527f6f776e6572000000000000000000000000000000000000000000000000000000602082015250565b6000610c51602583610b78565b9150610c5c82610bf5565b604082019050919050565b60006020820190508181036000830152610c8081610c44565b9050919050565b7f4f707350726f78793a204c656e677468206d69736d6174636800000000000000600082015250565b6000610cbd601983610b78565b9150610cc882610c87565b602082019050919050565b60006020820190508181036000830152610cec81610cb0565b9050919050565b7f4e487b7100000000000000000000000000000000000000000000000000000000600052603260045260246000fd5b600060208284031215610d3857610d376107f7565b5b6000610d468482850161084a565b91505092915050565b600080fd5b600080fd5b600080fd5b60008083356001602003843603038112610d7b57610d7a610d4f565b5b80840192508235915067ffffffffffffffff821115610d9d57610d9c610d54565b5b602083019250600182023603831315610db957610db8610d59565b5b509250929050565b7f4e487b7100000000000000000000000000000000000000000000000000000000600052601160045260246000fd5b6000610dfb826108c4565b91507fffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff8203610e2d57610e2c610dc1565b5b600182019050919050565b600082825260208201905092915050565b82818337600083830152505050565b6000601f19601f8301169050919050565b6000610e758385610e38565b9350610e82838584610e49565b610e8b83610e58565b840190509392505050565b600081519050919050565b60005b83811015610ebf578082015181840152602081019050610ea4565b83811115610ece576000848401525b50505050565b6000610edf82610e96565b610ee98185610e38565b9350610ef9818560208601610ea1565b610f0281610e58565b840191505092915050565b60006060820190508181036000830152610f28818688610e69565b9050610f37602083018561096e565b8181036040830152610f498184610ed4565b905095945050505050565b600081905092915050565b6000610f6a82610e96565b610f748185610f54565b9350610f84818560208601610ea1565b80840191505092915050565b6000610f9c8284610f5f565b915081905092915050565b7f4e487b7100000000000000000000000000000000000000000000000000000000600052601260045260246000fd5b6000610fe1826108c4565b9150610fec836108c4565b925082610ffc57610ffb610fa7565b5b828206905092915050565b600081519050919050565b600081905092915050565b600061102882611007565b6110328185611012565b9350611042818560208601610ea1565b80840191505092915050565b600061105a828561101d565b9150611066828461101d565b91508190509392505050565b600061107d82611007565b6110878185610b78565b9350611097818560208601610ea1565b6110a081610e58565b840191505092915050565b600060208201905081810360008301526110c58184611072565b905092915050565b7f4e6f4572726f7253656c6563746f720000000000000000000000000000000000600082015250565b6000611103600f83611012565b915061110e826110cd565b600f82019050919050565b6000611125828461101d565b9150611130826110f6565b915081905092915050565b7f556e657870656374656452657475726e64617461000000000000000000000000600082015250565b6000611171601483611012565b915061117c8261113b565b601482019050919050565b6000611193828461101d565b915061119e82611164565b91508190509291505056fea2646970667358221220925e8abf4f8b318f74a9a344b29c6785f3cc7ee8f12ec00fec31b621e6bdc76064736f6c634300080e0033",
+  "devdoc": {
+    "kind": "dev",
+    "methods": {
+      "batchExecuteCall(address[],bytes[],uint256[])": {
+        "params": {
+          "datas": "Datas for each contract call.",
+          "targets": "Addresses of contracts to be called.",
+          "values": "Native token value for each contract call."
+        }
+      },
+      "executeCall(address,bytes,uint256)": {
+        "params": {
+          "data": "Data for contract call.",
+          "target": "Address of contracts to be called.",
+          "value": "Native token value for contract call."
+        }
+      },
+      "owner()": {
+        "returns": {
+          "_0": "address Owner of the proxy"
+        }
+      }
+    },
+    "stateVariables": {
+      "ops": {
+        "return": "address Ops smart contract address",
+        "returns": {
+          "_0": "address Ops smart contract address"
+        }
+      },
+      "version": {
+        "return": "uint256 version of OpsProxy.",
+        "returns": {
+          "_0": "uint256 version of OpsProxy."
+        }
+      }
+    },
+    "version": 1
+  },
+  "userdoc": {
+    "events": {
+      "ExecuteCall(address,bytes,uint256,bytes)": {
+        "notice": "Emitted when proxy calls a contract successfully in `executeCall`"
+      }
+    },
+    "kind": "user",
+    "methods": {
+      "batchExecuteCall(address[],bytes[],uint256[])": {
+        "notice": "Multicall to different contracts with different datas."
+      },
+      "executeCall(address,bytes,uint256)": {
+        "notice": "Call to a single contract."
+      }
+    },
+    "version": 1
+  },
+  "storageLayout": {
+    "storage": [],
+    "types": null
+  }
+}
