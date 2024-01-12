@@ -139,6 +139,11 @@ const config: HardhatUserConfig = {
       chainId: 421614,
       accounts: PROD_PK ? [PROD_PK] : [],
     },
+    basesepolia: {
+      url: `https://sepolia.base.org`,
+      chainId: 84532,
+      accounts: PROD_PK ? [PROD_PK] : [],
+    },
     baseGoerli: {
       url: "https://goerli.base.org",
       chainId: 84531,
