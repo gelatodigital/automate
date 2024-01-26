@@ -92,11 +92,6 @@ const config: HardhatUserConfig = {
       chainId: 59144,
       accounts: PROD_PK ? [PROD_PK] : [],
     },
-    lisksepolia: {
-      url: `https://rpc.lisk-sepolia-testnet.gelato.digital`,
-      chainId: 4202,
-      accounts: PROD_PK ? [PROD_PK] : [],
-    },
     mainnet: {
       accounts: PROD_PK ? [PROD_PK] : [],
       chainId: 1,
@@ -159,6 +154,11 @@ const config: HardhatUserConfig = {
       chainId: 84531,
       accounts: PROD_PK ? [PROD_PK] : [],
     },
+    blastsepolia: {
+      url: `https://sepolia.blast.io`,
+      chainId: 168587773,
+      accounts: PROD_PK ? [PROD_PK] : [],
+    },
     gelopcelestiatestnet: {
       url: `https://rpc.op-celestia-testnet.gelato.digital`,
       chainId: 123420111,
@@ -172,6 +172,11 @@ const config: HardhatUserConfig = {
     goerli: {
       url: `https://eth-goerli.alchemyapi.io/v2/${ALCHEMY_ID}`,
       chainId: 5,
+      accounts: PROD_PK ? [PROD_PK] : [],
+    },
+    lisksepolia: {
+      url: `https://rpc.lisk-sepolia-testnet.gelato.digital`,
+      chainId: 4202,
       accounts: PROD_PK ? [PROD_PK] : [],
     },
     mumbai: {
