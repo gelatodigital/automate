@@ -92,6 +92,11 @@ const config: HardhatUserConfig = {
       chainId: 59144,
       accounts: PROD_PK ? [PROD_PK] : [],
     },
+    lisksepolia: {
+      url: `https://rpc.lisk-sepolia-testnet.gelato.digital`,
+      chainId: 4202,
+      accounts: PROD_PK ? [PROD_PK] : [],
+    },
     mainnet: {
       accounts: PROD_PK ? [PROD_PK] : [],
       chainId: 1,
