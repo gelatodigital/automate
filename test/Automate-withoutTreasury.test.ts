@@ -111,7 +111,53 @@ describe("Automate Without 1Balance test", function () {
     expect(countAfter).to.be.gt(countBefore);
 
     const taskIds = await automate.getTaskIdsByUser(userAddress);
-    expect(taskIds).not.include(taskId);
+    expect(taskIds).to.not.include(taskId);
+  });
+
+  it("execBypassModuleSyncFee", async () => {
+    const countBefore = await counterWT.count();
+
+    await automate
+      .connect(executor)
+      .execBypassModuleSyncFee(
+        userAddress,
+        counterWT.address,
+        taskId,
+        FEE,
+        ETH,
+        execData,
+        false,
+        false
+      );
+
+    const countAfter = await counterWT.count();
+    expect(countAfter).to.be.gt(countBefore);
+
+    const taskIds = await automate.getTaskIdsByUser(userAddress);
+    expect(taskIds).to.include(taskId);
+  });
+
+  it("execBypassModuleSyncFee - singleExec", async () => {
+    const countBefore = await counterWT.count();
+
+    await automate
+      .connect(executor)
+      .execBypassModuleSyncFee(
+        userAddress,
+        counterWT.address,
+        taskId,
+        FEE,
+        ETH,
+        execData,
+        false,
+        true
+      );
+
+    const countAfter = await counterWT.count();
+    expect(countAfter).to.be.gt(countBefore);
+
+    const taskIds = await automate.getTaskIdsByUser(userAddress);
+    expect(taskIds).to.not.include(taskId);
   });
 
   it("send funds to feeCollector", async () => {

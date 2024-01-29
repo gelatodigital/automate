@@ -159,6 +159,40 @@ contract Automate is Gelatofied, Proxied, AutomateStorage, IAutomate {
         emit LogUseGelato1Balance(_oneBalanceParam.correlationId);
     }
 
+    function execBypassModuleSyncFee(
+        address _taskCreator,
+        address _execAddress,
+        bytes32 _taskId,
+        uint256 _txFee,
+        address _feeToken,
+        bytes memory _execData,
+        bool _revertOnFailure,
+        bool _singleExec
+    ) external onlyGelato {
+        require(
+            _createdTasks[_taskCreator].contains(_taskId),
+            "Automate.exec: Task not found"
+        );
+
+        fee = _txFee;
+        feeToken = _feeToken;
+
+        bool success = LibBypassModule.onExecTask(
+            _taskId,
+            _taskCreator,
+            _execAddress,
+            _execData,
+            _revertOnFailure,
+            _singleExec,
+            _createdTasks
+        );
+
+        delete fee;
+        delete feeToken;
+
+        emit LibEvents.ExecBypassModuleSuccess(_taskId, bytes32(""), success);
+    }
+
     ///@inheritdoc IAutomate
     function execBypassModule(
         address _taskCreator,
