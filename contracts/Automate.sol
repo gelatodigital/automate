@@ -184,9 +184,11 @@ contract Automate is Gelatofied, Proxied, AutomateStorage, IAutomate {
             _createdTasks
         );
 
-        emit LibEvents.ExecBypassModuleSuccess(_taskId, success);
-
-        emit LogUseGelato1Balance(_correlationId);
+        emit LibEvents.ExecBypassModuleSuccess(
+            _taskId,
+            _correlationId,
+            success
+        );
     }
 
     ///@inheritdoc IAutomate
