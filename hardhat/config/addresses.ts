@@ -17,6 +17,7 @@ export const getGelatoAddress = (network: string) => {
     hardhat: "0x3caca7b48d0573d793d3b0279b5f0029180e83b6",
     linea: "0xc2a813699bF2353380c625e3D6b544dC42963941",
     mainnet: "0x3caca7b48d0573d793d3b0279b5f0029180e83b6",
+    metis: "0xFec1E33eBe899906Ff63546868A26E1028700b0e",
     moonbeam: "0x91f2A140cA47DdF438B9c583b7E71987525019bB",
     moonriver: "0x91f2A140cA47DdF438B9c583b7E71987525019bB",
     mumbai: "0x25aD59adbe00C2d80c86d01e2E05e1294DA84823",

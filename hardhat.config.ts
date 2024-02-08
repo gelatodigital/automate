@@ -97,6 +97,11 @@ const config: HardhatUserConfig = {
       chainId: 1,
       url: `https://eth-mainnet.alchemyapi.io/v2/${ALCHEMY_ID}`,
     },
+    metis: {
+      accounts: PROD_PK ? [PROD_PK] : [],
+      chainId: 1088,
+      url: "https://metis-mainnet.public.blastapi.io",
+    },
     optimism: {
       url: `https://opt-mainnet.g.alchemy.com/v2/${ALCHEMY_ID}`,
       chainId: 10,
