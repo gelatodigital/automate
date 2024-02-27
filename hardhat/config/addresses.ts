@@ -3,6 +3,7 @@ export const getGelatoAddress = (network: string) => {
     arbgoerli: "0xF82D64357D9120a760e1E4C75f646C0618eFc2F3",
     arbitrum: "0x4775aF8FEf4809fE10bf05867d2b038a4b5B2146",
     arbsepolia: "0xF82D64357D9120a760e1E4C75f646C0618eFc2F3",
+    astarzkevm: "0xa2351354b39977ea35b1C28A035BD94e48F3ED7D",
     astarzkyoto: "0x683913B3A32ada4F8100458A3E1675425BdAa7DF",
     avalanche: "0x7C5c4Af1618220C090A6863175de47afb20fa9Df",
     base: "0x08EFb6D315c7e74C39620c9AAEA289730f43a429",

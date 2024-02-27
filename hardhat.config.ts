@@ -62,6 +62,11 @@ const config: HardhatUserConfig = {
       chainId: 42161,
       accounts: PROD_PK ? [PROD_PK] : [],
     },
+    astarzkevm: {
+      url: "https://rpc.astar-zkevm.gelato.digital",
+      chainId: 3776,
+      accounts: PROD_PK ? [PROD_PK] : [],
+    },
     avalanche: {
       url: "https://api.avax.network/ext/bc/C/rpc",
       chainId: 43114,
