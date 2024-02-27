@@ -20,6 +20,7 @@ export const getGelatoAddress = (network: string) => {
     lisksepolia: "0xF82D64357D9120a760e1E4C75f646C0618eFc2F3",
     mainnet: "0x3caca7b48d0573d793d3b0279b5f0029180e83b6",
     metis: "0xFec1E33eBe899906Ff63546868A26E1028700b0e",
+    mode: "0xFec1E33eBe899906Ff63546868A26E1028700b0e",
     moonbeam: "0x91f2A140cA47DdF438B9c583b7E71987525019bB",
     moonriver: "0x91f2A140cA47DdF438B9c583b7E71987525019bB",
     mumbai: "0x25aD59adbe00C2d80c86d01e2E05e1294DA84823",
