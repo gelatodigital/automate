@@ -149,6 +149,11 @@ const config: HardhatUserConfig = {
       chainId: 421614,
       accounts: PROD_PK ? [PROD_PK] : [],
     },
+    astarzkyoto: {
+      url: `https://rpc.zkyoto.gelato.digital`,
+      chainId: 6038361,
+      accounts: PROD_PK ? [PROD_PK] : [],
+    },
     basesepolia: {
       url: `https://sepolia.base.org`,
       chainId: 84532,
