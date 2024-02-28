@@ -25,6 +25,7 @@ assert.ok(INFURA_ID, "no Infura ID in process.env");
 const PROD_PK = process.env.PROD_PK;
 const DEV_PK = process.env.DEV_PK;
 const ETHERSCAN_API = process.env.ETHERSCAN_API;
+const BLAST_API_URL = process.env.BLAST_API_URL;
 
 // ================================= CONFIG =========================================
 const config: HardhatUserConfig = {
@@ -75,6 +76,10 @@ const config: HardhatUserConfig = {
     base: {
       url: `https://mainnet.base.org`,
       chainId: 8453,
+      accounts: PROD_PK ? [PROD_PK] : [],
+    },
+    blast: {
+      url: BLAST_API_URL,
       accounts: PROD_PK ? [PROD_PK] : [],
     },
     bsc: {
