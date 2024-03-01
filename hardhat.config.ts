@@ -62,6 +62,11 @@ const config: HardhatUserConfig = {
       chainId: 42161,
       accounts: PROD_PK ? [PROD_PK] : [],
     },
+    astarzkevm: {
+      url: "https://rpc.astar-zkevm.gelato.digital",
+      chainId: 3776,
+      accounts: PROD_PK ? [PROD_PK] : [],
+    },
     avalanche: {
       url: "https://api.avax.network/ext/bc/C/rpc",
       chainId: 43114,
@@ -70,6 +75,11 @@ const config: HardhatUserConfig = {
     base: {
       url: `https://mainnet.base.org`,
       chainId: 8453,
+      accounts: PROD_PK ? [PROD_PK] : [],
+    },
+    blast: {
+      url: `https://blastl2-mainnet.public.blastapi.io`,
+      chainId: 81457,
       accounts: PROD_PK ? [PROD_PK] : [],
     },
     bsc: {
@@ -101,6 +111,11 @@ const config: HardhatUserConfig = {
       accounts: PROD_PK ? [PROD_PK] : [],
       chainId: 1088,
       url: "https://metis-mainnet.public.blastapi.io",
+    },
+    mode: {
+      url: `https://mainnet.mode.network`,
+      chainId: 34443,
+      accounts: PROD_PK ? [PROD_PK] : [],
     },
     optimism: {
       url: `https://opt-mainnet.g.alchemy.com/v2/${ALCHEMY_ID}`,
@@ -144,6 +159,11 @@ const config: HardhatUserConfig = {
       chainId: 421614,
       accounts: PROD_PK ? [PROD_PK] : [],
     },
+    astarzkyoto: {
+      url: `https://rpc.zkyoto.gelato.digital`,
+      chainId: 6038361,
+      accounts: PROD_PK ? [PROD_PK] : [],
+    },
     basesepolia: {
       url: `https://sepolia.base.org`,
       chainId: 84532,
@@ -167,6 +187,11 @@ const config: HardhatUserConfig = {
     geloptestnet: {
       url: `https://rpc.op-testnet.gelato.digital`,
       chainId: 42069,
+      accounts: PROD_PK ? [PROD_PK] : [],
+    },
+    gelatoorbittestnet: {
+      url: `https://rpc.gelato-orbit-anytrust-testnet.gelato.digital`,
+      chainId: 88153591557,
       accounts: PROD_PK ? [PROD_PK] : [],
     },
     goerli: {
