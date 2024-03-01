@@ -194,6 +194,11 @@ const config: HardhatUserConfig = {
       chainId: 11155420,
       accounts: PROD_PK ? [PROD_PK] : [],
     },
+    reyacronos: {
+      url: `https://rpc.reya-cronos.gelato.digital`,
+      chainId: 1729,
+      accounts: PROD_PK ? [PROD_PK] : [],
+    },
     sepolia: {
       url: `https://eth-sepolia.g.alchemy.com/v2/${ALCHEMY_ID}`,
       chainId: 11155111,
