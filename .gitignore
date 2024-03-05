@@ -10,6 +10,16 @@ cache/
 artifacts-zk/
 cache-zk/
 
+# foundry
+artifacts-foundry
+foundry_cache
+docs
+!broadcast
+broadcast/*
+broadcast/*/31337/
+.gas-snapshot
+
+
 # Typechain generation
 typechain
 
