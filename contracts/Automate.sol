@@ -12,7 +12,7 @@ import {LibDataTypes} from "./libraries/LibDataTypes.sol";
 import {LibEvents} from "./libraries/LibEvents.sol";
 import {LibTaskId} from "./libraries/LibTaskId.sol";
 import {LibTaskModule} from "./libraries/LibTaskModule.sol";
-import {LibSimpleTaskModule} from "./libraries/LibSimpleTaskModule.sol";
+import {LibBypassModule} from "./libraries/LibBypassModule.sol";
 import {IAutomate} from "./interfaces/IAutomate.sol";
 
 /**
@@ -159,8 +159,42 @@ contract Automate is Gelatofied, Proxied, AutomateStorage, IAutomate {
         emit LogUseGelato1Balance(_oneBalanceParam.correlationId);
     }
 
+    function execBypassModuleSyncFee(
+        address _taskCreator,
+        address _execAddress,
+        bytes32 _taskId,
+        uint256 _txFee,
+        address _feeToken,
+        bytes memory _execData,
+        bool _revertOnFailure,
+        bool _singleExec
+    ) external onlyGelato {
+        require(
+            _createdTasks[_taskCreator].contains(_taskId),
+            "Automate.exec: Task not found"
+        );
+
+        fee = _txFee;
+        feeToken = _feeToken;
+
+        bool success = LibBypassModule.onExecTask(
+            _taskId,
+            _taskCreator,
+            _execAddress,
+            _execData,
+            _revertOnFailure,
+            _singleExec,
+            _createdTasks
+        );
+
+        delete fee;
+        delete feeToken;
+
+        emit LibEvents.ExecBypassModuleSuccess(_taskId, bytes32(""), success);
+    }
+
     ///@inheritdoc IAutomate
-    function exec1BalanceSimple(
+    function execBypassModule(
         address _taskCreator,
         address _execAddress,
         bytes32 _taskId,
@@ -174,19 +208,21 @@ contract Automate is Gelatofied, Proxied, AutomateStorage, IAutomate {
             "Automate.exec: Task not found"
         );
 
-        bool success = LibSimpleTaskModule.onExecTask(
+        bool success = LibBypassModule.onExecTask(
             _taskId,
             _taskCreator,
             _execAddress,
             _execData,
             _revertOnFailure,
             _singleExec,
-            taskModuleAddresses
+            _createdTasks
         );
 
-        emit LibEvents.ExecSuccess1BalanceSimple(_taskId, success);
-
-        emit LogUseGelato1Balance(_correlationId);
+        emit LibEvents.ExecBypassModuleSuccess(
+            _taskId,
+            _correlationId,
+            success
+        );
     }
 
     ///@inheritdoc IAutomate

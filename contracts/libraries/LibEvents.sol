@@ -52,10 +52,15 @@ library LibEvents {
     );
 
     /**
-     * @notice Emitted when `exec1BalanceSimple` is called.
+     * @notice Emitted when `execBypassModule` is called.
      *
      * @param taskId Unique hash of the task. {See LibTaskId-getTaskId}
+     * @param correlationId Id of the execution to be used for 1Balance settlement.
      * @param callSuccess Status of the call to execAddress.
      */
-    event ExecSuccess1BalanceSimple(bytes32 taskId, bool callSuccess);
+    event ExecBypassModuleSuccess(
+        bytes32 taskId,
+        bytes32 correlationId,
+        bool callSuccess
+    );
 }
