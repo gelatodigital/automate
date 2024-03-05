@@ -233,7 +233,7 @@ describe("Automate multi module test", function () {
     expect(countAfter).to.be.gt(countBefore);
   });
 
-  it("exec1BalanceSimple", async () => {
+  it("execBypassModule", async () => {
     const countBefore = await counter.count();
     const [, execData] = await counterResolver.checker();
 
@@ -245,7 +245,7 @@ describe("Automate multi module test", function () {
 
     await automate
       .connect(executor)
-      .exec1BalanceSimple(
+      .execBypassModule(
         userAddress,
         opsProxy.address,
         taskId,

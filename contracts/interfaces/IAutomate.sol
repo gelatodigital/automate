@@ -80,11 +80,34 @@ interface IAutomate is IGelato1Balance {
      * @param revertOnFailure To revert or not if call to execAddress fails. (Used for off-chain simulations)
      * @param singleExec If the task is a SingleExec task. If true, task will be cancelled after execution.
      */
-    function exec1BalanceSimple(
+    function execBypassModule(
         address taskCreator,
         address execAddress,
         bytes32 taskId,
         bytes32 correlationId,
+        bytes memory execData,
+        bool revertOnFailure,
+        bool singleExec
+    ) external;
+
+    /**
+     * @notice Execution API called by Gelato, using Gelato Sync fee as fee payment method.
+     *
+     * @param taskCreator The address which created the task.
+     * @param execAddress Address of contract that should be called by Gelato.
+     * @param taskId Unique hash of the task.
+     * @param txFee Fee paid to Gelato for execution, transfered to Gelato.feeCollector().
+     * @param feeToken Token used to pay for the execution. ETH = 0xeeeeee...
+     * @param execData Execution data to be called with / function selector if execution data is yet to be determined.
+     * @param revertOnFailure To revert or not if call to execAddress fails. (Used for off-chain simulations)
+     * @param singleExec If the task is a SingleExec task. If true, task will be cancelled after execution.
+     */
+    function execBypassModuleSyncFee(
+        address taskCreator,
+        address execAddress,
+        bytes32 taskId,
+        uint256 txFee,
+        address feeToken,
         bytes memory execData,
         bool revertOnFailure,
         bool singleExec
