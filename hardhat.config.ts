@@ -122,6 +122,11 @@ const config: HardhatUserConfig = {
       chainId: 10,
       accounts: PROD_PK ? [PROD_PK] : [],
     },
+    playblock: {
+      url: `https://rpc.playblock.io`,
+      chainId: 1829,
+      accounts: PROD_PK ? [PROD_PK] : [],
+    },
     polygon: {
       url: `https://polygon-mainnet.g.alchemy.com/v2/${ALCHEMY_ID}`,
       chainId: 137,
