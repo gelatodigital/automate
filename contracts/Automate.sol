@@ -6,7 +6,7 @@ import {
 } from "@openzeppelin/contracts/utils/structs/EnumerableSet.sol";
 import {Gelatofied} from "./vendor/gelato/Gelatofied.sol";
 import {GelatoBytes} from "./vendor/gelato/GelatoBytes.sol";
-import {Proxied} from "./vendor/proxy/EIP173/Proxied.sol";
+import {BlastGasFees} from "./vendor/blast/BlastGasFees.sol";
 import {AutomateStorage} from "./AutomateStorage.sol";
 import {LibDataTypes} from "./libraries/LibDataTypes.sol";
 import {LibEvents} from "./libraries/LibEvents.sol";
@@ -22,7 +22,7 @@ import {IAutomate} from "./interfaces/IAutomate.sol";
  */
 //solhint-disable function-max-lines
 //solhint-disable no-empty-blocks
-contract Automate is Gelatofied, Proxied, AutomateStorage, IAutomate {
+contract Automate is Gelatofied, BlastGasFees, AutomateStorage, IAutomate {
     using GelatoBytes for bytes;
     using EnumerableSet for EnumerableSet.Bytes32Set;
 
