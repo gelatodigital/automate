@@ -137,6 +137,11 @@ const config: HardhatUserConfig = {
       chainId: 1101,
       accounts: PROD_PK ? [PROD_PK] : [],
     },
+    reyanetwork: {
+      url: "https://rpc.reya.network",
+      chainId: 1729,
+      accounts: PROD_PK ? [PROD_PK] : [],
+    },
     zksync: {
       zksync: true,
       url: "https://mainnet.era.zksync.io",
