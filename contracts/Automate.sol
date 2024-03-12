@@ -27,7 +27,7 @@ contract Automate is Gelatofied, Proxied, AutomateStorage, IAutomate {
     using EnumerableSet for EnumerableSet.Bytes32Set;
 
     // solhint-disable const-name-snakecase
-    string public constant version = "6";
+    string public constant version = "7";
 
     constructor(address payable _gelato) Gelatofied(_gelato) {}
 
