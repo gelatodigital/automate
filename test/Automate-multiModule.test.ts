@@ -226,7 +226,15 @@ describe("Automate multi module test", function () {
         )
     )
       .to.emit(automate, "LogUseGelato1Balance")
-      .withArgs(gelato1BalanceParam.correlationId);
+      .withArgs(
+        gelato1BalanceParam.sponsor,
+        counter.address,
+        gelato1BalanceParam.feeToken,
+        gelato1BalanceParam.oneBalanceChainId,
+        gelato1BalanceParam.nativeToFeeTokenXRateNumerator,
+        gelato1BalanceParam.nativeToFeeTokenXRateDenominator,
+        gelato1BalanceParam.correlationId
+      );
 
     const countAfter = await counter.count();
 
