@@ -11,5 +11,13 @@ interface IGelato1Balance {
         bytes32 correlationId;
     }
 
-    event LogUseGelato1Balance(bytes32 correlationId);
+    event LogUseGelato1Balance(
+        address indexed sponsor,
+        address indexed target,
+        address indexed feeToken,
+        uint256 oneBalanceChainId,
+        uint256 nativeToFeeTokenXRateNumerator,
+        uint256 nativeToFeeTokenXRateDenominator,
+        bytes32 correlationId
+    );
 }

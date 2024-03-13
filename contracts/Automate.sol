@@ -156,7 +156,15 @@ contract Automate is Gelatofied, Proxied, AutomateStorage, IAutomate {
             success
         );
 
-        emit LogUseGelato1Balance(_oneBalanceParam.correlationId);
+        emit LogUseGelato1Balance(
+            _oneBalanceParam.sponsor,
+            _execAddress,
+            _oneBalanceParam.feeToken,
+            _oneBalanceParam.oneBalanceChainId,
+            _oneBalanceParam.nativeToFeeTokenXRateNumerator,
+            _oneBalanceParam.nativeToFeeTokenXRateDenominator,
+            _oneBalanceParam.correlationId
+        );
     }
 
     function execBypassModuleSyncFee(
