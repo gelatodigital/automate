@@ -159,6 +159,11 @@ const config: HardhatUserConfig = {
     },
 
     // Staging
+    amoy: {
+      url: `https://rpc-amoy.polygon.technology`,
+      chainId: 80002,
+      accounts: PROD_PK ? [PROD_PK] : [],
+    },
     arbgoerli: {
       url: "https://goerli-rollup.arbitrum.io/rpc",
       chainId: 421613,
@@ -182,6 +187,11 @@ const config: HardhatUserConfig = {
     baseGoerli: {
       url: "https://goerli.base.org",
       chainId: 84531,
+      accounts: PROD_PK ? [PROD_PK] : [],
+    },
+    blackberry: {
+      url: `https://rpc.polygon-blackberry.gelato.digital`,
+      chainId: 94204209,
       accounts: PROD_PK ? [PROD_PK] : [],
     },
     blastsepolia: {
