@@ -221,7 +221,7 @@ const config: HardhatUserConfig = {
     },
     reyacronos: {
       url: `https://rpc.reya-cronos.gelato.digital`,
-      chainId: 1729,
+      chainId: 89346161,
       accounts: PROD_PK ? [PROD_PK] : [],
     },
     sepolia: {
