@@ -63,4 +63,19 @@ library LibEvents {
         bytes32 correlationId,
         bool callSuccess
     );
+
+    /**
+     * @notice Emitted when `execBypassModuleSyncFee` is called.
+     *
+     * @param taskId Unique hash of the task. {See LibTaskId-getTaskId}
+     * @param txFee Fee paid to Gelato for execution
+     * @param feeToken Token used to pay for the execution. ETH = 0xeeeeee...
+     * @param callSuccess Status of the call to execAddress.
+     */
+    event ExecBypassModuleSyncFeeSuccess(
+        bytes32 taskId,
+        uint256 txFee,
+        address feeToken,
+        bool callSuccess
+    );
 }

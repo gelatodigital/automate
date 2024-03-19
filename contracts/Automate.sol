@@ -198,7 +198,12 @@ contract Automate is Gelatofied, Proxied, AutomateStorage, IAutomate {
         delete fee;
         delete feeToken;
 
-        emit LibEvents.ExecBypassModuleSuccess(_taskId, bytes32(""), success);
+        emit LibEvents.ExecBypassModuleSyncFeeSuccess(
+            _taskId,
+            _txFee,
+            _feeToken,
+            success
+        );
     }
 
     ///@inheritdoc IAutomate
