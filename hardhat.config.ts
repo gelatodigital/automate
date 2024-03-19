@@ -122,6 +122,11 @@ const config: HardhatUserConfig = {
       chainId: 10,
       accounts: PROD_PK ? [PROD_PK] : [],
     },
+    playblock: {
+      url: `https://rpc.playblock.io`,
+      chainId: 1829,
+      accounts: PROD_PK ? [PROD_PK] : [],
+    },
     polygon: {
       url: `https://polygon-mainnet.g.alchemy.com/v2/${ALCHEMY_ID}`,
       chainId: 137,
@@ -130,6 +135,16 @@ const config: HardhatUserConfig = {
     polygonzk: {
       url: "https://zkevm-rpc.com",
       chainId: 1101,
+      accounts: PROD_PK ? [PROD_PK] : [],
+    },
+    real: {
+      url: "https://rpc.realforreal.gelato.digital/",
+      chainId: 111188,
+      accounts: PROD_PK ? [PROD_PK] : [],
+    },
+    reyanetwork: {
+      url: "https://rpc.reya.network",
+      chainId: 1729,
       accounts: PROD_PK ? [PROD_PK] : [],
     },
     zksync: {
@@ -149,6 +164,11 @@ const config: HardhatUserConfig = {
     },
 
     // Staging
+    amoy: {
+      url: `https://rpc-amoy.polygon.technology`,
+      chainId: 80002,
+      accounts: PROD_PK ? [PROD_PK] : [],
+    },
     arbgoerli: {
       url: "https://goerli-rollup.arbitrum.io/rpc",
       chainId: 421613,
@@ -172,6 +192,11 @@ const config: HardhatUserConfig = {
     baseGoerli: {
       url: "https://goerli.base.org",
       chainId: 84531,
+      accounts: PROD_PK ? [PROD_PK] : [],
+    },
+    blackberry: {
+      url: `https://rpc.polygon-blackberry.gelato.digital`,
+      chainId: 94204209,
       accounts: PROD_PK ? [PROD_PK] : [],
     },
     blastsepolia: {
@@ -232,6 +257,11 @@ const config: HardhatUserConfig = {
     unreal: {
       url: `https://rpc.unreal.gelato.digital`,
       chainId: 18231,
+      accounts: PROD_PK ? [PROD_PK] : [],
+    },
+    unrealorbit: {
+      url: `https://rpc.unreal-orbit.gelato.digital`,
+      chainId: 18233,
       accounts: PROD_PK ? [PROD_PK] : [],
     },
     zkatana: {
