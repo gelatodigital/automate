@@ -14,7 +14,8 @@
     "lint": "eslint --cache . && yarn lint:sol",
     "lint:ts": "eslint -c .eslintrc.json --ext \"**/*.ts\" \"**/*.test.ts\"",
     "lint:sol": "solhint 'contracts/**/*.sol'",
-    "postinstall": "yarn husky install"
+    "postinstall": "yarn husky install",
+    "gas-report:vrf": "forge test --match-path ./test/foundry/gas-reporting/VRFGasReport.t.sol --gas-report"
   },
   "devDependencies": {
     "@matterlabs/hardhat-zksync-solc": "^0.3.17",

@@ -50,4 +50,32 @@ library LibEvents {
         bytes32 taskId,
         bool callSuccess
     );
+
+    /**
+     * @notice Emitted when `execBypassModule` is called.
+     *
+     * @param taskId Unique hash of the task. {See LibTaskId-getTaskId}
+     * @param correlationId Id of the execution to be used for 1Balance settlement.
+     * @param callSuccess Status of the call to execAddress.
+     */
+    event ExecBypassModuleSuccess(
+        bytes32 taskId,
+        bytes32 correlationId,
+        bool callSuccess
+    );
+
+    /**
+     * @notice Emitted when `execBypassModuleSyncFee` is called.
+     *
+     * @param taskId Unique hash of the task. {See LibTaskId-getTaskId}
+     * @param txFee Fee paid to Gelato for execution
+     * @param feeToken Token used to pay for the execution. ETH = 0xeeeeee...
+     * @param callSuccess Status of the call to execAddress.
+     */
+    event ExecBypassModuleSyncFeeSuccess(
+        bytes32 taskId,
+        uint256 txFee,
+        address feeToken,
+        bool callSuccess
+    );
 }

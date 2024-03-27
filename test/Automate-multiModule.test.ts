@@ -211,8 +211,6 @@ describe("Automate multi module test", function () {
     const countBefore = await counter.count();
     const [, execData] = await counterResolver.checker();
 
-    const target = counter.address;
-
     const gelato1BalanceParam = getGelato1BalanceParam({});
 
     await expect(
@@ -230,12 +228,39 @@ describe("Automate multi module test", function () {
       .to.emit(automate, "LogUseGelato1Balance")
       .withArgs(
         gelato1BalanceParam.sponsor,
-        target,
+        counter.address,
         gelato1BalanceParam.feeToken,
         gelato1BalanceParam.oneBalanceChainId,
         gelato1BalanceParam.nativeToFeeTokenXRateNumerator,
         gelato1BalanceParam.nativeToFeeTokenXRateDenominator,
         gelato1BalanceParam.correlationId
+      );
+
+    const countAfter = await counter.count();
+
+    expect(countAfter).to.be.gt(countBefore);
+  });
+
+  it("execBypassModule", async () => {
+    const countBefore = await counter.count();
+    const [, execData] = await counterResolver.checker();
+
+    const dmsExecData = opsProxy.interface.encodeFunctionData("executeCall", [
+      counter.address,
+      execData,
+      0,
+    ]);
+
+    await automate
+      .connect(executor)
+      .execBypassModule(
+        userAddress,
+        opsProxy.address,
+        taskId,
+        ethers.constants.HashZero,
+        dmsExecData,
+        true,
+        false
       );
 
     const countAfter = await counter.count();

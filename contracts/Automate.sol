@@ -12,6 +12,7 @@ import {LibDataTypes} from "./libraries/LibDataTypes.sol";
 import {LibEvents} from "./libraries/LibEvents.sol";
 import {LibTaskId} from "./libraries/LibTaskId.sol";
 import {LibTaskModule} from "./libraries/LibTaskModule.sol";
+import {LibBypassModule} from "./libraries/LibBypassModule.sol";
 import {IAutomate} from "./interfaces/IAutomate.sol";
 
 /**
@@ -26,7 +27,7 @@ contract Automate is Gelatofied, Proxied, AutomateStorage, IAutomate {
     using EnumerableSet for EnumerableSet.Bytes32Set;
 
     // solhint-disable const-name-snakecase
-    string public constant version = "6";
+    string public constant version = "7";
 
     constructor(address payable _gelato) Gelatofied(_gelato) {}
 
@@ -163,6 +164,77 @@ contract Automate is Gelatofied, Proxied, AutomateStorage, IAutomate {
             _oneBalanceParam.nativeToFeeTokenXRateNumerator,
             _oneBalanceParam.nativeToFeeTokenXRateDenominator,
             _oneBalanceParam.correlationId
+        );
+    }
+
+    function execBypassModuleSyncFee(
+        address _taskCreator,
+        address _execAddress,
+        bytes32 _taskId,
+        uint256 _txFee,
+        address _feeToken,
+        bytes memory _execData,
+        bool _revertOnFailure,
+        bool _singleExec
+    ) external onlyGelato {
+        require(
+            _createdTasks[_taskCreator].contains(_taskId),
+            "Automate.exec: Task not found"
+        );
+
+        fee = _txFee;
+        feeToken = _feeToken;
+
+        bool success = LibBypassModule.onExecTask(
+            _taskId,
+            _taskCreator,
+            _execAddress,
+            _execData,
+            _revertOnFailure,
+            _singleExec,
+            _createdTasks
+        );
+
+        delete fee;
+        delete feeToken;
+
+        emit LibEvents.ExecBypassModuleSyncFeeSuccess(
+            _taskId,
+            _txFee,
+            _feeToken,
+            success
+        );
+    }
+
+    ///@inheritdoc IAutomate
+    function execBypassModule(
+        address _taskCreator,
+        address _execAddress,
+        bytes32 _taskId,
+        bytes32 _correlationId,
+        bytes memory _execData,
+        bool _revertOnFailure,
+        bool _singleExec
+    ) external onlyGelato {
+        require(
+            _createdTasks[_taskCreator].contains(_taskId),
+            "Automate.exec: Task not found"
+        );
+
+        bool success = LibBypassModule.onExecTask(
+            _taskId,
+            _taskCreator,
+            _execAddress,
+            _execData,
+            _revertOnFailure,
+            _singleExec,
+            _createdTasks
+        );
+
+        emit LibEvents.ExecBypassModuleSuccess(
+            _taskId,
+            _correlationId,
+            success
         );
     }
 

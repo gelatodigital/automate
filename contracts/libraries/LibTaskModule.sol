@@ -165,7 +165,7 @@ library LibTaskModule {
             taskModuleAddresses
         );
 
-        (_execAddress, _execData) = _preExecCall(
+        (_execAddress, _execData) = preExecCall(
             _taskId,
             _taskCreator,
             _execAddress,
@@ -182,7 +182,7 @@ library LibTaskModule {
             "Automate.exec: "
         );
 
-        _postExecCall(
+        postExecCall(
             _taskId,
             _taskCreator,
             _execAddress,
@@ -192,14 +192,14 @@ library LibTaskModule {
         );
     }
 
-    function _preExecCall(
+    function preExecCall(
         bytes32 _taskId,
         address _taskCreator,
         address _execAddress,
         bytes memory _execData,
         LibDataTypes.Module[] memory _modules,
         address[] memory _moduleAddresses
-    ) private returns (address, bytes memory) {
+    ) internal returns (address, bytes memory) {
         uint256 length = _modules.length;
 
         for (uint256 i; i < length; i++) {
@@ -227,14 +227,14 @@ library LibTaskModule {
         return (_execAddress, _execData);
     }
 
-    function _postExecCall(
+    function postExecCall(
         bytes32 _taskId,
         address _taskCreator,
         address _execAddress,
         bytes memory _execData,
         LibDataTypes.Module[] memory _modules,
         address[] memory _moduleAddresses
-    ) private {
+    ) internal {
         uint256 length = _moduleAddresses.length;
 
         for (uint256 i; i < length; i++) {
