@@ -1,0 +1,142 @@
+# Full reference https://github.com/foundry-rs/foundry/tree/master/config
+
+[profile.default]
+  auto_detect_solc = false
+  bytecode_hash = "none"
+  cbor_metadata = false
+  evm_version = "paris"
+  gas_reports = ["*"]
+  libs = ["node_modules", "lib"]
+  optimizer = true
+  optimizer_runs = 200
+  out = "artifacts-foundry"
+  script = "scripts/foundry"
+  solc = "0.8.20"
+  src = "contracts"
+  test = "test/foundry"
+
+  [profile.default.fuzz]
+    max_test_rejects = 1_000_000 # Number of times `vm.assume` can fail
+    runs = 1_000
+
+  [profile.default.invariant]
+    call_override = false # Override unsafe external calls to perform reentrancy checks
+    depth = 15            # Number of calls executed in one run
+    fail_on_revert = true
+    runs = 256
+
+# Speed up compilation and tests during development
+[profile.lite]
+  optimizer = false
+
+[profile.ci]
+  fuzz = { runs = 10_000 }
+  verbosity = 4
+
+[doc]
+  ignore = ["**/*.t.sol"]
+  out = "docs"
+
+[etherscan]
+  # ETHEREUM
+  goerli = { key = "${ETHERSCAN_API}" }
+  mainnet = { key = "${ETHERSCAN_API}" }
+  sepolia = { key = "${ETHERSCAN_API}" }
+
+  # BINANCE SMART CHAIN
+  bsc = { key = "${ETHERSCAN_BSC_API}" }
+
+  # MATIC/POLYGON
+  polygon = { key = "${ETHERSCAN_POLYGON_API}" }
+  polygonzk = { key = "${ETHERSCAN_POLYGON_ZK_API}" }
+  mumbai = { key = "${ETHERSCAN_POLYGON_API}" }
+
+
+  # OPTIMISM
+  optimism = { key = "${ETHERSCAN_OPTIMISM_API}" }
+  ogoerli = { key = "${ETHERSCAN_OPTIMISM_API}" }
+
+  # ARBITRUM
+  arbitrum = { key = "${ETHERSCAN_ARBITRUM_API}" }
+  arbgoerli = { key = "${ETHERSCAN_ARBITRUM_API}" }
+
+  # BASE
+  base = { key = "${ETHERSCAN_BASE_API}" }
+
+  # AVALANCHE
+  avalanche = { key = "${ETHERSCAN_AVALANCHE_API}" }
+
+  # FANTOM
+  fantom = { key = "${ETHERSCAN_FANTOM_API}" }
+
+  # GNOSIS CHAIN
+  gnosis = { key = "${ETHERSCAN_GNOSIS_API}" }
+
+  # LINEA
+  linea = { key = "${ETHERSCAN_LINEA_API}" }
+
+
+[fmt]
+  # bracket_spacing = true
+  # int_types = "long"
+  # line_length = 100
+  # multiline_func_header = "all"
+  # number_underscore = "thousands"
+  # quote_style = "double"
+  # tab_width = 4
+  # wrap_comments = true
+
+[rpc_endpoints]
+  # LOCALHOST
+  localhost = "http://localhost:8545"
+
+  # ETHEREUM
+  goerli = "https://eth-goerli.alchemyapi.io/v2/${ALCHEMY_ID}"
+  mainnet = "https://eth-mainnet.alchemyapi.io/v2/${ALCHEMY_ID}"
+  sepolia = "https://eth-sepolia.g.alchemy.com/v2/${ALCHEMY_ID}"
+
+  # BINANCE SMART CHAIN
+  bsc = "https://bsc-dataseed.binance.org"
+
+  # MATIC/POLYGON
+  polygon = "https://polygon-mainnet.g.alchemy.com/v2/${ALCHEMY_ID}"
+  polygonzk = "https://zkevm-rpc.com"
+  mumbai = "https://polygon-mumbai.g.alchemy.com/v2/${ALCHEMY_ID}"
+
+  # OPTIMISM
+  optimism = "https://opt-mainnet.g.alchemy.com/v2/${ALCHEMY_ID}"
+  ogoerli = "https://opt-goerli.g.alchemy.com/v2/${ALCHEMY_ID}"
+  osepolia = "https://sepolia.optimism.io"
+
+  # ARBITRUM
+  arbitrum = "https://arb-mainnet.g.alchemy.com/v2/${ALCHEMY_ID}"
+  arbgoerli = "https://goerli-rollup.arbitrum.io/rpc"
+  arbsepolia = "https://sepolia-rollup.arbitrum.io/rpc"
+
+  # BASE
+  base = "https://mainnet.base.org"
+  baseGoerli = "https://goerli.base.org"
+
+  # AVALANCHE
+  avalanche = "https://api.avax.network/ext/bc/C/rpc"
+
+  # FANTOM
+  fantom = "https://rpcapi.fantom.network/"
+
+  # GNOSIS CHAIN
+  gnosis = "https://rpc.gnosischain.com"
+
+  # LINEA
+  linea = "https://linea-mainnet.infura.io/v3/${INFURA_ID}"
+
+  # ZKSYNC ERA
+  zksync = "https://mainnet.era.zksync.io"
+
+  # ASTAR
+  zkatana = "https://rpc.zkatana.gelato.digital"
+
+  # TANGIBLE
+  unreal = "https://rpc.unreal.gelato.digital"
+
+  # GELATO
+  geloptestnet = "https://rpc.op-testnet.gelato.digital"
