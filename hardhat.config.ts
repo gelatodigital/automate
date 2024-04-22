@@ -215,7 +215,7 @@ const config: HardhatUserConfig = {
       accounts: PROD_PK ? [PROD_PK] : [],
     },
     gelatoorbittestnet: {
-      url: `https://rpc.gelato-orbit-anytrust-testnet.gelato.digital`,
+      url: `https://rpc.arb-blueberry.gelato.digital`,
       chainId: 88153591557,
       accounts: PROD_PK ? [PROD_PK] : [],
     },
