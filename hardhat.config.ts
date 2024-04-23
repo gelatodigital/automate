@@ -162,6 +162,16 @@ const config: HardhatUserConfig = {
       chainId: 80001,
       accounts: DEV_PK ? [DEV_PK] : [],
     },
+    amoyDev: {
+      url: `https://rpc-amoy.polygon.technology`,
+      chainId: 80002,
+      accounts: DEV_PK ? [DEV_PK] : [],
+    },
+    gelatoorbittestnetDev: {
+      url: `https://rpc.arb-blueberry.gelato.digital`,
+      chainId: 88153591557,
+      accounts: DEV_PK ? [DEV_PK] : [],
+    },
 
     // Staging
     amoy: {

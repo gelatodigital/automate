@@ -1,6 +1,7 @@
 export const getGelatoAddress = (network: string) => {
   const addresses: { [network: string]: string } = {
     amoy: "0x30056FD86993624B72c7400bB4D7b29F05928E59",
+    amoyDev: "0x963F2BeF2e6ac7764576bF449011eCcc759C0324",
     arbgoerli: "0xF82D64357D9120a760e1E4C75f646C0618eFc2F3",
     arbitrum: "0x4775aF8FEf4809fE10bf05867d2b038a4b5B2146",
     arbsepolia: "0xF82D64357D9120a760e1E4C75f646C0618eFc2F3",
@@ -18,6 +19,7 @@ export const getGelatoAddress = (network: string) => {
     fantom: "0xebA27A2301975FF5BF7864b99F55A4f7A457ED10",
     gelopcelestiatestnet: "0x30056FD86993624B72c7400bB4D7b29F05928E59",
     gelatoorbittestnet: "0x683913B3A32ada4F8100458A3E1675425BdAa7DF",
+    gelatoorbittestnetDev: "0xaB0A8DCb1590C4565C35cC785dc25A0590398054",
     geloptestnet: "0xF82D64357D9120a760e1E4C75f646C0618eFc2F3",
     gnosis: "0x29b6603D17B9D8f021EcB8845B6FD06E1Adf89DE",
     goerli: "0x683913B3A32ada4F8100458A3E1675425BdAa7DF",
