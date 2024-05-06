@@ -179,6 +179,11 @@ const config: HardhatUserConfig = {
       chainId: 80002,
       accounts: PROD_PK ? [PROD_PK] : [],
     },
+    anomalyandromeda: {
+      url: `https://rpc.anomaly-andromeda.gelato.digital`,
+      chainId: 241120,
+      accounts: PROD_PK ? [PROD_PK] : [],
+    },
     arbgoerli: {
       url: "https://goerli-rollup.arbitrum.io/rpc",
       chainId: 421613,

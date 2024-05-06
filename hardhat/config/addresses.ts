@@ -2,6 +2,7 @@ export const getGelatoAddress = (network: string) => {
   const addresses: { [network: string]: string } = {
     amoy: "0x30056FD86993624B72c7400bB4D7b29F05928E59",
     amoyDev: "0x963F2BeF2e6ac7764576bF449011eCcc759C0324",
+    anomalyandromeda: "0x30056FD86993624B72c7400bB4D7b29F05928E59",
     arbgoerli: "0xF82D64357D9120a760e1E4C75f646C0618eFc2F3",
     arbitrum: "0x4775aF8FEf4809fE10bf05867d2b038a4b5B2146",
     arbsepolia: "0xF82D64357D9120a760e1E4C75f646C0618eFc2F3",
