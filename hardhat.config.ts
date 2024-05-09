@@ -174,13 +174,18 @@ const config: HardhatUserConfig = {
     },
 
     // Staging
+    alephzerotestnet: {
+      url: `https://rpc.alephzero-testnet.gelato.digital`,
+      chainId: 2039,
+      accounts: PROD_PK ? [PROD_PK] : [],
+    },
     amoy: {
       url: `https://rpc-amoy.polygon.technology`,
       chainId: 80002,
       accounts: PROD_PK ? [PROD_PK] : [],
     },
     anomalyandromeda: {
-      url: `https://rpc.anomaly-andromeda.gelato.digital`,
+      url: `https://rpc.anomaly-andromeda.anomalygames.io`,
       chainId: 241120,
       accounts: PROD_PK ? [PROD_PK] : [],
     },
