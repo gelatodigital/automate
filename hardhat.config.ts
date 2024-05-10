@@ -102,6 +102,11 @@ const config: HardhatUserConfig = {
       chainId: 59144,
       accounts: PROD_PK ? [PROD_PK] : [],
     },
+    lisk: {
+      url: `https://rpc.api.lisk.com`,
+      chainId: 1135,
+      accounts: PROD_PK ? [PROD_PK] : [],
+    },
     mainnet: {
       accounts: PROD_PK ? [PROD_PK] : [],
       chainId: 1,
