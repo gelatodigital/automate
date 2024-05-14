@@ -87,6 +87,11 @@ const config: HardhatUserConfig = {
       chainId: 56,
       accounts: PROD_PK ? [PROD_PK] : [],
     },
+    coredao: {
+      url: `https://rpc.coredao.org`,
+      chainId: 1116,
+      accounts: PROD_PK ? [PROD_PK] : [],
+    },
     fantom: {
       accounts: PROD_PK ? [PROD_PK] : [],
       chainId: 250,

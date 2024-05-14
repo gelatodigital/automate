@@ -18,6 +18,7 @@ export const getGelatoAddress = (network: string) => {
     blastsepolia: "0xF82D64357D9120a760e1E4C75f646C0618eFc2F3",
     bsc: "0x7C5c4Af1618220C090A6863175de47afb20fa9Df",
     connextsepolia: "0x30056FD86993624B72c7400bB4D7b29F05928E59",
+    coredao: "0x6e1A85E0Ee2893C005eDB99c8Ca4c03d9a309Ed4",
     cronos: "0x91f2A140cA47DdF438B9c583b7E71987525019bB",
     fantom: "0xebA27A2301975FF5BF7864b99F55A4f7A457ED10",
     gelopcelestiatestnet: "0x30056FD86993624B72c7400bB4D7b29F05928E59",
