@@ -87,6 +87,11 @@ const config: HardhatUserConfig = {
       chainId: 56,
       accounts: PROD_PK ? [PROD_PK] : [],
     },
+    coredao: {
+      url: `https://rpc.coredao.org`,
+      chainId: 1116,
+      accounts: PROD_PK ? [PROD_PK] : [],
+    },
     fantom: {
       accounts: PROD_PK ? [PROD_PK] : [],
       chainId: 250,
@@ -100,6 +105,11 @@ const config: HardhatUserConfig = {
     linea: {
       url: `https://linea-mainnet.infura.io/v3/${INFURA_ID}`,
       chainId: 59144,
+      accounts: PROD_PK ? [PROD_PK] : [],
+    },
+    lisk: {
+      url: `https://rpc.api.lisk.com`,
+      chainId: 1135,
       accounts: PROD_PK ? [PROD_PK] : [],
     },
     mainnet: {
@@ -174,9 +184,19 @@ const config: HardhatUserConfig = {
     },
 
     // Staging
+    alephzerotestnet: {
+      url: `https://rpc.alephzero-testnet.gelato.digital`,
+      chainId: 2039,
+      accounts: PROD_PK ? [PROD_PK] : [],
+    },
     amoy: {
       url: `https://rpc-amoy.polygon.technology`,
       chainId: 80002,
+      accounts: PROD_PK ? [PROD_PK] : [],
+    },
+    anomalyandromeda: {
+      url: `https://rpc.anomaly-andromeda.anomalygames.io`,
+      chainId: 241120,
       accounts: PROD_PK ? [PROD_PK] : [],
     },
     arbgoerli: {

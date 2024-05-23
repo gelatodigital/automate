@@ -1,7 +1,9 @@
 export const getGelatoAddress = (network: string) => {
   const addresses: { [network: string]: string } = {
+    alephzerotestnet: "0x30056FD86993624B72c7400bB4D7b29F05928E59",
     amoy: "0x30056FD86993624B72c7400bB4D7b29F05928E59",
     amoyDev: "0x963F2BeF2e6ac7764576bF449011eCcc759C0324",
+    anomalyandromeda: "0x30056FD86993624B72c7400bB4D7b29F05928E59",
     arbgoerli: "0xF82D64357D9120a760e1E4C75f646C0618eFc2F3",
     arbitrum: "0x4775aF8FEf4809fE10bf05867d2b038a4b5B2146",
     arbsepolia: "0xF82D64357D9120a760e1E4C75f646C0618eFc2F3",
@@ -16,6 +18,7 @@ export const getGelatoAddress = (network: string) => {
     blastsepolia: "0xF82D64357D9120a760e1E4C75f646C0618eFc2F3",
     bsc: "0x7C5c4Af1618220C090A6863175de47afb20fa9Df",
     connextsepolia: "0x30056FD86993624B72c7400bB4D7b29F05928E59",
+    coredao: "0x6e1A85E0Ee2893C005eDB99c8Ca4c03d9a309Ed4",
     cronos: "0x91f2A140cA47DdF438B9c583b7E71987525019bB",
     fantom: "0xebA27A2301975FF5BF7864b99F55A4f7A457ED10",
     gelopcelestiatestnet: "0x30056FD86993624B72c7400bB4D7b29F05928E59",
@@ -26,6 +29,7 @@ export const getGelatoAddress = (network: string) => {
     goerli: "0x683913B3A32ada4F8100458A3E1675425BdAa7DF",
     hardhat: "0x3caca7b48d0573d793d3b0279b5f0029180e83b6",
     linea: "0xc2a813699bF2353380c625e3D6b544dC42963941",
+    lisk: "0xb0cb899251086ed70e5d2c8d733D2896Fd989850",
     lisksepolia: "0xF82D64357D9120a760e1E4C75f646C0618eFc2F3",
     mainnet: "0x3caca7b48d0573d793d3b0279b5f0029180e83b6",
     metis: "0xFec1E33eBe899906Ff63546868A26E1028700b0e",
