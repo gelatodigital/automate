@@ -279,6 +279,11 @@ const config: HardhatUserConfig = {
       chainId: 420,
       accounts: PROD_PK ? [PROD_PK] : [],
     },
+    opencampuscodex: {
+      url: `https://rpc.open-campus-codex.gelato.digital`,
+      chainId: 656476,
+      accounts: PROD_PK ? [PROD_PK] : [],
+    },
     osepolia: {
       url: `https://sepolia.optimism.io`,
       chainId: 11155420,

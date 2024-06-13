@@ -39,6 +39,7 @@ export const getGelatoAddress = (network: string) => {
     mumbai: "0x25aD59adbe00C2d80c86d01e2E05e1294DA84823",
     mumbaiDev: "0x266E4AB6baD069aFc28d3C2CC129f6F8455b1dc2",
     ogoerli: "0xF82D64357D9120a760e1E4C75f646C0618eFc2F3",
+    opencampuscodex: "0x30056FD86993624B72c7400bB4D7b29F05928E59",
     optimism: "0x01051113D81D7d6DA508462F2ad6d7fD96cF42Ef",
     osepolia: "0x2d4E9d6ac373d09033BF0b6579A881bF84B9Ee3A",
     playblock: "0xb0cb899251086ed70e5d2c8d733D2896Fd989850",
