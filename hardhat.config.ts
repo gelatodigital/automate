@@ -299,6 +299,11 @@ const config: HardhatUserConfig = {
       chainId: 89346161,
       accounts: PROD_PK ? [PROD_PK] : [],
     },
+    ridottotetromino: {
+      url: `https://rpc.ridotto-tetromino.gelato.digital`,
+      chainId: 4444,
+      accounts: PROD_PK ? [PROD_PK] : [],
+    },
     sepolia: {
       url: `https://eth-sepolia.g.alchemy.com/v2/${ALCHEMY_ID}`,
       chainId: 11155111,
