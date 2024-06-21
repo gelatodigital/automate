@@ -62,7 +62,7 @@ export const getTokenFromFaucet = async (
   await tx.wait();
   const recepientBalance = await token.balanceOf(recepient);
   if (recepientBalance.lt(amount))
-    throw Error(`Tranfer not succesfull: ${tokenAddress}`);
+    throw Error(`Transfer not successful: ${tokenAddress}`);
 };
 
 // @dev Faucet addresses must have payable fallback function
