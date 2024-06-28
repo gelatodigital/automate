@@ -299,8 +299,8 @@ const config: HardhatUserConfig = {
       chainId: 89346161,
       accounts: PROD_PK ? [PROD_PK] : [],
     },
-    ridottotetromino: {
-      url: `https://rpc.ridotto-tetromino.gelato.digital`,
+    ludicotetromino: {
+      url: `https://rpc.ludico-tetromino.gelato.digital`,
       chainId: 4444,
       accounts: PROD_PK ? [PROD_PK] : [],
     },
