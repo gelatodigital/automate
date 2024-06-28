@@ -239,6 +239,11 @@ const config: HardhatUserConfig = {
       chainId: 168587773,
       accounts: PROD_PK ? [PROD_PK] : [],
     },
+    campnetworktestnet: {
+      url: `https://rpc.camp-network-testnet.gelato.digital`,
+      chainId: 325000,
+      accounts: PROD_PK ? [PROD_PK] : [],
+    },
     connextsepolia: {
       url: `https://rpc.connext-sepolia.gelato.digital`,
       chainId: 6398,
@@ -284,6 +289,11 @@ const config: HardhatUserConfig = {
       chainId: 420,
       accounts: PROD_PK ? [PROD_PK] : [],
     },
+    opencampuscodex: {
+      url: `https://rpc.open-campus-codex.gelato.digital`,
+      chainId: 656476,
+      accounts: PROD_PK ? [PROD_PK] : [],
+    },
     osepolia: {
       url: `https://sepolia.optimism.io`,
       chainId: 11155420,
@@ -292,6 +302,11 @@ const config: HardhatUserConfig = {
     reyacronos: {
       url: `https://rpc.reya-cronos.gelato.digital`,
       chainId: 89346161,
+      accounts: PROD_PK ? [PROD_PK] : [],
+    },
+    ludicotetromino: {
+      url: `https://rpc.ludico-tetromino.gelato.digital`,
+      chainId: 4444,
       accounts: PROD_PK ? [PROD_PK] : [],
     },
     sepolia: {
