@@ -274,6 +274,11 @@ const config: HardhatUserConfig = {
       chainId: 80001,
       accounts: PROD_PK ? [PROD_PK] : [],
     },
+    novastrotestnet: {
+      url: `https://rpc.novastro-testnet.gelato.digital`,
+      chainId: 560098,
+      accounts: PROD_PK ? [PROD_PK] : [],
+    },
     ogoerli: {
       url: `https://opt-goerli.g.alchemy.com/v2/${ALCHEMY_ID}`,
       chainId: 420,
