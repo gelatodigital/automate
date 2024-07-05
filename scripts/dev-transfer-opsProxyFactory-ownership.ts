@@ -1,5 +1,5 @@
 import { ethers } from "hardhat";
-import { sleep } from "../hardhat/utils";
+import { sleep } from "../src/utils";
 
 export const transferOpsProxyFactoryOwnership = async () => {
   const newOwnerAddress = ""; // fill with your own owner address

@@ -1,31 +1,43 @@
+import hre, { deployments, ethers, getNamedAccounts } from "hardhat";
 import { DeployFunction } from "hardhat-deploy/types";
 import { HardhatRuntimeEnvironment } from "hardhat/types";
-import { sleep } from "../hardhat/utils";
+import { isTesting, sleep } from "../src/utils";
+
+const isHardhat = isTesting(hre.network.name);
+const isDevEnv = hre.network.name.endsWith("Dev");
+const isDynamicNetwork = hre.network.isDynamic;
+const noDeterministicDeployment = hre.network.noDeterministicDeployment;
 
 const func: DeployFunction = async (hre: HardhatRuntimeEnvironment) => {
-  if (hre.network.name !== "hardhat") {
+  if (!isTesting(hre.network.name)) {
     console.log(
       `Deploying TriggerModule to ${hre.network.name}. Hit ctrl + c to abort`
     );
-    await sleep(10000);
+    await sleep(5000);
   }
-
-  const { deployments } = hre;
   const { deploy } = deployments;
-  const { deployer } = await hre.getNamedAccounts();
+  const { deployer } = await getNamedAccounts();
 
   await deploy("TriggerModule", {
     from: deployer,
-    log: hre.network.name !== "hardhat",
-    gasLimit: 2_000_000,
+    deterministicDeployment: noDeterministicDeployment
+      ? false
+      : isDevEnv
+      ? ethers.utils.formatBytes32String("TriggerModule-dev")
+      : ethers.utils.formatBytes32String("TriggerModule-prod"),
+
+    log: !isTesting(hre.network.name),
   });
 };
 
 export default func;
 
-func.skip = async (hre: HardhatRuntimeEnvironment) => {
-  const shouldSkip = hre.network.name !== "hardhat";
-  return shouldSkip;
+func.skip = async () => {
+  if (isDynamicNetwork) {
+    return false;
+  } else {
+    return !isHardhat;
+  }
 };
 
 func.tags = ["TriggerModule"];

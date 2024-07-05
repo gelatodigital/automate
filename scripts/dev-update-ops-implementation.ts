@@ -1,5 +1,5 @@
 import { ethers } from "hardhat";
-import { sleep } from "../hardhat/utils";
+import { sleep } from "../src/utils";
 import { EIP173Proxy } from "../typechain";
 
 const main = async () => {

@@ -1,8 +1,8 @@
-import { HardhatRuntimeEnvironment } from "hardhat/types";
 import { DeployFunction } from "hardhat-deploy/types";
-import { isTesting, isZksync, sleep } from "../hardhat/utils";
+import { HardhatRuntimeEnvironment } from "hardhat/types";
 import { utils } from "zksync-web3";
 import { bytecode } from "../artifacts-zk/contracts/vendor/proxy/EIP173/EIP173OpsProxy.sol/EIP173OpsProxy.json";
+import { isTesting, isZksync, sleep } from "../src/utils";
 
 const func: DeployFunction = async (hre: HardhatRuntimeEnvironment) => {
   if (!isTesting(hre.network.name)) {
