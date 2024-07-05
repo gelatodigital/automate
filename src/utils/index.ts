@@ -11,3 +11,12 @@ export const isZksync = (name: string) => {
   if (name.toLowerCase().includes("zksync")) return true;
   return false;
 };
+
+export function verifyRequiredEnvVar(
+  key: string,
+  value?: string
+): asserts value is string {
+  if (!value) {
+    throw new Error(`Missing required environment variable: ${key}`);
+  }
+}
