@@ -1,3 +1,5 @@
+import { HardhatRuntimeEnvironment } from "hardhat/types";
+
 export const sleep = (ms: number): Promise<void> =>
   new Promise((resolve) => setTimeout(resolve, ms));
 
@@ -19,4 +21,23 @@ export function verifyRequiredEnvVar(
   if (!value) {
     throw new Error(`Missing required environment variable: ${key}`);
   }
+}
+
+export async function isFirstDeploy(
+  hre: HardhatRuntimeEnvironment,
+  contractName: string
+) {
+  let isFirstDeploy = false;
+  try {
+    await hre.deployments.get("Automate_Proxy");
+  } catch (error) {
+    if (
+      (error as Error).message.includes(
+        `No Contract deployed with name ${contractName}_Proxy`
+      )
+    )
+      isFirstDeploy = true;
+  }
+
+  return isFirstDeploy;
 }

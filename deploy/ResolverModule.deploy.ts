@@ -1,31 +1,43 @@
-import { HardhatRuntimeEnvironment } from "hardhat/types";
+import hre, { deployments, ethers, getNamedAccounts } from "hardhat";
 import { DeployFunction } from "hardhat-deploy/types";
-import { isTesting, sleep } from "../hardhat/utils";
+import { HardhatRuntimeEnvironment } from "hardhat/types";
+import { isTesting, sleep } from "../src/utils";
+
+const isHardhat = isTesting(hre.network.name);
+const isDevEnv = hre.network.name.endsWith("Dev");
+const isDynamicNetwork = hre.network.isDynamic;
+const noDeterministicDeployment = hre.network.noDeterministicDeployment;
 
 const func: DeployFunction = async (hre: HardhatRuntimeEnvironment) => {
   if (!isTesting(hre.network.name)) {
     console.log(
       `Deploying ResolverModule to ${hre.network.name}. Hit ctrl + c to abort`
     );
-    await sleep(10000);
+    await sleep(5000);
   }
-
-  const { deployments } = hre;
   const { deploy } = deployments;
-  const { deployer } = await hre.getNamedAccounts();
+  const { deployer } = await getNamedAccounts();
 
   await deploy("ResolverModule", {
     from: deployer,
+    deterministicDeployment: noDeterministicDeployment
+      ? false
+      : isDevEnv
+      ? ethers.utils.formatBytes32String("ResolverModule-dev")
+      : ethers.utils.formatBytes32String("ResolverModule-prod"),
+
     log: !isTesting(hre.network.name),
-    gasLimit: 2_000_000,
   });
 };
 
 export default func;
 
-func.skip = async (hre: HardhatRuntimeEnvironment) => {
-  const shouldSkip = !isTesting(hre.network.name);
-  return shouldSkip;
+func.skip = async () => {
+  if (isDynamicNetwork) {
+    return false;
+  } else {
+    return !isHardhat;
+  }
 };
 
 func.tags = ["ResolverModule"];
