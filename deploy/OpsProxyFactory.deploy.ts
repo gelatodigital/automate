@@ -7,7 +7,7 @@ import { EIP173Proxy, OpsProxyFactory } from "../typechain";
 const isHardhat = isTesting(hre.network.name);
 const isDevEnv = hre.network.name.endsWith("Dev");
 const isDynamicNetwork = hre.network.isDynamic;
-const noDeterministicDeployment = hre.network.noDeterministicDeployment;
+const isDeterministicDeployment = !hre.network.noDeterministicDeployment;
 
 const func: DeployFunction = async (hre: HardhatRuntimeEnvironment) => {
   if (!isTesting(hre.network.name)) {
@@ -31,7 +31,7 @@ const func: DeployFunction = async (hre: HardhatRuntimeEnvironment) => {
       proxyArgs: [ethers.constants.AddressZero, deployer, "0x"],
     },
     args: [AUTOMATE],
-    deterministicDeployment: noDeterministicDeployment
+    deterministicDeployment: isDeterministicDeployment
       ? false
       : isDevEnv
       ? ethers.utils.formatBytes32String("OpsProxyFactory-dev")
@@ -39,7 +39,7 @@ const func: DeployFunction = async (hre: HardhatRuntimeEnvironment) => {
     log: !isTesting(hre.network.name),
   });
 
-  if (isFirst) {
+  if (isFirst || isHardhat) {
     const proxy = (await ethers.getContract(
       "OpsProxyFactory_Proxy"
     )) as EIP173Proxy;
