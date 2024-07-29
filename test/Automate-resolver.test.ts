@@ -9,6 +9,7 @@ import {
 import { Module, ModuleData, encodeResolverArgs, getTaskId } from "./utils";
 import { getGelato1BalanceParam } from "./utils/1balance";
 import hre = require("hardhat");
+import { getContract } from "../src/utils";
 const { ethers, deployments } = hre;
 
 const GELATO = "0x3caca7b48d0573d793d3b0279b5f0029180e83b6";
@@ -36,10 +37,10 @@ describe("Automate Resolver module test", function () {
     [, user] = await hre.ethers.getSigners();
     userAddress = await user.getAddress();
 
-    automate = await ethers.getContract("Automate");
-    counter = await ethers.getContract("CounterTest");
-    resolverModule = await ethers.getContract("ResolverModule");
-    proxyModule = await ethers.getContract("ProxyModule");
+    automate = await getContract(hre, "Automate");
+    counter = await getContract(hre, "CounterTest");
+    resolverModule = await getContract(hre, "ResolverModule");
+    proxyModule = await getContract(hre, "ProxyModule");
 
     // set-up
     await automate.setModule(

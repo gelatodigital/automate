@@ -1,13 +1,20 @@
 import hre, { deployments, ethers, getNamedAccounts } from "hardhat";
 import { DeployFunction } from "hardhat-deploy/types";
 import { HardhatRuntimeEnvironment } from "hardhat/types";
-import { isFirstDeploy, isTesting, isZksync, sleep } from "../src/utils";
-import { EIP173Proxy, OpsProxyFactory } from "../typechain";
+import {
+  getContract,
+  isFirstDeploy,
+  isTesting,
+  isZksync,
+  sleep,
+} from "../src/utils";
+import { Automate, EIP173Proxy, OpsProxy, OpsProxyFactory } from "../typechain";
 
 const isHardhat = isTesting(hre.network.name);
 const isDevEnv = hre.network.name.endsWith("Dev");
 const isDynamicNetwork = hre.network.isDynamic;
-const isDeterministicDeployment = !hre.network.noDeterministicDeployment;
+// eslint-disable-next-line @typescript-eslint/naming-convention
+const noDeterministicDeployment = hre.network.noDeterministicDeployment;
 
 const func: DeployFunction = async (hre: HardhatRuntimeEnvironment) => {
   if (!isTesting(hre.network.name)) {
@@ -21,7 +28,7 @@ const func: DeployFunction = async (hre: HardhatRuntimeEnvironment) => {
 
   const isFirst = await isFirstDeploy(hre, "OpsProxyFactory");
 
-  const AUTOMATE = (await hre.ethers.getContract("Automate")).address;
+  const AUTOMATE = (await getContract<Automate>(hre, "Automate")).address;
 
   await deploy("OpsProxyFactory", {
     from: deployer,
@@ -31,7 +38,7 @@ const func: DeployFunction = async (hre: HardhatRuntimeEnvironment) => {
       proxyArgs: [ethers.constants.AddressZero, deployer, "0x"],
     },
     args: [AUTOMATE],
-    deterministicDeployment: isDeterministicDeployment
+    deterministicDeployment: noDeterministicDeployment
       ? false
       : isDevEnv
       ? ethers.utils.formatBytes32String("OpsProxyFactory-dev")
@@ -40,14 +47,13 @@ const func: DeployFunction = async (hre: HardhatRuntimeEnvironment) => {
   });
 
   if (isFirst || isHardhat) {
-    const proxy = (await ethers.getContract(
-      "OpsProxyFactory_Proxy"
-    )) as EIP173Proxy;
-    const implementation = (await ethers.getContract(
+    const proxy = await getContract<EIP173Proxy>(hre, "OpsProxyFactory_Proxy");
+    const implementation = await getContract<OpsProxyFactory>(
+      hre,
       "OpsProxyFactory_Implementation"
-    )) as OpsProxyFactory;
+    );
 
-    const OPSPROXY = (await hre.ethers.getContract("OpsProxy")).address;
+    const OPSPROXY = (await getContract<OpsProxy>(hre, "OpsProxy")).address;
     const initializeData = implementation.interface.encodeFunctionData(
       "initialize",
       [OPSPROXY]

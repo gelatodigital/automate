@@ -1,6 +1,7 @@
 import { DeployFunction } from "hardhat-deploy/types";
 import { HardhatRuntimeEnvironment } from "hardhat/types";
-import { isTesting, sleep } from "../../src/utils";
+import { getContract, isTesting, sleep } from "../../src/utils";
+import { Automate } from "../../typechain";
 
 const func: DeployFunction = async (hre: HardhatRuntimeEnvironment) => {
   if (!isTesting(hre.network.name)) {
@@ -16,7 +17,7 @@ const func: DeployFunction = async (hre: HardhatRuntimeEnvironment) => {
 
   await deploy("CounterTest", {
     from: deployer,
-    args: [(await hre.ethers.getContract("Automate")).address],
+    args: [(await getContract<Automate>(hre, "Automate")).address],
   });
 };
 

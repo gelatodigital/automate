@@ -2,7 +2,8 @@ import { DeployFunction } from "hardhat-deploy/types";
 import { HardhatRuntimeEnvironment } from "hardhat/types";
 import { utils } from "zksync-web3";
 import { bytecode } from "../artifacts-zk/contracts/vendor/proxy/EIP173/EIP173OpsProxy.sol/EIP173OpsProxy.json";
-import { isTesting, isZksync, sleep } from "../src/utils";
+import { getContract, isTesting, isZksync, sleep } from "../src/utils";
+import { Automate, OpsProxy } from "../typechain";
 
 const func: DeployFunction = async (hre: HardhatRuntimeEnvironment) => {
   if (!isTesting(hre.network.name)) {
@@ -16,8 +17,8 @@ const func: DeployFunction = async (hre: HardhatRuntimeEnvironment) => {
   const { deploy } = deployments;
   const { deployer } = await hre.getNamedAccounts();
 
-  const AUTOMATE = (await hre.ethers.getContract("Automate")).address;
-  const OPSPROXY = (await hre.ethers.getContract("OpsProxy")).address;
+  const AUTOMATE = (await getContract<Automate>(hre, "Automate")).address;
+  const OPSPROXY = (await getContract<OpsProxy>(hre, "OpsProxy")).address;
 
   const eip173OpsProxyByteCodeHash =
     "0x" + Buffer.from(utils.hashBytecode(bytecode)).toString("hex");
