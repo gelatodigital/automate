@@ -1,4 +1,5 @@
-import hre, { deployments, ethers, getNamedAccounts } from "hardhat";
+import { keccak256, toUtf8Bytes } from "ethers/lib/utils";
+import hre, { deployments, getNamedAccounts } from "hardhat";
 import { DeployFunction } from "hardhat-deploy/types";
 import { HardhatRuntimeEnvironment } from "hardhat/types";
 import { isTesting, sleep } from "../src/utils";
@@ -24,9 +25,8 @@ const func: DeployFunction = async (hre: HardhatRuntimeEnvironment) => {
     deterministicDeployment: noDeterministicDeployment
       ? false
       : isDevEnv
-      ? ethers.utils.formatBytes32String("TriggerModule-dev")
-      : ethers.utils.formatBytes32String("TriggerModule-prod"),
-
+      ? keccak256(toUtf8Bytes("TriggerModule-dev"))
+      : keccak256(toUtf8Bytes("TriggerModule-prod")),
     log: !isTesting(hre.network.name),
   });
 };

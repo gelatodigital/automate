@@ -1,3 +1,4 @@
+import { keccak256, toUtf8Bytes } from "ethers/lib/utils";
 import hre, { deployments, ethers, getNamedAccounts } from "hardhat";
 import { DeployFunction } from "hardhat-deploy/types";
 import { HardhatRuntimeEnvironment } from "hardhat/types";
@@ -41,8 +42,8 @@ const func: DeployFunction = async (hre: HardhatRuntimeEnvironment) => {
     deterministicDeployment: noDeterministicDeployment
       ? false
       : isDevEnv
-      ? ethers.utils.formatBytes32String("OpsProxyFactory-dev")
-      : ethers.utils.formatBytes32String("OpsProxyFactory-prod"),
+      ? keccak256(toUtf8Bytes("OpsProxyFactory-dev"))
+      : keccak256(toUtf8Bytes("OpsProxyFactory-prod")),
     log: !isTesting(hre.network.name),
   });
 
