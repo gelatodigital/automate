@@ -1,11 +1,14 @@
-import hre, { deployments, ethers, getNamedAccounts } from "hardhat";
+import { keccak256, toUtf8Bytes } from "ethers/lib/utils";
+import hre, { deployments, getNamedAccounts } from "hardhat";
 import { DeployFunction } from "hardhat-deploy/types";
 import { HardhatRuntimeEnvironment } from "hardhat/types";
-import { isTesting, sleep } from "../src/utils";
+import { getContract, isTesting, sleep } from "../src/utils";
+import { Automate } from "../typechain";
 
 const isHardhat = isTesting(hre.network.name);
 const isDevEnv = hre.network.name.endsWith("Dev");
 const isDynamicNetwork = hre.network.isDynamic;
+// eslint-disable-next-line @typescript-eslint/naming-convention
 const noDeterministicDeployment = hre.network.noDeterministicDeployment;
 
 const func: DeployFunction = async (hre: HardhatRuntimeEnvironment) => {
@@ -18,7 +21,7 @@ const func: DeployFunction = async (hre: HardhatRuntimeEnvironment) => {
   const { deploy } = deployments;
   const { deployer } = await getNamedAccounts();
 
-  const AUTOMATE = (await hre.ethers.getContract("Automate")).address;
+  const AUTOMATE = (await getContract<Automate>(hre, "Automate")).address;
 
   await deploy("OpsProxy", {
     from: deployer,
@@ -26,8 +29,8 @@ const func: DeployFunction = async (hre: HardhatRuntimeEnvironment) => {
     deterministicDeployment: noDeterministicDeployment
       ? false
       : isDevEnv
-      ? ethers.utils.formatBytes32String("OpsProxy-dev")
-      : ethers.utils.formatBytes32String("OpsProxy-prod"),
+      ? keccak256(toUtf8Bytes("OpsProxy-dev"))
+      : keccak256(toUtf8Bytes("OpsProxy-prod")),
 
     log: !isTesting(hre.network.name),
   });

@@ -1,4 +1,5 @@
-import { extendEnvironment, HardhatUserConfig } from "hardhat/config";
+import { extendEnvironment, HardhatUserConfig, subtask } from "hardhat/config";
+import { TASK_COMPILE_SOLIDITY_GET_SOLC_BUILD } from "hardhat/builtin-tasks/task-names";
 // PLUGINS
 import "@matterlabs/hardhat-zksync-solc";
 import "@matterlabs/hardhat-zksync-verify";
@@ -12,15 +13,13 @@ import * as dotenv from "dotenv";
 dotenv.config({ path: __dirname + "/.env" });
 
 // Libraries
-import assert from "assert";
 import { ethers } from "ethers";
 import { verifyRequiredEnvVar } from "./src/utils";
+import path from "path";
 
 // @dev Put this in .env
 const ALCHEMY_ID = process.env.ALCHEMY_ID;
-assert.ok(ALCHEMY_ID, "no Alchemy ID in process.env");
 const INFURA_ID = process.env.INFURA_ID;
-assert.ok(INFURA_ID, "no Infura ID in process.env");
 
 // @dev fill this out
 const AUTOMATE_DEPLOYER_PK = process.env.AUTOMATE_DEPLOYER_PK;
@@ -67,6 +66,40 @@ extendEnvironment((hre) => {
     hre.network.noDeterministicDeployment = hre.network.config.zksync ?? false;
   }
 });
+
+subtask(
+  TASK_COMPILE_SOLIDITY_GET_SOLC_BUILD,
+  async (
+    args: {
+      solcVersion: string;
+    },
+    hre,
+    runSuper
+  ) => {
+    // Full list of solc versions: https://github.com/ethereum/solc-bin/blob/gh-pages/bin/list.json
+    // Search by the version number in the list, there will be `nightly` versions as well along with the main in the list.json
+    // Find the one that is NOT a nightly build, and copy the `path` field in the build object
+    // The solidity compiler will be found at `https://github.com/ethereum/solc-bin/blob/gh-pages/bin/${path-field-in-the-build}`
+    if (args.solcVersion === "0.8.14") {
+      const compilerPath = path.join(
+        __dirname,
+        "src/solc",
+        "soljson-v0.8.14+commit.80d49f37.js"
+      );
+
+      return {
+        compilerPath,
+        isSolcJs: true,
+        version: args.solcVersion,
+        longVersion: "0.8.14+commit.80d49f37",
+      };
+    }
+
+    // Only overrides the compiler for version 0.8.14,
+    // the runSuper function allows us to call the default subtask.
+    return runSuper();
+  }
+);
 
 // ================================= CONFIG =========================================
 const config: HardhatUserConfig = {

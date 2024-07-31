@@ -21,11 +21,11 @@ describeConditionally("OpsProxyFactoryZkSync test", function () {
     [user] = await ethers.getSigners();
     userAddress = await user.getAddress();
 
-    opsProxyFactoryZkSync = await ethers.getContractAt(
+    opsProxyFactoryZkSync = (await ethers.getContractAt(
       res["OpsProxyFactoryZkSync"].abi,
       res["OpsProxyFactoryZkSync"].address,
       user
-    );
+    )) as OpsProxyFactoryZkSync;
   });
 
   it("should determine and deploy opsProxy correctly", async function () {

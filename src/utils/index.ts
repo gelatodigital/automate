@@ -1,3 +1,4 @@
+import { Contract } from "ethers";
 import { HardhatRuntimeEnvironment } from "hardhat/types";
 
 export const sleep = (ms: number): Promise<void> =>
@@ -29,15 +30,31 @@ export async function isFirstDeploy(
 ) {
   let isFirstDeploy = false;
   try {
-    await hre.deployments.get("Automate_Proxy");
+    await hre.deployments.get(contractName);
   } catch (error) {
     if (
       (error as Error).message.includes(
-        `No Contract deployed with name ${contractName}_Proxy`
+        `No deployment found for: ${contractName}`
       )
     )
       isFirstDeploy = true;
   }
 
   return isFirstDeploy;
+}
+
+export async function getContract<T extends Contract>(
+  hre: HardhatRuntimeEnvironment,
+  contractName: string
+): Promise<T> {
+  return (await hre.ethers.getContractAt(
+    contractName.endsWith("_Proxy")
+      ? "EIP173Proxy"
+      : contractName.endsWith("_Implementation")
+      ? contractName.split("_Implementation")[0]
+      : contractName,
+    (
+      await hre.deployments.get(contractName)
+    ).address
+  )) as T;
 }

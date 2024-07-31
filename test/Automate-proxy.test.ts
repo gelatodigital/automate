@@ -11,6 +11,7 @@ import {
 import { Module, ModuleData, getTaskId } from "./utils";
 import { getGelato1BalanceParam } from "./utils/1balance";
 import hre = require("hardhat");
+import { getContract } from "../src/utils";
 const { ethers, deployments } = hre;
 
 const GELATO = "0x3CACa7b48D0573D793d3b0279b5F0029180E83b6";
@@ -48,11 +49,11 @@ describe("Automate Proxy module test", function () {
     userAddress = await user.getAddress();
     user2Address = await user2.getAddress();
 
-    automate = await ethers.getContract("Automate");
-    proxyModule = await ethers.getContract("ProxyModule");
-    counter = await ethers.getContract("CounterWL");
-    opsProxyFactory = await ethers.getContract("OpsProxyFactory");
-    opsProxyImplementation = await ethers.getContract("OpsProxy");
+    automate = await getContract(hre, "Automate");
+    proxyModule = await getContract(hre, "ProxyModule");
+    counter = await getContract(hre, "CounterWL");
+    opsProxyFactory = await getContract(hre, "OpsProxyFactory");
+    opsProxyImplementation = await getContract(hre, "OpsProxy");
 
     await hre.network.provider.request({
       method: "hardhat_impersonateAccount",

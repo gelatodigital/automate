@@ -1,14 +1,22 @@
+import { keccak256, toUtf8Bytes } from "ethers/lib/utils";
 import hre, { deployments, ethers, getNamedAccounts } from "hardhat";
 import { DeployFunction } from "hardhat-deploy/types";
 import { HardhatRuntimeEnvironment } from "hardhat/types";
 import { getAddresses } from "../src/addresses";
-import { isFirstDeploy, isTesting, isZksync, sleep } from "../src/utils";
+import {
+  getContract,
+  isFirstDeploy,
+  isTesting,
+  isZksync,
+  sleep,
+} from "../src/utils";
 import { Automate, EIP173Proxy } from "../typechain";
 
 const isHardhat = isTesting(hre.network.name);
 const isDevEnv = hre.network.name.endsWith("Dev");
 const isDynamicNetwork = hre.network.isDynamic;
-const isDeterministicDeployment = !hre.network.noDeterministicDeployment;
+// eslint-disable-next-line @typescript-eslint/naming-convention
+const noDeterministicDeployment = hre.network.noDeterministicDeployment;
 
 const func: DeployFunction = async (hre: HardhatRuntimeEnvironment) => {
   if (!isTesting(hre.network.name)) {
@@ -32,19 +40,20 @@ const func: DeployFunction = async (hre: HardhatRuntimeEnvironment) => {
       proxyArgs: [ethers.constants.AddressZero, deployer, "0x"],
     },
     args: [GELATO],
-    deterministicDeployment: isDeterministicDeployment
+    deterministicDeployment: noDeterministicDeployment
       ? false
       : isDevEnv
-      ? ethers.utils.formatBytes32String("Automate-dev")
-      : ethers.utils.formatBytes32String("Automate-prod"),
+      ? keccak256(toUtf8Bytes("Automate-dev"))
+      : keccak256(toUtf8Bytes("Automate-prod")),
     log: !isTesting(hre.network.name),
   });
 
   if (isFirst || isHardhat) {
-    const proxy = (await ethers.getContract("Automate_Proxy")) as EIP173Proxy;
-    const implementation = (await ethers.getContract(
+    const proxy = await getContract<EIP173Proxy>(hre, "Automate_Proxy");
+    const implementation = await getContract<Automate>(
+      hre,
       "Automate_Implementation"
-    )) as Automate;
+    );
 
     console.log(`Setting implementation to ${implementation.address}`);
     const tx = await proxy.upgradeTo(implementation.address);
