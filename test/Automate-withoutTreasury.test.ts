@@ -3,12 +3,12 @@ import { expect } from "chai";
 import {
   Automate,
   CounterTestWT,
-  IGelato,
   ProxyModule,
   SingleExecModule,
 } from "../typechain";
 import { Module, ModuleData, getTaskId } from "./utils";
 import hre = require("hardhat");
+import { getContract } from "../src/utils";
 const { ethers, deployments } = hre;
 
 const GELATO = "0x3caca7b48d0573d793d3b0279b5f0029180e83b6";
@@ -35,15 +35,15 @@ describe("Automate Without 1Balance test", function () {
   beforeEach(async function () {
     await deployments.fixture();
 
-    const gelato = await ethers.getContractAt<IGelato>("IGelato", GELATO);
+    const gelato = await ethers.getContractAt("IGelato", GELATO);
     feeCollector = await gelato.feeCollector();
 
     [, user] = await hre.ethers.getSigners();
     userAddress = await user.getAddress();
 
-    automate = await ethers.getContract("Automate");
-    singleExecModule = await ethers.getContract("SingleExecModule");
-    proxyModule = await ethers.getContract("ProxyModule");
+    automate = await getContract(hre, "Automate");
+    singleExecModule = await getContract(hre, "SingleExecModule");
+    proxyModule = await getContract(hre, "ProxyModule");
 
     // set-up
     await automate.setModule(

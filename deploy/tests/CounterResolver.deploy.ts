@@ -1,6 +1,7 @@
-import { HardhatRuntimeEnvironment } from "hardhat/types";
 import { DeployFunction } from "hardhat-deploy/types";
-import { isTesting, sleep } from "../../hardhat/utils";
+import { HardhatRuntimeEnvironment } from "hardhat/types";
+import { getContract, isTesting, sleep } from "../../src/utils";
+import { CounterTest } from "../../typechain";
 
 const func: DeployFunction = async (hre: HardhatRuntimeEnvironment) => {
   if (!isTesting(hre.network.name)) {
@@ -16,7 +17,7 @@ const func: DeployFunction = async (hre: HardhatRuntimeEnvironment) => {
 
   await deploy("CounterResolver", {
     from: deployer,
-    args: [(await hre.ethers.getContract("CounterTest")).address],
+    args: [(await getContract<CounterTest>(hre, "CounterTest")).address],
   });
 };
 

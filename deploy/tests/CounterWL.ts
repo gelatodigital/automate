@@ -1,6 +1,6 @@
-import { HardhatRuntimeEnvironment } from "hardhat/types";
 import { DeployFunction } from "hardhat-deploy/types";
-import { isTesting, sleep } from "../../hardhat/utils";
+import { HardhatRuntimeEnvironment } from "hardhat/types";
+import { isTesting, sleep } from "../../src/utils";
 
 const func: DeployFunction = async (hre: HardhatRuntimeEnvironment) => {
   if (!isTesting(hre.network.name)) {

@@ -35,3 +35,12 @@ yarn-error.log
 package-lock.json
 
 dist
+
+
+.pnp.*
+.yarn/*
+!.yarn/patches
+!.yarn/plugins
+!.yarn/releases
+!.yarn/sdks
+!.yarn/versions
