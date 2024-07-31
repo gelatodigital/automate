@@ -10,6 +10,7 @@ import {
 } from "../typechain";
 import { Module } from "./utils";
 import hre = require("hardhat");
+import { getContract } from "../src/utils";
 const { ethers, deployments } = hre;
 
 describe("AutomateTaskCreator test", function () {
@@ -26,8 +27,8 @@ describe("AutomateTaskCreator test", function () {
 
     automateModule = new AutomateModule();
 
-    automate = await ethers.getContract("Automate");
-    proxyModule = await ethers.getContract("ProxyModule");
+    automate = await getContract(hre, "Automate");
+    proxyModule = await getContract(hre, "ProxyModule");
 
     await automate.setModule([Module.PROXY], [proxyModule.address]);
 

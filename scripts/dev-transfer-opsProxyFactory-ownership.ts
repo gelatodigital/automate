@@ -1,5 +1,7 @@
 import { ethers } from "hardhat";
-import { sleep } from "../src/utils";
+import { getContract, sleep } from "../src/utils";
+import { EIP173Proxy } from "../typechain";
+import hre = require("hardhat");
 
 export const transferOpsProxyFactoryOwnership = async () => {
   const newOwnerAddress = ""; // fill with your own owner address
@@ -8,8 +10,9 @@ export const transferOpsProxyFactoryOwnership = async () => {
     throw new Error(`No owner address defined`);
   }
 
-  const proxyAddress = (await ethers.getContract("OpsProxyFactory_Proxy"))
-    .address;
+  const proxyAddress = (
+    await getContract<EIP173Proxy>(hre, "OpsProxyFactory_Proxy")
+  ).address;
   const ownableInterface = [
     "function transferOwnership(address newOwner) external",
     "function transferProxyAdmin(address newAdmin) external",

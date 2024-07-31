@@ -1,4 +1,5 @@
-import hre, { deployments, ethers, getNamedAccounts } from "hardhat";
+import { keccak256, toUtf8Bytes } from "ethers/lib/utils";
+import hre, { deployments, getNamedAccounts } from "hardhat";
 import { DeployFunction } from "hardhat-deploy/types";
 import { HardhatRuntimeEnvironment } from "hardhat/types";
 import { isTesting, sleep } from "../src/utils";
@@ -6,6 +7,7 @@ import { isTesting, sleep } from "../src/utils";
 const isHardhat = isTesting(hre.network.name);
 const isDevEnv = hre.network.name.endsWith("Dev");
 const isDynamicNetwork = hre.network.isDynamic;
+// eslint-disable-next-line @typescript-eslint/naming-convention
 const noDeterministicDeployment = hre.network.noDeterministicDeployment;
 
 const func: DeployFunction = async (hre: HardhatRuntimeEnvironment) => {
@@ -23,9 +25,8 @@ const func: DeployFunction = async (hre: HardhatRuntimeEnvironment) => {
     deterministicDeployment: noDeterministicDeployment
       ? false
       : isDevEnv
-      ? ethers.utils.formatBytes32String("SingleExecModule-dev")
-      : ethers.utils.formatBytes32String("SingleExecModule-prod"),
-
+      ? keccak256(toUtf8Bytes("SingleExecModule-dev"))
+      : keccak256(toUtf8Bytes("SingleExecModule-prod")),
     log: !isTesting(hre.network.name),
   });
 };

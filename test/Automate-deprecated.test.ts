@@ -11,6 +11,7 @@ import {
 } from "../typechain";
 import { Module, encodeTimeArgs, getTimeStampNow } from "./utils";
 import hre = require("hardhat");
+import { getContract } from "../src/utils";
 const { ethers, deployments } = hre;
 
 const ZERO_ADD = ethers.constants.AddressZero;
@@ -32,14 +33,14 @@ describe("Automate deprecated test", function () {
 
     [, user] = await hre.ethers.getSigners();
 
-    automate = await ethers.getContract("Automate");
-    counter = await ethers.getContract("CounterTest");
+    automate = await getContract(hre, "Automate");
+    counter = await getContract(hre, "CounterTest");
 
-    resolverModule = await ethers.getContract("ResolverModule");
-    proxyModule = await ethers.getContract("ProxyModule");
-    singleExecModule = await ethers.getContract("SingleExecModule");
-    web3FunctionModule = await ethers.getContract("Web3FunctionModule");
-    triggerModule = await ethers.getContract("TriggerModule");
+    resolverModule = await getContract(hre, "ResolverModule");
+    proxyModule = await getContract(hre, "ProxyModule");
+    singleExecModule = await getContract(hre, "SingleExecModule");
+    web3FunctionModule = await getContract(hre, "Web3FunctionModule");
+    triggerModule = await getContract(hre, "TriggerModule");
 
     // set-up
     await automate.setModule(
