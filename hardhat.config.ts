@@ -57,6 +57,11 @@ const config: HardhatUserConfig = {
     },
 
     // Prod
+    alephzero: {
+      url: `https://rpc.alephzero.raas.gelato.cloud`,
+      chainId: 41455,
+      accounts: PROD_PK ? [PROD_PK] : [],
+    },
     arbitrum: {
       url: `https://arb-mainnet.g.alchemy.com/v2/${ALCHEMY_ID}`,
       chainId: 42161,
@@ -227,6 +232,11 @@ const config: HardhatUserConfig = {
     baseGoerli: {
       url: "https://goerli.base.org",
       chainId: 84531,
+      accounts: PROD_PK ? [PROD_PK] : [],
+    },
+    berachainbartio: {
+      url: "https://bartio.rpc.berachain.com/",
+      chainId: 80084,
       accounts: PROD_PK ? [PROD_PK] : [],
     },
     blackberry: {
