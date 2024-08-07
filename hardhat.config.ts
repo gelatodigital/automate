@@ -234,6 +234,11 @@ const config: HardhatUserConfig = {
       chainId: 84531,
       accounts: PROD_PK ? [PROD_PK] : [],
     },
+    berachainbartio: {
+      url: "https://bartio.rpc.berachain.com/",
+      chainId: 80084,
+      accounts: PROD_PK ? [PROD_PK] : [],
+    },
     blackberry: {
       url: `https://rpc.polygon-blackberry.gelato.digital`,
       chainId: 94204209,
