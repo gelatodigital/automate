@@ -1,5 +1,6 @@
 export const getGelatoAddress = (network: string) => {
   const addresses: { [network: string]: string } = {
+    alephzero: "0xb0cb899251086ed70e5d2c8d733D2896Fd989850",
     alephzerotestnet: "0x30056FD86993624B72c7400bB4D7b29F05928E59",
     amoy: "0x30056FD86993624B72c7400bB4D7b29F05928E59",
     amoyDev: "0x963F2BeF2e6ac7764576bF449011eCcc759C0324",
