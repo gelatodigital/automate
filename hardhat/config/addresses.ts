@@ -49,6 +49,7 @@ export const getGelatoAddress = (network: string) => {
     playblock: "0xb0cb899251086ed70e5d2c8d733D2896Fd989850",
     polygon: "0x7598e84B2E114AB62CAB288CE5f7d5f6bad35BbA",
     polygonzk: "0x08EFb6D315c7e74C39620c9AAEA289730f43a429",
+    prism: "0xb0cb899251086ed70e5d2c8d733D2896Fd989850",
     real: "0xb0cb899251086ed70e5d2c8d733D2896Fd989850",
     reyacronos: "0x683913B3A32ada4F8100458A3E1675425BdAa7DF",
     reyanetwork: "0xb0cb899251086ed70e5d2c8d733D2896Fd989850",

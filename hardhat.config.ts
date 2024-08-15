@@ -152,6 +152,11 @@ const config: HardhatUserConfig = {
       chainId: 1101,
       accounts: PROD_PK ? [PROD_PK] : [],
     },
+    prism: {
+      url: `https://mainnet-rpc.lumia.org`,
+      chainId: 994873017,
+      accounts: PROD_PK ? [PROD_PK] : [],
+    },
     real: {
       url: "https://rpc.realforreal.gelato.digital/",
       chainId: 111188,
