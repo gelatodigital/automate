@@ -1,5 +1,5 @@
-import { extendEnvironment, HardhatUserConfig, subtask } from "hardhat/config";
 import { TASK_COMPILE_SOLIDITY_GET_SOLC_BUILD } from "hardhat/builtin-tasks/task-names";
+import { extendEnvironment, HardhatUserConfig, subtask } from "hardhat/config";
 // PLUGINS
 import "@matterlabs/hardhat-zksync-solc";
 import "@matterlabs/hardhat-zksync-verify";
@@ -14,8 +14,8 @@ dotenv.config({ path: __dirname + "/.env" });
 
 // Libraries
 import { ethers } from "ethers";
-import { verifyRequiredEnvVar } from "./src/utils";
 import path from "path";
+import { verifyRequiredEnvVar } from "./src/utils";
 
 // @dev Put this in .env
 const ALCHEMY_ID = process.env.ALCHEMY_ID;
@@ -23,7 +23,7 @@ const INFURA_ID = process.env.INFURA_ID;
 
 // @dev fill this out
 const AUTOMATE_DEPLOYER_PK = process.env.AUTOMATE_DEPLOYER_PK;
-const ETHERSCAN_API = process.env.ETHERSCAN_API;
+const ETHERSCAN_API_KEY = process.env.ETHERSCAN_API_KEY;
 
 if (!AUTOMATE_DEPLOYER_PK) {
   throw new Error("AUTOMATE_DEPLOYER_PK is missing");
@@ -426,7 +426,7 @@ const config: HardhatUserConfig = {
 
   verify: {
     etherscan: {
-      apiKey: ETHERSCAN_API,
+      apiKey: ETHERSCAN_API_KEY ? ETHERSCAN_API_KEY : "",
     },
   },
 };
