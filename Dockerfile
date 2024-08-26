@@ -24,7 +24,7 @@ RUN yarn run build
 RUN npx hardhat deploy --network dynamic || true
 
 ARG ETHERSCAN_API_KEY=$HARDHAT_DYNAMIC_NETWORK_ETHERSCAN_API_KEY
-RUN timeout 300s yarn hardhat etherscan-verify --network dynamic --api-url $HARDHAT_DYNAMIC_NETWORK_ETHERSCAN_VERIFY_URL || true
+RUN timeout 60s yarn hardhat etherscan-verify --network dynamic --api-url $HARDHAT_DYNAMIC_NETWORK_ETHERSCAN_VERIFY_URL || true
 
 FROM alpine:3.20
 
