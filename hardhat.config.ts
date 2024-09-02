@@ -254,6 +254,11 @@ const config: HardhatUserConfig = {
       chainId: 168587773,
       accounts: PROD_PK ? [PROD_PK] : [],
     },
+    bonito: {
+      url: `https://rpc.bonito-testnet.t.raas.gelato.cloud`,
+      chainId: 69658185,
+      accounts: PROD_PK ? [PROD_PK] : [],
+    },
     campnetworktestnet: {
       url: `https://rpc.camp-network-testnet.gelato.digital`,
       chainId: 325000,
