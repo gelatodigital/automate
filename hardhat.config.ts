@@ -172,6 +172,12 @@ const config: HardhatUserConfig = {
       chainId: 30,
       accounts: PROD_PK ? [PROD_PK] : [],
     },
+    shape: {
+      url: `https://mainnet.shape.network`,
+      accounts: PROD_PK ? [PROD_PK] : [],
+      chainId: 360,
+      gasPrice: 10000,
+    },
     zksync: {
       zksync: true,
       url: "https://mainnet.era.zksync.io",
