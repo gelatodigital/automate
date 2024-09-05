@@ -1,7 +1,8 @@
 import { DeployFunction } from "hardhat-deploy/types";
 import { HardhatRuntimeEnvironment } from "hardhat/types";
 import { utils } from "zksync-web3";
-import { bytecode } from "../artifacts-zk/contracts/vendor/proxy/EIP173/EIP173OpsProxy.sol/EIP173OpsProxy.json";
+// import { bytecode } from "../artifacts-zk/contracts/vendor/proxy/EIP173/EIP173OpsProxy.sol/EIP173OpsProxy.json";
+import { ethers } from "hardhat";
 import { getContract, isTesting, isZksync, sleep } from "../src/utils";
 import { Automate, OpsProxy } from "../typechain";
 
@@ -11,6 +12,11 @@ const func: DeployFunction = async (hre: HardhatRuntimeEnvironment) => {
       `Deploying OpsProxyFactoryZkSync to ${hre.network.name}. Hit ctrl + c to abort`
     );
     await sleep(10000);
+  }
+
+  const bytecode = ethers.constants.HashZero;
+  if (isZksync(hre.network.name)) {
+    throw new Error(`Use bytecode from generated artifacts`);
   }
 
   const { deployments } = hre;
