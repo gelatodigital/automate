@@ -24,6 +24,7 @@ export const getGelatoAddress = (network: string) => {
     connextsepolia: "0x30056FD86993624B72c7400bB4D7b29F05928E59",
     coredao: "0x6e1A85E0Ee2893C005eDB99c8Ca4c03d9a309Ed4",
     cronos: "0x91f2A140cA47DdF438B9c583b7E71987525019bB",
+    everclear: "0xFec1E33eBe899906Ff63546868A26E1028700b0e",
     fantom: "0xebA27A2301975FF5BF7864b99F55A4f7A457ED10",
     gelopcelestiatestnet: "0x30056FD86993624B72c7400bB4D7b29F05928E59",
     gelatoorbittestnet: "0x683913B3A32ada4F8100458A3E1675425BdAa7DF",

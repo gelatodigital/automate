@@ -97,6 +97,11 @@ const config: HardhatUserConfig = {
       chainId: 1116,
       accounts: PROD_PK ? [PROD_PK] : [],
     },
+    everclear: {
+      url: `https://rpc.everclear.raas.gelato.cloud`,
+      chainId: 25327,
+      accounts: PROD_PK ? [PROD_PK] : [],
+    },
     fantom: {
       accounts: PROD_PK ? [PROD_PK] : [],
       chainId: 250,
