@@ -57,6 +57,11 @@ const config: HardhatUserConfig = {
     },
 
     // Prod
+    alephzero: {
+      url: `https://rpc.alephzero.raas.gelato.cloud`,
+      chainId: 41455,
+      accounts: PROD_PK ? [PROD_PK] : [],
+    },
     arbitrum: {
       url: `https://arb-mainnet.g.alchemy.com/v2/${ALCHEMY_ID}`,
       chainId: 42161,
@@ -90,6 +95,11 @@ const config: HardhatUserConfig = {
     coredao: {
       url: `https://rpc.coredao.org`,
       chainId: 1116,
+      accounts: PROD_PK ? [PROD_PK] : [],
+    },
+    everclear: {
+      url: `https://rpc.everclear.raas.gelato.cloud`,
+      chainId: 25327,
       accounts: PROD_PK ? [PROD_PK] : [],
     },
     fantom: {
@@ -147,6 +157,11 @@ const config: HardhatUserConfig = {
       chainId: 1101,
       accounts: PROD_PK ? [PROD_PK] : [],
     },
+    prism: {
+      url: `https://mainnet-rpc.lumia.org`,
+      chainId: 994873017,
+      accounts: PROD_PK ? [PROD_PK] : [],
+    },
     real: {
       url: "https://rpc.realforreal.gelato.digital/",
       chainId: 111188,
@@ -161,6 +176,12 @@ const config: HardhatUserConfig = {
       url: `https://public-node.rsk.co`,
       chainId: 30,
       accounts: PROD_PK ? [PROD_PK] : [],
+    },
+    shape: {
+      url: `https://mainnet.shape.network`,
+      accounts: PROD_PK ? [PROD_PK] : [],
+      chainId: 360,
+      gasPrice: 10000,
     },
     zksync: {
       zksync: true,
@@ -229,6 +250,11 @@ const config: HardhatUserConfig = {
       chainId: 84531,
       accounts: PROD_PK ? [PROD_PK] : [],
     },
+    berachainbartio: {
+      url: "https://bartio.rpc.berachain.com/",
+      chainId: 80084,
+      accounts: PROD_PK ? [PROD_PK] : [],
+    },
     blackberry: {
       url: `https://rpc.polygon-blackberry.gelato.digital`,
       chainId: 94204209,
@@ -237,6 +263,11 @@ const config: HardhatUserConfig = {
     blastsepolia: {
       url: `https://sepolia.blast.io`,
       chainId: 168587773,
+      accounts: PROD_PK ? [PROD_PK] : [],
+    },
+    bonito: {
+      url: `https://rpc.bonito-testnet.t.raas.gelato.cloud`,
+      chainId: 69658185,
       accounts: PROD_PK ? [PROD_PK] : [],
     },
     campnetworktestnet: {
