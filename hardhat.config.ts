@@ -107,6 +107,11 @@ const config: HardhatUserConfig = {
       chainId: 250,
       url: `https://rpcapi.fantom.network/`,
     },
+    filecoin: {
+      url: `https://api.node.glif.io`,
+      chainId: 314,
+      accounts: PROD_PK ? [PROD_PK] : [],
+    },
     gnosis: {
       accounts: PROD_PK ? [PROD_PK] : [],
       chainId: 100,
