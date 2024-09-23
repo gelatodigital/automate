@@ -21,6 +21,8 @@ RUN yarn run build
 
 RUN npx hardhat deploy --network dynamic || true
 
+RUN npx hardhat run ./scripts/dev-modules.ts --network dynamic || true
+
 FROM alpine:3.20
 
 WORKDIR /usr/src/app

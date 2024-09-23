@@ -1,4 +1,5 @@
 import { ethers } from "hardhat";
+import { getContract } from "../src/utils";
 import { Module } from "../test/utils";
 import {
   Automate,
@@ -8,7 +9,6 @@ import {
   TriggerModule,
   Web3FunctionModule,
 } from "../typechain";
-import { getContract } from "../src/utils";
 import hre = require("hardhat");
 
 export const setModules = async () => {
@@ -49,7 +49,10 @@ export const setModules = async () => {
     triggerModule.address,
   ];
 
-  await automate.setModule(modules, moduleAddresses);
+  const tx = await automate.setModule(modules, moduleAddresses);
+  const receipt = await tx.wait();
+
+  console.log(`Automate modules set in tx: ${receipt.transactionHash}`);
 };
 
 setModules();
