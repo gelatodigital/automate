@@ -2,9 +2,11 @@ import { DeployFunction } from "hardhat-deploy/types";
 import { HardhatRuntimeEnvironment } from "hardhat/types";
 import { utils } from "zksync-web3";
 // import { bytecode } from "../artifacts-zk/contracts/vendor/proxy/EIP173/EIP173OpsProxy.sol/EIP173OpsProxy.json";
-import { ethers } from "hardhat";
+import hre, { ethers } from "hardhat";
 import { getContract, isTesting, isZksync, sleep } from "../src/utils";
 import { Automate, OpsProxy } from "../typechain";
+
+const isHardhat = isTesting(hre.network.name);
 
 const func: DeployFunction = async (hre: HardhatRuntimeEnvironment) => {
   if (!isTesting(hre.network.name)) {
@@ -21,7 +23,10 @@ const func: DeployFunction = async (hre: HardhatRuntimeEnvironment) => {
 
   const { deployments } = hre;
   const { deploy } = deployments;
-  const { deployer } = await hre.getNamedAccounts();
+  const accounts = await hre.getNamedAccounts();
+  const deployer = isHardhat
+    ? accounts["hardhatDeployer"]
+    : accounts["deployer"];
 
   const AUTOMATE = (await getContract<Automate>(hre, "Automate")).address;
   const OPSPROXY = (await getContract<OpsProxy>(hre, "OpsProxy")).address;

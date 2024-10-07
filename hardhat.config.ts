@@ -107,8 +107,9 @@ const config: HardhatUserConfig = {
 
   namedAccounts: {
     deployer: {
-      default: 0,
+      default: "0x7aD7b5F4F0E5Df7D6Aa5444516429AF77babc3A0",
     },
+    hardhatDeployer: { default: 0 },
   },
 
   networks: {

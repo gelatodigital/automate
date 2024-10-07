@@ -18,7 +18,10 @@ const func: DeployFunction = async (hre: HardhatRuntimeEnvironment) => {
     await sleep(5000);
   }
   const { deploy } = deployments;
-  const { deployer } = await getNamedAccounts();
+  const accounts = await getNamedAccounts();
+  const deployer = isHardhat
+    ? accounts["hardhatDeployer"]
+    : accounts["deployer"];
 
   await deploy("SingleExecModule", {
     from: deployer,

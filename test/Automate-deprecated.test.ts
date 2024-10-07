@@ -1,5 +1,6 @@
 import { Signer } from "@ethersproject/abstract-signer";
 import { expect } from "chai";
+import { getContract } from "../src/utils";
 import {
   Automate,
   Counter,
@@ -11,7 +12,6 @@ import {
 } from "../typechain";
 import { Module, encodeTimeArgs, getTimeStampNow } from "./utils";
 import hre = require("hardhat");
-import { getContract } from "../src/utils";
 const { ethers, deployments } = hre;
 
 const ZERO_ADD = ethers.constants.AddressZero;
