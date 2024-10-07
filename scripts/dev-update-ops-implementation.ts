@@ -1,14 +1,18 @@
 import { ethers } from "hardhat";
-import { sleep } from "../hardhat/utils";
-import { EIP173Proxy } from "../typechain";
+import { getContract, sleep } from "../src/utils";
+import { Automate, EIP173Proxy } from "../typechain";
+import hre = require("hardhat");
 
 const main = async () => {
   const [owner] = await ethers.getSigners();
   const ownerAddress = await owner.getAddress();
   console.log("Owner: ", ownerAddress);
 
-  const proxy = (await ethers.getContract("Automate_Proxy")) as EIP173Proxy;
-  const implementation = await ethers.getContract("Automate_Implementation");
+  const proxy = await getContract<EIP173Proxy>(hre, "Automate_Proxy");
+  const implementation = await getContract<Automate>(
+    hre,
+    "Automate_Implementation"
+  );
 
   console.log("proxy: ", proxy.address);
   console.log("implementation: ", implementation.address);

@@ -1,6 +1,9 @@
-import { HardhatRuntimeEnvironment } from "hardhat/types";
+import hre, { getNamedAccounts } from "hardhat";
 import { DeployFunction } from "hardhat-deploy/types";
-import { isTesting, sleep } from "../../hardhat/utils";
+import { HardhatRuntimeEnvironment } from "hardhat/types";
+import { isTesting, sleep } from "../../src/utils";
+
+const isHardhat = isTesting(hre.network.name);
 
 const func: DeployFunction = async (hre: HardhatRuntimeEnvironment) => {
   if (!isTesting(hre.network.name)) {
@@ -12,7 +15,10 @@ const func: DeployFunction = async (hre: HardhatRuntimeEnvironment) => {
 
   const { deployments } = hre;
   const { deploy } = deployments;
-  const { deployer } = await hre.getNamedAccounts();
+  const accounts = await getNamedAccounts();
+  const deployer = isHardhat
+    ? accounts["hardhatDeployer"]
+    : accounts["deployer"];
 
   await deploy("CounterWL", {
     from: deployer,

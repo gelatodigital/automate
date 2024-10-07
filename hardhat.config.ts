@@ -1,5 +1,5 @@
-import { HardhatUserConfig } from "hardhat/config";
-
+import { TASK_COMPILE_SOLIDITY_GET_SOLC_BUILD } from "hardhat/builtin-tasks/task-names";
+import { extendEnvironment, HardhatUserConfig, subtask } from "hardhat/config";
 // PLUGINS
 import "@matterlabs/hardhat-zksync-solc";
 import "@matterlabs/hardhat-zksync-verify";
@@ -13,18 +13,93 @@ import * as dotenv from "dotenv";
 dotenv.config({ path: __dirname + "/.env" });
 
 // Libraries
-import assert from "assert";
+import { ethers } from "ethers";
+import path from "path";
+import { verifyRequiredEnvVar } from "./src/utils";
 
 // @dev Put this in .env
 const ALCHEMY_ID = process.env.ALCHEMY_ID;
-assert.ok(ALCHEMY_ID, "no Alchemy ID in process.env");
 const INFURA_ID = process.env.INFURA_ID;
-assert.ok(INFURA_ID, "no Infura ID in process.env");
 
 // @dev fill this out
-const PROD_PK = process.env.PROD_PK;
-const DEV_PK = process.env.DEV_PK;
-const ETHERSCAN_API = process.env.ETHERSCAN_API;
+const AUTOMATE_DEPLOYER_PK = process.env.AUTOMATE_DEPLOYER_PK;
+const ETHERSCAN_API_KEY = process.env.ETHERSCAN_API_KEY;
+
+if (!AUTOMATE_DEPLOYER_PK) {
+  throw new Error("AUTOMATE_DEPLOYER_PK is missing");
+}
+const accounts: string[] = [AUTOMATE_DEPLOYER_PK];
+
+extendEnvironment((hre) => {
+  if (hre.network.name === "dynamic") {
+    hre.network.isDynamic = true;
+    const networkName = process.env.HARDHAT_DYNAMIC_NETWORK_NAME as
+      | string
+      | undefined;
+    const networkUrl = process.env.HARDHAT_DYNAMIC_NETWORK_URL as
+      | string
+      | undefined;
+    // eslint-disable-next-line @typescript-eslint/naming-convention
+    const noDeterministicDeployment = process.env
+      .HARDHAT_DYNAMIC_NETWORK_NO_DETERMINISTIC_DEPLOYMENT as
+      | string
+      | undefined;
+    const gelatoContractAddress = process.env
+      .HARDHAT_DYNAMIC_NETWORK_CONTRACTS_GELATO as string | undefined;
+
+    verifyRequiredEnvVar("HARDHAT_DYNAMIC_NETWORK_NAME", networkName);
+    verifyRequiredEnvVar("HARDHAT_DYNAMIC_NETWORK_URL", networkUrl);
+    verifyRequiredEnvVar(
+      "HARDHAT_DYNAMIC_NETWORK_CONTRACTS_GELATO",
+      gelatoContractAddress
+    );
+
+    hre.network.name = networkName;
+    hre.network.config.url = networkUrl;
+    hre.network.contracts = {
+      GELATO: ethers.utils.getAddress(gelatoContractAddress),
+    };
+    hre.network.noDeterministicDeployment =
+      noDeterministicDeployment === "true";
+  } else {
+    hre.network.isDynamic = false;
+    hre.network.noDeterministicDeployment = hre.network.config.zksync ?? false;
+  }
+});
+
+subtask(
+  TASK_COMPILE_SOLIDITY_GET_SOLC_BUILD,
+  async (
+    args: {
+      solcVersion: string;
+    },
+    hre,
+    runSuper
+  ) => {
+    // Full list of solc versions: https://github.com/ethereum/solc-bin/blob/gh-pages/bin/list.json
+    // Search by the version number in the list, there will be `nightly` versions as well along with the main in the list.json
+    // Find the one that is NOT a nightly build, and copy the `path` field in the build object
+    // The solidity compiler will be found at `https://github.com/ethereum/solc-bin/blob/gh-pages/bin/${path-field-in-the-build}`
+    if (args.solcVersion === "0.8.14") {
+      const compilerPath = path.join(
+        __dirname,
+        "src/solc",
+        "soljson-v0.8.14+commit.80d49f37.js"
+      );
+
+      return {
+        compilerPath,
+        isSolcJs: true,
+        version: args.solcVersion,
+        longVersion: "0.8.14+commit.80d49f37",
+      };
+    }
+
+    // Only overrides the compiler for version 0.8.14,
+    // the runSuper function allows us to call the default subtask.
+    return runSuper();
+  }
+);
 
 // ================================= CONFIG =========================================
 const config: HardhatUserConfig = {
@@ -32,11 +107,17 @@ const config: HardhatUserConfig = {
 
   namedAccounts: {
     deployer: {
-      default: 0,
+      default: "0x7aD7b5F4F0E5Df7D6Aa5444516429AF77babc3A0",
     },
+    hardhatDeployer: { default: 0 },
   },
 
   networks: {
+    dynamic: {
+      accounts,
+      url: "",
+    },
+
     hardhat: {
       // Standard config
       // timeout: 150000,
@@ -60,131 +141,131 @@ const config: HardhatUserConfig = {
     alephzero: {
       url: `https://rpc.alephzero.raas.gelato.cloud`,
       chainId: 41455,
-      accounts: PROD_PK ? [PROD_PK] : [],
+      accounts,
     },
     arbitrum: {
       url: `https://arb-mainnet.g.alchemy.com/v2/${ALCHEMY_ID}`,
       chainId: 42161,
-      accounts: PROD_PK ? [PROD_PK] : [],
+      accounts: accounts,
     },
     astarzkevm: {
       url: "https://rpc.astar-zkevm.gelato.digital",
       chainId: 3776,
-      accounts: PROD_PK ? [PROD_PK] : [],
+      accounts: accounts,
     },
     avalanche: {
       url: "https://api.avax.network/ext/bc/C/rpc",
       chainId: 43114,
-      accounts: PROD_PK ? [PROD_PK] : [],
+      accounts: accounts,
     },
     base: {
       url: `https://mainnet.base.org`,
       chainId: 8453,
-      accounts: PROD_PK ? [PROD_PK] : [],
+      accounts: accounts,
     },
     blast: {
       url: `https://blastl2-mainnet.public.blastapi.io`,
       chainId: 81457,
-      accounts: PROD_PK ? [PROD_PK] : [],
+      accounts: accounts,
     },
     bsc: {
       url: "https://bsc-dataseed.binance.org/",
       chainId: 56,
-      accounts: PROD_PK ? [PROD_PK] : [],
+      accounts: accounts,
     },
     coredao: {
       url: `https://rpc.coredao.org`,
       chainId: 1116,
-      accounts: PROD_PK ? [PROD_PK] : [],
+      accounts: accounts,
     },
     everclear: {
       url: `https://rpc.everclear.raas.gelato.cloud`,
       chainId: 25327,
-      accounts: PROD_PK ? [PROD_PK] : [],
+      accounts,
     },
     fantom: {
-      accounts: PROD_PK ? [PROD_PK] : [],
+      accounts: accounts,
       chainId: 250,
       url: `https://rpcapi.fantom.network/`,
     },
     filecoin: {
       url: `https://api.node.glif.io`,
       chainId: 314,
-      accounts: PROD_PK ? [PROD_PK] : [],
+      accounts,
     },
     gnosis: {
-      accounts: PROD_PK ? [PROD_PK] : [],
+      accounts: accounts,
       chainId: 100,
       url: `https://gnosis-mainnet.public.blastapi.io`,
     },
     linea: {
       url: `https://linea-mainnet.infura.io/v3/${INFURA_ID}`,
       chainId: 59144,
-      accounts: PROD_PK ? [PROD_PK] : [],
+      accounts: accounts,
     },
     lisk: {
       url: `https://rpc.api.lisk.com`,
       chainId: 1135,
-      accounts: PROD_PK ? [PROD_PK] : [],
+      accounts: accounts,
     },
     mainnet: {
-      accounts: PROD_PK ? [PROD_PK] : [],
+      accounts: accounts,
       chainId: 1,
       url: `https://eth-mainnet.alchemyapi.io/v2/${ALCHEMY_ID}`,
     },
     metis: {
-      accounts: PROD_PK ? [PROD_PK] : [],
+      accounts: accounts,
       chainId: 1088,
       url: "https://metis-mainnet.public.blastapi.io",
     },
     mode: {
       url: `https://mainnet.mode.network`,
       chainId: 34443,
-      accounts: PROD_PK ? [PROD_PK] : [],
+      accounts: accounts,
     },
     optimism: {
       url: `https://opt-mainnet.g.alchemy.com/v2/${ALCHEMY_ID}`,
       chainId: 10,
-      accounts: PROD_PK ? [PROD_PK] : [],
+      accounts: accounts,
     },
     playblock: {
       url: `https://rpc.playblock.io`,
       chainId: 1829,
-      accounts: PROD_PK ? [PROD_PK] : [],
+      accounts: accounts,
     },
     polygon: {
       url: `https://polygon-mainnet.g.alchemy.com/v2/${ALCHEMY_ID}`,
       chainId: 137,
-      accounts: PROD_PK ? [PROD_PK] : [],
+      accounts: accounts,
     },
     polygonzk: {
       url: "https://zkevm-rpc.com",
       chainId: 1101,
-      accounts: PROD_PK ? [PROD_PK] : [],
+      accounts: accounts,
     },
     prism: {
       url: `https://mainnet-rpc.lumia.org`,
       chainId: 994873017,
-      accounts: PROD_PK ? [PROD_PK] : [],
+      accounts,
     },
     real: {
       url: "https://rpc.realforreal.gelato.digital/",
       chainId: 111188,
-      accounts: PROD_PK ? [PROD_PK] : [],
+      accounts: accounts,
     },
     reyanetwork: {
       url: "https://rpc.reya.network",
       chainId: 1729,
-      accounts: PROD_PK ? [PROD_PK] : [],
+      accounts: accounts,
     },
     rootstock: {
       url: `https://public-node.rsk.co`,
       chainId: 30,
-      accounts: PROD_PK ? [PROD_PK] : [],
+      accounts: accounts,
     },
     shape: {
       url: `https://mainnet.shape.network`,
-      accounts: PROD_PK ? [PROD_PK] : [],
+      accounts,
       chainId: 360,
       gasPrice: 10000,
     },
@@ -192,7 +273,7 @@ const config: HardhatUserConfig = {
       zksync: true,
       url: "https://mainnet.era.zksync.io",
       chainId: 324,
-      accounts: PROD_PK ? [PROD_PK] : [],
+      accounts: accounts,
       verifyURL:
         "https://zksync2-mainnet-explorer.zksync.io/contract_verification",
     },
@@ -201,169 +282,169 @@ const config: HardhatUserConfig = {
     mumbaiDev: {
       url: `https://polygon-mumbai.g.alchemy.com/v2/${ALCHEMY_ID}`,
       chainId: 80001,
-      accounts: DEV_PK ? [DEV_PK] : [],
+      accounts: accounts,
     },
     amoyDev: {
       url: `https://rpc-amoy.polygon.technology`,
       chainId: 80002,
-      accounts: DEV_PK ? [DEV_PK] : [],
+      accounts: accounts,
     },
     gelatoorbittestnetDev: {
       url: `https://rpc.arb-blueberry.gelato.digital`,
       chainId: 88153591557,
-      accounts: DEV_PK ? [DEV_PK] : [],
+      accounts: accounts,
     },
 
     // Staging
     alephzerotestnet: {
       url: `https://rpc.alephzero-testnet.gelato.digital`,
       chainId: 2039,
-      accounts: PROD_PK ? [PROD_PK] : [],
+      accounts: accounts,
     },
     amoy: {
       url: `https://rpc-amoy.polygon.technology`,
       chainId: 80002,
-      accounts: PROD_PK ? [PROD_PK] : [],
+      accounts: accounts,
     },
     anomalyandromeda: {
       url: `https://rpc.anomaly-andromeda.anomalygames.io`,
       chainId: 241120,
-      accounts: PROD_PK ? [PROD_PK] : [],
+      accounts: accounts,
     },
     arbgoerli: {
       url: "https://goerli-rollup.arbitrum.io/rpc",
       chainId: 421613,
-      accounts: PROD_PK ? [PROD_PK] : [],
+      accounts: accounts,
     },
     arbsepolia: {
       url: `https://sepolia-rollup.arbitrum.io/rpc`,
       chainId: 421614,
-      accounts: PROD_PK ? [PROD_PK] : [],
+      accounts: accounts,
     },
     astarzkyoto: {
       url: `https://rpc.zkyoto.gelato.digital`,
       chainId: 6038361,
-      accounts: PROD_PK ? [PROD_PK] : [],
+      accounts: accounts,
     },
     basesepolia: {
       url: `https://sepolia.base.org`,
       chainId: 84532,
-      accounts: PROD_PK ? [PROD_PK] : [],
+      accounts: accounts,
     },
     baseGoerli: {
       url: "https://goerli.base.org",
       chainId: 84531,
-      accounts: PROD_PK ? [PROD_PK] : [],
+      accounts: accounts,
     },
     berachainbartio: {
       url: "https://bartio.rpc.berachain.com/",
       chainId: 80084,
-      accounts: PROD_PK ? [PROD_PK] : [],
+      accounts,
     },
     blackberry: {
       url: `https://rpc.polygon-blackberry.gelato.digital`,
       chainId: 94204209,
-      accounts: PROD_PK ? [PROD_PK] : [],
+      accounts: accounts,
     },
     blastsepolia: {
       url: `https://sepolia.blast.io`,
       chainId: 168587773,
-      accounts: PROD_PK ? [PROD_PK] : [],
+      accounts: accounts,
     },
     bonito: {
       url: `https://rpc.bonito-testnet.t.raas.gelato.cloud`,
       chainId: 69658185,
-      accounts: PROD_PK ? [PROD_PK] : [],
+      accounts,
     },
     campnetworktestnet: {
       url: `https://rpc.camp-network-testnet.gelato.digital`,
       chainId: 325000,
-      accounts: PROD_PK ? [PROD_PK] : [],
+      accounts: accounts,
     },
     connextsepolia: {
       url: `https://rpc.connext-sepolia.gelato.digital`,
       chainId: 6398,
-      accounts: PROD_PK ? [PROD_PK] : [],
+      accounts: accounts,
     },
     gelopcelestiatestnet: {
       url: `https://rpc.op-celestia-testnet.gelato.digital`,
       chainId: 123420111,
-      accounts: PROD_PK ? [PROD_PK] : [],
+      accounts: accounts,
     },
     geloptestnet: {
       url: `https://rpc.op-testnet.gelato.digital`,
       chainId: 42069,
-      accounts: PROD_PK ? [PROD_PK] : [],
+      accounts: accounts,
     },
     gelatoorbittestnet: {
       url: `https://rpc.arb-blueberry.gelato.digital`,
       chainId: 88153591557,
-      accounts: PROD_PK ? [PROD_PK] : [],
+      accounts: accounts,
     },
     goerli: {
       url: `https://eth-goerli.alchemyapi.io/v2/${ALCHEMY_ID}`,
       chainId: 5,
-      accounts: PROD_PK ? [PROD_PK] : [],
+      accounts: accounts,
     },
     lisksepolia: {
       url: `https://rpc.lisk-sepolia-testnet.gelato.digital`,
       chainId: 4202,
-      accounts: PROD_PK ? [PROD_PK] : [],
+      accounts: accounts,
     },
     mumbai: {
       url: `https://polygon-mumbai.g.alchemy.com/v2/${ALCHEMY_ID}`,
       chainId: 80001,
-      accounts: PROD_PK ? [PROD_PK] : [],
+      accounts: accounts,
     },
     novastrotestnet: {
       url: `https://rpc.novastro-testnet.gelato.digital`,
       chainId: 560098,
-      accounts: PROD_PK ? [PROD_PK] : [],
+      accounts: accounts,
     },
     ogoerli: {
       url: `https://opt-goerli.g.alchemy.com/v2/${ALCHEMY_ID}`,
       chainId: 420,
-      accounts: PROD_PK ? [PROD_PK] : [],
+      accounts: accounts,
     },
     opencampuscodex: {
       url: `https://rpc.open-campus-codex.gelato.digital`,
       chainId: 656476,
-      accounts: PROD_PK ? [PROD_PK] : [],
+      accounts: accounts,
     },
     osepolia: {
       url: `https://sepolia.optimism.io`,
       chainId: 11155420,
-      accounts: PROD_PK ? [PROD_PK] : [],
+      accounts: accounts,
     },
     reyacronos: {
       url: `https://rpc.reya-cronos.gelato.digital`,
       chainId: 89346162,
-      accounts: PROD_PK ? [PROD_PK] : [],
+      accounts: accounts,
     },
     ludicotetromino: {
       url: `https://rpc.ludico-tetromino.gelato.digital`,
       chainId: 4444,
-      accounts: PROD_PK ? [PROD_PK] : [],
+      accounts: accounts,
     },
     sepolia: {
       url: `https://eth-sepolia.g.alchemy.com/v2/${ALCHEMY_ID}`,
       chainId: 11155111,
-      accounts: PROD_PK ? [PROD_PK] : [],
+      accounts: accounts,
     },
     unreal: {
       url: `https://rpc.unreal.gelato.digital`,
       chainId: 18231,
-      accounts: PROD_PK ? [PROD_PK] : [],
+      accounts: accounts,
     },
     unrealorbit: {
       url: `https://rpc.unreal-orbit.gelato.digital`,
       chainId: 18233,
-      accounts: PROD_PK ? [PROD_PK] : [],
+      accounts: accounts,
     },
     zkatana: {
       url: "https://rpc.zkatana.gelato.digital",
       chainId: 1261120,
-      accounts: PROD_PK ? [PROD_PK] : [],
+      accounts: accounts,
     },
   },
 
@@ -382,7 +463,7 @@ const config: HardhatUserConfig = {
 
   verify: {
     etherscan: {
-      apiKey: ETHERSCAN_API,
+      apiKey: ETHERSCAN_API_KEY ? ETHERSCAN_API_KEY : "",
     },
   },
 };

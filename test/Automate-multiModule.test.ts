@@ -15,6 +15,7 @@ import {
 import { Module, ModuleData, encodeResolverArgs, getTaskId } from "./utils";
 import { getGelato1BalanceParam } from "./utils/1balance";
 import hre = require("hardhat");
+import { getContract } from "../src/utils";
 const { ethers, deployments } = hre;
 
 const GELATO = "0x3caca7b48d0573d793d3b0279b5f0029180e83b6";
@@ -49,16 +50,16 @@ describe("Automate multi module test", function () {
     [, user] = await hre.ethers.getSigners();
     userAddress = await user.getAddress();
 
-    automate = await ethers.getContract("Automate");
-    counter = await ethers.getContract("CounterWL");
-    counterResolver = await ethers.getContract("CounterResolver");
-    opsProxyFactory = await ethers.getContract("OpsProxyFactory");
+    automate = await getContract(hre, "Automate");
+    counter = await getContract(hre, "CounterWL");
+    counterResolver = await getContract(hre, "CounterResolver");
+    opsProxyFactory = await getContract(hre, "OpsProxyFactory");
 
-    resolverModule = await ethers.getContract("ResolverModule");
-    proxyModule = await ethers.getContract("ProxyModule");
-    singleExecModule = await ethers.getContract("SingleExecModule");
-    web3FunctionModule = await ethers.getContract("Web3FunctionModule");
-    triggerModule = await ethers.getContract("TriggerModule");
+    resolverModule = await getContract(hre, "ResolverModule");
+    proxyModule = await getContract(hre, "ProxyModule");
+    singleExecModule = await getContract(hre, "SingleExecModule");
+    web3FunctionModule = await getContract(hre, "Web3FunctionModule");
+    triggerModule = await getContract(hre, "TriggerModule");
 
     // set-up
     await automate.setModule(

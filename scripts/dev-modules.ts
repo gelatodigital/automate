@@ -1,4 +1,5 @@
 import { ethers } from "hardhat";
+import { getContract } from "../src/utils";
 import { Module } from "../test/utils";
 import {
   Automate,
@@ -8,30 +9,30 @@ import {
   TriggerModule,
   Web3FunctionModule,
 } from "../typechain";
+import hre = require("hardhat");
 
 export const setModules = async () => {
   const [owner] = await ethers.getSigners();
   const ownerAddress = await owner.getAddress();
   console.log("Owner: ", ownerAddress);
 
-  const automateAddress = (await ethers.getContract("Automate")).address;
+  const automateAddress = (await getContract<Automate>(hre, "Automate"))
+    .address;
   const automate = <Automate>(
     await ethers.getContractAt("Automate", automateAddress)
   );
 
   const resolverModule = <ResolverModule>(
-    await ethers.getContract("ResolverModule")
+    await getContract(hre, "ResolverModule")
   );
-  const proxyModule = <ProxyModule>await ethers.getContract("ProxyModule");
+  const proxyModule = <ProxyModule>await getContract(hre, "ProxyModule");
   const singleExecModule = <SingleExecModule>(
-    await ethers.getContract("SingleExecModule")
+    await getContract(hre, "SingleExecModule")
   );
   const web3FunctionModule = <Web3FunctionModule>(
-    await ethers.getContract("Web3FunctionModule")
+    await getContract(hre, "Web3FunctionModule")
   );
-  const triggerModule = <TriggerModule>(
-    await ethers.getContract("TriggerModule")
-  );
+  const triggerModule = <TriggerModule>await getContract(hre, "TriggerModule");
 
   const modules = [
     Module.RESOLVER,
@@ -48,7 +49,10 @@ export const setModules = async () => {
     triggerModule.address,
   ];
 
-  await automate.setModule(modules, moduleAddresses);
+  const tx = await automate.setModule(modules, moduleAddresses);
+  const receipt = await tx.wait();
+
+  console.log(`Automate modules set in tx: ${receipt.transactionHash}`);
 };
 
 setModules();
