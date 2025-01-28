@@ -1,0 +1,1178 @@
+{
+  "address": "0x22CAc1f3D06A9f478ddC36E8B059D6e3d4092fe6",
+  "abi": [
+    {
+      "inputs": [
+        {
+          "internalType": "address",
+          "name": "_resolverAddress",
+          "type": "address"
+        },
+        {
+          "internalType": "bytes",
+          "name": "_resolverData",
+          "type": "bytes"
+        }
+      ],
+      "name": "encodeModuleArg",
+      "outputs": [
+        {
+          "internalType": "bytes",
+          "name": "",
+          "type": "bytes"
+        }
+      ],
+      "stateMutability": "pure",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "bytes32",
+          "name": "",
+          "type": "bytes32"
+        }
+      ],
+      "name": "execAddresses",
+      "outputs": [
+        {
+          "internalType": "address",
+          "name": "",
+          "type": "address"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [],
+      "name": "fee",
+      "outputs": [
+        {
+          "internalType": "uint256",
+          "name": "",
+          "type": "uint256"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [],
+      "name": "feeToken",
+      "outputs": [
+        {
+          "internalType": "address",
+          "name": "",
+          "type": "address"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "bytes32",
+          "name": "",
+          "type": "bytes32"
+        }
+      ],
+      "name": "nonce1Balance",
+      "outputs": [
+        {
+          "internalType": "uint256",
+          "name": "",
+          "type": "uint256"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "bytes32",
+          "name": "",
+          "type": "bytes32"
+        },
+        {
+          "internalType": "address",
+          "name": "",
+          "type": "address"
+        },
+        {
+          "internalType": "address",
+          "name": "",
+          "type": "address"
+        },
+        {
+          "internalType": "bytes",
+          "name": "",
+          "type": "bytes"
+        },
+        {
+          "internalType": "bytes",
+          "name": "",
+          "type": "bytes"
+        }
+      ],
+      "name": "onCreateTask",
+      "outputs": [],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "bytes32",
+          "name": "taskId",
+          "type": "bytes32"
+        },
+        {
+          "internalType": "address",
+          "name": "taskCreator",
+          "type": "address"
+        },
+        {
+          "internalType": "address",
+          "name": "execAddress",
+          "type": "address"
+        },
+        {
+          "internalType": "bytes",
+          "name": "execData",
+          "type": "bytes"
+        }
+      ],
+      "name": "postExecCall",
+      "outputs": [],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "bytes32",
+          "name": "",
+          "type": "bytes32"
+        },
+        {
+          "internalType": "address",
+          "name": "_taskCreator",
+          "type": "address"
+        }
+      ],
+      "name": "preCancelTask",
+      "outputs": [
+        {
+          "internalType": "address",
+          "name": "",
+          "type": "address"
+        }
+      ],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "address",
+          "name": "_taskCreator",
+          "type": "address"
+        },
+        {
+          "internalType": "address",
+          "name": "_execAddress",
+          "type": "address"
+        }
+      ],
+      "name": "preCreateTask",
+      "outputs": [
+        {
+          "internalType": "address",
+          "name": "",
+          "type": "address"
+        },
+        {
+          "internalType": "address",
+          "name": "",
+          "type": "address"
+        }
+      ],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "bytes32",
+          "name": "",
+          "type": "bytes32"
+        },
+        {
+          "internalType": "address",
+          "name": "",
+          "type": "address"
+        },
+        {
+          "internalType": "address",
+          "name": "_execAddress",
+          "type": "address"
+        },
+        {
+          "internalType": "bytes",
+          "name": "_execData",
+          "type": "bytes"
+        }
+      ],
+      "name": "preExecCall",
+      "outputs": [
+        {
+          "internalType": "address",
+          "name": "",
+          "type": "address"
+        },
+        {
+          "internalType": "bytes",
+          "name": "",
+          "type": "bytes"
+        }
+      ],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "bytes32",
+          "name": "",
+          "type": "bytes32"
+        }
+      ],
+      "name": "taskCreator",
+      "outputs": [
+        {
+          "internalType": "address",
+          "name": "",
+          "type": "address"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "enum LibDataTypes.Module",
+          "name": "",
+          "type": "uint8"
+        }
+      ],
+      "name": "taskModuleAddresses",
+      "outputs": [
+        {
+          "internalType": "address",
+          "name": "",
+          "type": "address"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "bytes32",
+          "name": "",
+          "type": "bytes32"
+        }
+      ],
+      "name": "timedTask",
+      "outputs": [
+        {
+          "internalType": "uint128",
+          "name": "nextExec",
+          "type": "uint128"
+        },
+        {
+          "internalType": "uint128",
+          "name": "interval",
+          "type": "uint128"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    }
+  ],
+  "transactionHash": "0x911ae68aa7f4e086a8a6e479a794a3cce9171d36fc3aa2f30c23b153e475c08e",
+  "receipt": {
+    "to": "0x0000000000000000000000000000000000008006",
+    "from": "0x7aD7b5F4F0E5Df7D6Aa5444516429AF77babc3A0",
+    "contractAddress": "0x22CAc1f3D06A9f478ddC36E8B059D6e3d4092fe6",
+    "transactionIndex": 3,
+    "gasUsed": "17057133",
+    "logsBloom": "0x00000000040400080000010000000004000000000000400000000000000000000000000000000000000000000001000000000000002000000000000000000000000100000000040000000028000040000400000000000000000000000000080000000000020100000004000800000800000000000200400000000010000000000000001000000000000004000100000000000100000000800000000000400080800000000000100000000000800100008000000000000000002000010000000000400002008000000000000000000000000010000100000000000000000020002000000000000000000000000000000080000040000000000000000080000000",
+    "blockHash": "0x29b2774d393899c7606283d35873804bd52b9660798692afca974fa4a339b61b",
+    "transactionHash": "0x911ae68aa7f4e086a8a6e479a794a3cce9171d36fc3aa2f30c23b153e475c08e",
+    "logs": [
+      {
+        "transactionIndex": 3,
+        "blockNumber": 324909,
+        "transactionHash": "0x911ae68aa7f4e086a8a6e479a794a3cce9171d36fc3aa2f30c23b153e475c08e",
+        "address": "0x000000000000000000000000000000000000800A",
+        "topics": [
+          "0xddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef",
+          "0x0000000000000000000000007ad7b5f4f0e5df7d6aa5444516429af77babc3a0",
+          "0x0000000000000000000000000000000000000000000000000000000000008001"
+        ],
+        "data": "0x0000000000000000000000000000000000000000000000000003aeb24be766c0",
+        "logIndex": 16,
+        "blockHash": "0x29b2774d393899c7606283d35873804bd52b9660798692afca974fa4a339b61b"
+      },
+      {
+        "transactionIndex": 3,
+        "blockNumber": 324909,
+        "transactionHash": "0x911ae68aa7f4e086a8a6e479a794a3cce9171d36fc3aa2f30c23b153e475c08e",
+        "address": "0x0000000000000000000000000000000000008008",
+        "topics": [
+          "0x27fe8c0b49f49507b9d4fe5968c9f49edfe5c9df277d433a07a0717ede97638d"
+        ],
+        "data": "0x0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000100000000000000000000000000000000000000000000000000000000000007c90000000000000000000000000000000000000000000000000000000000008008000000000000000000000000000000000000000000000000000000000000800e254863e53e88f6b326243eb82d82ffeae3079c589d497eaa1d733eb2da18acbc",
+        "logIndex": 17,
+        "blockHash": "0x29b2774d393899c7606283d35873804bd52b9660798692afca974fa4a339b61b"
+      },
+      {
+        "transactionIndex": 3,
+        "blockNumber": 324909,
+        "transactionHash": "0x911ae68aa7f4e086a8a6e479a794a3cce9171d36fc3aa2f30c23b153e475c08e",
+        "address": "0x0000000000000000000000000000000000008008",
+        "topics": [
+          "0x3a36e47291f4201faf137fab081d92295bce2d53be2c6ca68ba82c7faa9ce241",
+          "0x000000000000000000000000000000000000000000000000000000000000800e",
+          "0x254863e53e88f6b326243eb82d82ffeae3079c589d497eaa1d733eb2da18acbc"
+        ],
+        "data": "0x00000000000000000000000000000000000000000000000000000000000000200000000000000000000000000000000000000000000000000000000000000f7a01520000000000000000000001620000c13d000001620000213dffffffffffffffff000001620000413d000000000303043b000000000101043b000001ec0001042e000000000002004b0000000002000416000001d70000213d000000000001042d000001ed00010430000000000010043f000000900030009c000000000003004b0000000401100370000000240020008c0000000001000019000000910030009c000000000001004b00000000010004160000007c010080410000007c0010009c0000009802200197000000000101041a01eb01d90000040f000000200010043f000000000023004b000000440020008c000000000202043b000000000404043b000001620000813d0000002403100370000000000300041600000000ffffffff0000000002000019000001a40000213d000000040430003900000023043000390000008f01000041000000800010043f0000009401000041000000a00010043f000000800020043f000000900010009c00000024011003700000001f023000390000000000020435000000000121019f000000400220021000000060011002100000007c020080410000007c0020009c000000400200003900000000002104350000010005500089000000000656022f00000000065601cf0000000305600210000000000006004b0000000007970436000000008908043c000000400020043f000000910040009c000000000024004b000000440310037000000001002001900001000000000002add530568ba2f9ad77fcca02c6cb7e98a1439074097848e0bedc343f986cdd57000000400000000002000000000000007fffffffffffffff8000000000000000ffffffffffffffe000000024000000004e487b7100000000ffffffffffffff800000004000000080ffffffffffffff7f0000002000000080000000003c706c6f000000002e6e0bd00000000014ae99260000000076474e6a000000006d2dd29f00000000647846a500000000647846a400000000b2db0b4100000000b0ccbdf000000000ac21631a00000000c10304f700000000b81cd86600000000ddca3f4300000000cd3d4fb900000000cd3d4fb800000000b81cd86500000000ac21631900000040000001000000000200000000000001eb000004320000000102000039000001e900210423000001e40000613d01eb01e60000040f00008010020000390000009b011001c7000000c0011002100000000001000414000000000012004b00000024022000390000000002230019000000910020009c000000000242034f000001d70000813d000000000014004b0000006403200370000000440320037000000024032003700000000002000367000001d70000a13d000000830010008c0000009a0010009c00000000012100190000000002310019000001b50000a13d000001ab0000413d000000000032004b00000020022000390000000000650435000000000606043300000000062400190000000005210019000001b50000613d00000000013204360000000043010434000000000021004b000000200110003900000000013100190000000003100367000001a40000613d000000000304c019000000990060009c00000099030020410000000003000019000000000053004b000000000653013f00000099033001970000009905200197000000990400404100000000040000190000001f03100039000000400110003900000098013001970000001f0330003900000000000404350000000004430019000001820000a13d000001780000413d000000000035004b000000200550003900000000007604350000000007070433000000a00750003900000000064500190000000005000019000000c004400039000001820000613d0000000000350435000000800300043d000000a00540003900000000003204350000002003000039000000800240003900000090011001970000000601000039000001640000a13d000000050010008c000001660000013d0000000101000039000001680000013d0000000401000039000000cc0000013d01eb018d0000040f0000000401100039000000910010009c000000840110037000000024033000390000000003430019000000000441034f0000006403100370000000a40020008c0000000701000039000001670000013d000000200000043f000001620000013d0000016a0000a13d000000800110027000000093021001970000000501000039000001220000013d0000000301000039000000820030009c000001590000613d000000810030009c000000900020009c00000004021003700000008b0030009c0000014f0000613d0000008a0030009c0000014a0000613d000000890030009c0000004001100210000000400100043d01eb01b90000040f0000000001020019000000870030009c000001260000613d000000860030009c000001170000613d000000850030009c0000009701000041000000040010043f000000410100003900000096010000410000016d0000413d000000950040009c00000098042001970000009f02200039000000800030043f000000600320003900000100023000390000000000420435000000000464019f00000000045401cf000000000454022f0000000006020433000000000454034f000000b10000613d000000a00000c13d000000000027004b000000000804034f0000010007000039000000a40000613d00000100025000390000001f0630018f0000009805300198000000e00030043f000000000421034f0000002002600039000000c00020043f000000a00040043f000000000025004b00000024055000390000000005350019000000000361034f00000004065000390000002303500039000000910050009c000000000503043b000000900040009c000000000403043b00000004031003700000008e0030009c0000010d0000613d0000008d0030009c000001030000613d0000008c0030009c000000d10000213d000000880030009c0000007d010000410000012000000443000001000010044300000020010000390000000001210049000000010200002901eb01a60000040f0000008001000039000000400240003900000000003404350000002001400039000100000004001d000000400400043d0000000000010435000000a001400039000000000262019f00000000025201cf000000000252022f0000000006010433000000000252034f000000560000613d000000450000c13d000000000017004b000000000802034f000000a007000039000000490000613d000000a0015000390000001f0640018f0000009805400198000000800040043f000000000221034f00000020025000390000008002200039000000bb0000213d000000920020009c0000003f022000390000001f02400039000000000026004b00000024066000390000000006460019000000000451034f00000004056000390000002304600039000000910060009c000000000604043b0000006404100370000000840020008c000000840030009c000000f10000613d000000830030009c000000e80000213d000000800030009c000000c10000a13d0000007f0030009c000000730000a13d0000007e0030009c000000e003300270000000000301043b000000040020008c0000007c0220019700000060021002700000006b0000c13d000000400030043f000000800300003900000000000103550044004401510150014f0043014e014d014c014b0004014a01490148014701460145014401430142014101400001013f00040022000f000100210005000e000200420005000e0002013e013d013c0002013b00410020013a0139001f0040000201380137013600020135001801340018013301320131003f0130012f012e012d012c012b012a01290128003e003d01270126003c01250124003b0123003a0039001e00380122012101200037011f011e011d011c011b00360037011a0119011801170116011500170016003500340033003200310007001500140001011401130112011100070110010f010e010d010c010b010a0001001d00040022000f0001010901080107000200210106010500020104001c0020010301020005001300020101010000ff000200fe003600fd00fc00fb00fa00f900f800f700f600f500f4003e003d00f300f2003c00f100f0003b00ef003a0039001f003800ee00ed00ec00eb00ea0030002f001800e900e800e700e600e500e400e3000d00e200e100e0000c00df00de00dd00dc00db000100150014000100da00d900d80017001600d7000700d600d500d400d300d20001001d000400090008000100d1001e00d00002002e0006002d0002002c002b002a000700cf00ce00cd000100150014000100cc00cb0011000400090008000100100006000d00ca001b001a001900c9002c00c8002b002a0007001d0004000900080001002e0006002d00c700c60011000400090008000100100006000d00c500c40011000400090008000100100006000d00c3001b001a001900290028000700c200040022000f000100210005000e000200420005000e000200c1000500130002002700410020002600c0001f0040000200bf00be001c000200bd000600bc000200bb00ba00b900150014000100b800b70011000400090008000100100006000d00b600b5001100040009000800010010000600b400b30012000c000d00b2001b001a001900b100290028000700b0003f00af00ae00ad00ac00ab000f00aa00a900a800a700a600a500a400a300a200a100a0009f009e009d009c009b00170016003300350034003200310007009a001c0099009800970096009500940093009200910090000f008f008e000500130025008d008c008b0025000b0012000c008a0089000f0088002400870086008500840083008200810080007f0030002f0018007e000b007d000a007c007b007a00790005000e000a00780005000e000a007700050013000a00270076007500260074001e0073000a007200710070000a000b0012000c006f00170016006e006d006c006b0043006a0006000b0012000c00690068000b0024000b00670007000c000000000000000000000023006600000065000000000000000000640000000000000063000000000000006200000000000000610000000000000060000000000000005f000000000000005e000000000000005d000000000000005c000000000000005b000000000000005a0000000000000059000000000000005800000000000000570000000000000056000000000000005500000000000000540000000000530000000000230003000300000000000000030000000000000052000000000003000300000000005100000000000000000050004f00000000000000000000004e0000000300030003004d004c000000000000004b000300030003004a0000004900000048004700460045000000000000",
+        "logIndex": 18,
+        "blockHash": "0x29b2774d393899c7606283d35873804bd52b9660798692afca974fa4a339b61b"
+      },
+      {
+        "transactionIndex": 3,
+        "blockNumber": 324909,
+        "transactionHash": "0x911ae68aa7f4e086a8a6e479a794a3cce9171d36fc3aa2f30c23b153e475c08e",
+        "address": "0x0000000000000000000000000000000000008004",
+        "topics": [
+          "0xc94722ff13eacf53547c4741dab5228353a05938ffcdd5d4a2d533ae0e618287",
+          "0x0100009dbbe0fed713202d1e8db4a880b4e23231e6322db7a83d5fe900094433",
+          "0x0000000000000000000000000000000000000000000000000000000000000000"
+        ],
+        "data": "0x",
+        "logIndex": 19,
+        "blockHash": "0x29b2774d393899c7606283d35873804bd52b9660798692afca974fa4a339b61b"
+      },
+      {
+        "transactionIndex": 3,
+        "blockNumber": 324909,
+        "transactionHash": "0x911ae68aa7f4e086a8a6e479a794a3cce9171d36fc3aa2f30c23b153e475c08e",
+        "address": "0x0000000000000000000000000000000000008006",
+        "topics": [
+          "0x290afdae231a3fc0bbae8b1af63698b0a1d79b21ad17df0342dfb952fe74f8e5",
+          "0x0000000000000000000000007ad7b5f4f0e5df7d6aa5444516429af77babc3a0",
+          "0x0100009dbbe0fed713202d1e8db4a880b4e23231e6322db7a83d5fe900094433",
+          "0x00000000000000000000000022cac1f3d06a9f478ddc36e8b059d6e3d4092fe6"
+        ],
+        "data": "0x",
+        "logIndex": 20,
+        "blockHash": "0x29b2774d393899c7606283d35873804bd52b9660798692afca974fa4a339b61b"
+      },
+      {
+        "transactionIndex": 3,
+        "blockNumber": 324909,
+        "transactionHash": "0x911ae68aa7f4e086a8a6e479a794a3cce9171d36fc3aa2f30c23b153e475c08e",
+        "address": "0x000000000000000000000000000000000000800A",
+        "topics": [
+          "0xddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef",
+          "0x0000000000000000000000000000000000000000000000000000000000008001",
+          "0x0000000000000000000000007ad7b5f4f0e5df7d6aa5444516429af77babc3a0"
+        ],
+        "data": "0x0000000000000000000000000000000000000000000000000000f0b764ea2d30",
+        "logIndex": 21,
+        "blockHash": "0x29b2774d393899c7606283d35873804bd52b9660798692afca974fa4a339b61b"
+      }
+    ],
+    "blockNumber": 324909,
+    "cumulativeGasUsed": "0",
+    "status": 1,
+    "byzantium": true
+  },
+  "args": [],
+  "numDeployments": 1,
+  "solcInputHash": "45f8f3695cf10f0e422a8895bb222f29",
+  "metadata": {
+    "llvm_options": [],
+    "optimizer_settings": {
+      "is_debug_logging_enabled": false,
+      "is_fallback_to_size_enabled": false,
+      "is_verify_each_enabled": false,
+      "level_back_end": "Aggressive",
+      "level_middle_end": "Aggressive",
+      "level_middle_end_size": "Zero"
+    },
+    "solc_version": "0.8.14",
+    "solc_zkvm_edition": null,
+    "source_metadata": {
+      "compiler": {
+        "version": "0.8.14+commit.80d49f37"
+      },
+      "language": "Solidity",
+      "output": {
+        "abi": [
+          {
+            "inputs": [
+              {
+                "internalType": "address",
+                "name": "_resolverAddress",
+                "type": "address"
+              },
+              {
+                "internalType": "bytes",
+                "name": "_resolverData",
+                "type": "bytes"
+              }
+            ],
+            "name": "encodeModuleArg",
+            "outputs": [
+              {
+                "internalType": "bytes",
+                "name": "",
+                "type": "bytes"
+              }
+            ],
+            "stateMutability": "pure",
+            "type": "function"
+          },
+          {
+            "inputs": [
+              {
+                "internalType": "bytes32",
+                "name": "",
+                "type": "bytes32"
+              }
+            ],
+            "name": "execAddresses",
+            "outputs": [
+              {
+                "internalType": "address",
+                "name": "",
+                "type": "address"
+              }
+            ],
+            "stateMutability": "view",
+            "type": "function"
+          },
+          {
+            "inputs": [],
+            "name": "fee",
+            "outputs": [
+              {
+                "internalType": "uint256",
+                "name": "",
+                "type": "uint256"
+              }
+            ],
+            "stateMutability": "view",
+            "type": "function"
+          },
+          {
+            "inputs": [],
+            "name": "feeToken",
+            "outputs": [
+              {
+                "internalType": "address",
+                "name": "",
+                "type": "address"
+              }
+            ],
+            "stateMutability": "view",
+            "type": "function"
+          },
+          {
+            "inputs": [
+              {
+                "internalType": "bytes32",
+                "name": "",
+                "type": "bytes32"
+              }
+            ],
+            "name": "nonce1Balance",
+            "outputs": [
+              {
+                "internalType": "uint256",
+                "name": "",
+                "type": "uint256"
+              }
+            ],
+            "stateMutability": "view",
+            "type": "function"
+          },
+          {
+            "inputs": [
+              {
+                "internalType": "bytes32",
+                "name": "",
+                "type": "bytes32"
+              },
+              {
+                "internalType": "address",
+                "name": "",
+                "type": "address"
+              },
+              {
+                "internalType": "address",
+                "name": "",
+                "type": "address"
+              },
+              {
+                "internalType": "bytes",
+                "name": "",
+                "type": "bytes"
+              },
+              {
+                "internalType": "bytes",
+                "name": "",
+                "type": "bytes"
+              }
+            ],
+            "name": "onCreateTask",
+            "outputs": [],
+            "stateMutability": "nonpayable",
+            "type": "function"
+          },
+          {
+            "inputs": [
+              {
+                "internalType": "bytes32",
+                "name": "taskId",
+                "type": "bytes32"
+              },
+              {
+                "internalType": "address",
+                "name": "taskCreator",
+                "type": "address"
+              },
+              {
+                "internalType": "address",
+                "name": "execAddress",
+                "type": "address"
+              },
+              {
+                "internalType": "bytes",
+                "name": "execData",
+                "type": "bytes"
+              }
+            ],
+            "name": "postExecCall",
+            "outputs": [],
+            "stateMutability": "nonpayable",
+            "type": "function"
+          },
+          {
+            "inputs": [
+              {
+                "internalType": "bytes32",
+                "name": "",
+                "type": "bytes32"
+              },
+              {
+                "internalType": "address",
+                "name": "_taskCreator",
+                "type": "address"
+              }
+            ],
+            "name": "preCancelTask",
+            "outputs": [
+              {
+                "internalType": "address",
+                "name": "",
+                "type": "address"
+              }
+            ],
+            "stateMutability": "nonpayable",
+            "type": "function"
+          },
+          {
+            "inputs": [
+              {
+                "internalType": "address",
+                "name": "_taskCreator",
+                "type": "address"
+              },
+              {
+                "internalType": "address",
+                "name": "_execAddress",
+                "type": "address"
+              }
+            ],
+            "name": "preCreateTask",
+            "outputs": [
+              {
+                "internalType": "address",
+                "name": "",
+                "type": "address"
+              },
+              {
+                "internalType": "address",
+                "name": "",
+                "type": "address"
+              }
+            ],
+            "stateMutability": "nonpayable",
+            "type": "function"
+          },
+          {
+            "inputs": [
+              {
+                "internalType": "bytes32",
+                "name": "",
+                "type": "bytes32"
+              },
+              {
+                "internalType": "address",
+                "name": "",
+                "type": "address"
+              },
+              {
+                "internalType": "address",
+                "name": "_execAddress",
+                "type": "address"
+              },
+              {
+                "internalType": "bytes",
+                "name": "_execData",
+                "type": "bytes"
+              }
+            ],
+            "name": "preExecCall",
+            "outputs": [
+              {
+                "internalType": "address",
+                "name": "",
+                "type": "address"
+              },
+              {
+                "internalType": "bytes",
+                "name": "",
+                "type": "bytes"
+              }
+            ],
+            "stateMutability": "nonpayable",
+            "type": "function"
+          },
+          {
+            "inputs": [
+              {
+                "internalType": "bytes32",
+                "name": "",
+                "type": "bytes32"
+              }
+            ],
+            "name": "taskCreator",
+            "outputs": [
+              {
+                "internalType": "address",
+                "name": "",
+                "type": "address"
+              }
+            ],
+            "stateMutability": "view",
+            "type": "function"
+          },
+          {
+            "inputs": [
+              {
+                "internalType": "enum LibDataTypes.Module",
+                "name": "",
+                "type": "uint8"
+              }
+            ],
+            "name": "taskModuleAddresses",
+            "outputs": [
+              {
+                "internalType": "address",
+                "name": "",
+                "type": "address"
+              }
+            ],
+            "stateMutability": "view",
+            "type": "function"
+          },
+          {
+            "inputs": [
+              {
+                "internalType": "bytes32",
+                "name": "",
+                "type": "bytes32"
+              }
+            ],
+            "name": "timedTask",
+            "outputs": [
+              {
+                "internalType": "uint128",
+                "name": "nextExec",
+                "type": "uint128"
+              },
+              {
+                "internalType": "uint128",
+                "name": "interval",
+                "type": "uint128"
+              }
+            ],
+            "stateMutability": "view",
+            "type": "function"
+          }
+        ],
+        "devdoc": {
+          "kind": "dev",
+          "methods": {
+            "encodeModuleArg(address,bytes)": {
+              "params": {
+                "_resolverAddress": "Address of resolver.",
+                "_resolverData": "Data passed to resolver."
+              }
+            },
+            "onCreateTask(bytes32,address,address,bytes,bytes)": {
+              "params": {
+                "execAddress": "Address of contract that should be called.",
+                "execData": "Execution data to be called with / function selector if execution data is yet to be determined.",
+                "initModuleArg": "Encoded arguments for module if any.",
+                "taskCreator": "The address which created the task.",
+                "taskId": "Unique hash of the task created."
+              }
+            },
+            "postExecCall(bytes32,address,address,bytes)": {
+              "params": {
+                "execAddress": "Address of contract that should be called.",
+                "execData": "Execution data to be called with / function selector if execution data is yet to be determined.",
+                "taskCreator": "The address which created the task.",
+                "taskId": "Unique hash of the task created."
+              }
+            },
+            "preCancelTask(bytes32,address)": {
+              "details": "Modules can override taskCreator.",
+              "params": {
+                "taskCreator": "The address which created the task.",
+                "taskId": "Unique hash of the task created."
+              },
+              "returns": {
+                "_0": "address Overriden or original taskCreator."
+              }
+            },
+            "preCreateTask(address,address)": {
+              "details": "Modules can override execAddress or taskCreator. {See ProxyModule-preCreateTask}",
+              "params": {
+                "execAddress": "Address of contract that should be called.",
+                "taskCreator": "The address which created the task."
+              },
+              "returns": {
+                "_0": "address Overriden or original taskCreator.",
+                "_1": "address Overriden or original execAddress."
+              }
+            },
+            "preExecCall(bytes32,address,address,bytes)": {
+              "params": {
+                "execAddress": "Address of contract that should be called.",
+                "execData": "Execution data to be called with / function selector if execution data is yet to be determined.",
+                "taskCreator": "The address which created the task.",
+                "taskId": "Unique hash of the task created."
+              },
+              "returns": {
+                "_0": "address Overriden or original execution address.",
+                "_1": "bytes Overriden or original execution data."
+              }
+            }
+          },
+          "version": 1
+        },
+        "userdoc": {
+          "kind": "user",
+          "methods": {
+            "encodeModuleArg(address,bytes)": {
+              "notice": "Helper function to encode arguments for ResolverModule."
+            },
+            "onCreateTask(bytes32,address,address,bytes,bytes)": {
+              "notice": "Initiates task module whenever `createTask` is being called."
+            },
+            "postExecCall(bytes32,address,address,bytes)": {
+              "notice": "Called during `exec` and after execAddress is called."
+            },
+            "preCancelTask(bytes32,address)": {
+              "notice": "Called before taskId is removed from _createdTasks[]."
+            },
+            "preCreateTask(address,address)": {
+              "notice": "Called before generating taskId."
+            },
+            "preExecCall(bytes32,address,address,bytes)": {
+              "notice": "Called during `exec` and before execAddress is called."
+            }
+          },
+          "version": 1
+        }
+      },
+      "settings": {
+        "compilationTarget": {
+          "contracts/taskModules/ResolverModule.sol": "ResolverModule"
+        },
+        "evmVersion": "london",
+        "libraries": {},
+        "metadata": {
+          "bytecodeHash": "ipfs"
+        },
+        "optimizer": {
+          "enabled": true,
+          "runs": 200
+        },
+        "remappings": []
+      },
+      "sources": {
+        "@openzeppelin/contracts/utils/structs/EnumerableSet.sol": {
+          "keccak256": "0x9f4357008a8f7d8c8bf5d48902e789637538d8c016be5766610901b4bba81514",
+          "license": "MIT",
+          "urls": [
+            "bzz-raw://20bf19b2b851f58a4c24543de80ae70b3e08621f9230eb335dc75e2d4f43f5df",
+            "dweb:/ipfs/QmSYuH1AhvJkPK8hNvoPqtExBcgTB42pPRHgTHkS5c5zYW"
+          ]
+        },
+        "contracts/AutomateStorage.sol": {
+          "keccak256": "0xdc7009675d6be9436f1223a82c64b80f8f2ef8c2a594298bf6d5db8b201d45f8",
+          "license": "UNLICENSED",
+          "urls": [
+            "bzz-raw://bc95a08bece5941384260a54376b07f4ca30024fc4f1ca51d7d12ffc42fb74ef",
+            "dweb:/ipfs/QmNNyaJgxfyPzVbQd7oTPav86gn1swhvg7AyxSQrG2Vj7t"
+          ]
+        },
+        "contracts/interfaces/ITaskModule.sol": {
+          "keccak256": "0xd537257852c23ce7d0bc392b03aba1efd750be372d64a01edf1c726ef7c4274d",
+          "license": "MIT",
+          "urls": [
+            "bzz-raw://279804efd2c93f8e5282947429deb438776b39f9f6426bb88b17206aa98df131",
+            "dweb:/ipfs/QmWKTJ7xtrRENJPFZL4MzxiegB7h9cMPjqawggpYVk5sw9"
+          ]
+        },
+        "contracts/libraries/LibDataTypes.sol": {
+          "keccak256": "0x7307461a03c5bb31eef8b01b029fd898d45a495349498466c6238a6474c4edc2",
+          "license": "MIT",
+          "urls": [
+            "bzz-raw://a8e5eca0478c8791dbbbfbf552500f8f0bcc4ed2a2cc25e340f4a89aa5b8c494",
+            "dweb:/ipfs/QmWjxFPFEQ7sSxws31S5hNNoUDiPJCZFFxWeTsXMyn2xA8"
+          ]
+        },
+        "contracts/taskModules/ResolverModule.sol": {
+          "keccak256": "0xf85ee11d33e6e157bc5fca9dd18ff816ca828855858dc3f14dd8f9d1736421a6",
+          "license": "UNLICENSED",
+          "urls": [
+            "bzz-raw://2cc14b336f030023bdf117d5cf1a7ee98fb145ff002860ecc5e60d69c61d0411",
+            "dweb:/ipfs/QmSwELuWkBSQE393MypEd5YV4ULKyY6jKEB1Qcr9GvEm2K"
+          ]
+        },
+        "contracts/taskModules/TaskModuleBase.sol": {
+          "keccak256": "0x231bcf0d6af7d2e0f96eb4eb83285fe0ea0d64d3aa937c6af29779cf653af695",
+          "license": "UNLICENSED",
+          "urls": [
+            "bzz-raw://5d55f4944e8a91c9df605acf0c69c89d67d6302336ea46d2356bf101e038c56a",
+            "dweb:/ipfs/QmShpsJtHNQjz8FLjsQDg9c6UrmwjqnhDaJea26HPUS5dz"
+          ]
+        }
+      },
+      "version": 1
+    },
+    "zk_version": "1.5.7"
+  },
+  "bytecode": "0x0001000000000002000100000000000200000000000103550000008003000039000000400030043f00000001002001900000006b0000c13d00000060021002700000007c02200197000000040020008c000001620000413d000000000301043b000000e0033002700000007e0030009c000000730000a13d0000007f0030009c000000c10000a13d000000800030009c000000e80000213d000000830030009c000000f10000613d000000840030009c000001620000c13d000000840020008c000001620000413d0000000003000416000000000003004b000001620000c13d0000002403100370000000000303043b000000900030009c000001620000213d0000004403100370000000000303043b000000900030009c000001620000213d0000006404100370000000000604043b000000910060009c000001620000213d0000002304600039000000000024004b000001620000813d0000000405600039000000000451034f000000000404043b000000910040009c000001620000213d00000000064600190000002406600039000000000026004b000001620000213d0000001f0240003900000098022001970000003f022000390000009802200197000000920020009c000000bb0000213d0000008002200039000000400020043f0000002002500039000000000221034f000000800040043f00000098054001980000001f0640018f000000a001500039000000490000613d000000a007000039000000000802034f000000008908043c0000000007970436000000000017004b000000450000c13d000000000006004b000000560000613d000000000252034f0000000305600210000000000601043300000000065601cf000000000656022f000000000202043b0000010005500089000000000252022f00000000025201cf000000000262019f0000000000210435000000a0014000390000000000010435000000400400043d000100000004001d00000020014000390000004002000039000000000021043500000000003404350000004002400039000000800100003901eb01a60000040f000000010200002900000000012100490000007c0010009c0000007c010080410000007c0020009c0000007c0200804100000060011002100000004002200210000000000121019f000001ec0001042e0000000001000416000000000001004b000001620000c13d0000002001000039000001000010044300000120000004430000007d01000041000001ec0001042e000000880030009c000000d10000213d0000008c0030009c000001030000613d0000008d0030009c0000010d0000613d0000008e0030009c000001620000c13d000000440020008c000001620000413d0000000003000416000000000003004b000001620000c13d0000000403100370000000000403043b000000900040009c000001620000213d0000002403100370000000000503043b000000910050009c000001620000213d0000002303500039000000000023004b000001620000813d0000000406500039000000000361034f000000000303043b000000910030009c000001620000213d00000000053500190000002405500039000000000025004b000001620000213d000000a00040043f0000004002000039000000c00020043f0000002002600039000000000421034f000000e00030043f00000098053001980000001f0630018f0000010002500039000000a40000613d0000010007000039000000000804034f000000008908043c0000000007970436000000000027004b000000a00000c13d000000000006004b000000b10000613d000000000454034f0000000305600210000000000602043300000000065601cf000000000656022f000000000404043b0000010005500089000000000454022f00000000045401cf000000000464019f0000000000420435000001000230003900000000000204350000001f0230003900000098022001970000006003200039000000800030043f0000009f022000390000009804200197000000950040009c0000016d0000413d0000009601000041000000000010043f0000004101000039000000040010043f0000009701000041000001ed00010430000000850030009c000001170000613d000000860030009c000001260000613d000000870030009c000001620000c13d0000000001000416000000000001004b000001620000c13d000000000102001901eb01b90000040f000000400100043d0000007c0010009c0000007c010080410000004001100210000001ec0001042e000000890030009c0000014a0000613d0000008a0030009c0000014f0000613d0000008b0030009c000001620000c13d000000440020008c000001620000413d0000000002000416000000000002004b000001620000c13d0000000402100370000000000202043b000000900020009c000001620000213d0000002401100370000000000101043b000000900010009c000001620000213d000000800020043f000000a00010043f0000009401000041000001ec0001042e000000810030009c000001590000613d000000820030009c000001620000c13d0000000001000416000000000001004b000001620000c13d0000000301000039000001220000013d000000240020008c000001620000413d0000000002000416000000000002004b000001620000c13d0000000401100370000000000101043b000000000010043f0000000501000039000000200010043f01eb01d90000040f000000000101041a0000009302100197000000800020043f0000008001100270000000a00010043f0000009401000041000001ec0001042e000000440020008c000001620000413d0000000002000416000000000002004b000001620000c13d0000002401100370000000000101043b000000900010009c0000016a0000a13d000001620000013d000000240020008c000001620000413d0000000002000416000000000002004b000001620000c13d0000000401100370000000000101043b000000000010043f000000200000043f000001670000013d000000240020008c000001620000413d0000000002000416000000000002004b000001620000c13d0000000401100370000000000101043b000000000010043f0000000701000039000000200010043f01eb01d90000040f000000000101041a000000800010043f0000008f01000041000001ec0001042e000000a40020008c000001620000413d0000000003000416000000000003004b000001620000c13d0000002403100370000000000303043b000000900030009c000001620000213d0000004403100370000000000303043b000000900030009c000001620000213d0000006403100370000000000303043b000000910030009c000001620000213d0000002304300039000000000024004b000001620000813d0000000404300039000000000441034f000000000404043b000000910040009c000001620000213d00000000034300190000002403300039000000000023004b000001620000213d0000008401100370000000000101043b000000910010009c000001620000213d000000040110003901eb018d0000040f000000cc0000013d0000000001000416000000000001004b000001620000c13d0000000401000039000001680000013d000000240020008c000001620000413d0000000002000416000000000002004b000001620000c13d0000000401100370000000000101043b000000000010043f0000000101000039000001660000013d000000240020008c000001620000413d0000000002000416000000000002004b000001620000c13d0000000401100370000000000101043b000000050010008c000001640000a13d0000000001000019000001ed00010430000000000010043f0000000601000039000000200010043f01eb01d90000040f000000000101041a0000009001100197000000800010043f0000008f01000041000001ec0001042e0000008002400039000000400020043f00000020030000390000000000320435000000a005400039000000800300043d0000000000350435000000000003004b000001820000613d000000c00440003900000000050000190000000006450019000000a007500039000000000707043300000000007604350000002005500039000000000035004b000001780000413d000001820000a13d000000000443001900000000000404350000001f03300039000000980130019700000040011000390000007c0010009c0000007c0100804100000060011002100000007c0020009c0000007c020080410000004002200210000000000121019f000001ec0001042e0000001f03100039000000000023004b0000000004000019000000990400404100000099052001970000009903300197000000000653013f000000000053004b00000000030000190000009903002041000000990060009c000000000304c019000000000003004b000001a40000613d0000000003100367000000000303043b000000910030009c000001a40000213d00000000013100190000002001100039000000000021004b000001a40000213d000000000001042d0000000001000019000001ed0001043000000000430104340000000001320436000000000003004b000001b50000613d000000000200001900000000052100190000000006240019000000000606043300000000006504350000002002200039000000000032004b000001ab0000413d000001b50000a13d000000000231001900000000000204350000001f0230003900000098022001970000000001210019000000000001042d0000009a0010009c000001d70000213d000000830010008c000001d70000a13d00000000020003670000002403200370000000000303043b000000900030009c000001d70000213d0000004403200370000000000303043b000000900030009c000001d70000213d0000006403200370000000000303043b000000910030009c000001d70000213d0000002304300039000000000014004b000001d70000813d0000000404300039000000000242034f000000000202043b000000910020009c000001d70000213d00000000022300190000002402200039000000000012004b000001d70000213d000000000001042d0000000001000019000001ed0001043000000000010004140000007c0010009c0000007c01008041000000c0011002100000009b011001c7000080100200003901eb01e60000040f0000000100200190000001e40000613d000000000101043b000000000001042d0000000001000019000001ed00010430000001e9002104230000000102000039000000000001042d0000000002000019000000000001042d000001eb00000432000001ec0001042e000001ed000104300000000000000000000000000000000000000000000000000000000000000000000000000000000000000000ffffffff000000020000000000000000000000000000004000000100000000000000000000000000000000000000000000000000000000000000000000000000ac21631900000000000000000000000000000000000000000000000000000000b81cd86500000000000000000000000000000000000000000000000000000000cd3d4fb800000000000000000000000000000000000000000000000000000000cd3d4fb900000000000000000000000000000000000000000000000000000000ddca3f4300000000000000000000000000000000000000000000000000000000b81cd86600000000000000000000000000000000000000000000000000000000c10304f700000000000000000000000000000000000000000000000000000000ac21631a00000000000000000000000000000000000000000000000000000000b0ccbdf000000000000000000000000000000000000000000000000000000000b2db0b4100000000000000000000000000000000000000000000000000000000647846a400000000000000000000000000000000000000000000000000000000647846a5000000000000000000000000000000000000000000000000000000006d2dd29f0000000000000000000000000000000000000000000000000000000076474e6a0000000000000000000000000000000000000000000000000000000014ae9926000000000000000000000000000000000000000000000000000000002e6e0bd0000000000000000000000000000000000000000000000000000000003c706c6f0000000000000000000000000000000000000020000000800000000000000000000000000000000000000000ffffffffffffffffffffffffffffffffffffffff000000000000000000000000000000000000000000000000ffffffffffffffff000000000000000000000000000000000000000000000000ffffffffffffff7f00000000000000000000000000000000ffffffffffffffffffffffffffffffff0000000000000000000000000000000000000040000000800000000000000000000000000000000000000000000000000000000000000000ffffffffffffff804e487b71000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000024000000000000000000000000ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffe080000000000000000000000000000000000000000000000000000000000000007fffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff0200000000000000000000000000000000000040000000000000000000000000bedc343f986cdd57a1439074097848e077fcca02c6cb7e98add530568ba2f9ad",
+  "deployedBytecode": "0x0001000000000002000100000000000200000000000103550000008003000039000000400030043f00000001002001900000006b0000c13d00000060021002700000007c02200197000000040020008c000001620000413d000000000301043b000000e0033002700000007e0030009c000000730000a13d0000007f0030009c000000c10000a13d000000800030009c000000e80000213d000000830030009c000000f10000613d000000840030009c000001620000c13d000000840020008c000001620000413d0000000003000416000000000003004b000001620000c13d0000002403100370000000000303043b000000900030009c000001620000213d0000004403100370000000000303043b000000900030009c000001620000213d0000006404100370000000000604043b000000910060009c000001620000213d0000002304600039000000000024004b000001620000813d0000000405600039000000000451034f000000000404043b000000910040009c000001620000213d00000000064600190000002406600039000000000026004b000001620000213d0000001f0240003900000098022001970000003f022000390000009802200197000000920020009c000000bb0000213d0000008002200039000000400020043f0000002002500039000000000221034f000000800040043f00000098054001980000001f0640018f000000a001500039000000490000613d000000a007000039000000000802034f000000008908043c0000000007970436000000000017004b000000450000c13d000000000006004b000000560000613d000000000252034f0000000305600210000000000601043300000000065601cf000000000656022f000000000202043b0000010005500089000000000252022f00000000025201cf000000000262019f0000000000210435000000a0014000390000000000010435000000400400043d000100000004001d00000020014000390000004002000039000000000021043500000000003404350000004002400039000000800100003901eb01a60000040f000000010200002900000000012100490000007c0010009c0000007c010080410000007c0020009c0000007c0200804100000060011002100000004002200210000000000121019f000001ec0001042e0000000001000416000000000001004b000001620000c13d0000002001000039000001000010044300000120000004430000007d01000041000001ec0001042e000000880030009c000000d10000213d0000008c0030009c000001030000613d0000008d0030009c0000010d0000613d0000008e0030009c000001620000c13d000000440020008c000001620000413d0000000003000416000000000003004b000001620000c13d0000000403100370000000000403043b000000900040009c000001620000213d0000002403100370000000000503043b000000910050009c000001620000213d0000002303500039000000000023004b000001620000813d0000000406500039000000000361034f000000000303043b000000910030009c000001620000213d00000000053500190000002405500039000000000025004b000001620000213d000000a00040043f0000004002000039000000c00020043f0000002002600039000000000421034f000000e00030043f00000098053001980000001f0630018f0000010002500039000000a40000613d0000010007000039000000000804034f000000008908043c0000000007970436000000000027004b000000a00000c13d000000000006004b000000b10000613d000000000454034f0000000305600210000000000602043300000000065601cf000000000656022f000000000404043b0000010005500089000000000454022f00000000045401cf000000000464019f0000000000420435000001000230003900000000000204350000001f0230003900000098022001970000006003200039000000800030043f0000009f022000390000009804200197000000950040009c0000016d0000413d0000009601000041000000000010043f0000004101000039000000040010043f0000009701000041000001ed00010430000000850030009c000001170000613d000000860030009c000001260000613d000000870030009c000001620000c13d0000000001000416000000000001004b000001620000c13d000000000102001901eb01b90000040f000000400100043d0000007c0010009c0000007c010080410000004001100210000001ec0001042e000000890030009c0000014a0000613d0000008a0030009c0000014f0000613d0000008b0030009c000001620000c13d000000440020008c000001620000413d0000000002000416000000000002004b000001620000c13d0000000402100370000000000202043b000000900020009c000001620000213d0000002401100370000000000101043b000000900010009c000001620000213d000000800020043f000000a00010043f0000009401000041000001ec0001042e000000810030009c000001590000613d000000820030009c000001620000c13d0000000001000416000000000001004b000001620000c13d0000000301000039000001220000013d000000240020008c000001620000413d0000000002000416000000000002004b000001620000c13d0000000401100370000000000101043b000000000010043f0000000501000039000000200010043f01eb01d90000040f000000000101041a0000009302100197000000800020043f0000008001100270000000a00010043f0000009401000041000001ec0001042e000000440020008c000001620000413d0000000002000416000000000002004b000001620000c13d0000002401100370000000000101043b000000900010009c0000016a0000a13d000001620000013d000000240020008c000001620000413d0000000002000416000000000002004b000001620000c13d0000000401100370000000000101043b000000000010043f000000200000043f000001670000013d000000240020008c000001620000413d0000000002000416000000000002004b000001620000c13d0000000401100370000000000101043b000000000010043f0000000701000039000000200010043f01eb01d90000040f000000000101041a000000800010043f0000008f01000041000001ec0001042e000000a40020008c000001620000413d0000000003000416000000000003004b000001620000c13d0000002403100370000000000303043b000000900030009c000001620000213d0000004403100370000000000303043b000000900030009c000001620000213d0000006403100370000000000303043b000000910030009c000001620000213d0000002304300039000000000024004b000001620000813d0000000404300039000000000441034f000000000404043b000000910040009c000001620000213d00000000034300190000002403300039000000000023004b000001620000213d0000008401100370000000000101043b000000910010009c000001620000213d000000040110003901eb018d0000040f000000cc0000013d0000000001000416000000000001004b000001620000c13d0000000401000039000001680000013d000000240020008c000001620000413d0000000002000416000000000002004b000001620000c13d0000000401100370000000000101043b000000000010043f0000000101000039000001660000013d000000240020008c000001620000413d0000000002000416000000000002004b000001620000c13d0000000401100370000000000101043b000000050010008c000001640000a13d0000000001000019000001ed00010430000000000010043f0000000601000039000000200010043f01eb01d90000040f000000000101041a0000009001100197000000800010043f0000008f01000041000001ec0001042e0000008002400039000000400020043f00000020030000390000000000320435000000a005400039000000800300043d0000000000350435000000000003004b000001820000613d000000c00440003900000000050000190000000006450019000000a007500039000000000707043300000000007604350000002005500039000000000035004b000001780000413d000001820000a13d000000000443001900000000000404350000001f03300039000000980130019700000040011000390000007c0010009c0000007c0100804100000060011002100000007c0020009c0000007c020080410000004002200210000000000121019f000001ec0001042e0000001f03100039000000000023004b0000000004000019000000990400404100000099052001970000009903300197000000000653013f000000000053004b00000000030000190000009903002041000000990060009c000000000304c019000000000003004b000001a40000613d0000000003100367000000000303043b000000910030009c000001a40000213d00000000013100190000002001100039000000000021004b000001a40000213d000000000001042d0000000001000019000001ed0001043000000000430104340000000001320436000000000003004b000001b50000613d000000000200001900000000052100190000000006240019000000000606043300000000006504350000002002200039000000000032004b000001ab0000413d000001b50000a13d000000000231001900000000000204350000001f0230003900000098022001970000000001210019000000000001042d0000009a0010009c000001d70000213d000000830010008c000001d70000a13d00000000020003670000002403200370000000000303043b000000900030009c000001d70000213d0000004403200370000000000303043b000000900030009c000001d70000213d0000006403200370000000000303043b000000910030009c000001d70000213d0000002304300039000000000014004b000001d70000813d0000000404300039000000000242034f000000000202043b000000910020009c000001d70000213d00000000022300190000002402200039000000000012004b000001d70000213d000000000001042d0000000001000019000001ed0001043000000000010004140000007c0010009c0000007c01008041000000c0011002100000009b011001c7000080100200003901eb01e60000040f0000000100200190000001e40000613d000000000101043b000000000001042d0000000001000019000001ed00010430000001e9002104230000000102000039000000000001042d0000000002000019000000000001042d000001eb00000432000001ec0001042e000001ed000104300000000000000000000000000000000000000000000000000000000000000000000000000000000000000000ffffffff000000020000000000000000000000000000004000000100000000000000000000000000000000000000000000000000000000000000000000000000ac21631900000000000000000000000000000000000000000000000000000000b81cd86500000000000000000000000000000000000000000000000000000000cd3d4fb800000000000000000000000000000000000000000000000000000000cd3d4fb900000000000000000000000000000000000000000000000000000000ddca3f4300000000000000000000000000000000000000000000000000000000b81cd86600000000000000000000000000000000000000000000000000000000c10304f700000000000000000000000000000000000000000000000000000000ac21631a00000000000000000000000000000000000000000000000000000000b0ccbdf000000000000000000000000000000000000000000000000000000000b2db0b4100000000000000000000000000000000000000000000000000000000647846a400000000000000000000000000000000000000000000000000000000647846a5000000000000000000000000000000000000000000000000000000006d2dd29f0000000000000000000000000000000000000000000000000000000076474e6a0000000000000000000000000000000000000000000000000000000014ae9926000000000000000000000000000000000000000000000000000000002e6e0bd0000000000000000000000000000000000000000000000000000000003c706c6f0000000000000000000000000000000000000020000000800000000000000000000000000000000000000000ffffffffffffffffffffffffffffffffffffffff000000000000000000000000000000000000000000000000ffffffffffffffff000000000000000000000000000000000000000000000000ffffffffffffff7f00000000000000000000000000000000ffffffffffffffffffffffffffffffff0000000000000000000000000000000000000040000000800000000000000000000000000000000000000000000000000000000000000000ffffffffffffff804e487b71000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000024000000000000000000000000ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffe080000000000000000000000000000000000000000000000000000000000000007fffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff0200000000000000000000000000000000000040000000000000000000000000bedc343f986cdd57a1439074097848e077fcca02c6cb7e98add530568ba2f9ad",
+  "devdoc": {
+    "kind": "dev",
+    "methods": {
+      "encodeModuleArg(address,bytes)": {
+        "params": {
+          "_resolverAddress": "Address of resolver.",
+          "_resolverData": "Data passed to resolver."
+        }
+      },
+      "onCreateTask(bytes32,address,address,bytes,bytes)": {
+        "params": {
+          "execAddress": "Address of contract that should be called.",
+          "execData": "Execution data to be called with / function selector if execution data is yet to be determined.",
+          "initModuleArg": "Encoded arguments for module if any.",
+          "taskCreator": "The address which created the task.",
+          "taskId": "Unique hash of the task created."
+        }
+      },
+      "postExecCall(bytes32,address,address,bytes)": {
+        "params": {
+          "execAddress": "Address of contract that should be called.",
+          "execData": "Execution data to be called with / function selector if execution data is yet to be determined.",
+          "taskCreator": "The address which created the task.",
+          "taskId": "Unique hash of the task created."
+        }
+      },
+      "preCancelTask(bytes32,address)": {
+        "details": "Modules can override taskCreator.",
+        "params": {
+          "taskCreator": "The address which created the task.",
+          "taskId": "Unique hash of the task created."
+        },
+        "returns": {
+          "_0": "address Overriden or original taskCreator."
+        }
+      },
+      "preCreateTask(address,address)": {
+        "details": "Modules can override execAddress or taskCreator. {See ProxyModule-preCreateTask}",
+        "params": {
+          "execAddress": "Address of contract that should be called.",
+          "taskCreator": "The address which created the task."
+        },
+        "returns": {
+          "_0": "address Overriden or original taskCreator.",
+          "_1": "address Overriden or original execAddress."
+        }
+      },
+      "preExecCall(bytes32,address,address,bytes)": {
+        "params": {
+          "execAddress": "Address of contract that should be called.",
+          "execData": "Execution data to be called with / function selector if execution data is yet to be determined.",
+          "taskCreator": "The address which created the task.",
+          "taskId": "Unique hash of the task created."
+        },
+        "returns": {
+          "_0": "address Overriden or original execution address.",
+          "_1": "bytes Overriden or original execution data."
+        }
+      }
+    },
+    "version": 1
+  },
+  "userdoc": {
+    "kind": "user",
+    "methods": {
+      "encodeModuleArg(address,bytes)": {
+        "notice": "Helper function to encode arguments for ResolverModule."
+      },
+      "onCreateTask(bytes32,address,address,bytes,bytes)": {
+        "notice": "Initiates task module whenever `createTask` is being called."
+      },
+      "postExecCall(bytes32,address,address,bytes)": {
+        "notice": "Called during `exec` and after execAddress is called."
+      },
+      "preCancelTask(bytes32,address)": {
+        "notice": "Called before taskId is removed from _createdTasks[]."
+      },
+      "preCreateTask(address,address)": {
+        "notice": "Called before generating taskId."
+      },
+      "preExecCall(bytes32,address,address,bytes)": {
+        "notice": "Called during `exec` and before execAddress is called."
+      }
+    },
+    "version": 1
+  },
+  "storageLayout": {
+    "storage": [
+      {
+        "astId": 2704,
+        "contract": "contracts/taskModules/ResolverModule.sol:ResolverModule",
+        "label": "taskCreator",
+        "offset": 0,
+        "slot": "0",
+        "type": "t_mapping(t_bytes32,t_address)"
+      },
+      {
+        "astId": 2709,
+        "contract": "contracts/taskModules/ResolverModule.sol:ResolverModule",
+        "label": "execAddresses",
+        "offset": 0,
+        "slot": "1",
+        "type": "t_mapping(t_bytes32,t_address)"
+      },
+      {
+        "astId": 2715,
+        "contract": "contracts/taskModules/ResolverModule.sol:ResolverModule",
+        "label": "_createdTasks",
+        "offset": 0,
+        "slot": "2",
+        "type": "t_mapping(t_address,t_struct(Bytes32Set)1666_storage)"
+      },
+      {
+        "astId": 2717,
+        "contract": "contracts/taskModules/ResolverModule.sol:ResolverModule",
+        "label": "fee",
+        "offset": 0,
+        "slot": "3",
+        "type": "t_uint256"
+      },
+      {
+        "astId": 2719,
+        "contract": "contracts/taskModules/ResolverModule.sol:ResolverModule",
+        "label": "feeToken",
+        "offset": 0,
+        "slot": "4",
+        "type": "t_address"
+      },
+      {
+        "astId": 2725,
+        "contract": "contracts/taskModules/ResolverModule.sol:ResolverModule",
+        "label": "timedTask",
+        "offset": 0,
+        "slot": "5",
+        "type": "t_mapping(t_bytes32,t_struct(Time)5933_storage)"
+      },
+      {
+        "astId": 2731,
+        "contract": "contracts/taskModules/ResolverModule.sol:ResolverModule",
+        "label": "taskModuleAddresses",
+        "offset": 0,
+        "slot": "6",
+        "type": "t_mapping(t_enum(Module)5920,t_address)"
+      },
+      {
+        "astId": 2735,
+        "contract": "contracts/taskModules/ResolverModule.sol:ResolverModule",
+        "label": "nonce1Balance",
+        "offset": 0,
+        "slot": "7",
+        "type": "t_mapping(t_bytes32,t_uint256)"
+      }
+    ],
+    "types": {
+      "t_address": {
+        "encoding": "inplace",
+        "label": "address",
+        "numberOfBytes": "20"
+      },
+      "t_array(t_bytes32)dyn_storage": {
+        "base": "t_bytes32",
+        "encoding": "dynamic_array",
+        "label": "bytes32[]",
+        "numberOfBytes": "32"
+      },
+      "t_bytes32": {
+        "encoding": "inplace",
+        "label": "bytes32",
+        "numberOfBytes": "32"
+      },
+      "t_enum(Module)5920": {
+        "encoding": "inplace",
+        "label": "enum LibDataTypes.Module",
+        "numberOfBytes": "1"
+      },
+      "t_mapping(t_address,t_struct(Bytes32Set)1666_storage)": {
+        "encoding": "mapping",
+        "key": "t_address",
+        "label": "mapping(address => struct EnumerableSet.Bytes32Set)",
+        "numberOfBytes": "32",
+        "value": "t_struct(Bytes32Set)1666_storage"
+      },
+      "t_mapping(t_bytes32,t_address)": {
+        "encoding": "mapping",
+        "key": "t_bytes32",
+        "label": "mapping(bytes32 => address)",
+        "numberOfBytes": "32",
+        "value": "t_address"
+      },
+      "t_mapping(t_bytes32,t_struct(Time)5933_storage)": {
+        "encoding": "mapping",
+        "key": "t_bytes32",
+        "label": "mapping(bytes32 => struct LibDataTypes.Time)",
+        "numberOfBytes": "32",
+        "value": "t_struct(Time)5933_storage"
+      },
+      "t_mapping(t_bytes32,t_uint256)": {
+        "encoding": "mapping",
+        "key": "t_bytes32",
+        "label": "mapping(bytes32 => uint256)",
+        "numberOfBytes": "32",
+        "value": "t_uint256"
+      },
+      "t_mapping(t_enum(Module)5920,t_address)": {
+        "encoding": "mapping",
+        "key": "t_enum(Module)5920",
+        "label": "mapping(enum LibDataTypes.Module => address)",
+        "numberOfBytes": "32",
+        "value": "t_address"
+      },
+      "t_struct(Bytes32Set)1666_storage": {
+        "encoding": "inplace",
+        "label": "struct EnumerableSet.Bytes32Set",
+        "members": [
+          {
+            "astId": 1665,
+            "contract": "contracts/taskModules/ResolverModule.sol:ResolverModule",
+            "label": "_inner",
+            "offset": 0,
+            "slot": "0",
+            "type": "t_struct(Set)1472_storage"
+          }
+        ],
+        "numberOfBytes": "64"
+      },
+      "t_struct(Set)1472_storage": {
+        "encoding": "inplace",
+        "label": "struct EnumerableSet.Set",
+        "members": [
+          {
+            "astId": 1467,
+            "contract": "contracts/taskModules/ResolverModule.sol:ResolverModule",
+            "label": "_values",
+            "offset": 0,
+            "slot": "0",
+            "type": "t_array(t_bytes32)dyn_storage"
+          },
+          {
+            "astId": 1471,
+            "contract": "contracts/taskModules/ResolverModule.sol:ResolverModule",
+            "label": "_indexes",
+            "offset": 0,
+            "slot": "1",
+            "type": "t_mapping(t_bytes32,t_uint256)"
+          }
+        ],
+        "numberOfBytes": "64"
+      },
+      "t_struct(Time)5933_storage": {
+        "encoding": "inplace",
+        "label": "struct LibDataTypes.Time",
+        "members": [
+          {
+            "astId": 5930,
+            "contract": "contracts/taskModules/ResolverModule.sol:ResolverModule",
+            "label": "nextExec",
+            "offset": 0,
+            "slot": "0",
+            "type": "t_uint128"
+          },
+          {
+            "astId": 5932,
+            "contract": "contracts/taskModules/ResolverModule.sol:ResolverModule",
+            "label": "interval",
+            "offset": 16,
+            "slot": "0",
+            "type": "t_uint128"
+          }
+        ],
+        "numberOfBytes": "32"
+      },
+      "t_uint128": {
+        "encoding": "inplace",
+        "label": "uint128",
+        "numberOfBytes": "16"
+      },
+      "t_uint256": {
+        "encoding": "inplace",
+        "label": "uint256",
+        "numberOfBytes": "32"
+      }
+    }
+  },
+  "factoryDeps": [
+    "0x0001000000000002000100000000000200000000000103550000008003000039000000400030043f00000001002001900000006b0000c13d00000060021002700000007c02200197000000040020008c000001620000413d000000000301043b000000e0033002700000007e0030009c000000730000a13d0000007f0030009c000000c10000a13d000000800030009c000000e80000213d000000830030009c000000f10000613d000000840030009c000001620000c13d000000840020008c000001620000413d0000000003000416000000000003004b000001620000c13d0000002403100370000000000303043b000000900030009c000001620000213d0000004403100370000000000303043b000000900030009c000001620000213d0000006404100370000000000604043b000000910060009c000001620000213d0000002304600039000000000024004b000001620000813d0000000405600039000000000451034f000000000404043b000000910040009c000001620000213d00000000064600190000002406600039000000000026004b000001620000213d0000001f0240003900000098022001970000003f022000390000009802200197000000920020009c000000bb0000213d0000008002200039000000400020043f0000002002500039000000000221034f000000800040043f00000098054001980000001f0640018f000000a001500039000000490000613d000000a007000039000000000802034f000000008908043c0000000007970436000000000017004b000000450000c13d000000000006004b000000560000613d000000000252034f0000000305600210000000000601043300000000065601cf000000000656022f000000000202043b0000010005500089000000000252022f00000000025201cf000000000262019f0000000000210435000000a0014000390000000000010435000000400400043d000100000004001d00000020014000390000004002000039000000000021043500000000003404350000004002400039000000800100003901eb01a60000040f000000010200002900000000012100490000007c0010009c0000007c010080410000007c0020009c0000007c0200804100000060011002100000004002200210000000000121019f000001ec0001042e0000000001000416000000000001004b000001620000c13d0000002001000039000001000010044300000120000004430000007d01000041000001ec0001042e000000880030009c000000d10000213d0000008c0030009c000001030000613d0000008d0030009c0000010d0000613d0000008e0030009c000001620000c13d000000440020008c000001620000413d0000000003000416000000000003004b000001620000c13d0000000403100370000000000403043b000000900040009c000001620000213d0000002403100370000000000503043b000000910050009c000001620000213d0000002303500039000000000023004b000001620000813d0000000406500039000000000361034f000000000303043b000000910030009c000001620000213d00000000053500190000002405500039000000000025004b000001620000213d000000a00040043f0000004002000039000000c00020043f0000002002600039000000000421034f000000e00030043f00000098053001980000001f0630018f0000010002500039000000a40000613d0000010007000039000000000804034f000000008908043c0000000007970436000000000027004b000000a00000c13d000000000006004b000000b10000613d000000000454034f0000000305600210000000000602043300000000065601cf000000000656022f000000000404043b0000010005500089000000000454022f00000000045401cf000000000464019f0000000000420435000001000230003900000000000204350000001f0230003900000098022001970000006003200039000000800030043f0000009f022000390000009804200197000000950040009c0000016d0000413d0000009601000041000000000010043f0000004101000039000000040010043f0000009701000041000001ed00010430000000850030009c000001170000613d000000860030009c000001260000613d000000870030009c000001620000c13d0000000001000416000000000001004b000001620000c13d000000000102001901eb01b90000040f000000400100043d0000007c0010009c0000007c010080410000004001100210000001ec0001042e000000890030009c0000014a0000613d0000008a0030009c0000014f0000613d0000008b0030009c000001620000c13d000000440020008c000001620000413d0000000002000416000000000002004b000001620000c13d0000000402100370000000000202043b000000900020009c000001620000213d0000002401100370000000000101043b000000900010009c000001620000213d000000800020043f000000a00010043f0000009401000041000001ec0001042e000000810030009c000001590000613d000000820030009c000001620000c13d0000000001000416000000000001004b000001620000c13d0000000301000039000001220000013d000000240020008c000001620000413d0000000002000416000000000002004b000001620000c13d0000000401100370000000000101043b000000000010043f0000000501000039000000200010043f01eb01d90000040f000000000101041a0000009302100197000000800020043f0000008001100270000000a00010043f0000009401000041000001ec0001042e000000440020008c000001620000413d0000000002000416000000000002004b000001620000c13d0000002401100370000000000101043b000000900010009c0000016a0000a13d000001620000013d000000240020008c000001620000413d0000000002000416000000000002004b000001620000c13d0000000401100370000000000101043b000000000010043f000000200000043f000001670000013d000000240020008c000001620000413d0000000002000416000000000002004b000001620000c13d0000000401100370000000000101043b000000000010043f0000000701000039000000200010043f01eb01d90000040f000000000101041a000000800010043f0000008f01000041000001ec0001042e000000a40020008c000001620000413d0000000003000416000000000003004b000001620000c13d0000002403100370000000000303043b000000900030009c000001620000213d0000004403100370000000000303043b000000900030009c000001620000213d0000006403100370000000000303043b000000910030009c000001620000213d0000002304300039000000000024004b000001620000813d0000000404300039000000000441034f000000000404043b000000910040009c000001620000213d00000000034300190000002403300039000000000023004b000001620000213d0000008401100370000000000101043b000000910010009c000001620000213d000000040110003901eb018d0000040f000000cc0000013d0000000001000416000000000001004b000001620000c13d0000000401000039000001680000013d000000240020008c000001620000413d0000000002000416000000000002004b000001620000c13d0000000401100370000000000101043b000000000010043f0000000101000039000001660000013d000000240020008c000001620000413d0000000002000416000000000002004b000001620000c13d0000000401100370000000000101043b000000050010008c000001640000a13d0000000001000019000001ed00010430000000000010043f0000000601000039000000200010043f01eb01d90000040f000000000101041a0000009001100197000000800010043f0000008f01000041000001ec0001042e0000008002400039000000400020043f00000020030000390000000000320435000000a005400039000000800300043d0000000000350435000000000003004b000001820000613d000000c00440003900000000050000190000000006450019000000a007500039000000000707043300000000007604350000002005500039000000000035004b000001780000413d000001820000a13d000000000443001900000000000404350000001f03300039000000980130019700000040011000390000007c0010009c0000007c0100804100000060011002100000007c0020009c0000007c020080410000004002200210000000000121019f000001ec0001042e0000001f03100039000000000023004b0000000004000019000000990400404100000099052001970000009903300197000000000653013f000000000053004b00000000030000190000009903002041000000990060009c000000000304c019000000000003004b000001a40000613d0000000003100367000000000303043b000000910030009c000001a40000213d00000000013100190000002001100039000000000021004b000001a40000213d000000000001042d0000000001000019000001ed0001043000000000430104340000000001320436000000000003004b000001b50000613d000000000200001900000000052100190000000006240019000000000606043300000000006504350000002002200039000000000032004b000001ab0000413d000001b50000a13d000000000231001900000000000204350000001f0230003900000098022001970000000001210019000000000001042d0000009a0010009c000001d70000213d000000830010008c000001d70000a13d00000000020003670000002403200370000000000303043b000000900030009c000001d70000213d0000004403200370000000000303043b000000900030009c000001d70000213d0000006403200370000000000303043b000000910030009c000001d70000213d0000002304300039000000000014004b000001d70000813d0000000404300039000000000242034f000000000202043b000000910020009c000001d70000213d00000000022300190000002402200039000000000012004b000001d70000213d000000000001042d0000000001000019000001ed0001043000000000010004140000007c0010009c0000007c01008041000000c0011002100000009b011001c7000080100200003901eb01e60000040f0000000100200190000001e40000613d000000000101043b000000000001042d0000000001000019000001ed00010430000001e9002104230000000102000039000000000001042d0000000002000019000000000001042d000001eb00000432000001ec0001042e000001ed000104300000000000000000000000000000000000000000000000000000000000000000000000000000000000000000ffffffff000000020000000000000000000000000000004000000100000000000000000000000000000000000000000000000000000000000000000000000000ac21631900000000000000000000000000000000000000000000000000000000b81cd86500000000000000000000000000000000000000000000000000000000cd3d4fb800000000000000000000000000000000000000000000000000000000cd3d4fb900000000000000000000000000000000000000000000000000000000ddca3f4300000000000000000000000000000000000000000000000000000000b81cd86600000000000000000000000000000000000000000000000000000000c10304f700000000000000000000000000000000000000000000000000000000ac21631a00000000000000000000000000000000000000000000000000000000b0ccbdf000000000000000000000000000000000000000000000000000000000b2db0b4100000000000000000000000000000000000000000000000000000000647846a400000000000000000000000000000000000000000000000000000000647846a5000000000000000000000000000000000000000000000000000000006d2dd29f0000000000000000000000000000000000000000000000000000000076474e6a0000000000000000000000000000000000000000000000000000000014ae9926000000000000000000000000000000000000000000000000000000002e6e0bd0000000000000000000000000000000000000000000000000000000003c706c6f0000000000000000000000000000000000000020000000800000000000000000000000000000000000000000ffffffffffffffffffffffffffffffffffffffff000000000000000000000000000000000000000000000000ffffffffffffffff000000000000000000000000000000000000000000000000ffffffffffffff7f00000000000000000000000000000000ffffffffffffffffffffffffffffffff0000000000000000000000000000000000000040000000800000000000000000000000000000000000000000000000000000000000000000ffffffffffffff804e487b71000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000024000000000000000000000000ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffe080000000000000000000000000000000000000000000000000000000000000007fffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff0200000000000000000000000000000000000040000000000000000000000000bedc343f986cdd57a1439074097848e077fcca02c6cb7e98add530568ba2f9ad"
+  ]
+}

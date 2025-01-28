@@ -1,10 +1,9 @@
 import { TASK_COMPILE_SOLIDITY_GET_SOLC_BUILD } from "hardhat/builtin-tasks/task-names";
 import { extendEnvironment, HardhatUserConfig, subtask } from "hardhat/config";
 // PLUGINS
+import "@matterlabs/hardhat-zksync-deploy";
 import "@matterlabs/hardhat-zksync-solc";
-import "@matterlabs/hardhat-zksync-verify";
 import "@nomiclabs/hardhat-ethers";
-import "@nomiclabs/hardhat-waffle";
 import "@typechain/hardhat";
 import "hardhat-deploy";
 
@@ -104,6 +103,19 @@ subtask(
 // ================================= CONFIG =========================================
 const config: HardhatUserConfig = {
   defaultNetwork: "hardhat",
+
+  zksolc: {
+    version: "1.5.7",
+    compilerSource: "binary",
+    settings: {
+      isSystem: false,
+      forceEvmla: false,
+      optimizer: {
+        enabled: true,
+        mode: "3",
+      },
+    },
+  },
 
   namedAccounts: {
     deployer: {
@@ -276,6 +288,12 @@ const config: HardhatUserConfig = {
       accounts: accounts,
       verifyURL:
         "https://zksync2-mainnet-explorer.zksync.io/contract_verification",
+    },
+    abstract: {
+      zksync: true,
+      url: `https://solitary-ultra-emerald.abstract-mainnet.quiknode.pro/7e6af119737a70a9b3d9128931ecf0b72e5658c4/`,
+      accounts,
+      chainId: 2741,
     },
 
     // Dev
