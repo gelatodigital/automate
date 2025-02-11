@@ -21,7 +21,7 @@ RUN yarn run build
 
 RUN npx hardhat deploy --network dynamic || true
 
-RUN npx hardhat run ./scripts/dev-modules.ts --network dynamic || true
+RUN npx hardhat run ./scripts/dev-modules.ts --network dynamic --gasprice 2000298 || true
 
 FROM alpine:3.20
 
