@@ -8,7 +8,7 @@ cd "$(dirname "$0")/../.."
 
 IMAGE_NAME=automate-contracts-$HARDHAT_DYNAMIC_NETWORK_NAME
 
-docker build --progress plain \
+docker build --no-cache --progress plain \
     --build-arg AUTOMATE_DEPLOYER_PK="${AUTOMATE_DEPLOYER_PK}" \
     --build-arg HARDHAT_DYNAMIC_NETWORK_NAME="${HARDHAT_DYNAMIC_NETWORK_NAME}" \
     --build-arg HARDHAT_DYNAMIC_NETWORK_URL="${HARDHAT_DYNAMIC_NETWORK_URL}" \
