@@ -248,6 +248,10 @@ export const getAddresses = (
       return {
         GELATO: "0x52cb9f60225aA830AE420126BC8e3d5B2fc5bCf4",
       };
+    case "abstract":
+      return {
+        GELATO: "0xDFE7B0112D9D8B3ebe59529C5D37F026A311d393",
+      };
 
     default:
       throw new Error(`No addresses for Network: ${network}`);
