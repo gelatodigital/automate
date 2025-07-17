@@ -11,7 +11,11 @@ export const isTesting = (name: string) => {
 };
 
 export const isZksync = (name: string) => {
-  if (name.toLowerCase().includes("zksync")) return true;
+  if (
+    name.toLowerCase().includes("zksync") ||
+    name.toLowerCase().includes("abstract")
+  )
+    return true;
   return false;
 };
 
