@@ -62,6 +62,12 @@ describe("Automate Proxy module test", function () {
 
     executor = await ethers.getSigner(GELATO);
 
+    // fund executor
+    await deployer.sendTransaction({
+      to: GELATO,
+      value: ethers.utils.parseEther("10"),
+    });
+
     // set-up
     await automate.setModule([Module.PROXY], [proxyModule.address]);
 

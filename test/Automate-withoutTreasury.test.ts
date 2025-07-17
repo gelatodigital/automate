@@ -15,7 +15,9 @@ const GELATO = "0x3caca7b48d0573d793d3b0279b5f0029180e83b6";
 const ETH = "0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE";
 const FEE = ethers.utils.parseEther("0.1");
 
-describe("Automate Without 1Balance test", function () {
+const describeFunction = process.env.ALCHEMY_ID ? describe : describe.skip;
+
+describeFunction("Automate Without 1Balance test", function () {
   let automate: Automate;
   let counterWT: CounterTestWT;
   let singleExecModule: SingleExecModule;
@@ -61,6 +63,7 @@ describe("Automate Without 1Balance test", function () {
       method: "hardhat_impersonateAccount",
       params: [GELATO],
     });
+
     executor = ethers.provider.getSigner(GELATO);
 
     // create task

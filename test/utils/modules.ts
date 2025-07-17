@@ -1,6 +1,5 @@
 import { ethers } from "hardhat";
 
-/* eslint-disable @typescript-eslint/naming-convention */
 export enum Module {
   RESOLVER,
   DEPRECATED_TIME,

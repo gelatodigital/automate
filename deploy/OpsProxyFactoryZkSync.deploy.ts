@@ -1,8 +1,7 @@
 import { DeployFunction } from "hardhat-deploy/types";
 import { HardhatRuntimeEnvironment } from "hardhat/types";
-import { utils } from "zksync-web3";
-// import { bytecode } from "../artifacts-zk/contracts/vendor/proxy/EIP173/EIP173OpsProxy.sol/EIP173OpsProxy.json";
 import hre, { ethers } from "hardhat";
+import { utils } from "zksync-ethers";
 import { getContract, isTesting, isZksync, sleep } from "../src/utils";
 import { Automate, OpsProxy } from "../typechain";
 

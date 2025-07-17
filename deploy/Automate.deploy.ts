@@ -15,7 +15,6 @@ import { Automate, EIP173Proxy } from "../typechain";
 const isHardhat = isTesting(hre.network.name);
 const isDevEnv = hre.network.name.endsWith("Dev");
 const isDynamicNetwork = hre.network.isDynamic;
-// eslint-disable-next-line @typescript-eslint/naming-convention
 const noDeterministicDeployment = hre.network.noDeterministicDeployment;
 
 const func: DeployFunction = async (hre: HardhatRuntimeEnvironment) => {
