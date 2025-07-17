@@ -1,5 +1,4 @@
 import hre from "hardhat";
-/* eslint-disable @typescript-eslint/naming-convention */
 export interface Addresses {
   GELATO: string;
 }

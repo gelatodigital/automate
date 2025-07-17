@@ -4,6 +4,7 @@ import { extendEnvironment, HardhatUserConfig, subtask } from "hardhat/config";
 import "@matterlabs/hardhat-zksync-deploy";
 import "@matterlabs/hardhat-zksync-solc";
 import "@nomiclabs/hardhat-ethers";
+import "@nomiclabs/hardhat-waffle";
 import "@typechain/hardhat";
 import "hardhat-deploy";
 
@@ -38,7 +39,6 @@ extendEnvironment((hre) => {
     const networkUrl = process.env.HARDHAT_DYNAMIC_NETWORK_URL as
       | string
       | undefined;
-    // eslint-disable-next-line @typescript-eslint/naming-convention
     const noDeterministicDeployment = process.env
       .HARDHAT_DYNAMIC_NETWORK_NO_DETERMINISTIC_DEPLOYMENT as
       | string
@@ -133,10 +133,12 @@ const config: HardhatUserConfig = {
     hardhat: {
       // Standard config
       // timeout: 150000,
-      forking: {
-        url: `https://eth-mainnet.alchemyapi.io/v2/${ALCHEMY_ID}`,
-        blockNumber: 18000000,
-      },
+      forking: ALCHEMY_ID
+        ? {
+            url: `https://eth-mainnet.g.alchemy.com/v2/${ALCHEMY_ID}`,
+            blockNumber: 18000000,
+          }
+        : undefined,
     },
 
     // Local
@@ -286,8 +288,11 @@ const config: HardhatUserConfig = {
       url: "https://mainnet.era.zksync.io",
       chainId: 324,
       accounts: accounts,
-      verifyURL:
-        "https://zksync2-mainnet-explorer.zksync.io/contract_verification",
+      verify: {
+        etherscan: {
+          apiKey: ETHERSCAN_API_KEY ? ETHERSCAN_API_KEY : "",
+        },
+      },
     },
     abstract: {
       zksync: true,

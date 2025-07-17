@@ -52,6 +52,13 @@ describe("Automate SingleExec module test", function () {
       method: "hardhat_impersonateAccount",
       params: [GELATO],
     });
+
+    // fund executor
+    await user.sendTransaction({
+      to: GELATO,
+      value: ethers.utils.parseEther("10"),
+    });
+
     executor = ethers.provider.getSigner(GELATO);
 
     // create task

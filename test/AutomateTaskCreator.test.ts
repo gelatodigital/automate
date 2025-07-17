@@ -13,7 +13,9 @@ import hre = require("hardhat");
 import { getContract } from "../src/utils";
 const { ethers, deployments } = hre;
 
-describe("AutomateTaskCreator test", function () {
+const describeFunction = process.env.ALCHEMY_ID ? describe : describe.skip;
+
+describeFunction("AutomateTaskCreator test", function () {
   let automate: Automate;
   let proxyModule: ProxyModule;
   let automateTaskCreator: AutomateTaskCreatorTest;
