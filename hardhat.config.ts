@@ -291,7 +291,7 @@ const config: HardhatUserConfig = {
     },
     abstract: {
       zksync: true,
-      url: `https://solitary-ultra-emerald.abstract-mainnet.quiknode.pro/7e6af119737a70a9b3d9128931ecf0b72e5658c4/`,
+      url: `https://api.mainnet.abs.xyz`,
       accounts,
       chainId: 2741,
     },
