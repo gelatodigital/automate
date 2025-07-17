@@ -88,7 +88,7 @@ describe("Automate Resolver module test", function () {
     ).to.be.revertedWith("Automate.createTask: Duplicate task");
   });
 
-  it("cancel non existant task", async () => {
+  it("cancel non existent task", async () => {
     await automate.connect(user).cancelTask(taskId);
 
     await expect(automate.connect(user).cancelTask(taskId)).to.be.revertedWith(
