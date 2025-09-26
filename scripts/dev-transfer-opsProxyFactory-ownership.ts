@@ -4,15 +4,15 @@ import { EIP173Proxy } from "../typechain";
 import hre = require("hardhat");
 
 export const transferOpsProxyFactoryOwnership = async () => {
-  // Get target owner based on network
-  const getTargetOwner = (networkName: string) => {
-    const isTestnet = /testnet|sepolia|goerli|mumbai|dev$/.test(networkName);
+  // Get target owner based on IS_TESTNET environment variable
+  const getTargetOwner = () => {
+    const isTestnet = process.env.IS_TESTNET === 'true';
     return isTestnet
       ? process.env.TESTNET_OWNER_ADDRESS
       : process.env.MAINNET_OWNER_ADDRESS;
   };
 
-  const newOwnerAddress = getTargetOwner(hre.network.name);
+  const newOwnerAddress = getTargetOwner();
 
   if (!newOwnerAddress) {
     console.log("⚠️ No target owner address configured, skipping ownership transfer");

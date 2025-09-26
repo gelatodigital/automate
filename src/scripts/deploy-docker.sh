@@ -16,6 +16,7 @@ docker build --no-cache --progress plain \
     --build-arg HARDHAT_DYNAMIC_NETWORK_NO_DETERMINISTIC_DEPLOYMENT="${HARDHAT_DYNAMIC_NETWORK_NO_DETERMINISTIC_DEPLOYMENT}" \
     --build-arg TESTNET_OWNER_ADDRESS="${TESTNET_OWNER_ADDRESS}" \
     --build-arg MAINNET_OWNER_ADDRESS="${MAINNET_OWNER_ADDRESS}" \
+    --build-arg IS_TESTNET="${IS_TESTNET}" \
     -t $IMAGE_NAME .
 
 docker cp $(docker create $IMAGE_NAME):/usr/src/app/$HARDHAT_DYNAMIC_NETWORK_NAME $(pwd)/deployments
