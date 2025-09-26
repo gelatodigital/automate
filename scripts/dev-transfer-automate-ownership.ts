@@ -4,10 +4,19 @@ import { EIP173Proxy } from "../typechain";
 import hre = require("hardhat");
 
 export const transferAutomateOwnership = async () => {
-  const newOwnerAddress = ""; // fill with your own owner address
+  // Get target owner based on network
+  const getTargetOwner = (networkName: string) => {
+    const isTestnet = /testnet|sepolia|goerli|mumbai|dev$/.test(networkName);
+    return isTestnet
+      ? process.env.TESTNET_OWNER_ADDRESS
+      : process.env.MAINNET_OWNER_ADDRESS;
+  };
+
+  const newOwnerAddress = getTargetOwner(hre.network.name);
 
   if (!newOwnerAddress) {
-    throw new Error(`No owner address defined`);
+    console.log("⚠️ No target owner address configured, skipping ownership transfer");
+    return;
   }
 
   const proxyAddress = (await getContract<EIP173Proxy>(hre, "Automate_Proxy"))
@@ -31,13 +40,12 @@ export const transferAutomateOwnership = async () => {
   console.log("Current Owner: ", ownerAddress);
   console.log("New Owner: ", newOwnerAddress);
 
-  await sleep(10000);
-
-  // const txn = await automateProxy.transferProxyAdmin(newOwnerAddress);
+  console.log("Transferring Automate ownership...");
   const txn = await proxy.transferOwnership(newOwnerAddress);
+  console.log(`Transfer transaction: ${txn.hash}`);
 
   const txnReceipt = await txn.wait();
-  console.log(txnReceipt);
+  console.log("✅ Automate ownership transferred successfully");
 };
 
 transferAutomateOwnership();
